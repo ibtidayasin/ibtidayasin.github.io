@@ -104,3 +104,78 @@ footer{display:flex;justify-content:space-between;gap:20px;font-size:13px;color:
   .media-admin-item{grid-template-columns:1fr}
   .media-gallery{grid-template-columns:1fr}
 }
+
+
+/* PDF first-page thumbnail previews */
+.pdf-preview-card{
+  max-width:340px;
+}
+.pdf-preview-link{
+  display:block;
+  color:inherit;
+}
+.pdf-preview-stage{
+  position:relative;
+  min-height:220px;
+  max-height:310px;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  overflow:hidden;
+  background:#f3f3f3;
+  border-bottom:1px solid var(--line);
+  padding:12px;
+}
+.pdf-preview-canvas{
+  display:block;
+  max-width:100%;
+  height:auto;
+  background:#fff;
+  box-shadow:0 3px 12px rgba(0,0,0,.08);
+}
+.pdf-preview-loading{
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  padding:20px;
+  text-align:center;
+  color:var(--muted);
+  font-size:12px;
+  background:#f6f6f6;
+}
+.pdf-preview-info{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
+.pdf-preview-info>div{
+  min-width:0;
+}
+.pdf-open-button{
+  flex:0 0 auto;
+  color:var(--accent);
+  font-size:11px;
+  font-weight:700;
+  white-space:nowrap;
+}
+.pdf-open-button:hover{
+  text-decoration:underline;
+}
+.pub-item .pdf-preview-card,
+.card .pdf-preview-card,
+.skill-card .pdf-preview-card,
+.edu .pdf-preview-card{
+  max-width:280px;
+}
+.pub-item .pdf-preview-stage,
+.card .pdf-preview-stage,
+.skill-card .pdf-preview-stage,
+.edu .pdf-preview-stage{
+  min-height:180px;
+  max-height:240px;
+}
+@media(max-width:760px){
+  .pdf-preview-card{max-width:100%}
+}

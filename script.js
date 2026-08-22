@@ -171,11 +171,63 @@ function mediaHtml(media){
         `<video class="media-public-video" controls preload="metadata" src="${escAttr(url)}"></video>`}
         ${(title||caption)?`<div class="media-public-info">${title?`<strong>${esc(title)}</strong>`:""}${caption?`<p>${esc(caption)}</p>`:""}</div>`:""}
       </div>`);
+    }else if(type==="pdf"){
+      const pdfId=`pdf-${Math.random().toString(36).slice(2,10)}`;
+      visual.push(`<article class="media-public-item pdf-preview-card">
+        <a class="pdf-preview-link" href="${escAttr(url)}" target="_blank" rel="noopener" aria-label="Open ${escAttr(title)}">
+          <div class="pdf-preview-stage">
+            <canvas class="pdf-preview-canvas" id="${pdfId}" data-pdf-url="${escAttr(url)}"></canvas>
+            <div class="pdf-preview-loading">Loading PDF preview…</div>
+          </div>
+        </a>
+        <div class="media-public-info pdf-preview-info">
+          <div>
+            <strong>${esc(title)}</strong>
+            ${caption?`<p>${esc(caption)}</p>`:""}
+          </div>
+          <a class="pdf-open-button" href="${escAttr(url)}" target="_blank" rel="noopener">Open PDF ↗</a>
+        </div>
+      </article>`);
     }else{
-      links.push(`<a class="attachment-link" href="${escAttr(url)}" target="_blank" rel="noopener">${type==="pdf"?"PDF":"Link"} · ${esc(title)} ↗</a>`);
+      links.push(`<a class="attachment-link" href="${escAttr(url)}" target="_blank" rel="noopener">Link · ${esc(title)} ↗</a>`);
     }
   });
-  return `${visual.length?`<div class="media-gallery">${visual.join("")}</div>`:""}${links.length?`<div class="attachment-links">${links.join("")}</div>`:""}`;
+  const html=`${visual.length?`<div class="media-gallery">${visual.join("")}</div>`:""}${links.length?`<div class="attachment-links">${links.join("")}</div>`:""}`;
+  setTimeout(renderPdfPreviews,0);
+  return html;
+}
+
+async function renderPdfPreviews(){
+  if(!window.pdfjsLib)return;
+  window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  const canvases=[...document.querySelectorAll("canvas[data-pdf-url]:not([data-rendered])")];
+  for(const canvas of canvases){
+    canvas.dataset.rendered="1";
+    const stage=canvas.closest(".pdf-preview-stage");
+    const loading=stage?.querySelector(".pdf-preview-loading");
+    try{
+      const task=window.pdfjsLib.getDocument(canvas.dataset.pdfUrl);
+      const pdf=await task.promise;
+      const page=await pdf.getPage(1);
+      const baseViewport=page.getViewport({scale:1});
+      const targetWidth=Math.min(360, Math.max(220, stage?.clientWidth||300));
+      const scale=targetWidth/baseViewport.width;
+      const viewport=page.getViewport({scale});
+      const ratio=Math.min(window.devicePixelRatio||1,2);
+      canvas.width=Math.floor(viewport.width*ratio);
+      canvas.height=Math.floor(viewport.height*ratio);
+      canvas.style.width=`${Math.floor(viewport.width)}px`;
+      canvas.style.height=`${Math.floor(viewport.height)}px`;
+      const ctx=canvas.getContext("2d");
+      ctx.setTransform(ratio,0,0,ratio,0,0);
+      await page.render({canvasContext:ctx,viewport}).promise;
+      if(loading)loading.remove();
+    }catch(err){
+      console.warn("PDF preview failed:",err);
+      if(loading)loading.textContent="PDF preview unavailable — click to open";
+      canvas.style.display="none";
+    }
+  }
 }
 function videoEmbed(url){
   try{
