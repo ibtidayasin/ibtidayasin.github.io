@@ -198,8 +198,15 @@ function mediaEditor(owner,media,title){
                 <label class="media-mini-label">PDF preview image
                   <input type="file" data-pdf-thumb-file accept="image/jpeg,image/png,image/webp">
                 </label>
-                <button class="secondary" data-pdf-thumb-upload="${esc(owner)}:${i}" type="button">${m.thumbnail_url?"Replace preview":"Upload preview"}</button>
-                <span class="helper">Use a screenshot/export of page 1. JPG, PNG or WebP · maximum 5 MB.</span>
+                <div class="pdf-thumb-actions">
+                  <button class="secondary" data-pdf-thumb-generate="${esc(owner)}:${i}" type="button">
+                    ${m.thumbnail_url?"Regenerate automatically":"Generate preview automatically"}
+                  </button>
+                  <button class="secondary" data-pdf-thumb-upload="${esc(owner)}:${i}" type="button">
+                    ${m.thumbnail_url?"Replace manually":"Upload manually"}
+                  </button>
+                </div>
+                <span class="helper">Automatic preview uses page 1. Manual JPG/PNG/WebP upload remains available as backup.</span>
               </div>`:""}
           </div>
           <button class="danger" data-media-remove="${esc(owner)}:${i}" type="button">Remove</button>
@@ -282,6 +289,9 @@ document.addEventListener("click",async e=>{
 
   b=e.target.closest("[data-media-add-link]");
   if(b){await addMediaLink(b.dataset.mediaAddLink,b.closest(".media-editor"));return}
+
+  b=e.target.closest("[data-pdf-thumb-generate]");
+  if(b){await generateExistingPdfThumbnail(b.dataset.pdfThumbGenerate);return}
 
   b=e.target.closest("[data-pdf-thumb-upload]");
   if(b){await uploadPdfThumbnail(b.dataset.pdfThumbUpload,b.closest(".media-admin-item"));return}
@@ -404,16 +414,41 @@ async function uploadMedia(owner,editor){
 
   setStatus(`Uploading ${file.name}...`);
   const path=`${ownerFolder(owner)}/${uid()}-${safeFileName(file.name)}`;
-  const{error}=await sb.storage.from("site-media").upload(path,file,{upsert:false,contentType:file.type||undefined,cacheControl:"3600"});
+  const{error}=await sb.storage.from("site-media").upload(path,file,{
+    upsert:false,
+    contentType:file.type||undefined,
+    cacheControl:"3600"
+  });
   if(error)return setStatus("Media upload failed: "+error.message);
 
   const{data}=sb.storage.from("site-media").getPublicUrl(path);
   const media=getOwnerMedia(owner);
-  media.push({
-    id:uid(),type,url:data.publicUrl,filename:file.name,path,
-    title:file.name.replace(/\.[^.]+$/,""),caption:"",uploaded_at:new Date().toISOString()
-  });
-  await persistContent("Media uploaded.");
+  const item={
+    id:uid(),
+    type,
+    url:data.publicUrl,
+    filename:file.name,
+    path,
+    title:file.name.replace(/\.[^.]+$/,""),
+    caption:"",
+    uploaded_at:new Date().toISOString()
+  };
+  media.push(item);
+
+  if(type==="pdf"){
+    setStatus("PDF uploaded. Creating first-page preview...");
+    try{
+      const blob=await createPdfPreviewBlob(await file.arrayBuffer());
+      await saveGeneratedPdfPreview(owner,item,blob);
+    }catch(err){
+      console.warn("Automatic PDF preview failed:",err);
+      setStatus("PDF uploaded. Automatic preview failed; you can generate or upload a preview manually.");
+    }
+  }
+
+  await persistContent(type==="pdf" && item.thumbnail_url
+    ? "PDF uploaded with preview."
+    : "Media uploaded.");
   input.value="";
   fillForms();
 }
@@ -433,6 +468,93 @@ async function addMediaLink(owner,editor){
 }
 function defaultLinkTitle(type){return{video:"Video",pdf:"PDF",image:"Image",link:"Link"}[type]||"Link"}
 
+
+
+function requirePdfJs(){
+  if(!window.pdfjsLib)throw new Error("PDF preview engine did not load. Refresh the admin page and try again.");
+}
+
+async function createPdfPreviewBlob(arrayBuffer){
+  requirePdfJs();
+  const loadingTask=window.pdfjsLib.getDocument({data:arrayBuffer});
+  const pdf=await loadingTask.promise;
+  const page=await pdf.getPage(1);
+
+  const base=page.getViewport({scale:1});
+  const targetWidth=720;
+  const scale=targetWidth/base.width;
+  const viewport=page.getViewport({scale});
+
+  const canvas=document.createElement("canvas");
+  const ratio=Math.min(window.devicePixelRatio||1,2);
+  canvas.width=Math.floor(viewport.width*ratio);
+  canvas.height=Math.floor(viewport.height*ratio);
+
+  const ctx=canvas.getContext("2d",{alpha:false});
+  ctx.fillStyle="#ffffff";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.setTransform(ratio,0,0,ratio,0,0);
+
+  await page.render({canvasContext:ctx,viewport}).promise;
+
+  const blob=await new Promise((resolve,reject)=>{
+    canvas.toBlob(b=>b?resolve(b):reject(new Error("Could not create preview image.")),"image/jpeg",0.88);
+  });
+
+  try{await pdf.destroy()}catch{}
+  return blob;
+}
+
+async function saveGeneratedPdfPreview(owner,item,blob){
+  if(item.thumbnail_path){
+    try{await sb.storage.from("site-media").remove([item.thumbnail_path])}catch{}
+  }
+
+  const path=`${ownerFolder(owner)}/previews/${uid()}-page1.jpg`;
+  const{error}=await sb.storage.from("site-media").upload(path,blob,{
+    upsert:false,
+    contentType:"image/jpeg",
+    cacheControl:"3600"
+  });
+  if(error)throw error;
+
+  const{data}=sb.storage.from("site-media").getPublicUrl(path);
+  item.thumbnail_url=data.publicUrl+"?v="+Date.now();
+  item.thumbnail_path=path;
+}
+
+async function generateExistingPdfThumbnail(spec){
+  syncAllForms();
+
+  const parts=spec.split(":");
+  let owner,index;
+  if(["profile","research","contact"].includes(parts[0])){
+    owner=parts[0];
+    index=Number(parts[1]);
+  }else{
+    owner=`${parts[0]}:${parts[1]}`;
+    index=Number(parts[2]);
+  }
+
+  const media=getOwnerMedia(owner);
+  const item=media?.[index];
+  if(!item||item.type!=="pdf")return setStatus("PDF attachment not found.");
+
+  setStatus("Generating first-page PDF preview...");
+  try{
+    requirePdfJs();
+    const response=await fetch(item.url,{cache:"no-store"});
+    if(!response.ok)throw new Error(`Could not read PDF (${response.status}).`);
+    const buffer=await response.arrayBuffer();
+    const blob=await createPdfPreviewBlob(buffer);
+    await saveGeneratedPdfPreview(owner,item,blob);
+    await persistContent("PDF preview generated.");
+    fillForms();
+  }catch(err){
+    console.error(err);
+    setStatus("Automatic preview failed. Use “Upload manually” with a JPG/PNG screenshot of page 1.");
+  }
+}
 
 async function uploadPdfThumbnail(spec,row){
   syncAllForms();

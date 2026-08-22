@@ -278,3 +278,101 @@ footer{display:flex;justify-content:space-between;gap:20px;font-size:13px;color:
 .edu .pdf-cover-image{
   height:220px;
 }
+
+
+/* FINAL PDF PREVIEW UI — v20260822-3 */
+.pdf-thumb-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.pdf-thumb-actions .secondary{
+  width:auto;
+}
+
+.pdf-preview-card{
+  width:min(100%,310px) !important;
+  max-width:310px !important;
+  border:1px solid var(--line) !important;
+  border-radius:10px !important;
+  overflow:hidden !important;
+  background:#fff !important;
+}
+
+.pdf-cover-link{
+  display:block !important;
+  background:#f7f7f7 !important;
+  border-bottom:1px solid var(--line) !important;
+}
+
+.pdf-cover-image{
+  display:block !important;
+  width:100% !important;
+  height:220px !important;
+  object-fit:contain !important;
+  object-position:top center !important;
+  padding:10px !important;
+  background:#f4f4f4 !important;
+}
+
+.pdf-cover-placeholder{
+  height:145px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+  align-items:center !important;
+  gap:9px !important;
+  padding:18px !important;
+  background:#f7f7f7 !important;
+  color:var(--muted) !important;
+  text-align:center !important;
+}
+
+.pdf-file-mark{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  width:52px !important;
+  height:64px !important;
+  border:1.5px solid var(--accent) !important;
+  border-radius:6px !important;
+  background:#fff !important;
+  color:var(--accent) !important;
+  font-size:12px !important;
+  font-weight:800 !important;
+  line-height:1 !important;
+}
+
+.pdf-placeholder-text{
+  display:block !important;
+  font-size:11px !important;
+  color:var(--muted) !important;
+}
+
+.pdf-preview-info{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:10px !important;
+  padding:10px 12px !important;
+}
+
+.pdf-preview-info strong{
+  display:block !important;
+  font-size:12px !important;
+}
+
+.pdf-open-button{
+  flex:0 0 auto !important;
+  color:var(--accent) !important;
+  font-size:11px !important;
+  font-weight:700 !important;
+  white-space:nowrap !important;
+}
+
+@media(max-width:760px){
+  .pdf-preview-card{
+    width:100% !important;
+    max-width:100% !important;
+  }
+}

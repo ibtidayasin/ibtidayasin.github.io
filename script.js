@@ -179,7 +179,7 @@ function mediaHtml(media){
             ? `<img class="pdf-cover-image" src="${escAttr(thumb)}" alt="Preview of ${escAttr(title)}" loading="lazy">`
             : `<div class="pdf-cover-placeholder">
                  <span class="pdf-file-mark">PDF</span>
-                 <span>Preview image not added</span>
+                 <span class="pdf-placeholder-text">PDF document</span>
                </div>`}
         </a>
         <div class="media-public-info pdf-preview-info">
