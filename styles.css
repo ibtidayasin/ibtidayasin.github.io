@@ -1,0 +1,56 @@
+:root{
+  --bg:#fbfbfb; --surface:#fff; --text:#202328; --muted:#686f78;
+  --line:#e7e7e7; --accent:#a15d1d; --accent-soft:#f8f1e9;
+  --shadow:0 12px 30px rgba(0,0,0,.055); --max:1120px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:88px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif;line-height:1.7}
+a{text-decoration:none;color:inherit}
+.shell{width:min(calc(100% - 34px),var(--max));margin:auto}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(251,251,251,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar-inner{min-height:72px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{font-weight:700;font-size:18px}
+nav{display:flex;gap:24px;flex-wrap:wrap}
+nav a{font-size:14px;color:var(--muted);font-weight:600}
+nav a:hover{color:var(--accent)}
+.layout{display:grid;grid-template-columns:250px minmax(0,1fr);gap:58px;padding:42px 0 70px}
+.sidebar{position:sticky;top:108px}
+.portrait{width:185px;height:185px;background:linear-gradient(145deg,#d7a04a,#885018);display:grid;place-items:center;border-radius:3px;box-shadow:var(--shadow);margin-bottom:20px}
+.portrait span{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.93);color:var(--accent);font:700 35px Georgia,serif}
+.sidebar h1{margin:0 0 5px;font-size:30px;letter-spacing:-.035em;line-height:1.15}
+.role{font-weight:600;margin:0 0 4px}
+.small{font-size:14px}.muted{color:var(--muted)}
+.meta{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;margin:20px 0}
+.meta p{margin:8px 0;display:grid;font-size:13px}
+.meta strong{font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+.links{display:grid;gap:8px}
+.links a{font-size:14px;color:var(--muted)}
+.links a:hover{color:var(--accent)}
+.section{border-bottom:1px solid var(--line);padding:2px 0 38px;margin-bottom:38px}
+.eyebrow{text-transform:uppercase;color:var(--accent);letter-spacing:.13em;font-size:11px;font-weight:700;margin:0 0 8px}
+h2{font:700 clamp(34px,5vw,49px)/1.1 Georgia,serif;letter-spacing:-.04em;margin:0 0 20px}
+h3{margin:0 0 8px;font-size:20px}
+.lead{font-size:18px}
+.interest-list{padding-left:19px;margin:0}
+.interest-list li{margin:8px 0}
+.research-card{display:grid;grid-template-columns:1.15fr .85fr;border:1px solid var(--line);border-radius:13px;background:#fff;box-shadow:var(--shadow);overflow:hidden}
+.research-card>div{padding:24px}
+.research-side{background:#f6f6f6;border-left:1px solid var(--line);display:grid;align-content:center;gap:4px}
+.research-side span{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-top:10px}
+.research-side span:first-child{margin-top:0}
+.research-side strong{font-size:14px}
+.tags{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
+.tag{padding:5px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.card{border:1px solid var(--line);background:#fff;border-radius:11px;padding:19px;min-height:220px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.card p{font-size:14px}
+.card .meta-line{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);font-size:12px;font-weight:700;color:var(--muted)}
+.edu{display:grid;grid-template-columns:90px 1fr;gap:18px;padding:13px 0}
+.edu .period{font-size:13px;color:var(--muted);font-weight:700}
+.button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 15px;border-radius:8px;border:1px solid var(--accent);color:var(--accent);font-size:13px;font-weight:700}
+.button.disabled{opacity:.55;pointer-events:none}
+code{background:#f1f1f1;padding:2px 5px;border-radius:4px}
+footer{display:flex;justify-content:space-between;gap:20px;font-size:13px;color:var(--muted);padding-top:6px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static}.research-card{grid-template-columns:1fr}.research-side{border-left:0;border-top:1px solid var(--line)}.cards{grid-template-columns:1fr}.card{min-height:170px}}
+@media(max-width:620px){.topbar-inner{align-items:flex-start;flex-direction:column;padding:10px 0}.layout{padding-top:28px}.edu{grid-template-columns:1fr}footer{flex-direction:column}}

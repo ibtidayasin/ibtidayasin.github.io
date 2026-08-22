@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Ibtida Yasin — Mechanical Engineering and Computational Materials">
+  <title>Ibtida Yasin | Academic Profile</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="shell topbar-inner">
+    <a class="brand" href="#home" id="brandName">Ibtida Yasin</a>
+    <nav>
+      <a href="#home">Home</a>
+      <a href="#research">Research</a>
+      <a href="#projects">Projects</a>
+      <a href="#education">Education</a>
+      <a href="#cv">CV</a>
+    </nav>
+  </div>
+</header>
+
+<main class="shell layout" id="home">
+  <aside class="sidebar">
+    <div class="portrait"><span id="initials">IY</span></div>
+    <h1 id="name">Ibtida Yasin</h1>
+    <p class="role" id="title"></p>
+    <p class="muted small" id="institution"></p>
+
+    <div class="meta">
+      <p><strong>Location</strong><span id="location"></span></p>
+      <p><strong>Focus</strong><span id="focus"></span></p>
+    </div>
+
+    <div class="links" id="links"></div>
+  </aside>
+
+  <div class="content">
+    <section class="section hero">
+      <p class="eyebrow">About Me</p>
+      <h2 id="aboutHeadline"></h2>
+      <p class="lead" id="aboutLead"></p>
+      <p class="muted" id="aboutBio"></p>
+    </section>
+
+    <section class="section" id="research">
+      <p class="eyebrow">Research Interests</p>
+      <h2>What I work on</h2>
+      <ul class="interest-list" id="researchInterests"></ul>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">Featured Research</p>
+      <div class="research-card">
+        <div>
+          <h3 id="researchTitle"></h3>
+          <p class="muted" id="researchDescription"></p>
+          <div class="tags" id="researchTags"></div>
+        </div>
+        <div class="research-side">
+          <span>Current focus</span>
+          <strong>Atomistic mechanics</strong>
+          <span>Primary method</span>
+          <strong>Classical molecular dynamics</strong>
+          <span>Material system</span>
+          <strong>Cu–Ni nanowires</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="projects">
+      <p class="eyebrow">Projects</p>
+      <h2>Selected work</h2>
+      <div class="cards" id="projectsList"></div>
+    </section>
+
+    <section class="section" id="education">
+      <p class="eyebrow">Education</p>
+      <h2>Academic background</h2>
+      <div id="educationList"></div>
+    </section>
+
+    <section class="section" id="cv">
+      <p class="eyebrow">Curriculum Vitae</p>
+      <h2>Academic CV</h2>
+      <p class="muted">Your CV link can be added later in <code>content.json</code>.</p>
+      <a class="button disabled" id="cvLink" href="#" aria-disabled="true">CV coming soon</a>
+    </section>
+
+    <footer>
+      <span>© <span id="year"></span> Ibtida Yasin</span>
+      <span>Mechanical Engineering · Computational Materials</span>
+    </footer>
+  </div>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

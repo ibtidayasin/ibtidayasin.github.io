@@ -1,0 +1,63 @@
+{
+  "name": "Ibtida Yasin",
+  "title": "Mechanical Engineering Graduate",
+  "institution": "Shahjalal University of Science and Technology (SUST)",
+  "location": "Bangladesh",
+  "focus": "Computational Materials · Molecular Dynamics · Nanomechanics",
+  "aboutHeadline": "Mechanical engineering with an atomistic materials focus.",
+  "aboutLead": "I am a Mechanical Engineering graduate from Shahjalal University of Science and Technology (SUST), interested in computational materials science, molecular dynamics, nanoscale mechanics, and scientific computing.",
+  "aboutBio": "My research work focuses on atomistic simulation of compositionally graded metallic nanostructures, with emphasis on how composition, crystallographic orientation, temperature, and defects influence deformation and mechanical response.",
+  "researchInterests": [
+    "Computational materials science and atomistic simulation",
+    "Molecular dynamics of metallic nanostructures",
+    "Nanoscale deformation and plasticity",
+    "Compositionally graded materials",
+    "Crystallographic effects on mechanical behaviour",
+    "Scientific computing and research data analysis"
+  ],
+  "featuredResearch": {
+    "title": "Radially graded Cu–Ni nanowires under tensile loading",
+    "description": "A classical molecular dynamics study of how radial composition grading, crystallographic orientation, temperature, and surface defects influence tensile behaviour and deformation mechanisms in Cu–Ni nanowires.",
+    "tags": [
+      "LAMMPS",
+      "Python",
+      "OVITO",
+      "PTM",
+      "DXA",
+      "RDF"
+    ]
+  },
+  "projects": [
+    {
+      "title": "Atomistic Structure Generation",
+      "description": "Python-based generation and manipulation of nanoscale structures for molecular dynamics simulations.",
+      "meta": "Python · LAMMPS"
+    },
+    {
+      "title": "MD Data Analysis",
+      "description": "Post-processing of simulation data, stress–strain analysis, comparison across cases, and scientific plotting.",
+      "meta": "Python · Matplotlib"
+    },
+    {
+      "title": "Atomistic Mechanism Analysis",
+      "description": "Structural and defect analysis using PTM, DXA, RDF, atomic strain, and visualization workflows.",
+      "meta": "OVITO"
+    }
+  ],
+  "education": [
+    {
+      "period": "B.Sc.",
+      "degree": "Mechanical Engineering",
+      "institution": "Shahjalal University of Science and Technology (SUST)",
+      "description": "Mechanical engineering education with growing focus on computational materials and atomistic simulation."
+    }
+  ],
+  "links": {
+    "email": "",
+    "linkedin": "",
+    "github": "https://github.com/ibtidayasin",
+    "orcid": "",
+    "scholar": "",
+    "cv": ""
+  }
+}
