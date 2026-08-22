@@ -192,6 +192,15 @@ function mediaEditor(owner,media,title){
             <input data-media-field="title" value="${esc(m.title||"")}" placeholder="Display title (optional)">
             <input data-media-field="caption" value="${esc(m.caption||"")}" placeholder="Caption / note (optional)">
             <span class="helper">${esc(m.url||"")}</span>
+            ${m.type==="pdf"?`
+              <div class="pdf-thumb-admin">
+                ${m.thumbnail_url?`<img src="${esc(m.thumbnail_url)}" alt="PDF preview image">`:""}
+                <label class="media-mini-label">PDF preview image
+                  <input type="file" data-pdf-thumb-file accept="image/jpeg,image/png,image/webp">
+                </label>
+                <button class="secondary" data-pdf-thumb-upload="${esc(owner)}:${i}" type="button">${m.thumbnail_url?"Replace preview":"Upload preview"}</button>
+                <span class="helper">Use a screenshot/export of page 1. JPG, PNG or WebP · maximum 5 MB.</span>
+              </div>`:""}
           </div>
           <button class="danger" data-media-remove="${esc(owner)}:${i}" type="button">Remove</button>
         </div>`).join(""):`<div class="empty-state">No media added yet.</div>`}
@@ -273,6 +282,9 @@ document.addEventListener("click",async e=>{
 
   b=e.target.closest("[data-media-add-link]");
   if(b){await addMediaLink(b.dataset.mediaAddLink,b.closest(".media-editor"));return}
+
+  b=e.target.closest("[data-pdf-thumb-upload]");
+  if(b){await uploadPdfThumbnail(b.dataset.pdfThumbUpload,b.closest(".media-admin-item"));return}
 
   b=e.target.closest("[data-media-remove]");
   if(b){await removeMedia(b.dataset.mediaRemove);return}
@@ -421,6 +433,50 @@ async function addMediaLink(owner,editor){
 }
 function defaultLinkTitle(type){return{video:"Video",pdf:"PDF",image:"Image",link:"Link"}[type]||"Link"}
 
+
+async function uploadPdfThumbnail(spec,row){
+  syncAllForms();
+  const parts=spec.split(":");
+  let owner,index;
+  if(["profile","research","contact"].includes(parts[0])){
+    owner=parts[0];index=Number(parts[1]);
+  }else{
+    owner=`${parts[0]}:${parts[1]}`;index=Number(parts[2]);
+  }
+  const media=getOwnerMedia(owner);
+  const item=media?.[index];
+  if(!item||item.type!=="pdf")return setStatus("PDF attachment not found.");
+
+  const input=row?.querySelector("[data-pdf-thumb-file]");
+  const file=input?.files?.[0];
+  if(!file)return setStatus("Choose a preview image first.");
+  if(file.size>5*1024*1024)return setStatus("Preview image is larger than 5 MB.");
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type))
+    return setStatus("Preview image must be JPG, PNG or WebP.");
+
+  setStatus("Uploading PDF preview image...");
+  const ext=(file.name.split(".").pop()||"jpg").toLowerCase();
+  const path=`${ownerFolder(owner)}/previews/${uid()}-pdf-preview.${ext}`;
+
+  const{error}=await sb.storage.from("site-media").upload(path,file,{
+    upsert:false,
+    contentType:file.type,
+    cacheControl:"3600"
+  });
+  if(error)return setStatus("Preview upload failed: "+error.message);
+
+  if(item.thumbnail_path){
+    try{await sb.storage.from("site-media").remove([item.thumbnail_path])}catch{}
+  }
+
+  const{data}=sb.storage.from("site-media").getPublicUrl(path);
+  item.thumbnail_url=data.publicUrl;
+  item.thumbnail_path=path;
+
+  await persistContent("PDF preview image uploaded.");
+  fillForms();
+}
+
 async function removeMedia(spec){
   syncAllForms();
   const parts=spec.split(":");
@@ -435,8 +491,9 @@ async function removeMedia(spec){
   if(!item)return;
   if(!confirm(`Remove "${item.title||item.filename||"this attachment"}"?`))return;
 
-  if(item.path){
-    const{error}=await sb.storage.from("site-media").remove([item.path]);
+  const paths=[item.path,item.thumbnail_path].filter(Boolean);
+  if(paths.length){
+    const{error}=await sb.storage.from("site-media").remove(paths);
     if(error)console.warn("Storage remove warning:",error.message);
   }
   media.splice(index,1);

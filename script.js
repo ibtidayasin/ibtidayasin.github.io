@@ -172,21 +172,16 @@ function mediaHtml(media){
         ${(title||caption)?`<div class="media-public-info">${title?`<strong>${esc(title)}</strong>`:""}${caption?`<p>${esc(caption)}</p>`:""}</div>`:""}
       </div>`);
     }else if(type==="pdf"){
-      const previewUrl = `${url}#page=1&toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+      const thumb=safeUrl(m.thumbnail_url);
       visual.push(`<article class="media-public-item pdf-preview-card">
-        <div class="pdf-native-stage">
-          <iframe
-            class="pdf-native-frame"
-            src="${escAttr(previewUrl)}"
-            title="Preview of ${escAttr(title)}"
-            loading="lazy">
-          </iframe>
-          <a class="pdf-preview-click"
-             href="${escAttr(url)}"
-             target="_blank"
-             rel="noopener"
-             aria-label="Open ${escAttr(title)}"></a>
-        </div>
+        <a class="pdf-cover-link" href="${escAttr(url)}" target="_blank" rel="noopener" aria-label="Open ${escAttr(title)}">
+          ${thumb
+            ? `<img class="pdf-cover-image" src="${escAttr(thumb)}" alt="Preview of ${escAttr(title)}" loading="lazy">`
+            : `<div class="pdf-cover-placeholder">
+                 <span class="pdf-file-mark">PDF</span>
+                 <span>Preview image not added</span>
+               </div>`}
+        </a>
         <div class="media-public-info pdf-preview-info">
           <div>
             <strong>${esc(title)}</strong>
