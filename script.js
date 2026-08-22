@@ -61,6 +61,30 @@ async function loadContent(){
   }catch(e){console.error(e)}
   render(normalize(data));
 }
+
+function profileIcon(type){
+  const common='class="profile-link-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"';
+  const icons={
+    email:`<svg ${common}><rect x="3.5" y="5.5" width="17" height="13" rx="2"></rect><path d="M4.5 7l7.5 5.7L19.5 7"></path></svg>`,
+    linkedin:`<svg ${common}><rect x="4" y="4" width="16" height="16" rx="2"></rect><circle cx="8" cy="9" r="1" class="profile-icon-fill"></circle><path d="M7.5 12v5"></path><path d="M11.5 17v-3.1c0-1.4.8-2.3 2.1-2.3 1.2 0 1.9.8 1.9 2.2V17"></path></svg>`,
+    github:`<svg ${common}><path d="M9 19c-4 .8-4-2-5-2"></path><path d="M15 19v-3.5a3 3 0 0 0-.9-2.3c3-.3 6.1-1.5 6.1-6.7a5.2 5.2 0 0 0-1.4-3.6 4.9 4.9 0 0 0-.1-3.5s-1.1-.4-3.7 1.4a12.8 12.8 0 0 0-6 0C6.4-1 5.3-.6 5.3-.6a4.9 4.9 0 0 0-.1 3.5 5.2 5.2 0 0 0-1.4 3.6c0 5.2 3.1 6.4 6.1 6.7A3 3 0 0 0 9 15.5V19"></path></svg>`,
+    scholar:`<svg ${common}><path d="M12 4L3 9l9 5 9-5-9-5z"></path><path d="M6 11.5V15c0 1.7 2.7 3 6 3s6-1.3 6-3v-3.5"></path></svg>`,
+    orcid:`<svg ${common}><circle cx="12" cy="12" r="8.5"></circle><circle cx="9" cy="8.3" r="1" class="profile-icon-fill"></circle><path d="M9 11v5"></path><path d="M12.5 16v-5h2a2.5 2.5 0 1 1 0 5h-2z"></path></svg>`,
+    phone:`<svg ${common}><path d="M6.5 4.5l3 3-2 2.2a14 14 0 0 0 6.8 6.8l2.2-2 3 3-1.6 2c-.7.8-1.8 1.1-2.8.8C9.4 18.7 5.3 14.6 3.7 8.9c-.3-1 .1-2.1.8-2.8l2-1.6z"></path></svg>`,
+    location:`<svg ${common}><path d="M12 21s6-5.4 6-11a6 6 0 1 0-12 0c0 5.6 6 11 6 11z"></path><circle cx="12" cy="10" r="2"></circle></svg>`
+  };
+  return icons[type]||icons.github;
+}
+
+function iconLinkHtml(type,label,url,isExternal=true){
+  if(!url)return "";
+  return `<a class="profile-icon-link" href="${escAttr(url)}" ${isExternal?'target="_blank" rel="noopener"':""}>
+    ${profileIcon(type)}
+    <span>${esc(label)}</span>
+    ${isExternal?'<span class="profile-link-arrow">↗</span>':""}
+  </a>`;
+}
+
 function render(d){
   document.title=`${d.name} | Academic Profile`;
   document.documentElement.dataset.theme=validSiteTheme(d.defaultTheme||"classic-brown");
@@ -136,17 +160,33 @@ function render(d){
   $("contactHeadline").textContent=d.contact?.headline||"";
   $("contactMessage").textContent=d.contact?.message||"";
   const contactItems=[];
-  if(d.contact?.email)contactItems.push(["Email",`<a href="mailto:${escAttr(d.contact.email)}">${esc(d.contact.email)}</a>`]);
-  if(d.contact?.phone)contactItems.push(["Phone",`<strong>${esc(d.contact.phone)}</strong>`]);
-  if(d.contact?.location)contactItems.push(["Location",`<strong>${esc(d.contact.location)}</strong>`]);
-  [["LinkedIn",d.links?.linkedin],["GitHub",d.links?.github],["ORCID",d.links?.orcid],["Google Scholar",d.links?.scholar]].forEach(([label,url])=>{
-    if(safeUrl(url))contactItems.push([label,`<a href="${escAttr(safeUrl(url))}" target="_blank" rel="noopener">Open profile ↗</a>`]);
+  if(d.contact?.email)contactItems.push(["email","Email",`mailto:${d.contact.email}`,d.contact.email,false]);
+  if(d.contact?.phone)contactItems.push(["phone","Phone","",d.contact.phone,false]);
+  if(d.contact?.location)contactItems.push(["location","Location","",d.contact.location,false]);
+  [["linkedin","LinkedIn",d.links?.linkedin],["github","GitHub",d.links?.github],["orcid","ORCID",d.links?.orcid],["scholar","Google Scholar",d.links?.scholar]].forEach(([type,label,url])=>{
+    const safe=safeUrl(url);
+    if(safe)contactItems.push([type,label,safe,"Open profile",true]);
   });
-  $("contactLinks").innerHTML=contactItems.map(([k,v])=>`<div class="contact-item"><span>${esc(k)}</span>${v}</div>`).join("");
+  $("contactLinks").innerHTML=contactItems.map(([type,label,url,value,isExternal])=>`
+    <div class="contact-item contact-item-with-icon">
+      <div class="contact-item-heading">${profileIcon(type)}<span>${esc(label)}</span></div>
+      ${url
+        ? `<a href="${escAttr(url)}" ${isExternal?'target="_blank" rel="noopener"':""}>${esc(value)}${isExternal?' ↗':""}</a>`
+        : `<strong>${esc(value)}</strong>`}
+    </div>`).join("");
   $("contactMedia").innerHTML=mediaHtml(d.contact?.media||[]);
 
-  const sideDefs=[["Email",d.contact?.email?`mailto:${d.contact.email}`:""],["LinkedIn",d.links?.linkedin],["GitHub",d.links?.github],["ORCID",d.links?.orcid],["Google Scholar",d.links?.scholar]];
-  $("sidebarLinks").innerHTML=sideDefs.filter(([,u])=>u).map(([l,u])=>`<a href="${escAttr(u)}" target="_blank" rel="noopener">${esc(l)} ↗</a>`).join("");
+  const sideDefs=[
+    ["email","Email",d.contact?.email?`mailto:${d.contact.email}`:"",false],
+    ["linkedin","LinkedIn",safeUrl(d.links?.linkedin),true],
+    ["github","GitHub",safeUrl(d.links?.github),true],
+    ["orcid","ORCID",safeUrl(d.links?.orcid),true],
+    ["scholar","Google Scholar",safeUrl(d.links?.scholar),true]
+  ];
+  $("sidebarLinks").innerHTML=sideDefs
+    .filter(([, ,url])=>url)
+    .map(([type,label,url,isExternal])=>iconLinkHtml(type,label,url,isExternal))
+    .join("");
 
   if(d.cv?.url){
     [$("cvLink"),$("sidebarCv")].forEach(a=>{
