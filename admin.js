@@ -30,6 +30,32 @@ const DEFAULT_CONTENT={
 };
 
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
+const ADMIN_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic"];
+function validAdminTheme(t){return ADMIN_THEMES.includes(t)?t:"classic-brown"}
+function selectedAdminTheme(){
+  return document.querySelector('input[name="siteTheme"]:checked')?.value||"classic-brown";
+}
+function applyAdminThemePreview(theme){
+  document.documentElement.dataset.theme=validAdminTheme(theme);
+}
+function fillThemeChooser(){
+  const theme=validAdminTheme(currentContent.defaultTheme||"classic-brown");
+  const input=document.querySelector(`input[name="siteTheme"][value="${theme}"]`);
+  if(input)input.checked=true;
+  document.querySelectorAll("[data-theme-card]").forEach(card=>{
+    card.classList.toggle("selected",card.dataset.themeCard===theme);
+  });
+  applyAdminThemePreview(theme);
+}
+document.addEventListener("change",e=>{
+  const input=e.target.closest('input[name="siteTheme"]');
+  if(!input)return;
+  document.querySelectorAll("[data-theme-card]").forEach(card=>{
+    card.classList.toggle("selected",card.dataset.themeCard===input.value);
+  });
+  applyAdminThemePreview(input.value);
+});
+
 const $=id=>document.getElementById(id);
 let currentContent=structuredClone(DEFAULT_CONTENT);
 
@@ -98,7 +124,6 @@ function fillForms(){
   $("fInstitution").value=currentContent.institution||"";
   $("fLocation").value=currentContent.location||"";
   $("fFocus").value=currentContent.focus||"";
-  $("fDefaultTheme").value=currentContent.defaultTheme||"classic-brown";
   $("fAboutHeadline").value=currentContent.aboutHeadline||"";
   $("fAboutLead").value=currentContent.aboutLead||"";
   $("fAboutBio").value=currentContent.aboutBio||"";
@@ -125,6 +150,7 @@ function fillForms(){
   }
   renderAllEditors();
   renderCvState();
+  fillThemeChooser();
 }
 
 function renderAllEditors(){
@@ -309,7 +335,7 @@ function syncAllForms(){
   currentContent.institution=$("fInstitution").value.trim();
   currentContent.location=$("fLocation").value.trim();
   currentContent.focus=$("fFocus").value.trim();
-  currentContent.defaultTheme=$("fDefaultTheme").value||"classic-brown";
+  currentContent.defaultTheme=selectedAdminTheme();
   currentContent.aboutHeadline=$("fAboutHeadline").value.trim();
   currentContent.aboutLead=$("fAboutLead").value.trim();
   currentContent.aboutBio=$("fAboutBio").value.trim();

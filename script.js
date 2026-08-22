@@ -30,39 +30,8 @@ const DEFAULT_CONTENT={
   "sectionMedia":{"profile":[]}
 };
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
-const THEME_KEY="ibtida-theme";
-const THEME_IDS=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic"];
-let siteDefaultTheme="classic-brown";
-
-function validTheme(t){return THEME_IDS.includes(t)?t:"classic-brown"}
-function applyTheme(theme){
-  document.documentElement.dataset.theme=validTheme(theme);
-}
-function loadSavedTheme(defaultTheme){
-  siteDefaultTheme=validTheme(defaultTheme);
-  let saved="";
-  try{saved=localStorage.getItem(THEME_KEY)||""}catch{}
-  const chosen=THEME_IDS.includes(saved)?saved:siteDefaultTheme;
-  applyTheme(chosen);
-  const select=$("themeSelect");
-  if(select)select.value=THEME_IDS.includes(saved)?saved:"default";
-}
-function initThemeSelector(){
-  const select=$("themeSelect");
-  if(!select)return;
-  select.addEventListener("change",()=>{
-    const value=select.value;
-    if(value==="default"){
-      try{localStorage.removeItem(THEME_KEY)}catch{}
-      applyTheme(siteDefaultTheme);
-    }else{
-      const theme=validTheme(value);
-      try{localStorage.setItem(THEME_KEY,theme)}catch{}
-      applyTheme(theme);
-    }
-  });
-}
-
+const SITE_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic"];
+function validSiteTheme(t){return SITE_THEMES.includes(t)?t:"classic-brown"}
 
 function merge(base,extra){
   if(Array.isArray(base))return Array.isArray(extra)?extra:base;
@@ -94,7 +63,7 @@ async function loadContent(){
 }
 function render(d){
   document.title=`${d.name} | Academic Profile`;
-  loadSavedTheme(d.defaultTheme||"classic-brown");
+  document.documentElement.dataset.theme=validSiteTheme(d.defaultTheme||"classic-brown");
   $("brandName").textContent=$("name").textContent=$("footerName").textContent=d.name;
   $("initials").textContent=d.name.split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase();
   $("title").textContent=d.title;
@@ -258,5 +227,4 @@ function escAttr(s){return esc(String(s??"").replace(/javascript:/gi,""))}
 function formatDate(v){try{return new Date(v).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})}catch{return""}}
 
 $("year").textContent=new Date().getFullYear();
-initThemeSelector();
 loadContent();

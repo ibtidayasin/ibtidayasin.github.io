@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260822-theme1">
+  <link rel="stylesheet" href="styles.css?v=20260822-admin-theme1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -36,6 +36,7 @@
         <button data-tab="education" type="button">Education</button>
         <button data-tab="contact" type="button">Contact</button>
         <button data-tab="cv" type="button">CV</button>
+        <button data-tab="appearance" type="button">Appearance</button>
       </div>
 
       <div class="admin-panel active" data-panel="profile">
@@ -45,22 +46,6 @@
           <div class="field"><label>Institution</label><input id="fInstitution"></div>
           <div class="field"><label>Location</label><input id="fLocation"></div>
           <div class="field full"><label>Research focus</label><input id="fFocus"></div>
-          <div class="field full theme-admin-field">
-            <label>Default website theme</label>
-            <select id="fDefaultTheme">
-              <option value="classic-brown">Classic Brown</option>
-<option value="soft-beige">Soft Beige</option>
-<option value="slate-blue">Slate Blue</option>
-<option value="deep-navy">Deep Navy</option>
-<option value="forest-sage">Forest Sage</option>
-<option value="olive-stone">Olive Stone</option>
-<option value="burgundy">Burgundy</option>
-<option value="dusty-plum">Dusty Plum</option>
-<option value="charcoal">Charcoal</option>
-<option value="dark-academic">Dark Academic</option>
-            </select>
-            <span class="helper">First-time visitors see this theme. Visitors can still choose another theme on their own device.</span>
-          </div>
           <div class="field full"><label>About headline</label><input id="fAboutHeadline"></div>
           <div class="field full"><label>Short introduction</label><textarea id="fAboutLead"></textarea></div>
           <div class="field full"><label>Biography</label><textarea id="fAboutBio"></textarea></div>
@@ -145,6 +130,125 @@
         </div>
       </div>
 
+
+      <div class="admin-panel" data-panel="appearance">
+        <div class="appearance-head">
+          <div>
+            <p class="eyebrow">Appearance</p>
+            <h2 class="admin-section-title">Website theme</h2>
+            <p class="muted">Choose the color theme visitors will see. The public website itself will not show a theme selector.</p>
+          </div>
+        </div>
+
+        <div class="theme-choice-grid">
+          <label class="theme-choice" data-theme-card="classic-brown">
+            <input type="radio" name="siteTheme" value="classic-brown">
+            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#a15d1d;--tc-soft:#f8f1e9">
+              <span class="theme-mini-header"></span>
+              <span class="theme-mini-title"></span>
+              <span class="theme-mini-line"></span>
+              <span class="theme-mini-button"></span>
+            </span>
+            <span class="theme-choice-name">Classic Brown</span>
+          </label>
+          <label class="theme-choice" data-theme-card="soft-beige">
+            <input type="radio" name="siteTheme" value="soft-beige">
+            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#9f8064;--tc-soft:#f5eee7">
+              <span class="theme-mini-header"></span>
+              <span class="theme-mini-title"></span>
+              <span class="theme-mini-line"></span>
+              <span class="theme-mini-button"></span>
+            </span>
+            <span class="theme-choice-name">Soft Beige</span>
+          </label>
+          <label class="theme-choice" data-theme-card="slate-blue">
+            <input type="radio" name="siteTheme" value="slate-blue">
+            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#536f87;--tc-soft:#edf3f7">
+              <span class="theme-mini-header"></span>
+              <span class="theme-mini-title"></span>
+              <span class="theme-mini-line"></span>
+              <span class="theme-mini-button"></span>
+            </span>
+            <span class="theme-choice-name">Slate Blue</span>
+          </label>
+          <label class="theme-choice" data-theme-card="deep-navy">
+            <input type="radio" name="siteTheme" value="deep-navy">
+            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#2f506d;--tc-soft:#eaf1f6">
+              <span class="theme-mini-header"></span>
+              <span class="theme-mini-title"></span>
+              <span class="theme-mini-line"></span>
+              <span class="theme-mini-button"></span>
+            </span>
+            <span class="theme-choice-name">Deep Navy</span>
+          </label>
+          <label class="theme-choice" data-theme-card="forest-sage">
+            <input type="radio" name="siteTheme" value="forest-sage">
+            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#587569;--tc-soft:#edf4f0">
+              <span class="theme-mini-header"></span>
+              <span class="theme-mini-title"></span>
+              <span class="theme-mini-line"></span>
+              <span class="theme-mini-button"></span>
+            </span>
+            <span class="theme-choice-name">Forest Sage</span>
+          </label>
+          <label class="theme-choice" data-theme-card="olive-stone">
+            <input type="radio" name="siteTheme" value="olive-stone">
+            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#777750;--tc-soft:#f2f2e6">
+              <span class="theme-mini-header"></span>
+              <span class="theme-mini-title"></span>
+              <span class="theme-mini-line"></span>
+              <span class="theme-mini-button"></span>
+            </span>
+            <span class="theme-choice-name">Olive Stone</span>
+          </label>
+          <label class="theme-choice" data-theme-card="burgundy">
+            <input type="radio" name="siteTheme" value="burgundy">
+            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#7d4b58;--tc-soft:#f5eaed">
+              <span class="theme-mini-header"></span>
+              <span class="theme-mini-title"></span>
+              <span class="theme-mini-line"></span>
+              <span class="theme-mini-button"></span>
+            </span>
+            <span class="theme-choice-name">Burgundy</span>
+          </label>
+          <label class="theme-choice" data-theme-card="dusty-plum">
+            <input type="radio" name="siteTheme" value="dusty-plum">
+            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#6e6278;--tc-soft:#f1edf4">
+              <span class="theme-mini-header"></span>
+              <span class="theme-mini-title"></span>
+              <span class="theme-mini-line"></span>
+              <span class="theme-mini-button"></span>
+            </span>
+            <span class="theme-choice-name">Dusty Plum</span>
+          </label>
+          <label class="theme-choice" data-theme-card="charcoal">
+            <input type="radio" name="siteTheme" value="charcoal">
+            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#5b6469;--tc-soft:#edf0f1">
+              <span class="theme-mini-header"></span>
+              <span class="theme-mini-title"></span>
+              <span class="theme-mini-line"></span>
+              <span class="theme-mini-button"></span>
+            </span>
+            <span class="theme-choice-name">Charcoal</span>
+          </label>
+          <label class="theme-choice" data-theme-card="dark-academic">
+            <input type="radio" name="siteTheme" value="dark-academic">
+            <span class="theme-choice-preview" style="--tc-bg:#151718;--tc-text:#eef0ef;--tc-accent:#c69a67;--tc-soft:#1d2022">
+              <span class="theme-mini-header"></span>
+              <span class="theme-mini-title"></span>
+              <span class="theme-mini-line"></span>
+              <span class="theme-mini-button"></span>
+            </span>
+            <span class="theme-choice-name">Dark Academic</span>
+          </label>
+        </div>
+
+        <div class="theme-preview-note">
+          <strong>Live preview</strong>
+          <span>Choosing a theme previews it immediately in this private admin page. Click <b>Save all changes</b> to publish it.</span>
+        </div>
+      </div>
+
       <div class="save-footer">
         <div class="action-row">
           <button id="saveBtn" class="primary" type="button">Save all changes</button>
@@ -164,6 +268,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260822-theme1"></script>
+  <script src="admin.js?v=20260822-admin-theme1"></script>
 </body>
 </html>
