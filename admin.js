@@ -25,6 +25,7 @@ const DEFAULT_CONTENT={
   "links":{"linkedin":"","github":"https://github.com/ibtidayasin","orcid":"","scholar":""},
   "cv":{"url":"","filename":"","updated_at":""},
   "photo_url":"",
+  "defaultTheme":"classic-brown",
   "sectionMedia":{"profile":[]}
 };
 
@@ -97,6 +98,7 @@ function fillForms(){
   $("fInstitution").value=currentContent.institution||"";
   $("fLocation").value=currentContent.location||"";
   $("fFocus").value=currentContent.focus||"";
+  $("fDefaultTheme").value=currentContent.defaultTheme||"classic-brown";
   $("fAboutHeadline").value=currentContent.aboutHeadline||"";
   $("fAboutLead").value=currentContent.aboutLead||"";
   $("fAboutBio").value=currentContent.aboutBio||"";
@@ -307,6 +309,7 @@ function syncAllForms(){
   currentContent.institution=$("fInstitution").value.trim();
   currentContent.location=$("fLocation").value.trim();
   currentContent.focus=$("fFocus").value.trim();
+  currentContent.defaultTheme=$("fDefaultTheme").value||"classic-brown";
   currentContent.aboutHeadline=$("fAboutHeadline").value.trim();
   currentContent.aboutLead=$("fAboutLead").value.trim();
   currentContent.aboutBio=$("fAboutBio").value.trim();

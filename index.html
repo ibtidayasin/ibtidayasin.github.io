@@ -5,22 +5,43 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Ibtida Yasin — Mechanical Engineering and Computational Materials">
   <title>Ibtida Yasin | Academic Profile</title>
-  <link rel="stylesheet" href="styles.css?v=20260822-3">
+  <script>
+    (()=>{try{const t=localStorage.getItem("ibtida-theme");if(t&&t!=="default")document.documentElement.dataset.theme=t}catch{}})();
+  </script>
+  <link rel="stylesheet" href="styles.css?v=20260822-theme1">
 </head>
 <body>
 <header class="topbar">
   <div class="shell topbar-inner">
     <a class="brand" href="#home" id="brandName">Ibtida Yasin</a>
-    <nav>
-      <a href="#home">Home</a>
-      <a href="#research">Research</a>
-      <a href="#publications">Publications</a>
-      <a href="#projects">Projects</a>
-      <a href="#skills">Skills</a>
-      <a href="#education">Education</a>
-      <a href="#contact">Contact</a>
-      <a href="#cv">CV</a>
-    </nav>
+    <div class="nav-right">
+      <nav>
+        <a href="#home">Home</a>
+        <a href="#research">Research</a>
+        <a href="#publications">Publications</a>
+        <a href="#projects">Projects</a>
+        <a href="#skills">Skills</a>
+        <a href="#education">Education</a>
+        <a href="#contact">Contact</a>
+        <a href="#cv">CV</a>
+      </nav>
+      <label class="theme-control" title="Choose website color theme">
+        <span>Theme</span>
+        <select id="themeSelect" aria-label="Choose website theme">
+          <option value="default">Site default</option>
+<option value="classic-brown">Classic Brown</option>
+<option value="soft-beige">Soft Beige</option>
+<option value="slate-blue">Slate Blue</option>
+<option value="deep-navy">Deep Navy</option>
+<option value="forest-sage">Forest Sage</option>
+<option value="olive-stone">Olive Stone</option>
+<option value="burgundy">Burgundy</option>
+<option value="dusty-plum">Dusty Plum</option>
+<option value="charcoal">Charcoal</option>
+<option value="dark-academic">Dark Academic</option>
+        </select>
+      </label>
+    </div>
   </div>
 </header>
 
@@ -123,6 +144,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="script.js?v=20260822-3"></script>
+<script src="script.js?v=20260822-theme1"></script>
 </body>
 </html>
