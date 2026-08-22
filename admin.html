@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Website Admin | Ibtida Yasin</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="admin-body">
+<main class="admin-shell">
+<section id="loginView" class="admin-card login-wrap">
+<p class="eyebrow">Private Admin</p><h1>Website login</h1>
+<p class="muted">Use the Supabase admin email and password you created.</p>
+<div class="form-grid">
+<div class="field full"><label>Email</label><input id="loginEmail" type="email"></div>
+<div class="field full"><label>Password</label><input id="loginPassword" type="password"></div>
+</div>
+<div class="action-row"><button id="loginBtn" class="primary" type="button">Log in</button><a class="secondary" href="index.html">Back to website</a></div>
+<div id="loginStatus" class="status"></div>
+</section>
+
+<section id="adminView" class="hidden">
+<div class="admin-card">
+<div class="admin-head"><div><p class="eyebrow">Private Admin</p><h1>Edit your website</h1></div><div class="action-row"><a class="secondary" href="index.html" target="_blank">View website</a><button id="logoutBtn" class="secondary" type="button">Log out</button></div></div>
+
+<div class="admin-tabs">
+<button class="active" data-tab="profile" type="button">Profile</button>
+<button data-tab="research" type="button">Research</button>
+<button data-tab="projects" type="button">Projects</button>
+<button data-tab="education" type="button">Education</button>
+<button data-tab="links" type="button">Links & CV</button>
+</div>
+
+<div class="admin-panel active" data-panel="profile">
+<div class="form-grid">
+<div class="field"><label>Name</label><input id="fName"></div>
+<div class="field"><label>Professional title</label><input id="fTitle"></div>
+<div class="field"><label>Institution</label><input id="fInstitution"></div>
+<div class="field"><label>Location</label><input id="fLocation"></div>
+<div class="field full"><label>Research focus</label><input id="fFocus"></div>
+<div class="field full"><label>About headline</label><input id="fAboutHeadline"></div>
+<div class="field full"><label>Short introduction</label><textarea id="fAboutLead"></textarea></div>
+<div class="field full"><label>Biography</label><textarea id="fAboutBio"></textarea></div>
+<div class="field full"><label>Profile photo</label><img id="photoPreview" class="preview-photo" alt="Current profile photo"><input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp"><span class="muted small">JPEG, PNG or WebP. Maximum 5 MB.</span></div>
+</div>
+</div>
+
+<div class="admin-panel" data-panel="research">
+<div class="form-grid">
+<div class="field full"><label>Research interests — one per line</label><textarea id="fInterests"></textarea></div>
+<div class="field full"><label>Featured research title</label><input id="fResearchTitle"></div>
+<div class="field full"><label>Featured research description</label><textarea id="fResearchDescription"></textarea></div>
+<div class="field full"><label>Tags — separated by commas</label><input id="fResearchTags"></div>
+</div>
+</div>
+
+<div class="admin-panel" data-panel="projects"><div id="projectsEditor"></div><button id="addProjectBtn" class="secondary" type="button">+ Add project</button></div>
+<div class="admin-panel" data-panel="education"><div id="educationEditor"></div><button id="addEducationBtn" class="secondary" type="button">+ Add education</button></div>
+
+<div class="admin-panel" data-panel="links">
+<div class="form-grid">
+<div class="field"><label>Email</label><input id="fEmail"></div>
+<div class="field"><label>LinkedIn URL</label><input id="fLinkedIn"></div>
+<div class="field"><label>GitHub URL</label><input id="fGitHub"></div>
+<div class="field"><label>ORCID URL</label><input id="fOrcid"></div>
+<div class="field"><label>Google Scholar URL</label><input id="fScholar"></div>
+<div class="field"><label>CV URL</label><input id="fCv"></div>
+</div>
+</div>
+
+<div class="action-row"><button id="saveBtn" class="primary" type="button">Save changes</button><span id="saveStatus" class="status"></span></div>
+</div>
+</section>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
