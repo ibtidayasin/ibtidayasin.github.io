@@ -904,3 +904,55 @@ html[data-theme="crimson-cream"]{
   --header-bg:rgba(255,249,238,.97);--media-bg:#faecef;--portrait-a:#d54a60;--portrait-b:#7f0c20;
   --shadow:0 12px 30px rgba(166,17,43,.10);
 }
+
+/* =========================================================
+   PUBLIC SECTION HIERARCHY
+   Large section names + smaller supporting subtitles
+   ========================================================= */
+body:not(.admin-body) .section-title{
+  font:700 clamp(36px,4.4vw,44px)/1.08 Georgia,serif;
+  letter-spacing:-.035em;
+  margin:0 0 8px;
+  color:var(--text);
+}
+
+body:not(.admin-body) .section-subtitle{
+  margin:0 0 22px;
+  max-width:900px;
+  color:var(--muted);
+  font-size:clamp(20px,2.3vw,25px);
+  font-weight:600;
+  line-height:1.35;
+  letter-spacing:-.012em;
+}
+
+body:not(.admin-body) .section-title + .section-subtitle{
+  margin-top:0;
+}
+
+body:not(.admin-body) .section .lead{
+  margin-top:6px;
+}
+
+.section-heading-editor{
+  margin-bottom:18px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface-soft);
+}
+.section-heading-editor .heading-editor-note{
+  grid-column:1/-1;
+  margin:0 0 2px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+@media(max-width:680px){
+  body:not(.admin-body) .section-title{
+    font-size:34px;
+  }
+  body:not(.admin-body) .section-subtitle{
+    font-size:20px;
+  }
+}

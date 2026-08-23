@@ -29,6 +29,41 @@ const DEFAULT_CONTENT={
   "defaultTheme":"classic-brown",
   "sectionMedia":{"profile":[]}
 };
+
+const DEFAULT_SECTION_HEADINGS={
+  about:{title:"About Me",subtitle:"Mechanical engineering with an atomistic materials focus."},
+  research:{title:"Research Interests",subtitle:"What I work on"},
+  featured:{title:"Featured Research",subtitle:""},
+  publications:{title:"Publications",subtitle:"Research output"},
+  projects:{title:"Projects",subtitle:"Selected work"},
+  skills:{title:"Skills",subtitle:"Research toolkit"},
+  education:{title:"Education",subtitle:"Academic background"},
+  contact:{title:"Contact",subtitle:"Interested in computational materials and nanoscale mechanics?"},
+  cv:{title:"Curriculum Vitae",subtitle:"Academic CV"}
+};
+
+function normalizeSectionHeadings(content){
+  const current=(content.sectionHeadings&&typeof content.sectionHeadings==="object")?content.sectionHeadings:{};
+  const legacyAbout=content.aboutHeadline??DEFAULT_SECTION_HEADINGS.about.subtitle;
+  const legacyContact=content.contact?.headline??DEFAULT_SECTION_HEADINGS.contact.subtitle;
+  const out={};
+
+  Object.entries(DEFAULT_SECTION_HEADINGS).forEach(([key,defaults])=>{
+    const item=(current[key]&&typeof current[key]==="object")?current[key]:{};
+    const hasTitle=Object.prototype.hasOwnProperty.call(item,"title");
+    const hasSubtitle=Object.prototype.hasOwnProperty.call(item,"subtitle");
+    const fallbackSubtitle=key==="about"?legacyAbout:(key==="contact"?legacyContact:defaults.subtitle);
+
+    out[key]={
+      title:hasTitle?String(item.title??""):defaults.title,
+      subtitle:hasSubtitle?String(item.subtitle??""):String(fallbackSubtitle??"")
+    };
+  });
+
+  content.sectionHeadings=out;
+  return content;
+}
+
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
 const SITE_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream"];
 function validSiteTheme(t){return SITE_THEMES.includes(t)?t:"classic-brown"}
@@ -43,6 +78,7 @@ function merge(base,extra){
   return extra??base;
 }
 function normalize(d){
+  normalizeSectionHeadings(d);
   d.sectionMedia=d.sectionMedia||{profile:[]};
   d.sectionMedia.profile=d.sectionMedia.profile||[];
   d.featuredResearch=d.featuredResearch||{};d.featuredResearch.media=d.featuredResearch.media||[];
@@ -94,7 +130,30 @@ function render(d){
   $("institution").textContent=d.institution;
   $("location").textContent=d.location;
   $("focus").textContent=d.focus;
-  $("aboutHeadline").textContent=d.aboutHeadline;
+
+  const sections=normalizeSectionHeadings(d).sectionHeadings;
+
+  function setPublicSection(key,titleId,subtitleId,navId){
+    const item=sections[key]||DEFAULT_SECTION_HEADINGS[key];
+    const titleEl=$(titleId);
+    const subtitleEl=$(subtitleId);
+    if(titleEl)titleEl.textContent=item.title||"";
+    if(subtitleEl){
+      subtitleEl.textContent=item.subtitle||"";
+      subtitleEl.classList.toggle("hidden",!item.subtitle);
+    }
+    if(navId&&$(navId))$(navId).textContent=item.title||DEFAULT_SECTION_HEADINGS[key].title;
+  }
+
+  setPublicSection("about","aboutSectionTitle","aboutHeadline");
+  setPublicSection("research","researchSectionTitle","researchSectionSubtitle","navResearch");
+  setPublicSection("featured","featuredSectionTitle","featuredSectionSubtitle");
+  setPublicSection("publications","publicationsSectionTitle","publicationsSectionSubtitle","navPublications");
+  setPublicSection("projects","projectsSectionTitle","projectsSectionSubtitle","navProjects");
+  setPublicSection("skills","skillsSectionTitle","skillsSectionSubtitle","navSkills");
+  setPublicSection("education","educationSectionTitle","educationSectionSubtitle","navEducation");
+  setPublicSection("contact","contactSectionTitle","contactHeadline","navContact");
+  setPublicSection("cv","cvSectionTitle","cvSectionSubtitle","navCv");
   $("aboutLead").textContent=d.aboutLead;
   $("aboutBio").textContent=d.aboutBio;
 
@@ -157,7 +216,6 @@ function render(d){
       </div>
     </div>`).join("");
 
-  $("contactHeadline").textContent=d.contact?.headline||"";
   $("contactMessage").textContent=d.contact?.message||"";
   const contactItems=[];
   if(d.contact?.email)contactItems.push(["email","Email",`mailto:${d.contact.email}`,d.contact.email,false]);

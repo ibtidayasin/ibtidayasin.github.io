@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260822-themes40">
+  <link rel="stylesheet" href="styles.css?v=20260823-sections1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -46,7 +46,8 @@
           <div class="field"><label>Institution</label><input id="fInstitution"></div>
           <div class="field"><label>Location</label><input id="fLocation"></div>
           <div class="field full"><label>Research focus</label><input id="fFocus"></div>
-          <div class="field full"><label>About headline</label><input id="fAboutHeadline"></div>
+          <div class="field"><label>About section name</label><input id="fSectionAboutTitle"></div>
+          <div class="field"><label>About section subtitle</label><input id="fAboutHeadline"></div>
           <div class="field full"><label>Short introduction</label><textarea id="fAboutLead"></textarea></div>
           <div class="field full"><label>Biography</label><textarea id="fAboutBio"></textarea></div>
           <div class="field full">
@@ -60,6 +61,16 @@
       </div>
 
       <div class="admin-panel" data-panel="research">
+        <div class="form-grid section-heading-editor">
+          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+          <div class="field"><label>Section name</label><input id="fSectionResearchTitle"></div>
+          <div class="field"><label>Section subtitle</label><input id="fSectionResearchSubtitle"></div>
+        </div>
+        <div class="form-grid section-heading-editor">
+          <p class="heading-editor-note">Controls the separate Featured Research section heading.</p>
+          <div class="field"><label>Featured section name</label><input id="fSectionFeaturedTitle"></div>
+          <div class="field"><label>Featured section subtitle (optional)</label><input id="fSectionFeaturedSubtitle"></div>
+        </div>
         <div class="form-grid">
           <div class="field full"><label>Research interests — one per line</label><textarea id="fInterests"></textarea></div>
           <div class="field full"><label>Featured research title</label><input id="fResearchTitle"></div>
@@ -70,28 +81,52 @@
       </div>
 
       <div class="admin-panel" data-panel="publications">
+        <div class="form-grid section-heading-editor">
+          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+          <div class="field"><label>Section name</label><input id="fSectionPublicationsTitle"></div>
+          <div class="field"><label>Section subtitle</label><input id="fSectionPublicationsSubtitle"></div>
+        </div>
         <div id="publicationsEditor"></div>
         <button id="addPublicationBtn" class="secondary" type="button">+ Add publication</button>
       </div>
 
       <div class="admin-panel" data-panel="projects">
+        <div class="form-grid section-heading-editor">
+          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+          <div class="field"><label>Section name</label><input id="fSectionProjectsTitle"></div>
+          <div class="field"><label>Section subtitle</label><input id="fSectionProjectsSubtitle"></div>
+        </div>
         <div id="projectsEditor"></div>
         <button id="addProjectBtn" class="secondary" type="button">+ Add project</button>
       </div>
 
       <div class="admin-panel" data-panel="skills">
+        <div class="form-grid section-heading-editor">
+          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+          <div class="field"><label>Section name</label><input id="fSectionSkillsTitle"></div>
+          <div class="field"><label>Section subtitle</label><input id="fSectionSkillsSubtitle"></div>
+        </div>
         <div id="skillsEditor"></div>
         <button id="addSkillGroupBtn" class="secondary" type="button">+ Add skill group</button>
       </div>
 
       <div class="admin-panel" data-panel="education">
+        <div class="form-grid section-heading-editor">
+          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+          <div class="field"><label>Section name</label><input id="fSectionEducationTitle"></div>
+          <div class="field"><label>Section subtitle</label><input id="fSectionEducationSubtitle"></div>
+        </div>
         <div id="educationEditor"></div>
         <button id="addEducationBtn" class="secondary" type="button">+ Add education</button>
       </div>
 
       <div class="admin-panel" data-panel="contact">
+        <div class="form-grid section-heading-editor">
+          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+          <div class="field"><label>Section name</label><input id="fSectionContactTitle"></div>
+          <div class="field"><label>Section subtitle</label><input id="fContactHeadline"></div>
+        </div>
         <div class="form-grid">
-          <div class="field full"><label>Contact section headline</label><input id="fContactHeadline"></div>
           <div class="field full"><label>Contact message</label><textarea id="fContactMessage"></textarea></div>
           <div class="field"><label>Public email</label><input id="fEmail" type="email"></div>
           <div class="field"><label>Phone (optional)</label><input id="fPhone"></div>
@@ -105,6 +140,11 @@
       </div>
 
       <div class="admin-panel" data-panel="cv">
+        <div class="form-grid section-heading-editor">
+          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+          <div class="field"><label>Section name</label><input id="fSectionCvTitle"></div>
+          <div class="field"><label>Section subtitle</label><input id="fSectionCvSubtitle"></div>
+        </div>
         <div class="cv-manager">
           <div class="cv-current">
             <h3>Current CV</h3>
@@ -574,6 +614,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260822-themes40"></script>
+  <script src="admin.js?v=20260823-sections1"></script>
 </body>
 </html>

@@ -29,6 +29,41 @@ const DEFAULT_CONTENT={
   "sectionMedia":{"profile":[]}
 };
 
+
+const DEFAULT_SECTION_HEADINGS={
+  about:{title:"About Me",subtitle:"Mechanical engineering with an atomistic materials focus."},
+  research:{title:"Research Interests",subtitle:"What I work on"},
+  featured:{title:"Featured Research",subtitle:""},
+  publications:{title:"Publications",subtitle:"Research output"},
+  projects:{title:"Projects",subtitle:"Selected work"},
+  skills:{title:"Skills",subtitle:"Research toolkit"},
+  education:{title:"Education",subtitle:"Academic background"},
+  contact:{title:"Contact",subtitle:"Interested in computational materials and nanoscale mechanics?"},
+  cv:{title:"Curriculum Vitae",subtitle:"Academic CV"}
+};
+
+function normalizeSectionHeadings(content){
+  const current=(content.sectionHeadings&&typeof content.sectionHeadings==="object")?content.sectionHeadings:{};
+  const legacyAbout=content.aboutHeadline??DEFAULT_SECTION_HEADINGS.about.subtitle;
+  const legacyContact=content.contact?.headline??DEFAULT_SECTION_HEADINGS.contact.subtitle;
+  const out={};
+
+  Object.entries(DEFAULT_SECTION_HEADINGS).forEach(([key,defaults])=>{
+    const item=(current[key]&&typeof current[key]==="object")?current[key]:{};
+    const hasTitle=Object.prototype.hasOwnProperty.call(item,"title");
+    const hasSubtitle=Object.prototype.hasOwnProperty.call(item,"subtitle");
+    const fallbackSubtitle=key==="about"?legacyAbout:(key==="contact"?legacyContact:defaults.subtitle);
+
+    out[key]={
+      title:hasTitle?String(item.title??""):defaults.title,
+      subtitle:hasSubtitle?String(item.subtitle??""):String(fallbackSubtitle??"")
+    };
+  });
+
+  content.sectionHeadings=out;
+  return content;
+}
+
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
 const ADMIN_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream"];
 function validAdminTheme(t){return ADMIN_THEMES.includes(t)?t:"classic-brown"}
@@ -99,6 +134,7 @@ function merge(base,extra){
   return extra??base;
 }
 function normalizeMedia(content){
+  normalizeSectionHeadings(content);
   content.sectionMedia=content.sectionMedia||{};
   content.sectionMedia.profile=Array.isArray(content.sectionMedia.profile)?content.sectionMedia.profile:[];
   content.featuredResearch=content.featuredResearch||{};
@@ -124,14 +160,31 @@ function fillForms(){
   $("fInstitution").value=currentContent.institution||"";
   $("fLocation").value=currentContent.location||"";
   $("fFocus").value=currentContent.focus||"";
-  $("fAboutHeadline").value=currentContent.aboutHeadline||"";
+  const sections=normalizeSectionHeadings(currentContent).sectionHeadings;
+  $("fSectionAboutTitle").value=sections.about.title||"";
+  $("fAboutHeadline").value=sections.about.subtitle||"";
+  $("fSectionResearchTitle").value=sections.research.title||"";
+  $("fSectionResearchSubtitle").value=sections.research.subtitle||"";
+  $("fSectionFeaturedTitle").value=sections.featured.title||"";
+  $("fSectionFeaturedSubtitle").value=sections.featured.subtitle||"";
+  $("fSectionPublicationsTitle").value=sections.publications.title||"";
+  $("fSectionPublicationsSubtitle").value=sections.publications.subtitle||"";
+  $("fSectionProjectsTitle").value=sections.projects.title||"";
+  $("fSectionProjectsSubtitle").value=sections.projects.subtitle||"";
+  $("fSectionSkillsTitle").value=sections.skills.title||"";
+  $("fSectionSkillsSubtitle").value=sections.skills.subtitle||"";
+  $("fSectionEducationTitle").value=sections.education.title||"";
+  $("fSectionEducationSubtitle").value=sections.education.subtitle||"";
+  $("fSectionContactTitle").value=sections.contact.title||"";
+  $("fContactHeadline").value=sections.contact.subtitle||"";
+  $("fSectionCvTitle").value=sections.cv.title||"";
+  $("fSectionCvSubtitle").value=sections.cv.subtitle||"";
   $("fAboutLead").value=currentContent.aboutLead||"";
   $("fAboutBio").value=currentContent.aboutBio||"";
   $("fInterests").value=(currentContent.researchInterests||[]).join("\n");
   $("fResearchTitle").value=currentContent.featuredResearch?.title||"";
   $("fResearchDescription").value=currentContent.featuredResearch?.description||"";
   $("fResearchTags").value=(currentContent.featuredResearch?.tags||[]).join(", ");
-  $("fContactHeadline").value=currentContent.contact?.headline||"";
   $("fContactMessage").value=currentContent.contact?.message||"";
   $("fEmail").value=currentContent.contact?.email||"";
   $("fPhone").value=currentContent.contact?.phone||"";
@@ -336,7 +389,21 @@ function syncAllForms(){
   currentContent.location=$("fLocation").value.trim();
   currentContent.focus=$("fFocus").value.trim();
   currentContent.defaultTheme=selectedAdminTheme();
-  currentContent.aboutHeadline=$("fAboutHeadline").value.trim();
+
+  currentContent.sectionHeadings={
+    about:{title:$("fSectionAboutTitle").value.trim(),subtitle:$("fAboutHeadline").value.trim()},
+    research:{title:$("fSectionResearchTitle").value.trim(),subtitle:$("fSectionResearchSubtitle").value.trim()},
+    featured:{title:$("fSectionFeaturedTitle").value.trim(),subtitle:$("fSectionFeaturedSubtitle").value.trim()},
+    publications:{title:$("fSectionPublicationsTitle").value.trim(),subtitle:$("fSectionPublicationsSubtitle").value.trim()},
+    projects:{title:$("fSectionProjectsTitle").value.trim(),subtitle:$("fSectionProjectsSubtitle").value.trim()},
+    skills:{title:$("fSectionSkillsTitle").value.trim(),subtitle:$("fSectionSkillsSubtitle").value.trim()},
+    education:{title:$("fSectionEducationTitle").value.trim(),subtitle:$("fSectionEducationSubtitle").value.trim()},
+    contact:{title:$("fSectionContactTitle").value.trim(),subtitle:$("fContactHeadline").value.trim()},
+    cv:{title:$("fSectionCvTitle").value.trim(),subtitle:$("fSectionCvSubtitle").value.trim()}
+  };
+
+  /* Keep the old fields synchronized for backwards compatibility. */
+  currentContent.aboutHeadline=currentContent.sectionHeadings.about.subtitle;
   currentContent.aboutLead=$("fAboutLead").value.trim();
   currentContent.aboutBio=$("fAboutBio").value.trim();
   currentContent.researchInterests=$("fInterests").value.split("\n").map(x=>x.trim()).filter(Boolean);
@@ -353,7 +420,7 @@ function syncAllForms(){
 
   const contactMedia=currentContent.contact?.media||[];
   currentContent.contact={
-    headline:$("fContactHeadline").value.trim(),
+    headline:currentContent.sectionHeadings.contact.subtitle,
     message:$("fContactMessage").value.trim(),
     email:$("fEmail").value.trim(),
     phone:$("fPhone").value.trim(),

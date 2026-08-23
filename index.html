@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Ibtida Yasin — Mechanical Engineering and Computational Materials">
   <title>Ibtida Yasin | Academic Profile</title>
-  <link rel="stylesheet" href="styles.css?v=20260822-themes40">
+  <link rel="stylesheet" href="styles.css?v=20260823-sections1">
 </head>
 <body>
 <header class="topbar">
@@ -13,13 +13,13 @@
     <a class="brand" href="#home" id="brandName">Ibtida Yasin</a>
     <nav>
       <a href="#home">Home</a>
-      <a href="#research">Research</a>
-      <a href="#publications">Publications</a>
-      <a href="#projects">Projects</a>
-      <a href="#skills">Skills</a>
-      <a href="#education">Education</a>
-      <a href="#contact">Contact</a>
-      <a href="#cv">CV</a>
+      <a href="#research" id="navResearch">Research Interests</a>
+      <a href="#publications" id="navPublications">Publications</a>
+      <a href="#projects" id="navProjects">Projects</a>
+      <a href="#skills" id="navSkills">Skills</a>
+      <a href="#education" id="navEducation">Education</a>
+      <a href="#contact" id="navContact">Contact</a>
+      <a href="#cv" id="navCv">Curriculum Vitae</a>
     </nav>
   </div>
 </header>
@@ -44,22 +44,23 @@
   </aside>
 
   <div class="content">
-    <section class="section">
-      <p class="eyebrow">About Me</p>
-      <h2 id="aboutHeadline"></h2>
+    <section class="section" id="about">
+      <h2 class="section-title" id="aboutSectionTitle">About Me</h2>
+      <p class="section-subtitle" id="aboutHeadline"></p>
       <p class="lead" id="aboutLead"></p>
       <p class="muted" id="aboutBio"></p>
       <div id="profileMedia" class="public-media"></div>
     </section>
 
     <section class="section" id="research">
-      <p class="eyebrow">Research Interests</p>
-      <h2>What I work on</h2>
+      <h2 class="section-title" id="researchSectionTitle">Research Interests</h2>
+      <p class="section-subtitle" id="researchSectionSubtitle">What I work on</p>
       <ul class="interest-list" id="researchInterests"></ul>
     </section>
 
     <section class="section">
-      <p class="eyebrow">Featured Research</p>
+      <h2 class="section-title" id="featuredSectionTitle">Featured Research</h2>
+      <p class="section-subtitle hidden" id="featuredSectionSubtitle"></p>
       <div class="research-card">
         <div>
           <h3 id="researchTitle"></h3>
@@ -76,40 +77,40 @@
     </section>
 
     <section class="section" id="publications">
-      <p class="eyebrow">Publications</p>
-      <h2>Research output</h2>
+      <h2 class="section-title" id="publicationsSectionTitle">Publications</h2>
+      <p class="section-subtitle" id="publicationsSectionSubtitle">Research output</p>
       <div id="publicationsList" class="stack-list"></div>
     </section>
 
     <section class="section" id="projects">
-      <p class="eyebrow">Projects</p>
-      <h2>Selected work</h2>
+      <h2 class="section-title" id="projectsSectionTitle">Projects</h2>
+      <p class="section-subtitle" id="projectsSectionSubtitle">Selected work</p>
       <div class="cards" id="projectsList"></div>
     </section>
 
     <section class="section" id="skills">
-      <p class="eyebrow">Skills</p>
-      <h2>Research toolkit</h2>
+      <h2 class="section-title" id="skillsSectionTitle">Skills</h2>
+      <p class="section-subtitle" id="skillsSectionSubtitle">Research toolkit</p>
       <div class="skills-grid" id="skillsList"></div>
     </section>
 
     <section class="section" id="education">
-      <p class="eyebrow">Education</p>
-      <h2>Academic background</h2>
+      <h2 class="section-title" id="educationSectionTitle">Education</h2>
+      <p class="section-subtitle" id="educationSectionSubtitle">Academic background</p>
       <div id="educationList"></div>
     </section>
 
     <section class="section" id="contact">
-      <p class="eyebrow">Contact</p>
-      <h2 id="contactHeadline"></h2>
+      <h2 class="section-title" id="contactSectionTitle">Contact</h2>
+      <p class="section-subtitle" id="contactHeadline"></p>
       <p class="lead" id="contactMessage"></p>
       <div class="contact-grid" id="contactLinks"></div>
       <div id="contactMedia" class="public-media"></div>
     </section>
 
     <section class="section" id="cv">
-      <p class="eyebrow">Curriculum Vitae</p>
-      <h2>Academic CV</h2>
+      <h2 class="section-title" id="cvSectionTitle">Curriculum Vitae</h2>
+      <p class="section-subtitle" id="cvSectionSubtitle">Academic CV</p>
       <p class="muted" id="cvNote">Upload your CV from the private admin page.</p>
       <a class="button disabled" id="cvLink" href="#" aria-disabled="true">CV coming soon</a>
     </section>
@@ -123,6 +124,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="script.js?v=20260822-themes40"></script>
+<script src="script.js?v=20260823-sections1"></script>
 </body>
 </html>
