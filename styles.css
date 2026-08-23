@@ -913,7 +913,7 @@ body:not(.admin-body) .section-title{
   font:700 clamp(36px,4.4vw,44px)/1.08 Georgia,serif;
   letter-spacing:-.035em;
   margin:0 0 8px;
-  color:var(--text);
+  color:var(--accent);
 }
 
 body:not(.admin-body) .section-subtitle{
