@@ -125,6 +125,37 @@ function updateTypographyUndoButton(){
   btn.disabled=!typographySavedSnapshot||typographyStatesEqual(now,typographySavedSnapshot);
 }
 
+
+function currentThemeTypographyColors(){
+  const cs=getComputedStyle(document.documentElement);
+  const accent=cs.getPropertyValue("--accent").trim();
+  const muted=cs.getPropertyValue("--muted").trim();
+  return {
+    title:validHex(accent)?accent.toUpperCase():"#9F8064",
+    subtitle:validHex(muted)?muted.toUpperCase():"#746E66"
+  };
+}
+
+function showCurrentThemeColorsInBoxes(){
+  const colors=currentThemeTypographyColors();
+
+  $("useThemeSectionTitleColor").checked=true;
+  $("useThemeSectionSubtitleColor").checked=true;
+
+  $("fSectionTitleColor").value=colors.title;
+  $("fSectionTitleColorText").value=colors.title;
+  $("fSectionSubtitleColor").value=colors.subtitle;
+  $("fSectionSubtitleColorText").value=colors.subtitle;
+
+  normalizeTypography(currentContent);
+  currentContent.appearance.typography.sectionTitleColor="";
+  currentContent.appearance.typography.sectionSubtitleColor="";
+
+  syncTypographyDisabledState();
+  applyAdminTypographyPreview();
+  updateTypographyUndoButton();
+}
+
 function renderTypographyControlsFromState(t){
   const state={
     sectionTitleSize:clampNumber(t?.sectionTitleSize,30,60,DEFAULT_TYPOGRAPHY.sectionTitleSize),
@@ -138,10 +169,11 @@ function renderTypographyControlsFromState(t){
   $("fSectionSubtitleSize").value=state.sectionSubtitleSize;
   $("fSectionSubtitleSizeNumber").value=state.sectionSubtitleSize;
 
-  $("fSectionTitleColor").value=state.sectionTitleColor||"#9f8064";
-  $("fSectionSubtitleColor").value=state.sectionSubtitleColor||"#746e66";
-  $("fSectionTitleColorText").value=state.sectionTitleColor||"";
-  $("fSectionSubtitleColorText").value=state.sectionSubtitleColor||"";
+  const themeColors=currentThemeTypographyColors();
+  $("fSectionTitleColor").value=state.sectionTitleColor||themeColors.title;
+  $("fSectionSubtitleColor").value=state.sectionSubtitleColor||themeColors.subtitle;
+  $("fSectionTitleColorText").value=state.sectionTitleColor||themeColors.title;
+  $("fSectionSubtitleColorText").value=state.sectionSubtitleColor||themeColors.subtitle;
 
   $("useThemeSectionTitleColor").checked=!state.sectionTitleColor;
   $("useThemeSectionSubtitleColor").checked=!state.sectionSubtitleColor;
@@ -160,24 +192,30 @@ function fillTypographyControls(){
 }
 
 function syncTypographyDisabledState(){
-  const titleTheme=$("useThemeSectionTitleColor").checked;
-  const subtitleTheme=$("useThemeSectionSubtitleColor").checked;
-  $("fSectionTitleColor").disabled=titleTheme;
-  $("fSectionTitleColorText").disabled=titleTheme;
-  $("fSectionSubtitleColor").disabled=subtitleTheme;
-  $("fSectionSubtitleColorText").disabled=subtitleTheme;
+  /* Color boxes stay editable even while showing the theme's current colors.
+     Editing a box automatically switches that item to manual override mode. */
+  $("fSectionTitleColor").disabled=false;
+  $("fSectionTitleColorText").disabled=false;
+  $("fSectionSubtitleColor").disabled=false;
+  $("fSectionSubtitleColorText").disabled=false;
 }
 
-function syncColorPickerToText(pickerId,textId){
-  const picker=$(pickerId),text=$(textId);
+function syncColorPickerToText(pickerId,textId,themeToggleId){
+  const picker=$(pickerId),text=$(textId),toggle=$(themeToggleId);
   if(!picker||!text)return;
+
   picker.addEventListener("input",()=>{
+    if(toggle)toggle.checked=false;
     text.value=picker.value.toUpperCase();
     previewTypographyFromControls();
   });
+
   text.addEventListener("input",()=>{
     const value=text.value.trim();
-    if(validHex(value))picker.value=value;
+    if(validHex(value)){
+      if(toggle)toggle.checked=false;
+      picker.value=value;
+    }
     previewTypographyFromControls();
   });
 }
@@ -203,13 +241,15 @@ function resetTypographyControls(){
   $("fSectionSubtitleSize").value=defaults.sectionSubtitleSize;
   $("fSectionSubtitleSizeNumber").value=defaults.sectionSubtitleSize;
 
-  /* Default colors follow the active theme. */
+  /* Default colors follow the currently selected theme and the color boxes
+     visibly show those exact theme colors. */
+  const themeColors=currentThemeTypographyColors();
   $("useThemeSectionTitleColor").checked=true;
   $("useThemeSectionSubtitleColor").checked=true;
-  $("fSectionTitleColorText").value="";
-  $("fSectionSubtitleColorText").value="";
-  $("fSectionTitleColor").value="#9f8064";
-  $("fSectionSubtitleColor").value="#746e66";
+  $("fSectionTitleColor").value=themeColors.title;
+  $("fSectionTitleColorText").value=themeColors.title;
+  $("fSectionSubtitleColor").value=themeColors.subtitle;
+  $("fSectionSubtitleColorText").value=themeColors.subtitle;
 
   syncTypographyDisabledState();
   previewTypographyFromControls();
@@ -249,6 +289,10 @@ document.addEventListener("change",e=>{
     card.classList.toggle("selected",card.dataset.themeCard===input.value);
   });
   applyAdminThemePreview(input.value);
+  if($("fSectionTitleColor")&&$("fSectionSubtitleColor")){
+    showCurrentThemeColorsInBoxes();
+    setStatus("Theme preview updated. Typography colors now start from this theme's colors.");
+  }
 });
 
 const $=id=>document.getElementById(id);
@@ -970,10 +1014,26 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
     previewTypographyFromControls();
   });
 });
-syncColorPickerToText("fSectionTitleColor","fSectionTitleColorText");
-syncColorPickerToText("fSectionSubtitleColor","fSectionSubtitleColorText");
-$("useThemeSectionTitleColor")?.addEventListener("change",()=>{syncTypographyDisabledState();previewTypographyFromControls()});
-$("useThemeSectionSubtitleColor")?.addEventListener("change",()=>{syncTypographyDisabledState();previewTypographyFromControls()});
+syncColorPickerToText("fSectionTitleColor","fSectionTitleColorText","useThemeSectionTitleColor");
+syncColorPickerToText("fSectionSubtitleColor","fSectionSubtitleColorText","useThemeSectionSubtitleColor");
+$("useThemeSectionTitleColor")?.addEventListener("change",()=>{
+  if($("useThemeSectionTitleColor").checked){
+    const c=currentThemeTypographyColors().title;
+    $("fSectionTitleColor").value=c;
+    $("fSectionTitleColorText").value=c;
+  }
+  syncTypographyDisabledState();
+  previewTypographyFromControls();
+});
+$("useThemeSectionSubtitleColor")?.addEventListener("change",()=>{
+  if($("useThemeSectionSubtitleColor").checked){
+    const c=currentThemeTypographyColors().subtitle;
+    $("fSectionSubtitleColor").value=c;
+    $("fSectionSubtitleColorText").value=c;
+  }
+  syncTypographyDisabledState();
+  previewTypographyFromControls();
+});
 $("resetTypographyBtn")?.addEventListener("click",resetTypographyControls);
 $("undoTypographyBtn")?.addEventListener("click",undoTypographyControls);
 
