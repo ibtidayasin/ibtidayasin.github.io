@@ -106,8 +106,58 @@ function applyPublicTypography(d){
   root.style.setProperty("--public-section-subtitle-color",t.sectionSubtitleColor||"var(--muted)");
 }
 
+
+const DEFAULT_CUSTOM_THEME={
+  bg:"#FCFBF9",
+  surface:"#FFFFFF",
+  surfaceAlt:"#F7F3EE",
+  text:"#2B2926",
+  muted:"#746E66",
+  line:"#E8E1D9",
+  accent:"#9F8064",
+  accentSoft:"#F5EEE7",
+  portraitA:"#D7C2AE",
+  portraitB:"#9A7D65"
+};
+
+function normalizeCustomTheme(content){
+  const a=(content.appearance&&typeof content.appearance==="object")?content.appearance:{};
+  const raw=(a.customTheme&&typeof a.customTheme==="object")?a.customTheme:{};
+  const out={};
+  Object.entries(DEFAULT_CUSTOM_THEME).forEach(([k,v])=>{
+    out[k]=validHex(raw[k])?raw[k].toUpperCase():v;
+  });
+  content.appearance={...a,customTheme:out};
+  return content;
+}
+
+function hexToRgba(hex,alpha){
+  const h=String(hex||"").replace("#","");
+  if(!/^[0-9a-fA-F]{6}$/.test(h))return `rgba(255,255,255,${alpha})`;
+  const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function applyCustomThemeVariables(theme){
+  const t=theme||DEFAULT_CUSTOM_THEME;
+  const root=document.documentElement;
+  root.style.setProperty("--bg",t.bg);
+  root.style.setProperty("--surface",t.surface);
+  root.style.setProperty("--surface-alt",t.surfaceAlt);
+  root.style.setProperty("--surface-soft",t.surface);
+  root.style.setProperty("--text",t.text);
+  root.style.setProperty("--muted",t.muted);
+  root.style.setProperty("--line",t.line);
+  root.style.setProperty("--accent",t.accent);
+  root.style.setProperty("--accent-soft",t.accentSoft);
+  root.style.setProperty("--header-bg",hexToRgba(t.bg,.96));
+  root.style.setProperty("--media-bg",t.surfaceAlt);
+  root.style.setProperty("--portrait-a",t.portraitA);
+  root.style.setProperty("--portrait-b",t.portraitB);
+}
+
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
-const SITE_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream"];
+const SITE_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream","custom-theme"];
 function validSiteTheme(t){return SITE_THEMES.includes(t)?t:"classic-brown"}
 
 function merge(base,extra){
@@ -120,6 +170,7 @@ function merge(base,extra){
   return extra??base;
 }
 function normalize(d){
+  normalizeCustomTheme(d);
   normalizeTypography(d);
   normalizeSectionHeadings(d);
   d.sectionMedia=d.sectionMedia||{profile:[]};
@@ -167,6 +218,10 @@ function iconLinkHtml(type,label,url,isExternal=true){
 function render(d){
   document.title=`${d.name} | Academic Profile`;
   document.documentElement.dataset.theme=validSiteTheme(d.defaultTheme||"classic-brown");
+  if(validSiteTheme(d.defaultTheme||"")==="custom-theme"){
+    normalizeCustomTheme(d);
+    applyCustomThemeVariables(d.appearance.customTheme);
+  }
   applyPublicTypography(d);
   $("brandName").textContent=$("name").textContent=$("footerName").textContent=d.name;
   $("initials").textContent=d.name.split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase();

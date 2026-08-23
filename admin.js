@@ -107,6 +107,137 @@ function applyAdminTypographyPreview(){
 }
 
 
+
+const DEFAULT_CUSTOM_THEME={
+  bg:"#FCFBF9",
+  surface:"#FFFFFF",
+  surfaceAlt:"#F7F3EE",
+  text:"#2B2926",
+  muted:"#746E66",
+  line:"#E8E1D9",
+  accent:"#9F8064",
+  accentSoft:"#F5EEE7",
+  portraitA:"#D7C2AE",
+  portraitB:"#9A7D65"
+};
+
+function normalizeCustomTheme(content){
+  const a=(content.appearance&&typeof content.appearance==="object")?content.appearance:{};
+  const raw=(a.customTheme&&typeof a.customTheme==="object")?a.customTheme:{};
+  const out={};
+  Object.entries(DEFAULT_CUSTOM_THEME).forEach(([k,v])=>{
+    out[k]=validHex(raw[k])?raw[k].toUpperCase():v;
+  });
+  content.appearance={...a,customTheme:out};
+  return content;
+}
+
+function hexToRgba(hex,alpha){
+  const h=String(hex||"").replace("#","");
+  if(!/^[0-9a-fA-F]{6}$/.test(h))return `rgba(255,255,255,${alpha})`;
+  const r=parseInt(h.slice(0,2),16),g=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function applyCustomThemeVariables(theme){
+  const t=theme||DEFAULT_CUSTOM_THEME;
+  const root=document.documentElement;
+  root.style.setProperty("--bg",t.bg);
+  root.style.setProperty("--surface",t.surface);
+  root.style.setProperty("--surface-alt",t.surfaceAlt);
+  root.style.setProperty("--surface-soft",t.surface);
+  root.style.setProperty("--text",t.text);
+  root.style.setProperty("--muted",t.muted);
+  root.style.setProperty("--line",t.line);
+  root.style.setProperty("--accent",t.accent);
+  root.style.setProperty("--accent-soft",t.accentSoft);
+  root.style.setProperty("--header-bg",hexToRgba(t.bg,.96));
+  root.style.setProperty("--media-bg",t.surfaceAlt);
+  root.style.setProperty("--portrait-a",t.portraitA);
+  root.style.setProperty("--portrait-b",t.portraitB);
+}
+
+
+const CUSTOM_THEME_FIELDS=[
+  ["bg","fCustomBg"],
+  ["surface","fCustomSurface"],
+  ["surfaceAlt","fCustomSurfaceAlt"],
+  ["text","fCustomText"],
+  ["muted","fCustomMuted"],
+  ["line","fCustomLine"],
+  ["accent","fCustomAccent"],
+  ["accentSoft","fCustomAccentSoft"],
+  ["portraitA","fCustomPortraitA"],
+  ["portraitB","fCustomPortraitB"]
+];
+
+function readCustomThemeControls(){
+  const out={};
+  CUSTOM_THEME_FIELDS.forEach(([key,id])=>{
+    const el=$(id);
+    out[key]=validHex(el?.value)?el.value.toUpperCase():DEFAULT_CUSTOM_THEME[key];
+  });
+  return out;
+}
+
+function fillCustomThemeControls(){
+  normalizeCustomTheme(currentContent);
+  const t=currentContent.appearance.customTheme;
+  CUSTOM_THEME_FIELDS.forEach(([key,id])=>{
+    if($(id))$(id).value=t[key];
+    const hex=$(id+"Hex");
+    if(hex)hex.value=t[key];
+  });
+}
+
+function syncCustomThemeHexPair(colorId){
+  const picker=$(colorId),hex=$(colorId+"Hex");
+  if(!picker||!hex)return;
+  picker.addEventListener("input",()=>{
+    hex.value=picker.value.toUpperCase();
+    previewCustomThemeFromControls();
+  });
+  hex.addEventListener("input",()=>{
+    const v=hex.value.trim();
+    if(validHex(v)){
+      picker.value=v;
+      previewCustomThemeFromControls();
+    }
+  });
+}
+
+function previewCustomThemeFromControls(){
+  normalizeCustomTheme(currentContent);
+  currentContent.appearance.customTheme=readCustomThemeControls();
+  const customSelected=selectedAdminTheme()==="custom-theme";
+  const preview=document.querySelector('[data-theme-card="custom-theme"] .custom-theme-mini-preview');
+  if(preview){
+    const t=currentContent.appearance.customTheme;
+    preview.style.setProperty("--tc-bg",t.bg);
+    preview.style.setProperty("--tc-text",t.text);
+    preview.style.setProperty("--tc-accent",t.accent);
+    preview.style.setProperty("--tc-soft",t.accentSoft);
+  }
+  if(customSelected){
+    document.documentElement.dataset.theme="custom-theme";
+    applyCustomThemeVariables(currentContent.appearance.customTheme);
+    showCurrentThemeColorsInBoxes();
+  }
+  updateTypographyUndoButton();
+}
+
+function resetCustomThemeBuilder(){
+  normalizeCustomTheme(currentContent);
+  currentContent.appearance.customTheme=structuredClone(DEFAULT_CUSTOM_THEME);
+  fillCustomThemeControls();
+  if(selectedAdminTheme()==="custom-theme"){
+    document.documentElement.dataset.theme="custom-theme";
+    applyCustomThemeVariables(currentContent.appearance.customTheme);
+    showCurrentThemeColorsInBoxes();
+  }
+  setStatus("Custom theme reset to its starter palette. Click Save all changes to publish it.");
+}
+
 let typographySavedSnapshot=null;
 
 function typographyStateFromContent(){
@@ -265,13 +396,18 @@ function undoTypographyControls(){
   setStatus("Unsaved typography changes were undone.");
 }
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
-const ADMIN_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream"];
+const ADMIN_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream","custom-theme"];
 function validAdminTheme(t){return ADMIN_THEMES.includes(t)?t:"classic-brown"}
 function selectedAdminTheme(){
   return document.querySelector('input[name="siteTheme"]:checked')?.value||"classic-brown";
 }
 function applyAdminThemePreview(theme){
-  document.documentElement.dataset.theme=validAdminTheme(theme);
+  const valid=validAdminTheme(theme);
+  document.documentElement.dataset.theme=valid;
+  if(valid==="custom-theme"){
+    normalizeCustomTheme(currentContent);
+    applyCustomThemeVariables(currentContent.appearance.customTheme);
+  }
 }
 function fillThemeChooser(){
   const theme=validAdminTheme(currentContent.defaultTheme||"classic-brown");
@@ -338,6 +474,7 @@ function merge(base,extra){
   return extra??base;
 }
 function normalizeMedia(content){
+  normalizeCustomTheme(content);
   normalizeTypography(content);
   normalizeSectionHeadings(content);
   content.sectionMedia=content.sectionMedia||{};
@@ -410,6 +547,7 @@ function fillForms(){
   renderCvState();
   fillThemeChooser();
   fillTypographyControls();
+  fillCustomThemeControls();
 }
 
 function renderAllEditors(){
@@ -595,6 +733,8 @@ function syncAllForms(){
   currentContent.location=$("fLocation").value.trim();
   currentContent.focus=$("fFocus").value.trim();
   currentContent.defaultTheme=selectedAdminTheme();
+  normalizeCustomTheme(currentContent);
+  currentContent.appearance.customTheme=readCustomThemeControls();
   normalizeTypography(currentContent);
   currentContent.appearance.typography={
     sectionTitleSize:clampNumber($("fSectionTitleSizeNumber").value||$("fSectionTitleSize").value,30,60,44),
@@ -1036,5 +1176,9 @@ $("useThemeSectionSubtitleColor")?.addEventListener("change",()=>{
 });
 $("resetTypographyBtn")?.addEventListener("click",resetTypographyControls);
 $("undoTypographyBtn")?.addEventListener("click",undoTypographyControls);
+
+
+CUSTOM_THEME_FIELDS.forEach(([,id])=>syncCustomThemeHexPair(id));
+$("resetCustomThemeBtn")?.addEventListener("click",resetCustomThemeBuilder);
 
 boot();

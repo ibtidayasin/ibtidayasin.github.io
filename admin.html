@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260823-typography2">
+  <link rel="stylesheet" href="styles.css?v=20260823-customtheme1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -590,6 +590,41 @@
 </div>
 
 
+
+        <div class="custom-theme-builder">
+          <div class="custom-theme-builder-head">
+            <div>
+              <h3>Create your own theme</h3>
+              <p class="muted">Choose <strong>Custom Theme</strong> above, then adjust these colors. Changes preview instantly.</p>
+            </div>
+            <button id="resetCustomThemeBtn" class="secondary" type="button">Reset custom palette</button>
+          </div>
+
+          <div class="custom-theme-grid">
+            <div class="custom-theme-card">
+              <h4>Page & cards</h4>
+              <div class="custom-color-control"><label>Page background</label><div><input id="fCustomBg" type="color"><input id="fCustomBgHex" maxlength="7"></div></div>
+              <div class="custom-color-control"><label>Card / surface</label><div><input id="fCustomSurface" type="color"><input id="fCustomSurfaceHex" maxlength="7"></div></div>
+              <div class="custom-color-control"><label>Secondary surface</label><div><input id="fCustomSurfaceAlt" type="color"><input id="fCustomSurfaceAltHex" maxlength="7"></div></div>
+              <div class="custom-color-control"><label>Borders / lines</label><div><input id="fCustomLine" type="color"><input id="fCustomLineHex" maxlength="7"></div></div>
+            </div>
+
+            <div class="custom-theme-card">
+              <h4>Typography & accent</h4>
+              <div class="custom-color-control"><label>Main text</label><div><input id="fCustomText" type="color"><input id="fCustomTextHex" maxlength="7"></div></div>
+              <div class="custom-color-control"><label>Muted text</label><div><input id="fCustomMuted" type="color"><input id="fCustomMutedHex" maxlength="7"></div></div>
+              <div class="custom-color-control"><label>Accent</label><div><input id="fCustomAccent" type="color"><input id="fCustomAccentHex" maxlength="7"></div></div>
+              <div class="custom-color-control"><label>Accent soft</label><div><input id="fCustomAccentSoft" type="color"><input id="fCustomAccentSoftHex" maxlength="7"></div></div>
+            </div>
+
+            <div class="custom-theme-card">
+              <h4>Profile portrait gradient</h4>
+              <div class="custom-color-control"><label>Gradient color 1</label><div><input id="fCustomPortraitA" type="color"><input id="fCustomPortraitAHex" maxlength="7"></div></div>
+              <div class="custom-color-control"><label>Gradient color 2</label><div><input id="fCustomPortraitB" type="color"><input id="fCustomPortraitBHex" maxlength="7"></div></div>
+            </div>
+          </div>
+        </div>
+
         <div class="typography-controls">
           <h3>Manual typography</h3>
           <p class="muted">Override the public section heading sizes and colors. You can return colors to the active theme at any time.</p>
@@ -660,7 +695,20 @@
             <button id="resetTypographyBtn" class="secondary" type="button">Reset typography to defaults</button>
             <button id="undoTypographyBtn" class="secondary" type="button" disabled>Undo unsaved changes</button>
           </div>
-        </div>
+        
+          <div class="theme-group-title">Custom</div>
+          <label class="theme-choice" data-theme-card="custom-theme">
+            <input type="radio" name="siteTheme" value="custom-theme">
+            <span class="theme-choice-preview custom-theme-mini-preview" style="--tc-bg:#FCFBF9;--tc-text:#2B2926;--tc-accent:#9F8064;--tc-soft:#F5EEE7">
+              <span class="theme-mini-header"></span>
+              <span class="theme-mini-title"></span>
+              <span class="theme-mini-line"></span>
+              <span class="theme-mini-button"></span>
+            </span>
+            <span class="theme-choice-name">Custom Theme</span>
+          </label>
+
+</div>
 
         <div class="theme-preview-note">
           <strong>Live preview</strong>
@@ -687,6 +735,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260823-theme-color-sync1"></script>
+  <script src="admin.js?v=20260823-customtheme1"></script>
 </body>
 </html>
