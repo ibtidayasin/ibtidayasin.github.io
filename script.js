@@ -279,6 +279,7 @@ function portraitRadiusValue(shape){
 
 
 let siteActiveNavObserver=null;
+let siteActiveNavScrollHandler=null;
 let siteRevealObserver=null;
 let siteEnhancementsBound=false;
 let currentSiteExperience=structuredClone(DEFAULT_SITE_SETTINGS.experience);
@@ -420,21 +421,68 @@ function applyLayoutSettings(d){
 }
 
 function setupActiveNavigation(d){
-  if(siteActiveNavObserver){siteActiveNavObserver.disconnect();siteActiveNavObserver=null}
-  document.querySelectorAll(".topbar nav a").forEach(a=>a.classList.remove("active-section"));
+  if(siteActiveNavObserver){
+    siteActiveNavObserver.disconnect();
+    siteActiveNavObserver=null;
+  }
+  if(siteActiveNavScrollHandler){
+    window.removeEventListener("scroll",siteActiveNavScrollHandler);
+    window.removeEventListener("resize",siteActiveNavScrollHandler);
+    siteActiveNavScrollHandler=null;
+  }
+
+  const navLinks=[...document.querySelectorAll(".topbar nav a")];
+  navLinks.forEach(a=>a.classList.remove("active-section"));
   if(!d.siteSettings.experience.activeNav)return;
 
   const sections=[...document.querySelectorAll(".content .section[data-section-key]:not(.site-section-hidden)")];
-  siteActiveNavObserver=new IntersectionObserver(entries=>{
-    const visible=entries.filter(x=>x.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
-    if(!visible)return;
-    const id=visible.target.id;
+  if(!sections.length)return;
+
+  const activateSection=id=>{
     const navId=id==="about"?"home":id;
-    document.querySelectorAll(".topbar nav a").forEach(a=>{
+    navLinks.forEach(a=>{
       a.classList.toggle("active-section",a.getAttribute("href")===`#${navId}`);
     });
-  },{rootMargin:"-25% 0px -60% 0px",threshold:[0,.15,.35,.6]});
-  sections.forEach(s=>siteActiveNavObserver.observe(s));
+  };
+
+  let ticking=false;
+  const updateActiveSection=()=>{
+    ticking=false;
+
+    /*
+     * The final section can be too short to cross the normal viewport
+     * activation line. When the user reaches the document bottom, always
+     * activate the last visible section (normally Curriculum Vitae).
+     */
+    const doc=document.documentElement;
+    const atBottom=window.scrollY+window.innerHeight>=doc.scrollHeight-12;
+    if(atBottom){
+      activateSection(sections[sections.length-1].id);
+      return;
+    }
+
+    const header=document.querySelector(".topbar");
+    const headerBottom=header?header.getBoundingClientRect().bottom:0;
+    const activationY=Math.max(headerBottom+24,window.innerHeight*0.30);
+
+    let selected=sections[0];
+    for(const section of sections){
+      const rect=section.getBoundingClientRect();
+      if(rect.top<=activationY)selected=section;
+      else break;
+    }
+    activateSection(selected.id);
+  };
+
+  siteActiveNavScrollHandler=()=>{
+    if(ticking)return;
+    ticking=true;
+    requestAnimationFrame(updateActiveSection);
+  };
+
+  window.addEventListener("scroll",siteActiveNavScrollHandler,{passive:true});
+  window.addEventListener("resize",siteActiveNavScrollHandler,{passive:true});
+  updateActiveSection();
 }
 
 function setupRevealAnimations(d){
@@ -691,7 +739,7 @@ function render(d){
 
   setPublicSection("about","aboutSectionTitle","aboutHeadline");
   setPublicSection("research","researchSectionTitle","researchSectionSubtitle","navResearch");
-  setPublicSection("thesis","thesisSectionTitle","thesisSectionSubtitle");
+  setPublicSection("thesis","thesisSectionTitle","thesisSectionSubtitle","navThesis");
   setPublicSection("publications","publicationsSectionTitle","publicationsSectionSubtitle","navPublications");
   setPublicSection("projects","projectsSectionTitle","projectsSectionSubtitle","navProjects");
   setPublicSection("skills","skillsSectionTitle","skillsSectionSubtitle","navSkills");
@@ -919,3 +967,5 @@ if(IS_ADMIN_PREVIEW){
 }else{
   loadContent();
 }
+
+// active-nav-bottom-fix: 20260824-v1
