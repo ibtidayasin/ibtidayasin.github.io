@@ -37,6 +37,7 @@
         <button data-tab="contact" type="button">Contact</button>
         <button data-tab="cv" type="button">CV</button>
         <button data-tab="appearance" type="button">Appearance</button>
+      <button type="button" data-tab="typography">Typography</button>
       </div>
 
       <div class="admin-panel active" data-panel="profile">
@@ -625,7 +626,18 @@
           </div>
         </div>
 
-        <div class="typography-controls">
+        
+
+        <div class="theme-preview-note">
+          <strong>Live preview</strong>
+          <span>Choosing a theme previews it immediately in this private admin page. Click <b>Save all changes</b> to publish it.</span>
+        </div>
+      </div>
+      <div class="admin-panel" data-panel="typography">
+        <div class="admin-card">
+          <h2>Typography</h2>
+          <p class="muted">Control public section-name and section-subtitle sizes and colors independently from the selected theme.</p>
+<div class="typography-controls">
           <h3>Manual typography</h3>
           <p class="muted">Override the public section heading sizes and colors. You can return colors to the active theme at any time.</p>
 
@@ -709,10 +721,6 @@
           </label>
 
 </div>
-
-        <div class="theme-preview-note">
-          <strong>Live preview</strong>
-          <span>Choosing a theme previews it immediately in this private admin page. Click <b>Save all changes</b> to publish it.</span>
         </div>
       </div>
 
@@ -735,6 +743,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260823-customtheme1"></script>
+  <script src="admin.js?v=20260823-typography-tab1"></script>
 </body>
 </html>
