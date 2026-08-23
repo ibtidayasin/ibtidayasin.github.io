@@ -64,6 +64,48 @@ function normalizeSectionHeadings(content){
   return content;
 }
 
+
+const DEFAULT_TYPOGRAPHY={
+  sectionTitleSize:44,
+  sectionTitleColor:"",
+  sectionSubtitleSize:25,
+  sectionSubtitleColor:""
+};
+
+function normalizeTypography(content){
+  const a=(content.appearance&&typeof content.appearance==="object")?content.appearance:{};
+  const raw=(a.typography&&typeof a.typography==="object")?a.typography:{};
+  content.appearance={
+    ...a,
+    typography:{
+      sectionTitleSize:clampNumber(raw.sectionTitleSize,30,60,DEFAULT_TYPOGRAPHY.sectionTitleSize),
+      sectionTitleColor:validHex(raw.sectionTitleColor)?raw.sectionTitleColor:"",
+      sectionSubtitleSize:clampNumber(raw.sectionSubtitleSize,16,34,DEFAULT_TYPOGRAPHY.sectionSubtitleSize),
+      sectionSubtitleColor:validHex(raw.sectionSubtitleColor)?raw.sectionSubtitleColor:""
+    }
+  };
+  return content;
+}
+
+function clampNumber(value,min,max,fallback){
+  const n=Number(value);
+  return Number.isFinite(n)?Math.min(max,Math.max(min,n)):fallback;
+}
+function validHex(value){
+  return typeof value==="string"&&/^#[0-9a-fA-F]{6}$/.test(value.trim());
+}
+
+
+function applyPublicTypography(d){
+  normalizeTypography(d);
+  const t=d.appearance.typography;
+  const root=document.documentElement;
+  root.style.setProperty("--public-section-title-size",`${t.sectionTitleSize}px`);
+  root.style.setProperty("--public-section-subtitle-size",`${t.sectionSubtitleSize}px`);
+  root.style.setProperty("--public-section-title-color",t.sectionTitleColor||"var(--accent)");
+  root.style.setProperty("--public-section-subtitle-color",t.sectionSubtitleColor||"var(--muted)");
+}
+
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
 const SITE_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream"];
 function validSiteTheme(t){return SITE_THEMES.includes(t)?t:"classic-brown"}
@@ -78,6 +120,7 @@ function merge(base,extra){
   return extra??base;
 }
 function normalize(d){
+  normalizeTypography(d);
   normalizeSectionHeadings(d);
   d.sectionMedia=d.sectionMedia||{profile:[]};
   d.sectionMedia.profile=d.sectionMedia.profile||[];
@@ -124,6 +167,7 @@ function iconLinkHtml(type,label,url,isExternal=true){
 function render(d){
   document.title=`${d.name} | Academic Profile`;
   document.documentElement.dataset.theme=validSiteTheme(d.defaultTheme||"classic-brown");
+  applyPublicTypography(d);
   $("brandName").textContent=$("name").textContent=$("footerName").textContent=d.name;
   $("initials").textContent=d.name.split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase();
   $("title").textContent=d.title;

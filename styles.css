@@ -913,7 +913,7 @@ body:not(.admin-body) .section-title{
   font:700 clamp(36px,4.4vw,44px)/1.08 Georgia,serif;
   letter-spacing:-.035em;
   margin:0 0 8px;
-  color:var(--accent);
+  color:var(--text);
 }
 
 body:not(.admin-body) .section-subtitle{
@@ -955,4 +955,91 @@ body:not(.admin-body) .section .lead{
   body:not(.admin-body) .section-subtitle{
     font-size:20px;
   }
+}
+
+
+/* =========================================================
+   MANUAL PUBLIC TYPOGRAPHY OVERRIDES
+   ========================================================= */
+:root{
+  --public-section-title-size:44px;
+  --public-section-subtitle-size:25px;
+  --public-section-title-color:var(--accent);
+  --public-section-subtitle-color:var(--muted);
+}
+
+body:not(.admin-body) .section-title{
+  font-size:clamp(32px,4.4vw,var(--public-section-title-size)) !important;
+  color:var(--public-section-title-color) !important;
+}
+
+body:not(.admin-body) .section-subtitle{
+  font-size:clamp(16px,2.3vw,var(--public-section-subtitle-size)) !important;
+  color:var(--public-section-subtitle-color) !important;
+}
+
+.typography-controls{
+  margin-top:24px;
+  padding-top:22px;
+  border-top:1px solid var(--line);
+}
+.typography-controls h3{
+  margin:0 0 5px;
+  font-size:19px;
+}
+.typography-controls .muted{
+  margin:0 0 16px;
+}
+.typography-control-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+.typography-control-card{
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:var(--surface-soft);
+  padding:14px;
+}
+.typography-control-card h4{
+  margin:0 0 12px;
+  font-size:14px;
+}
+.typography-size-row{
+  display:grid;
+  grid-template-columns:1fr 90px;
+  gap:10px;
+  align-items:end;
+}
+.typography-color-row{
+  display:grid;
+  grid-template-columns:52px 1fr;
+  gap:9px;
+  align-items:end;
+  margin-top:12px;
+}
+.typography-color-row input[type="color"]{
+  width:52px;
+  height:42px;
+  padding:3px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--surface);
+}
+.typography-theme-toggle{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-top:10px;
+  font-size:12px;
+  color:var(--muted);
+}
+.typography-theme-toggle input{
+  width:auto;
+}
+.typography-reset-row{
+  margin-top:14px;
+}
+@media(max-width:760px){
+  .typography-control-grid{grid-template-columns:1fr}
 }
