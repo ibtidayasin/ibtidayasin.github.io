@@ -1043,3 +1043,16 @@ body:not(.admin-body) .section-subtitle{
 @media(max-width:760px){
   .typography-control-grid{grid-template-columns:1fr}
 }
+
+
+/* Typography reset / undo controls */
+.typography-reset-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.typography-reset-row button:disabled{
+  opacity:.48;
+  cursor:not-allowed;
+}
