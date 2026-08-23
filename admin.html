@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260823-customtheme1">
+  <link rel="stylesheet" href="styles.css?v=20260824-pro1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -38,6 +38,9 @@
         <button data-tab="cv" type="button">CV</button>
         <button data-tab="appearance" type="button">Appearance</button>
       <button type="button" data-tab="typography">Typography</button>
+      <button type="button" data-tab="layout">Layout</button>
+      <button type="button" data-tab="experience">Experience</button>
+      <button type="button" data-tab="backup">Backup</button>
       </div>
 
       <div class="admin-panel active" data-panel="profile">
@@ -722,6 +725,108 @@
           </div></div>
         </div>
       </div>
+      <div class="admin-panel" data-panel="layout">
+        <div class="admin-card">
+          <h2>Layout</h2>
+          <p class="muted">Control section order, visibility, spacing, card geometry, portrait shape, columns and font pairing.</p>
+
+          <div class="settings-section">
+            <div class="settings-head">
+              <div><h3>Sections</h3><p class="muted">Reorder or hide any public section without deleting its content.</p></div>
+              <button id="resetSectionStructureBtn" class="secondary" type="button">Reset sections</button>
+            </div>
+            <div id="sectionManager" class="section-manager"></div>
+          </div>
+
+          <div class="settings-section">
+            <div class="settings-head">
+              <div><h3>Page layout</h3><p class="muted">Adjust the overall proportions of the public site.</p></div>
+              <button id="resetLayoutStyleBtn" class="secondary" type="button">Reset layout style</button>
+            </div>
+
+            <div class="layout-control-grid">
+              <div class="layout-control-card">
+                <h4>Dimensions</h4>
+                <div class="range-setting"><label>Content width</label><div><input id="fMaxWidth" type="range" min="960" max="1500" step="10"><input id="fMaxWidthNumber" type="number" min="960" max="1500" step="10"></div></div>
+                <div class="range-setting"><label>Sidebar width</label><div><input id="fSidebarWidth" type="range" min="210" max="340" step="5"><input id="fSidebarWidthNumber" type="number" min="210" max="340" step="5"></div></div>
+                <div class="range-setting"><label>Sidebar/content gap</label><div><input id="fLayoutGap" type="range" min="20" max="100" step="2"><input id="fLayoutGapNumber" type="number" min="20" max="100" step="2"></div></div>
+                <div class="range-setting"><label>Section spacing</label><div><input id="fSectionSpacing" type="range" min="20" max="90" step="2"><input id="fSectionSpacingNumber" type="number" min="20" max="90" step="2"></div></div>
+              </div>
+
+              <div class="layout-control-card">
+                <h4>Cards & portrait</h4>
+                <div class="range-setting"><label>Card corner radius</label><div><input id="fCardRadius" type="range" min="0" max="28" step="1"><input id="fCardRadiusNumber" type="number" min="0" max="28" step="1"></div></div>
+                <div class="range-setting"><label>Portrait size</label><div><input id="fPortraitSize" type="range" min="140" max="250" step="5"><input id="fPortraitSizeNumber" type="number" min="140" max="250" step="5"></div></div>
+                <div class="field"><label>Portrait shape</label><select id="fPortraitShape"><option value="square">Square</option><option value="slight">Slightly rounded</option><option value="rounded">Rounded</option><option value="circle">Circle</option></select></div>
+                <div class="field"><label>Shadow</label><select id="fShadow"><option value="theme">Theme default</option><option value="none">None</option><option value="subtle">Subtle</option><option value="medium">Medium</option></select></div>
+              </div>
+
+              <div class="layout-control-card">
+                <h4>Columns & fonts</h4>
+                <div class="field"><label>Project columns</label><select id="fProjectColumns"><option value="1">1 column</option><option value="2">2 columns</option><option value="3">3 columns</option></select></div>
+                <div class="field"><label>Skills columns</label><select id="fSkillsColumns"><option value="1">1 column</option><option value="2">2 columns</option><option value="3">3 columns</option></select></div>
+                <div class="field"><label>Font pairing</label><select id="fFontPair">
+                  <option value="classic">Classic Academic — Georgia + Arial</option>
+                  <option value="modern">Modern Sans — Segoe UI</option>
+                  <option value="humanist">Humanist — Georgia + Segoe UI</option>
+                  <option value="editorial">Editorial Serif — Georgia</option>
+                  <option value="palatino">Modern Academic — Palatino + Segoe UI</option>
+                  <option value="bookish">Bookish — Georgia + Palatino</option>
+                </select></div>
+                <label class="setting-toggle"><input id="fStickySidebar" type="checkbox"> Keep profile sidebar sticky while scrolling</label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-panel" data-panel="experience">
+        <div class="admin-card">
+          <div class="settings-head">
+            <div>
+              <h2>Experience</h2>
+              <p class="muted">Turn optional interaction and motion features on or off.</p>
+            </div>
+            <button id="resetExperienceBtn" class="secondary" type="button">Reset experience</button>
+          </div>
+
+          <div class="experience-grid">
+            <label class="experience-card"><input id="fActiveNav" type="checkbox"><span><strong>Active navigation highlight</strong><small>Highlights the section currently being viewed.</small></span></label>
+            <label class="experience-card"><input id="fBackToTop" type="checkbox"><span><strong>Back-to-top button</strong><small>Shows a small ↑ button after scrolling down.</small></span></label>
+            <label class="experience-card"><input id="fLightbox" type="checkbox"><span><strong>Image lightbox</strong><small>Opens research/project images in a clean enlarged viewer.</small></span></label>
+            <label class="experience-card"><input id="fSmoothScroll" type="checkbox"><span><strong>Smooth scrolling</strong><small>Smoothly moves between navigation sections.</small></span></label>
+            <label class="experience-card"><input id="fCopyButtons" type="checkbox"><span><strong>Copy contact buttons</strong><small>Adds one-click Copy buttons for email and phone.</small></span></label>
+
+            <div class="experience-card experience-select-card">
+              <span><strong>Entrance animations</strong><small>Keep motion subtle for an academic site.</small></span>
+              <select id="fAnimations"><option value="off">Off</option><option value="subtle">Subtle</option><option value="normal">Normal</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-panel" data-panel="backup">
+        <div class="admin-card">
+          <h2>Backup & restore</h2>
+          <p class="muted">Export the entire editable website configuration as JSON, or load it back later. Imported data is not public until you click Save all changes.</p>
+
+          <div class="backup-grid">
+            <div class="backup-card">
+              <h3>Export backup</h3>
+              <p class="muted">Includes content, section settings, theme, custom theme, typography, layout and experience settings.</p>
+              <button id="exportBackupBtn" class="secondary" type="button">Export website backup</button>
+            </div>
+
+            <div class="backup-card">
+              <h3>Import backup</h3>
+              <p class="muted">Choose a JSON backup previously exported from this admin system.</p>
+              <input id="backupImportFile" type="file" accept=".json,application/json">
+              <button id="importBackupBtn" class="secondary" type="button">Load backup into editor</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
       <div class="save-footer">
         <div class="action-row">
@@ -742,6 +847,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260823-custom-card-fix1"></script>
+  <script src="admin.js?v=20260824-pro1"></script>
 </body>
 </html>

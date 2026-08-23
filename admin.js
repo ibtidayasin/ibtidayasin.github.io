@@ -230,6 +230,7 @@ function resetCustomThemeBuilder(){
   normalizeCustomTheme(currentContent);
   currentContent.appearance.customTheme=structuredClone(DEFAULT_CUSTOM_THEME);
   fillCustomThemeControls();
+  fillSiteCustomizationControls();
   if(selectedAdminTheme()==="custom-theme"){
     document.documentElement.dataset.theme="custom-theme";
     applyCustomThemeVariables(currentContent.appearance.customTheme);
@@ -395,6 +396,292 @@ function undoTypographyControls(){
   renderTypographyControlsFromState(typographySavedSnapshot);
   setStatus("Unsaved typography changes were undone.");
 }
+
+const SITE_SECTION_KEYS=["about","research","featured","publications","projects","skills","education","contact","cv"];
+const DEFAULT_SITE_SETTINGS={
+  sectionOrder:["about","research","featured","publications","projects","skills","education","contact","cv"],
+  sectionVisibility:{
+    about:true,research:true,featured:true,publications:true,projects:true,skills:true,education:true,contact:true,cv:true
+  },
+  layout:{
+    maxWidth:1180,
+    sidebarWidth:255,
+    layoutGap:58,
+    sectionSpacing:40,
+    cardRadius:11,
+    portraitSize:190,
+    portraitShape:"slight",
+    projectColumns:3,
+    skillsColumns:3,
+    fontPair:"classic",
+    shadow:"theme",
+    stickySidebar:true
+  },
+  experience:{
+    activeNav:true,
+    animations:"subtle",
+    backToTop:true,
+    lightbox:true,
+    smoothScroll:true,
+    copyButtons:true
+  }
+};
+
+const SITE_FONT_PAIRS={
+  classic:{body:"Arial, Helvetica, sans-serif",heading:"Georgia, serif"},
+  modern:{body:"Segoe UI, Arial, sans-serif",heading:"Segoe UI, Arial, sans-serif"},
+  humanist:{body:"Segoe UI, Arial, sans-serif",heading:"Georgia, serif"},
+  editorial:{body:"Georgia, Times New Roman, serif",heading:"Georgia, Times New Roman, serif"},
+  palatino:{body:"Segoe UI, Arial, sans-serif",heading:"Palatino Linotype, Book Antiqua, Palatino, serif"},
+  bookish:{body:"Palatino Linotype, Book Antiqua, Palatino, serif",heading:"Georgia, serif"}
+};
+
+function normalizeSiteSettings(content){
+  const raw=(content.siteSettings&&typeof content.siteSettings==="object")?content.siteSettings:{};
+  const rawOrder=Array.isArray(raw.sectionOrder)?raw.sectionOrder.filter(x=>SITE_SECTION_KEYS.includes(x)):[];
+  const order=[...new Set([...rawOrder,...SITE_SECTION_KEYS])];
+  const rawVis=(raw.sectionVisibility&&typeof raw.sectionVisibility==="object")?raw.sectionVisibility:{};
+
+  const l=(raw.layout&&typeof raw.layout==="object")?raw.layout:{};
+  const e=(raw.experience&&typeof raw.experience==="object")?raw.experience:{};
+
+  content.siteSettings={
+    sectionOrder:order,
+    sectionVisibility:Object.fromEntries(SITE_SECTION_KEYS.map(k=>[k,rawVis[k]!==false])),
+    layout:{
+      maxWidth:clampNumber(l.maxWidth,960,1500,1180),
+      sidebarWidth:clampNumber(l.sidebarWidth,210,340,255),
+      layoutGap:clampNumber(l.layoutGap,20,100,58),
+      sectionSpacing:clampNumber(l.sectionSpacing,20,90,40),
+      cardRadius:clampNumber(l.cardRadius,0,28,11),
+      portraitSize:clampNumber(l.portraitSize,140,250,190),
+      portraitShape:["square","slight","rounded","circle"].includes(l.portraitShape)?l.portraitShape:"slight",
+      projectColumns:[1,2,3].includes(Number(l.projectColumns))?Number(l.projectColumns):3,
+      skillsColumns:[1,2,3].includes(Number(l.skillsColumns))?Number(l.skillsColumns):3,
+      fontPair:Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,l.fontPair)?l.fontPair:"classic",
+      shadow:["none","subtle","medium"].includes(l.shadow)?l.shadow:"theme",
+      stickySidebar:l.stickySidebar!==false
+    },
+    experience:{
+      activeNav:e.activeNav!==false,
+      animations:["off","subtle","normal"].includes(e.animations)?e.animations:"subtle",
+      backToTop:e.backToTop!==false,
+      lightbox:e.lightbox!==false,
+      smoothScroll:e.smoothScroll!==false,
+      copyButtons:e.copyButtons!==false
+    }
+  };
+  return content;
+}
+
+function siteShadowValue(level){
+  if(level==="theme")return"var(--shadow)";
+  if(level==="none")return"none";
+  if(level==="medium")return"0 16px 38px rgba(0,0,0,.12)";
+  return"0 12px 30px rgba(0,0,0,.055)";
+}
+
+function portraitRadiusValue(shape){
+  if(shape==="square")return"0px";
+  if(shape==="rounded")return"18px";
+  if(shape==="circle")return"50%";
+  return"3px";
+}
+
+
+function fillSiteCustomizationControls(){
+  normalizeSiteSettings(currentContent);
+  const l=currentContent.siteSettings.layout;
+  const e=currentContent.siteSettings.experience;
+
+  const pairs=[
+    ["fMaxWidth","fMaxWidthNumber",l.maxWidth],
+    ["fSidebarWidth","fSidebarWidthNumber",l.sidebarWidth],
+    ["fLayoutGap","fLayoutGapNumber",l.layoutGap],
+    ["fSectionSpacing","fSectionSpacingNumber",l.sectionSpacing],
+    ["fCardRadius","fCardRadiusNumber",l.cardRadius],
+    ["fPortraitSize","fPortraitSizeNumber",l.portraitSize]
+  ];
+  pairs.forEach(([range,number,value])=>{
+    if($(range))$(range).value=value;
+    if($(number))$(number).value=value;
+  });
+
+  $("fPortraitShape").value=l.portraitShape;
+  $("fProjectColumns").value=String(l.projectColumns);
+  $("fSkillsColumns").value=String(l.skillsColumns);
+  $("fFontPair").value=l.fontPair;
+  $("fShadow").value=l.shadow;
+  $("fStickySidebar").checked=l.stickySidebar;
+
+  $("fActiveNav").checked=e.activeNav;
+  $("fAnimations").value=e.animations;
+  $("fBackToTop").checked=e.backToTop;
+  $("fLightbox").checked=e.lightbox;
+  $("fSmoothScroll").checked=e.smoothScroll;
+  $("fCopyButtons").checked=e.copyButtons;
+
+  renderSectionManager();
+}
+
+function sectionDisplayName(key){
+  const headings=normalizeSectionHeadings(currentContent).sectionHeadings;
+  return headings[key]?.title||DEFAULT_SECTION_HEADINGS[key]?.title||key;
+}
+
+function renderSectionManager(){
+  normalizeSiteSettings(currentContent);
+  const s=currentContent.siteSettings;
+  const box=$("sectionManager");
+  if(!box)return;
+  box.innerHTML=s.sectionOrder.map((key,i)=>`
+    <div class="section-manager-row" data-section-setting="${esc(key)}">
+      <div class="section-manager-grab">⋮⋮</div>
+      <strong>${esc(sectionDisplayName(key))}</strong>
+      <label class="section-manager-visible">
+        <input type="checkbox" data-section-visible="${esc(key)}" ${s.sectionVisibility[key]!==false?"checked":""}>
+        Show
+      </label>
+      <div class="section-manager-actions">
+        <button class="secondary mini-action" type="button" data-section-move="${esc(key)}:-1" ${i===0?"disabled":""}>↑</button>
+        <button class="secondary mini-action" type="button" data-section-move="${esc(key)}:1" ${i===s.sectionOrder.length-1?"disabled":""}>↓</button>
+      </div>
+    </div>`).join("");
+}
+
+function syncSiteCustomizationFromControls(){
+  normalizeSiteSettings(currentContent);
+  const l=currentContent.siteSettings.layout;
+  l.maxWidth=clampNumber($("fMaxWidthNumber").value||$("fMaxWidth").value,960,1500,1180);
+  l.sidebarWidth=clampNumber($("fSidebarWidthNumber").value||$("fSidebarWidth").value,210,340,255);
+  l.layoutGap=clampNumber($("fLayoutGapNumber").value||$("fLayoutGap").value,20,100,58);
+  l.sectionSpacing=clampNumber($("fSectionSpacingNumber").value||$("fSectionSpacing").value,20,90,40);
+  l.cardRadius=clampNumber($("fCardRadiusNumber").value||$("fCardRadius").value,0,28,11);
+  l.portraitSize=clampNumber($("fPortraitSizeNumber").value||$("fPortraitSize").value,140,250,190);
+  l.portraitShape=$("fPortraitShape").value;
+  l.projectColumns=Number($("fProjectColumns").value);
+  l.skillsColumns=Number($("fSkillsColumns").value);
+  l.fontPair=$("fFontPair").value;
+  l.shadow=$("fShadow").value;
+  l.stickySidebar=$("fStickySidebar").checked;
+
+  const e=currentContent.siteSettings.experience;
+  e.activeNav=$("fActiveNav").checked;
+  e.animations=$("fAnimations").value;
+  e.backToTop=$("fBackToTop").checked;
+  e.lightbox=$("fLightbox").checked;
+  e.smoothScroll=$("fSmoothScroll").checked;
+  e.copyButtons=$("fCopyButtons").checked;
+}
+
+function resetLayoutStyleControls(){
+  normalizeSiteSettings(currentContent);
+  currentContent.siteSettings.layout=structuredClone(DEFAULT_SITE_SETTINGS.layout);
+  fillSiteCustomizationControls();
+  setStatus("Layout style reset to defaults. Save all changes to publish.");
+}
+
+function resetSectionStructure(){
+  normalizeSiteSettings(currentContent);
+  currentContent.siteSettings.sectionOrder=[...DEFAULT_SITE_SETTINGS.sectionOrder];
+  currentContent.siteSettings.sectionVisibility=structuredClone(DEFAULT_SITE_SETTINGS.sectionVisibility);
+  renderSectionManager();
+  setStatus("Section order and visibility reset. Save all changes to publish.");
+}
+
+function resetExperienceControls(){
+  normalizeSiteSettings(currentContent);
+  currentContent.siteSettings.experience=structuredClone(DEFAULT_SITE_SETTINGS.experience);
+  fillSiteCustomizationControls();
+  setStatus("Experience settings reset to defaults. Save all changes to publish.");
+}
+
+function moveSectionSetting(key,delta){
+  normalizeSiteSettings(currentContent);
+  const arr=currentContent.siteSettings.sectionOrder;
+  const i=arr.indexOf(key),j=i+delta;
+  if(i<0||j<0||j>=arr.length)return;
+  [arr[i],arr[j]]=[arr[j],arr[i]];
+  renderSectionManager();
+}
+
+function setSectionVisibility(key,visible){
+  normalizeSiteSettings(currentContent);
+  if(!SITE_SECTION_KEYS.includes(key))return;
+  currentContent.siteSettings.sectionVisibility[key]=visible;
+}
+
+function renderRepeaterType(type){
+  if(type==="publication")renderPublicationsEditor();
+  if(type==="project")renderProjectsEditor();
+  if(type==="skill")renderSkillsEditor();
+  if(type==="education")renderEducationEditor();
+}
+
+function moveRepeaterItem(type,index,delta){
+  syncAllForms();
+  const map={publication:"publications",project:"projects",skill:"skills",education:"education"};
+  const arr=currentContent[map[type]];
+  if(!Array.isArray(arr))return;
+  const j=index+delta;
+  if(index<0||j<0||j>=arr.length)return;
+  [arr[index],arr[j]]=[arr[j],arr[index]];
+  renderRepeaterType(type);
+  setStatus("Item reordered. Save all changes to publish.");
+}
+
+function exportWebsiteBackup(){
+  syncAllForms();
+  const payload={
+    exportedAt:new Date().toISOString(),
+    format:"academic-site-backup-v1",
+    content:currentContent
+  };
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  const safeName=(currentContent.name||"academic-site").replace(/[^a-z0-9]+/gi,"_").replace(/^_+|_+$/g,"");
+  a.href=url;
+  a.download=`${safeName||"academic_site"}_backup_${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  setStatus("Website backup exported.");
+}
+
+async function importWebsiteBackup(){
+  const file=$("backupImportFile")?.files?.[0];
+  if(!file){setStatus("Choose a JSON backup file first.");return}
+  try{
+    const parsed=JSON.parse(await file.text());
+    const incoming=parsed?.content&&typeof parsed.content==="object"?parsed.content:parsed;
+    if(!incoming||typeof incoming!=="object"||Array.isArray(incoming))throw new Error("Invalid backup structure.");
+    currentContent=merge(DEFAULT_CONTENT,incoming);
+    normalizeMedia(currentContent);
+    normalizeSectionHeadings(currentContent);
+    normalizeTypography(currentContent);
+    normalizeCustomTheme(currentContent);
+    normalizeSiteSettings(currentContent);
+    fillForms();
+    setStatus("Backup loaded into the editor. Review it, then click Save all changes to publish.");
+  }catch(err){
+    setStatus("Backup import failed: "+(err?.message||"Invalid JSON file."));
+  }
+}
+
+function syncRangeNumber(rangeId,numberId,min,max,fallback){
+  const range=$(rangeId),number=$(numberId);
+  if(!range||!number)return;
+  const update=(source,target)=>{
+    const value=clampNumber(source.value,min,max,fallback);
+    source.value=value;
+    target.value=value;
+  };
+  range.addEventListener("input",()=>update(range,number));
+  number.addEventListener("input",()=>update(number,range));
+}
+
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
 const ADMIN_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream","custom-theme"];
 function validAdminTheme(t){return ADMIN_THEMES.includes(t)?t:"classic-brown"}
@@ -474,6 +761,7 @@ function merge(base,extra){
   return extra??base;
 }
 function normalizeMedia(content){
+  normalizeSiteSettings(content);
   normalizeCustomTheme(content);
   normalizeTypography(content);
   normalizeSectionHeadings(content);
@@ -560,9 +848,17 @@ function renderAllEditors(){
   $("contactMediaEditor").innerHTML=mediaEditor("contact",currentContent.contact?.media||[],"Contact media");
 }
 
-function repeatBlock(type,i,title,fields,media=[]){
+function repeatBlock(type,i,title,fields,media=[],visible=true){
   return `<div class="repeat-item" data-${type}="${i}">
-    <div class="repeat-head"><strong>${esc(title)}</strong><button class="danger" data-remove="${type}:${i}" type="button">Remove</button></div>
+    <div class="repeat-head">
+      <strong>${esc(title)}</strong>
+      <div class="repeat-actions">
+        <label class="repeat-public-toggle"><input type="checkbox" data-item-visible ${visible!==false?"checked":""}> Show publicly</label>
+        <button class="secondary repeat-move" data-move-item="${type}:${i}:-1" type="button" title="Move up">↑</button>
+        <button class="secondary repeat-move" data-move-item="${type}:${i}:1" type="button" title="Move down">↓</button>
+        <button class="danger" data-remove="${type}:${i}" type="button">Remove</button>
+      </div>
+    </div>
     <div class="form-grid">
       ${fields.map(f=>`<div class="field ${f.full?"full":""}"><label>${esc(f.label)}</label>${
         f.kind==="textarea"?`<textarea data-k="${f.key}">${esc(f.value||"")}</textarea>`:
@@ -580,24 +876,24 @@ function renderPublicationsEditor(){
     {label:"Journal / Conference",key:"venue",value:p.venue},{label:"Year",key:"year",value:p.year},
     {label:"Status",key:"status",value:p.status,kind:"select"},{label:"DOI",key:"doi",value:p.doi},
     {label:"Publication URL",key:"url",value:p.url,full:true},{label:"Short note / description",key:"description",value:p.description,kind:"textarea",full:true}
-  ],p.media||[])).join("")||`<div class="empty-state">No publications added yet.</div>`;
+  ],p.media||[],p.visible!==false)).join("")||`<div class="empty-state">No publications added yet.</div>`;
 }
 function renderProjectsEditor(){
   $("projectsEditor").innerHTML=(currentContent.projects||[]).map((p,i)=>repeatBlock("project",i,`Project ${i+1}`,[
     {label:"Project title",key:"title",value:p.title,full:true},{label:"Description",key:"description",value:p.description,kind:"textarea",full:true},
     {label:"Tools / metadata",key:"meta",value:p.meta},{label:"Project URL",key:"url",value:p.url}
-  ],p.media||[])).join("")||`<div class="empty-state">No projects added.</div>`;
+  ],p.media||[],p.visible!==false)).join("")||`<div class="empty-state">No projects added.</div>`;
 }
 function renderSkillsEditor(){
   $("skillsEditor").innerHTML=(currentContent.skills||[]).map((g,i)=>repeatBlock("skill",i,`Skill group ${i+1}`,[
     {label:"Category",key:"category",value:g.category,full:true},{label:"Skills — one per line",key:"items",value:(g.items||[]).join("\n"),kind:"textarea",full:true}
-  ],g.media||[])).join("")||`<div class="empty-state">No skill groups added.</div>`;
+  ],g.media||[],g.visible!==false)).join("")||`<div class="empty-state">No skill groups added.</div>`;
 }
 function renderEducationEditor(){
   $("educationEditor").innerHTML=(currentContent.education||[]).map((e,i)=>repeatBlock("education",i,`Education ${i+1}`,[
     {label:"Period",key:"period",value:e.period},{label:"Degree",key:"degree",value:e.degree},
     {label:"Institution",key:"institution",value:e.institution,full:true},{label:"Description",key:"description",value:e.description,kind:"textarea",full:true}
-  ],e.media||[])).join("")||`<div class="empty-state">No education entries added.</div>`;
+  ],e.media||[],e.visible!==false)).join("")||`<div class="empty-state">No education entries added.</div>`;
 }
 
 function mediaEditor(owner,media,title){
@@ -682,21 +978,28 @@ function renderCvState(){
 
 $("addPublicationBtn").addEventListener("click",()=>{
   syncAllForms();
-  currentContent.publications.push({title:"",authors:"",venue:"",year:"",status:"",doi:"",url:"",description:"",media:[]});
+  currentContent.publications.push({title:"",authors:"",venue:"",year:"",status:"",doi:"",url:"",description:"",visible:true,media:[]});
   renderPublicationsEditor();
 });
 $("addProjectBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.projects.push({title:"",description:"",meta:"",url:"",media:[]});renderProjectsEditor();
+  syncAllForms();currentContent.projects.push({title:"",description:"",meta:"",url:"",visible:true,media:[]});renderProjectsEditor();
 });
 $("addSkillGroupBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.skills.push({category:"",items:[],media:[]});renderSkillsEditor();
+  syncAllForms();currentContent.skills.push({category:"",items:[],visible:true,media:[]});renderSkillsEditor();
 });
 $("addEducationBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.education.push({period:"",degree:"",institution:"",description:"",media:[]});renderEducationEditor();
+  syncAllForms();currentContent.education.push({period:"",degree:"",institution:"",description:"",visible:true,media:[]});renderEducationEditor();
 });
 
 document.addEventListener("click",async e=>{
-  let b=e.target.closest("[data-remove]");
+  let b=e.target.closest("[data-move-item]");
+  if(b){
+    const[type,idxs,deltas]=b.dataset.moveItem.split(":");
+    moveRepeaterItem(type,Number(idxs),Number(deltas));
+    return;
+  }
+
+  b=e.target.closest("[data-remove]");
   if(b){
     syncAllForms();
     const[type,idxs]=b.dataset.remove.split(":");const i=Number(idxs);
@@ -727,6 +1030,7 @@ document.addEventListener("click",async e=>{
 
 function syncAllForms(){
   readMediaMetadata();
+  syncSiteCustomizationFromControls();
   currentContent.name=$("fName").value.trim();
   currentContent.title=$("fTitle").value.trim();
   currentContent.institution=$("fInstitution").value.trim();
@@ -794,22 +1098,22 @@ function syncAllForms(){
 function readRepeaters(){
   currentContent.publications=[...document.querySelectorAll("[data-publication]")].map((r,i)=>{
     const old=currentContent.publications[i]||{};
-    return {title:get(r,"title"),authors:get(r,"authors"),venue:get(r,"venue"),year:get(r,"year"),status:get(r,"status"),doi:get(r,"doi"),url:get(r,"url"),description:get(r,"description"),media:old.media||[]};
+    return {title:get(r,"title"),authors:get(r,"authors"),venue:get(r,"venue"),year:get(r,"year"),status:get(r,"status"),doi:get(r,"doi"),url:get(r,"url"),description:get(r,"description"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
   }).filter(x=>x.title||x.venue||x.media.length);
 
   currentContent.projects=[...document.querySelectorAll("[data-project]")].map((r,i)=>{
     const old=currentContent.projects[i]||{};
-    return {title:get(r,"title"),description:get(r,"description"),meta:get(r,"meta"),url:get(r,"url"),media:old.media||[]};
+    return {title:get(r,"title"),description:get(r,"description"),meta:get(r,"meta"),url:get(r,"url"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
   }).filter(x=>x.title||x.description||x.media.length);
 
   currentContent.skills=[...document.querySelectorAll("[data-skill]")].map((r,i)=>{
     const old=currentContent.skills[i]||{};
-    return {category:get(r,"category"),items:get(r,"items").split("\n").map(x=>x.trim()).filter(Boolean),media:old.media||[]};
+    return {category:get(r,"category"),items:get(r,"items").split("\n").map(x=>x.trim()).filter(Boolean),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
   }).filter(x=>x.category||x.items.length||x.media.length);
 
   currentContent.education=[...document.querySelectorAll("[data-education]")].map((r,i)=>{
     const old=currentContent.education[i]||{};
-    return {period:get(r,"period"),degree:get(r,"degree"),institution:get(r,"institution"),description:get(r,"description"),media:old.media||[]};
+    return {period:get(r,"period"),degree:get(r,"degree"),institution:get(r,"institution"),description:get(r,"description"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
   }).filter(x=>x.degree||x.institution||x.media.length);
 }
 function get(r,k){return(r.querySelector(`[data-k="${k}"]`)?.value||"").trim()}
@@ -1180,5 +1484,31 @@ $("undoTypographyBtn")?.addEventListener("click",undoTypographyControls);
 
 CUSTOM_THEME_FIELDS.forEach(([,id])=>syncCustomThemeHexPair(id));
 $("resetCustomThemeBtn")?.addEventListener("click",resetCustomThemeBuilder);
+
+
+syncRangeNumber("fMaxWidth","fMaxWidthNumber",960,1500,1180);
+syncRangeNumber("fSidebarWidth","fSidebarWidthNumber",210,340,255);
+syncRangeNumber("fLayoutGap","fLayoutGapNumber",20,100,58);
+syncRangeNumber("fSectionSpacing","fSectionSpacingNumber",20,90,40);
+syncRangeNumber("fCardRadius","fCardRadiusNumber",0,28,11);
+syncRangeNumber("fPortraitSize","fPortraitSizeNumber",140,250,190);
+
+$("resetLayoutStyleBtn")?.addEventListener("click",resetLayoutStyleControls);
+$("resetSectionStructureBtn")?.addEventListener("click",resetSectionStructure);
+$("resetExperienceBtn")?.addEventListener("click",resetExperienceControls);
+$("exportBackupBtn")?.addEventListener("click",exportWebsiteBackup);
+$("importBackupBtn")?.addEventListener("click",importWebsiteBackup);
+
+document.addEventListener("click",e=>{
+  const move=e.target.closest("[data-section-move]");
+  if(move){
+    const[key,delta]=move.dataset.sectionMove.split(":");
+    moveSectionSetting(key,Number(delta));
+  }
+});
+document.addEventListener("change",e=>{
+  const vis=e.target.closest("[data-section-visible]");
+  if(vis)setSectionVisibility(vis.dataset.sectionVisible,vis.checked);
+});
 
 boot();
