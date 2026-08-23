@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260824-pro1">
+  <link rel="stylesheet" href="styles.css?v=20260824-thesisclean1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -30,6 +30,7 @@
       <div class="admin-tabs">
         <button class="active" data-tab="profile" type="button">Profile</button>
         <button data-tab="research" type="button">Research</button>
+      <button type="button" data-tab="thesis">Thesis</button>
         <button data-tab="publications" type="button">Publications</button>
         <button data-tab="projects" type="button">Projects</button>
         <button data-tab="skills" type="button">Skills</button>
@@ -70,19 +71,47 @@
           <div class="field"><label>Section name</label><input id="fSectionResearchTitle"></div>
           <div class="field"><label>Section subtitle</label><input id="fSectionResearchSubtitle"></div>
         </div>
-        <div class="form-grid section-heading-editor">
-          <p class="heading-editor-note">Controls the separate Featured Research section heading.</p>
-          <div class="field"><label>Featured section name</label><input id="fSectionFeaturedTitle"></div>
-          <div class="field"><label>Featured section subtitle (optional)</label><input id="fSectionFeaturedSubtitle"></div>
-        </div>
         <div class="form-grid">
           <div class="field full"><label>Research interests — one per line</label><textarea id="fInterests"></textarea></div>
-          <div class="field full"><label>Featured research title</label><input id="fResearchTitle"></div>
-          <div class="field full"><label>Featured research description</label><textarea id="fResearchDescription"></textarea></div>
-          <div class="field full"><label>Tags — separated by commas</label><input id="fResearchTags"></div>
         </div>
-        <div id="researchMediaEditor" class="media-section-editor"></div>
       </div>
+      <div class="admin-panel" data-panel="thesis">
+        <div class="admin-card">
+          <h2>Undergraduate Thesis</h2>
+          <p class="muted">Add a dedicated thesis section. It can be shown, hidden or reordered later from Layout.</p>
+
+          <div class="form-grid section-heading-editor">
+            <p class="heading-editor-note">Controls the public section name and subtitle.</p>
+            <div class="field"><label>Section name</label><input id="fSectionThesisTitle"></div>
+            <div class="field"><label>Section subtitle</label><input id="fSectionThesisSubtitle"></div>
+          </div>
+
+          <div class="form-grid">
+            <div class="field full"><label>Thesis title</label><input id="fThesisTitle"></div>
+            <div class="field full"><label>Thesis description / abstract summary</label><textarea id="fThesisDescription"></textarea></div>
+            <div class="field"><label>Supervisor</label><input id="fThesisSupervisor"></div>
+            <div class="field"><label>Co-supervisor (optional)</label><input id="fThesisCoSupervisor"></div>
+            <div class="field"><label>Degree / program</label><input id="fThesisDegree"></div>
+            <div class="field"><label>Institution</label><input id="fThesisInstitution"></div>
+            <div class="field"><label>Period / year</label><input id="fThesisPeriod" placeholder="2025–2026"></div>
+            <div class="field"><label>Status</label>
+              <select id="fThesisStatus">
+                <option value="">—</option>
+                <option>Completed</option>
+                <option>Ongoing</option>
+                <option>Submitted</option>
+                <option>Defended</option>
+              </select>
+            </div>
+            <div class="field full"><label>Keywords / tools — comma separated</label><input id="fThesisKeywords" placeholder="LAMMPS, Python, OVITO, Molecular Dynamics"></div>
+          </div>
+
+          <div class="media-section-editor">
+            <div id="thesisMediaEditor"></div>
+          </div>
+        </div>
+      </div>
+
 
       <div class="admin-panel" data-panel="publications">
         <div class="form-grid section-heading-editor">
@@ -847,6 +876,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260824-underreview1"></script>
+  <script src="admin.js?v=20260824-thesisclean1"></script>
 </body>
 </html>

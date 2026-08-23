@@ -33,7 +33,7 @@ const DEFAULT_CONTENT={
 const DEFAULT_SECTION_HEADINGS={
   about:{title:"About Me",subtitle:"Mechanical engineering with an atomistic materials focus."},
   research:{title:"Research Interests",subtitle:"What I work on"},
-  featured:{title:"Featured Research",subtitle:""},
+  thesis:{title:"Undergraduate Thesis",subtitle:"Research Thesis"},
   publications:{title:"Publications",subtitle:"Research output"},
   projects:{title:"Projects",subtitle:"Selected work"},
   skills:{title:"Skills",subtitle:"Research toolkit"},
@@ -397,11 +397,11 @@ function undoTypographyControls(){
   setStatus("Unsaved typography changes were undone.");
 }
 
-const SITE_SECTION_KEYS=["about","research","featured","publications","projects","skills","education","contact","cv"];
+const SITE_SECTION_KEYS=["about","research","thesis","publications","projects","skills","education","contact","cv"];
 const DEFAULT_SITE_SETTINGS={
-  sectionOrder:["about","research","featured","publications","projects","skills","education","contact","cv"],
+  sectionOrder:["about","research","thesis","publications","projects","skills","education","contact","cv"],
   sectionVisibility:{
-    about:true,research:true,featured:true,publications:true,projects:true,skills:true,education:true,contact:true,cv:true
+    about:true,research:true,thesis:true,publications:true,projects:true,skills:true,education:true,contact:true,cv:true
   },
   layout:{
     maxWidth:1180,
@@ -444,10 +444,12 @@ function normalizeSiteSettings(content){
 
   const l=(raw.layout&&typeof raw.layout==="object")?raw.layout:{};
   const e=(raw.experience&&typeof raw.experience==="object")?raw.experience:{};
+  const thesisVisible=raw.thesisDefaultVisibleApplied===true?rawVis.thesis!==false:true;
 
   content.siteSettings={
+    thesisDefaultVisibleApplied:true,
     sectionOrder:order,
-    sectionVisibility:Object.fromEntries(SITE_SECTION_KEYS.map(k=>[k,rawVis[k]!==false])),
+    sectionVisibility:Object.fromEntries(SITE_SECTION_KEYS.map(k=>[k,k==="thesis"?thesisVisible:rawVis[k]!==false])),
     layout:{
       maxWidth:clampNumber(l.maxWidth,960,1500,1180),
       sidebarWidth:clampNumber(l.sidebarWidth,210,340,255),
@@ -682,6 +684,36 @@ function syncRangeNumber(rangeId,numberId,min,max,fallback){
   number.addEventListener("input",()=>update(number,range));
 }
 
+
+const DEFAULT_THESIS={
+  title:"",
+  description:"",
+  supervisor:"",
+  coSupervisor:"",
+  degree:"B.Sc. in Mechanical Engineering",
+  institution:"",
+  period:"",
+  status:"Completed",
+  keywords:[],
+  media:[]
+};
+function normalizeThesis(content){
+  const raw=(content.thesis&&typeof content.thesis==="object")?content.thesis:{};
+  content.thesis={
+    title:String(raw.title??""),
+    description:String(raw.description??""),
+    supervisor:String(raw.supervisor??""),
+    coSupervisor:String(raw.coSupervisor??""),
+    degree:String(raw.degree??DEFAULT_THESIS.degree),
+    institution:String(raw.institution??content.institution??""),
+    period:String(raw.period??""),
+    status:String(raw.status??DEFAULT_THESIS.status),
+    keywords:Array.isArray(raw.keywords)?raw.keywords:[],
+    media:Array.isArray(raw.media)?raw.media:[]
+  };
+  return content;
+}
+
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
 const ADMIN_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream","custom-theme"];
 function validAdminTheme(t){return ADMIN_THEMES.includes(t)?t:"classic-brown"}
@@ -761,14 +793,13 @@ function merge(base,extra){
   return extra??base;
 }
 function normalizeMedia(content){
+  normalizeThesis(content);
   normalizeSiteSettings(content);
   normalizeCustomTheme(content);
   normalizeTypography(content);
   normalizeSectionHeadings(content);
   content.sectionMedia=content.sectionMedia||{};
   content.sectionMedia.profile=Array.isArray(content.sectionMedia.profile)?content.sectionMedia.profile:[];
-  content.featuredResearch=content.featuredResearch||{};
-  content.featuredResearch.media=Array.isArray(content.featuredResearch.media)?content.featuredResearch.media:[];
   content.publications=(content.publications||[]).map(x=>({...x,media:Array.isArray(x.media)?x.media:[]}));
   content.projects=(content.projects||[]).map(x=>({...x,media:Array.isArray(x.media)?x.media:[]}));
   content.skills=(content.skills||[]).map(x=>({...x,media:Array.isArray(x.media)?x.media:[]}));
@@ -795,8 +826,8 @@ function fillForms(){
   $("fAboutHeadline").value=sections.about.subtitle||"";
   $("fSectionResearchTitle").value=sections.research.title||"";
   $("fSectionResearchSubtitle").value=sections.research.subtitle||"";
-  $("fSectionFeaturedTitle").value=sections.featured.title||"";
-  $("fSectionFeaturedSubtitle").value=sections.featured.subtitle||"";
+  $("fSectionThesisTitle").value=sections.thesis.title||"";
+  $("fSectionThesisSubtitle").value=sections.thesis.subtitle||"";
   $("fSectionPublicationsTitle").value=sections.publications.title||"";
   $("fSectionPublicationsSubtitle").value=sections.publications.subtitle||"";
   $("fSectionProjectsTitle").value=sections.projects.title||"";
@@ -812,9 +843,16 @@ function fillForms(){
   $("fAboutLead").value=currentContent.aboutLead||"";
   $("fAboutBio").value=currentContent.aboutBio||"";
   $("fInterests").value=(currentContent.researchInterests||[]).join("\n");
-  $("fResearchTitle").value=currentContent.featuredResearch?.title||"";
-  $("fResearchDescription").value=currentContent.featuredResearch?.description||"";
-  $("fResearchTags").value=(currentContent.featuredResearch?.tags||[]).join(", ");
+  normalizeThesis(currentContent);
+  $("fThesisTitle").value=currentContent.thesis.title||"";
+  $("fThesisDescription").value=currentContent.thesis.description||"";
+  $("fThesisSupervisor").value=currentContent.thesis.supervisor||"";
+  $("fThesisCoSupervisor").value=currentContent.thesis.coSupervisor||"";
+  $("fThesisDegree").value=currentContent.thesis.degree||"";
+  $("fThesisInstitution").value=currentContent.thesis.institution||currentContent.institution||"";
+  $("fThesisPeriod").value=currentContent.thesis.period||"";
+  $("fThesisStatus").value=currentContent.thesis.status||"";
+  $("fThesisKeywords").value=(currentContent.thesis.keywords||[]).join(", ");
   $("fContactMessage").value=currentContent.contact?.message||"";
   $("fEmail").value=currentContent.contact?.email||"";
   $("fPhone").value=currentContent.contact?.phone||"";
@@ -844,7 +882,7 @@ function renderAllEditors(){
   renderSkillsEditor();
   renderEducationEditor();
   $("profileMediaEditor").innerHTML=mediaEditor("profile",currentContent.sectionMedia?.profile||[],"Profile / About media");
-  $("researchMediaEditor").innerHTML=mediaEditor("research",currentContent.featuredResearch?.media||[],"Research media");
+  $("thesisMediaEditor").innerHTML=mediaEditor("thesis",currentContent.thesis?.media||[],"Thesis media & attachments");
   $("contactMediaEditor").innerHTML=mediaEditor("contact",currentContent.contact?.media||[],"Contact media");
 }
 
@@ -1052,7 +1090,7 @@ function syncAllForms(){
   currentContent.sectionHeadings={
     about:{title:$("fSectionAboutTitle").value.trim(),subtitle:$("fAboutHeadline").value.trim()},
     research:{title:$("fSectionResearchTitle").value.trim(),subtitle:$("fSectionResearchSubtitle").value.trim()},
-    featured:{title:$("fSectionFeaturedTitle").value.trim(),subtitle:$("fSectionFeaturedSubtitle").value.trim()},
+    thesis:{title:$("fSectionThesisTitle").value.trim(),subtitle:$("fSectionThesisSubtitle").value.trim()},
     publications:{title:$("fSectionPublicationsTitle").value.trim(),subtitle:$("fSectionPublicationsSubtitle").value.trim()},
     projects:{title:$("fSectionProjectsTitle").value.trim(),subtitle:$("fSectionProjectsSubtitle").value.trim()},
     skills:{title:$("fSectionSkillsTitle").value.trim(),subtitle:$("fSectionSkillsSubtitle").value.trim()},
@@ -1067,12 +1105,19 @@ function syncAllForms(){
   currentContent.aboutBio=$("fAboutBio").value.trim();
   currentContent.researchInterests=$("fInterests").value.split("\n").map(x=>x.trim()).filter(Boolean);
 
-  const researchMedia=currentContent.featuredResearch?.media||[];
-  currentContent.featuredResearch={
-    title:$("fResearchTitle").value.trim(),
-    description:$("fResearchDescription").value.trim(),
-    tags:$("fResearchTags").value.split(",").map(x=>x.trim()).filter(Boolean),
-    media:researchMedia
+  delete currentContent.featuredResearch;
+  const thesisMedia=currentContent.thesis?.media||[];
+  currentContent.thesis={
+    title:$("fThesisTitle").value.trim(),
+    description:$("fThesisDescription").value.trim(),
+    supervisor:$("fThesisSupervisor").value.trim(),
+    coSupervisor:$("fThesisCoSupervisor").value.trim(),
+    degree:$("fThesisDegree").value.trim(),
+    institution:$("fThesisInstitution").value.trim(),
+    period:$("fThesisPeriod").value.trim(),
+    status:$("fThesisStatus").value.trim(),
+    keywords:$("fThesisKeywords").value.split(",").map(x=>x.trim()).filter(Boolean),
+    media:thesisMedia
   };
 
   readRepeaters();
@@ -1133,7 +1178,11 @@ function readMediaMetadata(){
 
 function getOwnerMedia(owner){
   if(owner==="profile")return currentContent.sectionMedia.profile;
-  if(owner==="research")return currentContent.featuredResearch.media;
+  if(owner==="thesis"){
+    normalizeThesis(currentContent);
+    currentContent.thesis.media=currentContent.thesis.media||[];
+    return currentContent.thesis.media;
+  }
   if(owner==="contact")return currentContent.contact.media;
   const[type,idxs]=owner.split(":");const i=Number(idxs);
   const map={publication:"publications",project:"projects",skill:"skills",education:"education"};
@@ -1142,7 +1191,7 @@ function getOwnerMedia(owner){
 }
 function ownerFolder(owner){
   if(owner==="profile")return "profile";
-  if(owner==="research")return "research";
+  if(owner==="thesis")return "thesis";
   if(owner==="contact")return "contact";
   const type=owner.split(":")[0];
   return {publication:"publications",project:"projects",skill:"skills",education:"education"}[type]||"misc";

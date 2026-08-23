@@ -1518,3 +1518,31 @@ body:not(.admin-body) .portrait.has-photo .profile-photo{
 body:not(.admin-body) .portrait{
   position:relative;
 }
+
+/* Undergraduate Thesis */
+.thesis-card{
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(240px,.65fr);
+  border:1px solid var(--line);
+  border-radius:var(--site-card-radius);
+  background:var(--surface);
+  box-shadow:var(--site-shadow);
+  overflow:hidden;
+}
+.thesis-main{padding:24px}
+.thesis-main h3{font-size:22px;line-height:1.35;margin-bottom:12px}
+.thesis-main p{margin-bottom:0}
+.thesis-meta{
+  padding:24px;background:var(--surface-alt);border-left:1px solid var(--line);
+  display:grid;align-content:center;gap:13px;
+}
+.thesis-meta-item{display:grid;gap:3px}
+.thesis-meta-item span{
+  color:var(--muted);font-size:11px;text-transform:uppercase;
+  letter-spacing:.08em;font-weight:700
+}
+.thesis-meta-item strong{font-size:14px;line-height:1.45}
+@media(max-width:760px){
+  .thesis-card{grid-template-columns:1fr}
+  .thesis-meta{border-left:0;border-top:1px solid var(--line)}
+}
