@@ -862,7 +862,7 @@ function repeatBlock(type,i,title,fields,media=[],visible=true){
     <div class="form-grid">
       ${fields.map(f=>`<div class="field ${f.full?"full":""}"><label>${esc(f.label)}</label>${
         f.kind==="textarea"?`<textarea data-k="${f.key}">${esc(f.value||"")}</textarea>`:
-        f.kind==="select"?`<select data-k="${f.key}">${["","Published","Accepted","In press","Submitted","Preprint","Conference"].map(o=>`<option ${o===f.value?"selected":""}>${esc(o)}</option>`).join("")}</select>`:
+        f.kind==="select"?`<select data-k="${f.key}">${["","Published","Accepted","In press","Submitted","Under review","Preprint","Conference"].map(o=>`<option ${o===f.value?"selected":""}>${esc(o)}</option>`).join("")}</select>`:
         `<input data-k="${f.key}" value="${esc(f.value||"")}">`
       }</div>`).join("")}
     </div>
