@@ -441,38 +441,57 @@ function normalizeSiteSettings(content){
   const rawOrder=Array.isArray(raw.sectionOrder)?raw.sectionOrder.filter(x=>SITE_SECTION_KEYS.includes(x)):[];
   const order=[...new Set([...rawOrder,...SITE_SECTION_KEYS])];
   const rawVis=(raw.sectionVisibility&&typeof raw.sectionVisibility==="object")?raw.sectionVisibility:{};
-
   const l=(raw.layout&&typeof raw.layout==="object")?raw.layout:{};
   const e=(raw.experience&&typeof raw.experience==="object")?raw.experience:{};
+
   const thesisVisible=raw.thesisDefaultVisibleApplied===true?rawVis.thesis!==false:true;
 
-  content.siteSettings={
+  // Preserve the one-time Experience-default repair, but never override
+  // an explicit choice after the migration marker has been stored.
+  const experienceDefaultsMigrated=raw.experienceDefaultsMigratedV1===true;
+  const experienceBool=(key)=>{
+    if(!experienceDefaultsMigrated)return DEFAULT_SITE_SETTINGS.experience[key]!==false;
+    return e[key]!==false;
+  };
+
+  const normalized={
+    ...raw,
     thesisDefaultVisibleApplied:true,
+    experienceDefaultsMigratedV1:true,
     sectionOrder:order,
-    sectionVisibility:Object.fromEntries(SITE_SECTION_KEYS.map(k=>[k,k==="thesis"?thesisVisible:rawVis[k]!==false])),
+    sectionVisibility:Object.fromEntries(
+      SITE_SECTION_KEYS.map(k=>[
+        k,
+        k==="thesis"?thesisVisible:(Object.prototype.hasOwnProperty.call(rawVis,k)?rawVis[k]!==false:true)
+      ])
+    ),
     layout:{
-      maxWidth:clampNumber(l.maxWidth,960,1500,1180),
-      sidebarWidth:clampNumber(l.sidebarWidth,210,340,255),
-      layoutGap:clampNumber(l.layoutGap,20,100,58),
-      sectionSpacing:clampNumber(l.sectionSpacing,20,90,40),
-      cardRadius:clampNumber(l.cardRadius,0,28,11),
-      portraitSize:clampNumber(l.portraitSize,140,250,190),
-      portraitShape:["square","slight","rounded","circle"].includes(l.portraitShape)?l.portraitShape:"slight",
-      projectColumns:[1,2,3].includes(Number(l.projectColumns))?Number(l.projectColumns):3,
-      skillsColumns:[1,2,3].includes(Number(l.skillsColumns))?Number(l.skillsColumns):3,
-      fontPair:Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,l.fontPair)?l.fontPair:"classic",
-      shadow:["none","subtle","medium"].includes(l.shadow)?l.shadow:"theme",
-      stickySidebar:l.stickySidebar!==false
+      ...l,
+      maxWidth:clampNumber(l.maxWidth,960,1500,DEFAULT_SITE_SETTINGS.layout.maxWidth),
+      sidebarWidth:clampNumber(l.sidebarWidth,210,340,DEFAULT_SITE_SETTINGS.layout.sidebarWidth),
+      layoutGap:clampNumber(l.layoutGap,20,100,DEFAULT_SITE_SETTINGS.layout.layoutGap),
+      sectionSpacing:clampNumber(l.sectionSpacing,20,90,DEFAULT_SITE_SETTINGS.layout.sectionSpacing),
+      cardRadius:clampNumber(l.cardRadius,0,28,DEFAULT_SITE_SETTINGS.layout.cardRadius),
+      portraitSize:clampNumber(l.portraitSize,140,250,DEFAULT_SITE_SETTINGS.layout.portraitSize),
+      portraitShape:["square","slight","rounded","circle"].includes(l.portraitShape)?l.portraitShape:DEFAULT_SITE_SETTINGS.layout.portraitShape,
+      projectColumns:[1,2,3].includes(Number(l.projectColumns))?Number(l.projectColumns):DEFAULT_SITE_SETTINGS.layout.projectColumns,
+      skillsColumns:[1,2,3].includes(Number(l.skillsColumns))?Number(l.skillsColumns):DEFAULT_SITE_SETTINGS.layout.skillsColumns,
+      fontPair:Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,l.fontPair)?l.fontPair:DEFAULT_SITE_SETTINGS.layout.fontPair,
+      shadow:["theme","none","subtle","medium"].includes(l.shadow)?l.shadow:DEFAULT_SITE_SETTINGS.layout.shadow,
+      stickySidebar:Object.prototype.hasOwnProperty.call(l,"stickySidebar")?l.stickySidebar!==false:DEFAULT_SITE_SETTINGS.layout.stickySidebar
     },
     experience:{
-      activeNav:e.activeNav!==false,
-      animations:["off","subtle","normal"].includes(e.animations)?e.animations:"subtle",
-      backToTop:e.backToTop!==false,
-      lightbox:e.lightbox!==false,
-      smoothScroll:e.smoothScroll!==false,
-      copyButtons:e.copyButtons!==false
+      ...e,
+      activeNav:experienceBool("activeNav"),
+      animations:["off","subtle","normal"].includes(e.animations)?e.animations:DEFAULT_SITE_SETTINGS.experience.animations,
+      backToTop:experienceBool("backToTop"),
+      lightbox:experienceBool("lightbox"),
+      smoothScroll:experienceBool("smoothScroll"),
+      copyButtons:experienceBool("copyButtons")
     }
   };
+
+  content.siteSettings=normalized;
   return content;
 }
 
@@ -714,6 +733,66 @@ function normalizeThesis(content){
   return content;
 }
 
+
+const BUILDER_SETTINGS_SCHEMA_VERSION=1;
+let savedBuilderSettingsSnapshot=null;
+
+function deepCloneSafe(value){
+  try{return structuredClone(value)}catch{return JSON.parse(JSON.stringify(value))}
+}
+
+function deepFillMissing(target,fallback){
+  if(Array.isArray(fallback)){
+    return Array.isArray(target)?target:deepCloneSafe(fallback);
+  }
+  if(fallback&&typeof fallback==="object"){
+    const out=(target&&typeof target==="object"&&!Array.isArray(target))?{...target}:{};
+    Object.keys(fallback).forEach(k=>{
+      if(out[k]===undefined||out[k]===null){
+        out[k]=deepCloneSafe(fallback[k]);
+      }else{
+        out[k]=deepFillMissing(out[k],fallback[k]);
+      }
+    });
+    return out;
+  }
+  return target===undefined||target===null?fallback:target;
+}
+
+function captureBuilderSettings(content){
+  const c=content&&typeof content==="object"?content:{};
+  return deepCloneSafe({
+    defaultTheme:c.defaultTheme,
+    appearance:c.appearance,
+    sectionHeadings:c.sectionHeadings,
+    siteSettings:c.siteSettings,
+    thesis:c.thesis,
+    builderState:c.builderState
+  });
+}
+
+function restoreMissingBuilderSettings(content,snapshot){
+  if(!snapshot||typeof snapshot!=="object")return content;
+  ["defaultTheme","appearance","sectionHeadings","siteSettings","thesis","builderState"].forEach(k=>{
+    if(content[k]===undefined||content[k]===null){
+      content[k]=deepCloneSafe(snapshot[k]);
+    }else if(snapshot[k]&&typeof snapshot[k]==="object"&&!Array.isArray(snapshot[k])){
+      content[k]=deepFillMissing(content[k],snapshot[k]);
+    }
+  });
+  return content;
+}
+
+function ensureBuilderState(content){
+  content.builderState=(content.builderState&&typeof content.builderState==="object")?content.builderState:{};
+  content.builderState.settingsSchemaVersion=BUILDER_SETTINGS_SCHEMA_VERSION;
+  return content.builderState;
+}
+
+function builderSettingsNeedMigration(content){
+  return Number(content?.builderState?.settingsSchemaVersion||0)<BUILDER_SETTINGS_SCHEMA_VERSION;
+}
+
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
 const ADMIN_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream","custom-theme"];
 function validAdminTheme(t){return ADMIN_THEMES.includes(t)?t:"classic-brown"}
@@ -810,8 +889,30 @@ function normalizeMedia(content){
 }
 async function loadContent(){
   const{data:row,error}=await sb.from("site_content").select("content").eq("id","main").single();
-  currentContent=!error&&row?.content&&Object.keys(row.content).length?merge(DEFAULT_CONTENT,row.content):structuredClone(DEFAULT_CONTENT);
+  const rawContent=!error&&row?.content&&Object.keys(row.content).length?row.content:{};
+  const neededMigration=builderSettingsNeedMigration(rawContent);
+
+  currentContent=Object.keys(rawContent).length?merge(DEFAULT_CONTENT,rawContent):structuredClone(DEFAULT_CONTENT);
   normalizeMedia(currentContent);
+  ensureBuilderState(currentContent);
+
+  // Snapshot the fully normalized settings. All future partial saves use this
+  // as a safety net so an unrelated code update cannot drop another setting.
+  savedBuilderSettingsSnapshot=captureBuilderSettings(currentContent);
+
+  // Persist migration markers/default repairs immediately. The user no longer
+  // has to remember to click Save after installing a maintenance update.
+  if(neededMigration){
+    const{error:migrationError}=await sb.from("site_content")
+      .update({content:currentContent,updated_at:new Date().toISOString()})
+      .eq("id","main");
+    if(!migrationError){
+      savedBuilderSettingsSnapshot=captureBuilderSettings(currentContent);
+    }else{
+      console.warn("Settings migration save warning:",migrationError.message);
+    }
+  }
+
   fillForms();
 }
 
@@ -1428,8 +1529,19 @@ async function removeMedia(spec){
 }
 
 async function persistContent(successMessage){
-  const{error}=await sb.from("site_content").update({content:currentContent,updated_at:new Date().toISOString()}).eq("id","main");
+  // Protect all design/admin preferences from being accidentally dropped by
+  // an unrelated feature patch or partial editor operation.
+  restoreMissingBuilderSettings(currentContent,savedBuilderSettingsSnapshot);
+  normalizeMedia(currentContent);
+  ensureBuilderState(currentContent);
+
+  const{error}=await sb.from("site_content")
+    .update({content:currentContent,updated_at:new Date().toISOString()})
+    .eq("id","main");
+
   if(error){setStatus("Save failed: "+error.message);return false}
+
+  savedBuilderSettingsSnapshot=captureBuilderSettings(currentContent);
   setStatus(successMessage||"Saved.");
   return true;
 }
