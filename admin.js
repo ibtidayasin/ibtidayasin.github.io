@@ -22,7 +22,7 @@ const DEFAULT_CONTENT={
   ],
   "education":[{"period":"B.Sc.","degree":"Mechanical Engineering","institution":"Shahjalal University of Science and Technology (SUST)","description":"Mechanical engineering education with growing focus on computational materials and atomistic simulation.","media":[]}],
   "contact":{"headline":"Interested in computational materials and nanoscale mechanics?","message":"I am open to research discussions, graduate opportunities, and collaborations related to computational materials science and atomistic simulation.","email":"","phone":"","location":"Bangladesh","media":[]},
-  "links":{"linkedin":"","github":"https://github.com/ibtidayasin","orcid":"","scholar":""},
+  "links":{"linkedin":"","github":"https://github.com/ibtidayasin","orcid":"","scholar":"","researchgate":"","scopus":"","wos":"","website":""},
   "cv":{"url":"","filename":"","updated_at":""},
   "photo_url":"",
   "defaultTheme":"classic-brown",
@@ -411,6 +411,8 @@ const DEFAULT_SITE_SETTINGS={
     cardRadius:11,
     portraitSize:190,
     portraitShape:"slight",
+    portraitFit:"cover",
+    portraitPosition:"center",
     projectColumns:3,
     skillsColumns:3,
     fontPair:"classic",
@@ -423,7 +425,9 @@ const DEFAULT_SITE_SETTINGS={
     backToTop:true,
     lightbox:true,
     smoothScroll:true,
-    copyButtons:true
+    copyButtons:true,
+    navHighlightStyle:"underline",
+    socialStyle:"labels"
   }
 };
 
@@ -474,6 +478,8 @@ function normalizeSiteSettings(content){
       cardRadius:clampNumber(l.cardRadius,0,28,DEFAULT_SITE_SETTINGS.layout.cardRadius),
       portraitSize:clampNumber(l.portraitSize,140,250,DEFAULT_SITE_SETTINGS.layout.portraitSize),
       portraitShape:["square","slight","rounded","circle"].includes(l.portraitShape)?l.portraitShape:DEFAULT_SITE_SETTINGS.layout.portraitShape,
+      portraitFit:["cover","contain"].includes(l.portraitFit)?l.portraitFit:DEFAULT_SITE_SETTINGS.layout.portraitFit,
+      portraitPosition:["center","top","bottom","left","right"].includes(l.portraitPosition)?l.portraitPosition:DEFAULT_SITE_SETTINGS.layout.portraitPosition,
       projectColumns:[1,2,3].includes(Number(l.projectColumns))?Number(l.projectColumns):DEFAULT_SITE_SETTINGS.layout.projectColumns,
       skillsColumns:[1,2,3].includes(Number(l.skillsColumns))?Number(l.skillsColumns):DEFAULT_SITE_SETTINGS.layout.skillsColumns,
       fontPair:Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,l.fontPair)?l.fontPair:DEFAULT_SITE_SETTINGS.layout.fontPair,
@@ -487,7 +493,9 @@ function normalizeSiteSettings(content){
       backToTop:experienceBool("backToTop"),
       lightbox:experienceBool("lightbox"),
       smoothScroll:experienceBool("smoothScroll"),
-      copyButtons:experienceBool("copyButtons")
+      copyButtons:experienceBool("copyButtons"),
+      navHighlightStyle:["underline","pill","text"].includes(e.navHighlightStyle)?e.navHighlightStyle:DEFAULT_SITE_SETTINGS.experience.navHighlightStyle,
+      socialStyle:["labels","icons"].includes(e.socialStyle)?e.socialStyle:DEFAULT_SITE_SETTINGS.experience.socialStyle
     }
   };
 
@@ -529,6 +537,8 @@ function fillSiteCustomizationControls(){
   });
 
   $("fPortraitShape").value=l.portraitShape;
+  $("fPortraitFit").value=l.portraitFit||"cover";
+  $("fPortraitPosition").value=l.portraitPosition||"center";
   $("fProjectColumns").value=String(l.projectColumns);
   $("fSkillsColumns").value=String(l.skillsColumns);
   $("fFontPair").value=l.fontPair;
@@ -541,6 +551,8 @@ function fillSiteCustomizationControls(){
   $("fLightbox").checked=e.lightbox;
   $("fSmoothScroll").checked=e.smoothScroll;
   $("fCopyButtons").checked=e.copyButtons;
+  $("fNavHighlightStyle").value=e.navHighlightStyle||"underline";
+  $("fSocialStyle").value=e.socialStyle||"labels";
 
   renderSectionManager();
 }
@@ -580,6 +592,8 @@ function syncSiteCustomizationFromControls(){
   l.cardRadius=clampNumber($("fCardRadiusNumber").value||$("fCardRadius").value,0,28,11);
   l.portraitSize=clampNumber($("fPortraitSizeNumber").value||$("fPortraitSize").value,140,250,190);
   l.portraitShape=$("fPortraitShape").value;
+  l.portraitFit=$("fPortraitFit").value;
+  l.portraitPosition=$("fPortraitPosition").value;
   l.projectColumns=Number($("fProjectColumns").value);
   l.skillsColumns=Number($("fSkillsColumns").value);
   l.fontPair=$("fFontPair").value;
@@ -593,6 +607,8 @@ function syncSiteCustomizationFromControls(){
   e.lightbox=$("fLightbox").checked;
   e.smoothScroll=$("fSmoothScroll").checked;
   e.copyButtons=$("fCopyButtons").checked;
+  e.navHighlightStyle=$("fNavHighlightStyle").value;
+  e.socialStyle=$("fSocialStyle").value;
 }
 
 function resetLayoutStyleControls(){
@@ -734,7 +750,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=1;
+const BUILDER_SETTINGS_SCHEMA_VERSION=2;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -791,6 +807,333 @@ function ensureBuilderState(content){
 
 function builderSettingsNeedMigration(content){
   return Number(content?.builderState?.settingsSchemaVersion||0)<BUILDER_SETTINGS_SCHEMA_VERSION;
+}
+
+
+/* =========================================================
+   ADVANCED ADMIN SUITE
+   Preview · History · Presets
+   ========================================================= */
+const MAX_UNDO_STEPS=30;
+const MAX_SAVED_REVISIONS=12;
+let globalUndoStack=[];
+let globalRedoStack=[];
+let globalHistoryLast=null;
+let globalHistoryMuted=0;
+let globalHistoryTimer=null;
+let lastPersistedFullSnapshot=null;
+let previewTimer=null;
+
+function historySnapshot(content=currentContent){
+  const snap=deepCloneSafe(content);
+  if(snap?.builderState)delete snap.builderState.revisions;
+  return snap;
+}
+function setHistoryMuted(fn){
+  globalHistoryMuted++;
+  try{return fn()}finally{globalHistoryMuted--}
+}
+function initializeGlobalHistory(){
+  globalUndoStack=[];
+  globalRedoStack=[];
+  globalHistoryLast=historySnapshot(currentContent);
+  lastPersistedFullSnapshot=historySnapshot(currentContent);
+  updateHistoryUi();
+  renderRevisionList();
+}
+function captureEditorIntoContent(){
+  if(globalHistoryMuted)return;
+  try{syncAllForms()}catch{}
+}
+function checkpointAfterEditorChange(){
+  if(globalHistoryMuted)return;
+  clearTimeout(globalHistoryTimer);
+  globalHistoryTimer=setTimeout(()=>{
+    if(globalHistoryMuted)return;
+    captureEditorIntoContent();
+    const now=historySnapshot(currentContent);
+    if(JSON.stringify(now)===JSON.stringify(globalHistoryLast))return;
+    if(globalHistoryLast){
+      globalUndoStack.push(globalHistoryLast);
+      if(globalUndoStack.length>MAX_UNDO_STEPS)globalUndoStack.shift();
+    }
+    globalHistoryLast=now;
+    globalRedoStack=[];
+    updateHistoryUi();
+    scheduleAdminPreview();
+  },350);
+}
+function capturePreMutation(){
+  if(globalHistoryMuted)return;
+  captureEditorIntoContent();
+  const now=historySnapshot(currentContent);
+  const top=globalUndoStack[globalUndoStack.length-1];
+  if(!top||JSON.stringify(top)!==JSON.stringify(now)){
+    globalUndoStack.push(now);
+    if(globalUndoStack.length>MAX_UNDO_STEPS)globalUndoStack.shift();
+  }
+  globalHistoryLast=now;
+  globalRedoStack=[];
+  updateHistoryUi();
+}
+function applyHistoryState(snapshot,statusText){
+  if(!snapshot)return;
+  const revisions=deepCloneSafe(currentContent?.builderState?.revisions||[]);
+  setHistoryMuted(()=>{
+    currentContent=merge(DEFAULT_CONTENT,deepCloneSafe(snapshot));
+    normalizeMedia(currentContent);
+    ensureBuilderState(currentContent);
+    currentContent.builderState.revisions=revisions;
+    fillForms();
+  });
+  globalHistoryLast=historySnapshot(currentContent);
+  updateHistoryUi();
+  renderRevisionList();
+  scheduleAdminPreview(true);
+  if(statusText)setStatus(statusText);
+}
+function globalUndo(){
+  if(!globalUndoStack.length)return;
+  captureEditorIntoContent();
+  const current=historySnapshot(currentContent);
+  const previous=globalUndoStack.pop();
+  globalRedoStack.push(current);
+  if(globalRedoStack.length>MAX_UNDO_STEPS)globalRedoStack.shift();
+  applyHistoryState(previous,"Undo applied. Save all changes to publish it.");
+}
+function globalRedo(){
+  if(!globalRedoStack.length)return;
+  captureEditorIntoContent();
+  const current=historySnapshot(currentContent);
+  const next=globalRedoStack.pop();
+  globalUndoStack.push(current);
+  if(globalUndoStack.length>MAX_UNDO_STEPS)globalUndoStack.shift();
+  applyHistoryState(next,"Redo applied. Save all changes to publish it.");
+}
+function updateHistoryUi(){
+  const undo=$("globalUndoBtn"),redo=$("globalRedoBtn");
+  if(undo)undo.disabled=!globalUndoStack.length;
+  if(redo)redo.disabled=!globalRedoStack.length;
+  if($("undoCount"))$("undoCount").textContent=String(globalUndoStack.length);
+  if($("redoCount"))$("redoCount").textContent=String(globalRedoStack.length);
+  const revisions=currentContent?.builderState?.revisions||[];
+  if($("revisionCount"))$("revisionCount").textContent=String(revisions.length);
+}
+function cleanRevisionSnapshot(content){
+  const snap=deepCloneSafe(content);
+  if(!snap.builderState)snap.builderState={};
+  delete snap.builderState.revisions;
+  return snap;
+}
+function ensureRevisionArray(){
+  ensureBuilderState(currentContent);
+  if(!Array.isArray(currentContent.builderState.revisions))currentContent.builderState.revisions=[];
+  return currentContent.builderState.revisions;
+}
+function addSavedRevision(snapshot,label="Saved version"){
+  if(!snapshot)return;
+  const revisions=ensureRevisionArray();
+  const clean=cleanRevisionSnapshot(snapshot);
+  const fingerprint=JSON.stringify(clean);
+  const latest=revisions[revisions.length-1];
+  if(latest&&JSON.stringify(latest.content)===fingerprint)return;
+  revisions.push({
+    id:`rev-${Date.now()}-${Math.random().toString(36).slice(2,7)}`,
+    at:new Date().toISOString(),
+    label:String(label||"Saved version").slice(0,80),
+    content:clean
+  });
+  while(revisions.length>MAX_SAVED_REVISIONS)revisions.shift();
+}
+function formatRevisionTime(v){
+  try{return new Date(v).toLocaleString(undefined,{year:"numeric",month:"short",day:"numeric",hour:"numeric",minute:"2-digit"})}
+  catch{return String(v||"")}
+}
+function renderRevisionList(){
+  const box=$("revisionList");
+  if(!box)return;
+  const revisions=[...(currentContent?.builderState?.revisions||[])].reverse();
+  box.innerHTML=revisions.length?revisions.map(r=>`
+    <div class="revision-row">
+      <div>
+        <strong>${esc(r.label||"Saved version")}</strong>
+        <span>${esc(formatRevisionTime(r.at))}</span>
+      </div>
+      <button class="secondary" type="button" data-restore-revision="${esc(r.id)}">Restore to editor</button>
+    </div>`).join(""):`<div class="empty-state">No saved revisions yet. They will appear after future saves.</div>`;
+  updateHistoryUi();
+}
+async function saveManualRevision(){
+  captureEditorIntoContent();
+  addSavedRevision(currentContent,"Manual checkpoint");
+  const ok=await persistContent("Checkpoint saved.");
+  if(ok){
+    lastPersistedFullSnapshot=historySnapshot(currentContent);
+    renderRevisionList();
+  }
+}
+
+/* Live Preview */
+function previewIsActive(){
+  return document.querySelector('[data-panel="preview"]')?.classList.contains("active");
+}
+function sendPreviewContent(){
+  const frame=$("sitePreviewFrame");
+  if(!frame?.contentWindow)return;
+  setHistoryMuted(()=>{try{syncAllForms()}catch{}});
+  frame.contentWindow.postMessage({
+    type:"academic-site-preview",
+    content:historySnapshot(currentContent)
+  },location.origin);
+}
+function scheduleAdminPreview(force=false){
+  if(!force&&!previewIsActive())return;
+  clearTimeout(previewTimer);
+  previewTimer=setTimeout(sendPreviewContent,force?30:300);
+}
+function setPreviewDevice(device){
+  const shell=$("previewFrameShell");
+  if(!shell)return;
+  ["desktop","tablet","mobile"].forEach(d=>shell.classList.toggle(`preview-${d}`,d===device));
+  document.querySelectorAll("[data-preview-device]").forEach(b=>b.classList.toggle("active",b.dataset.previewDevice===device));
+  const labels={desktop:"Desktop · 100%",tablet:"Tablet · 768 px",mobile:"Mobile · 390 px"};
+  if($("previewDeviceLabel"))$("previewDeviceLabel").textContent=labels[device]||labels.desktop;
+}
+
+/* Design Presets */
+const DESIGN_PRESETS={
+  "academic-classic":{
+    name:"Academic Classic",
+    description:"Traditional academic profile with serif headings, balanced spacing and understated cards.",
+    theme:"classic-brown",
+    typography:{sectionTitleSize:44,sectionTitleColor:"",sectionSubtitleSize:24,sectionSubtitleColor:""},
+    layout:{maxWidth:1180,sidebarWidth:255,layoutGap:58,sectionSpacing:42,cardRadius:10,portraitSize:190,portraitShape:"slight",projectColumns:3,skillsColumns:3,fontPair:"classic",shadow:"theme",stickySidebar:true},
+    experience:{activeNav:true,animations:"subtle",backToTop:true,lightbox:true,smoothScroll:true,copyButtons:true,navHighlightStyle:"underline",socialStyle:"labels"}
+  },
+  "minimal-research":{
+    name:"Minimal Research",
+    description:"Clean, low-distraction layout with tighter spacing, flatter cards and a research-first feel.",
+    theme:"soft-beige",
+    typography:{sectionTitleSize:42,sectionTitleColor:"",sectionSubtitleSize:21,sectionSubtitleColor:""},
+    layout:{maxWidth:1120,sidebarWidth:240,layoutGap:48,sectionSpacing:34,cardRadius:5,portraitSize:180,portraitShape:"slight",projectColumns:2,skillsColumns:3,fontPair:"humanist",shadow:"none",stickySidebar:true},
+    experience:{activeNav:true,animations:"off",backToTop:true,lightbox:true,smoothScroll:true,copyButtons:true,navHighlightStyle:"text",socialStyle:"icons"}
+  },
+  "modern-portfolio":{
+    name:"Modern Portfolio",
+    description:"Contemporary cards, wider content, rounded geometry and stronger visual interaction.",
+    theme:"cobalt-white",
+    typography:{sectionTitleSize:46,sectionTitleColor:"",sectionSubtitleSize:24,sectionSubtitleColor:""},
+    layout:{maxWidth:1280,sidebarWidth:270,layoutGap:62,sectionSpacing:46,cardRadius:18,portraitSize:200,portraitShape:"rounded",projectColumns:3,skillsColumns:3,fontPair:"modern",shadow:"medium",stickySidebar:true},
+    experience:{activeNav:true,animations:"normal",backToTop:true,lightbox:true,smoothScroll:true,copyButtons:true,navHighlightStyle:"pill",socialStyle:"labels"}
+  },
+  "editorial-scholar":{
+    name:"Editorial Scholar",
+    description:"Publication-oriented serif presentation with restrained geometry and strong typographic hierarchy.",
+    theme:"burgundy",
+    typography:{sectionTitleSize:46,sectionTitleColor:"",sectionSubtitleSize:23,sectionSubtitleColor:""},
+    layout:{maxWidth:1100,sidebarWidth:250,layoutGap:54,sectionSpacing:44,cardRadius:6,portraitSize:185,portraitShape:"slight",projectColumns:2,skillsColumns:2,fontPair:"editorial",shadow:"subtle",stickySidebar:true},
+    experience:{activeNav:true,animations:"subtle",backToTop:true,lightbox:true,smoothScroll:true,copyButtons:true,navHighlightStyle:"underline",socialStyle:"labels"}
+  },
+  "compact-academic":{
+    name:"Compact Academic",
+    description:"Denser layout for content-heavy profiles with compact sections and efficient use of space.",
+    theme:"deep-navy",
+    typography:{sectionTitleSize:40,sectionTitleColor:"",sectionSubtitleSize:20,sectionSubtitleColor:""},
+    layout:{maxWidth:1180,sidebarWidth:230,layoutGap:40,sectionSpacing:28,cardRadius:8,portraitSize:170,portraitShape:"slight",projectColumns:3,skillsColumns:3,fontPair:"palatino",shadow:"subtle",stickySidebar:true},
+    experience:{activeNav:true,animations:"off",backToTop:true,lightbox:true,smoothScroll:true,copyButtons:true,navHighlightStyle:"text",socialStyle:"icons"}
+  }
+};
+function renderDesignPresets(){
+  const grid=$("designPresetGrid");
+  if(!grid)return;
+  const selected=currentContent?.appearance?.designPreset||"custom";
+  grid.innerHTML=Object.entries(DESIGN_PRESETS).map(([id,p])=>`
+    <button class="preset-card ${selected===id?"selected":""}" data-apply-preset="${esc(id)}" type="button">
+      <span class="preset-swatch"></span>
+      <strong>${esc(p.name)}</strong>
+      <small>${esc(p.description)}</small>
+      <span class="preset-action">Apply preset</span>
+    </button>`).join("");
+  const current=DESIGN_PRESETS[selected]?.name||"Custom";
+  if($("currentPresetLabel"))$("currentPresetLabel").textContent=current;
+}
+function applyDesignPreset(id){
+  const preset=DESIGN_PRESETS[id];
+  if(!preset)return;
+  capturePreMutation();
+  const before=historySnapshot(currentContent);
+  setHistoryMuted(()=>{
+    normalizeSiteSettings(currentContent);
+    normalizeTypography(currentContent);
+    currentContent.defaultTheme=preset.theme;
+    currentContent.appearance=currentContent.appearance||{};
+    currentContent.appearance.typography=deepCloneSafe(preset.typography);
+    currentContent.appearance.designPreset=id;
+    currentContent.siteSettings.layout={...currentContent.siteSettings.layout,...deepCloneSafe(preset.layout)};
+    currentContent.siteSettings.experience={...currentContent.siteSettings.experience,...deepCloneSafe(preset.experience)};
+    fillForms();
+  });
+  globalUndoStack.push(before);
+  if(globalUndoStack.length>MAX_UNDO_STEPS)globalUndoStack.shift();
+  globalHistoryLast=historySnapshot(currentContent);
+  globalRedoStack=[];
+  updateHistoryUi();
+  renderDesignPresets();
+  scheduleAdminPreview(true);
+  setStatus(`${preset.name} applied in the editor. Save all changes to publish it.`);
+}
+function bindAdvancedAdminSuite(){
+  $("globalUndoBtn")?.addEventListener("click",globalUndo);
+  $("globalRedoBtn")?.addEventListener("click",globalRedo);
+  $("addManualRevisionBtn")?.addEventListener("click",saveManualRevision);
+  $("refreshPreviewBtn")?.addEventListener("click",()=>scheduleAdminPreview(true));
+  $("sitePreviewFrame")?.addEventListener("load",()=>scheduleAdminPreview(true));
+  document.querySelectorAll("[data-preview-device]").forEach(b=>b.addEventListener("click",()=>setPreviewDevice(b.dataset.previewDevice)));
+
+  document.addEventListener("click",e=>{
+    const restore=e.target.closest("[data-restore-revision]");
+    if(restore){
+      const revision=(currentContent?.builderState?.revisions||[]).find(r=>r.id===restore.dataset.restoreRevision);
+      if(revision){
+        const before=historySnapshot(currentContent);
+        globalUndoStack.push(before);
+        applyHistoryState(revision.content,"Revision restored to the editor. Save all changes to publish it.");
+      }
+      return;
+    }
+    const preset=e.target.closest("[data-apply-preset]");
+    if(preset){applyDesignPreset(preset.dataset.applyPreset);return}
+  });
+
+  const mutationSelectors=[
+    "[data-remove]","[data-move-item]","[data-section-move]","[data-media-remove]","[data-media-add-link]",
+    "#addPublicationBtn","#addProjectBtn","#addSkillGroupBtn","#addEducationBtn","#removeCvBtn",
+    "#resetLayoutStyleBtn","#resetSectionStructureBtn","#resetExperienceBtn",
+    "#resetTypographyBtn","#resetCustomThemeBtn"
+  ].join(",");
+  document.addEventListener("click",e=>{
+    if(e.target.closest(mutationSelectors))capturePreMutation();
+  },true);
+
+  const markCustomIfDesignEdit=(target)=>{
+    if(!target?.closest)return;
+    if(target.closest('[data-panel="appearance"],[data-panel="typography"],[data-panel="layout"],[data-panel="experience"]')){
+      currentContent.appearance=currentContent.appearance||{};
+      currentContent.appearance.designPreset="custom";
+      renderDesignPresets();
+    }
+  };
+  document.addEventListener("input",e=>{
+    if(e.target.closest("#loginView")||e.target.closest('[data-panel="preview"]'))return;
+    markCustomIfDesignEdit(e.target);
+    checkpointAfterEditorChange();
+  });
+  document.addEventListener("change",e=>{
+    if(e.target.closest("#loginView")||e.target.closest('[data-panel="preview"]'))return;
+    markCustomIfDesignEdit(e.target);
+    checkpointAfterEditorChange();
+  });
+  setPreviewDevice("desktop");
 }
 
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
@@ -860,6 +1203,9 @@ $("logoutBtn").addEventListener("click",async()=>{await sb.auth.signOut();locati
 document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{
   document.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("active",b===btn));
   document.querySelectorAll("[data-panel]").forEach(p=>p.classList.toggle("active",p.dataset.panel===btn.dataset.tab));
+  if(btn.dataset.tab==="preview")scheduleAdminPreview(true);
+  if(btn.dataset.tab==="history")renderRevisionList();
+  if(btn.dataset.tab==="presets")renderDesignPresets();
 }));
 
 function merge(base,extra){
@@ -914,6 +1260,7 @@ async function loadContent(){
   }
 
   fillForms();
+  initializeGlobalHistory();
 }
 
 function fillForms(){
@@ -962,6 +1309,10 @@ function fillForms(){
   $("fGitHub").value=currentContent.links?.github||"";
   $("fOrcid").value=currentContent.links?.orcid||"";
   $("fScholar").value=currentContent.links?.scholar||"";
+  $("fResearchGate").value=currentContent.links?.researchgate||"";
+  $("fScopus").value=currentContent.links?.scopus||"";
+  $("fWos").value=currentContent.links?.wos||"";
+  $("fWebsite").value=currentContent.links?.website||"";
   $("fCvExternal").value="";
   if(currentContent.photo_url){
     $("photoPreview").src=currentContent.photo_url;
@@ -975,6 +1326,10 @@ function fillForms(){
   fillThemeChooser();
   fillTypographyControls();
   fillCustomThemeControls();
+  fillSiteCustomizationControls();
+  renderDesignPresets();
+  renderRevisionList();
+  scheduleAdminPreview();
 }
 
 function renderAllEditors(){
@@ -1051,6 +1406,41 @@ function mediaEditor(owner,media,title){
             </div>
             <input data-media-field="title" value="${esc(m.title||"")}" placeholder="Display title (optional)">
             <input data-media-field="caption" value="${esc(m.caption||"")}" placeholder="Caption / note (optional)">
+            ${m.type==="image"?`
+              <div class="image-settings-admin">
+                <h5>Image settings</h5>
+                <div class="image-settings-grid">
+                  <label>Alt text<input data-media-field="alt" value="${esc(m.alt||"")}" placeholder="Describe the image"></label>
+                  <label>Aspect ratio<select data-media-field="aspect">
+                    <option value="original" ${(m.aspect||"original")==="original"?"selected":""}>Original</option>
+                    <option value="square" ${m.aspect==="square"?"selected":""}>1:1 square</option>
+                    <option value="4x3" ${m.aspect==="4x3"?"selected":""}>4:3</option>
+                    <option value="16x9" ${m.aspect==="16x9"?"selected":""}>16:9</option>
+                  </select></label>
+                  <label>Fit<select data-media-field="fit">
+                    <option value="cover" ${(m.fit||"cover")==="cover"?"selected":""}>Cover / crop</option>
+                    <option value="contain" ${m.fit==="contain"?"selected":""}>Contain</option>
+                  </select></label>
+                  <label>Crop position<select data-media-field="position">
+                    <option value="center" ${(m.position||"center")==="center"?"selected":""}>Center</option>
+                    <option value="top" ${m.position==="top"?"selected":""}>Top</option>
+                    <option value="bottom" ${m.position==="bottom"?"selected":""}>Bottom</option>
+                    <option value="left" ${m.position==="left"?"selected":""}>Left</option>
+                    <option value="right" ${m.position==="right"?"selected":""}>Right</option>
+                  </select></label>
+                  <label>Display width<select data-media-field="width">
+                    <option value="auto" ${(m.width||"auto")==="auto"?"selected":""}>Auto</option>
+                    <option value="full" ${m.width==="full"?"selected":""}>Full width</option>
+                    <option value="half" ${m.width==="half"?"selected":""}>Half width</option>
+                    <option value="third" ${m.width==="third"?"selected":""}>Third width</option>
+                  </select></label>
+                  <label>Click to enlarge<select data-media-field="enlarge">
+                    <option value="inherit" ${(m.enlarge||"inherit")==="inherit"?"selected":""}>Use site setting</option>
+                    <option value="on" ${m.enlarge==="on"?"selected":""}>Always</option>
+                    <option value="off" ${m.enlarge==="off"?"selected":""}>Never</option>
+                  </select></label>
+                </div>
+              </div>`:""}
             <span class="helper">${esc(m.url||"")}</span>
             ${m.type==="pdf"?`
               <div class="pdf-thumb-admin">
@@ -1236,7 +1626,11 @@ function syncAllForms(){
     linkedin:$("fLinkedIn").value.trim(),
     github:$("fGitHub").value.trim(),
     orcid:$("fOrcid").value.trim(),
-    scholar:$("fScholar").value.trim()
+    scholar:$("fScholar").value.trim(),
+    researchgate:$("fResearchGate").value.trim(),
+    scopus:$("fScopus").value.trim(),
+    wos:$("fWos").value.trim(),
+    website:$("fWebsite").value.trim()
   };
   normalizeMedia(currentContent);
 }
@@ -1273,6 +1667,14 @@ function readMediaMetadata(){
       if(!media[i])return;
       media[i].title=(row.querySelector('[data-media-field="title"]')?.value||"").trim();
       media[i].caption=(row.querySelector('[data-media-field="caption"]')?.value||"").trim();
+      if(media[i].type==="image"){
+        media[i].alt=(row.querySelector('[data-media-field="alt"]')?.value||"").trim();
+        media[i].aspect=row.querySelector('[data-media-field="aspect"]')?.value||"original";
+        media[i].fit=row.querySelector('[data-media-field="fit"]')?.value||"cover";
+        media[i].position=row.querySelector('[data-media-field="position"]')?.value||"center";
+        media[i].width=row.querySelector('[data-media-field="width"]')?.value||"auto";
+        media[i].enlarge=row.querySelector('[data-media-field="enlarge"]')?.value||"inherit";
+      }
     });
   });
 }
@@ -1336,6 +1738,7 @@ async function uploadMedia(owner,editor){
     path,
     title:file.name.replace(/\.[^.]+$/,""),
     caption:"",
+      ...(type==="image"?{alt:"",aspect:"original",fit:"cover",position:"center",width:"auto",enlarge:"inherit"}:{}),
     uploaded_at:new Date().toISOString()
   };
   media.push(item);
@@ -1366,7 +1769,9 @@ async function addMediaLink(owner,editor){
   if(!/^https?:\/\//i.test(url))return setStatus("Media URL must start with http:// or https://");
 
   getOwnerMedia(owner).push({
-    id:uid(),type,url,title:title||defaultLinkTitle(type),caption:"",filename:"",path:"",uploaded_at:new Date().toISOString()
+    id:uid(),type,url,title:title||defaultLinkTitle(type),caption:"",filename:"",path:"",
+    ...(type==="image"?{alt:"",aspect:"original",fit:"cover",position:"center",width:"auto",enlarge:"inherit"}:{}),
+    uploaded_at:new Date().toISOString()
   });
   await persistContent("Link added.");
   fillForms();
@@ -1535,6 +1940,12 @@ async function persistContent(successMessage){
   normalizeMedia(currentContent);
   ensureBuilderState(currentContent);
 
+  const beforeSave=lastPersistedFullSnapshot?deepCloneSafe(lastPersistedFullSnapshot):null;
+  const currentBeforeSave=historySnapshot(currentContent);
+  if(beforeSave&&JSON.stringify(beforeSave)!==JSON.stringify(currentBeforeSave)){
+    addSavedRevision(beforeSave,successMessage||"Saved version");
+  }
+
   const{error}=await sb.from("site_content")
     .update({content:currentContent,updated_at:new Date().toISOString()})
     .eq("id","main");
@@ -1542,6 +1953,10 @@ async function persistContent(successMessage){
   if(error){setStatus("Save failed: "+error.message);return false}
 
   savedBuilderSettingsSnapshot=captureBuilderSettings(currentContent);
+  lastPersistedFullSnapshot=historySnapshot(currentContent);
+  globalHistoryLast=historySnapshot(currentContent);
+  renderRevisionList();
+  updateHistoryUi();
   setStatus(successMessage||"Saved.");
   return true;
 }
@@ -1672,4 +2087,5 @@ document.addEventListener("change",e=>{
   if(vis)setSectionVisibility(vis.dataset.sectionVisible,vis.checked);
 });
 
+bindAdvancedAdminSuite();
 boot();

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260824-thesisclean1">
+  <link rel="stylesheet" href="styles.css?v=20260824-advanced3">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -38,9 +38,12 @@
         <button data-tab="contact" type="button">Contact</button>
         <button data-tab="cv" type="button">CV</button>
         <button data-tab="appearance" type="button">Appearance</button>
+        <button data-tab="presets" type="button">Presets</button>
       <button type="button" data-tab="typography">Typography</button>
       <button type="button" data-tab="layout">Layout</button>
       <button type="button" data-tab="experience">Experience</button>
+      <button type="button" data-tab="preview">Preview</button>
+      <button type="button" data-tab="history">History</button>
       <button type="button" data-tab="backup">Backup</button>
       </div>
 
@@ -168,6 +171,10 @@
           <div class="field"><label>GitHub URL</label><input id="fGitHub"></div>
           <div class="field"><label>ORCID URL</label><input id="fOrcid"></div>
           <div class="field"><label>Google Scholar URL</label><input id="fScholar"></div>
+          <div class="field"><label>ResearchGate URL</label><input id="fResearchGate"></div>
+          <div class="field"><label>Scopus author URL</label><input id="fScopus"></div>
+          <div class="field"><label>Web of Science researcher URL</label><input id="fWos"></div>
+          <div class="field"><label>Personal / professional website URL</label><input id="fWebsite"></div>
         </div>
         <div id="contactMediaEditor" class="media-section-editor"></div>
       </div>
@@ -678,6 +685,20 @@
           <span>Choosing a theme previews it immediately in this private admin page. Click <b>Save all changes</b> to publish it.</span>
         </div>
       </div>
+
+      <div class="admin-panel" data-panel="presets">
+        <div class="admin-card">
+          <div class="settings-head">
+            <div>
+              <h2>Design presets</h2>
+              <p class="muted">Apply a complete visual starting point, then customize every setting afterward.</p>
+            </div>
+            <span id="currentPresetLabel" class="preset-current">Custom</span>
+          </div>
+          <div id="designPresetGrid" class="preset-grid"></div>
+          <p class="helper">Presets change design settings only. Your text, publications, projects, thesis, media and CV are not replaced.</p>
+        </div>
+      </div>
       <div class="admin-panel" data-panel="typography">
         <div class="admin-card">
           <h2>Typography</h2>
@@ -787,6 +808,8 @@
                 <div class="range-setting"><label>Card corner radius</label><div><input id="fCardRadius" type="range" min="0" max="28" step="1"><input id="fCardRadiusNumber" type="number" min="0" max="28" step="1"></div></div>
                 <div class="range-setting"><label>Portrait size</label><div><input id="fPortraitSize" type="range" min="140" max="250" step="5"><input id="fPortraitSizeNumber" type="number" min="140" max="250" step="5"></div></div>
                 <div class="field"><label>Portrait shape</label><select id="fPortraitShape"><option value="square">Square</option><option value="slight">Slightly rounded</option><option value="rounded">Rounded</option><option value="circle">Circle</option></select></div>
+                <div class="field"><label>Portrait image fit</label><select id="fPortraitFit"><option value="cover">Cover / crop</option><option value="contain">Contain</option></select></div>
+                <div class="field"><label>Portrait crop position</label><select id="fPortraitPosition"><option value="center">Center</option><option value="top">Top</option><option value="bottom">Bottom</option><option value="left">Left</option><option value="right">Right</option></select></div>
                 <div class="field"><label>Shadow</label><select id="fShadow"><option value="theme">Theme default</option><option value="none">None</option><option value="subtle">Subtle</option><option value="medium">Medium</option></select></div>
               </div>
 
@@ -830,10 +853,68 @@
               <span><strong>Entrance animations</strong><small>Keep motion subtle for an academic site.</small></span>
               <select id="fAnimations"><option value="off">Off</option><option value="subtle">Subtle</option><option value="normal">Normal</option></select>
             </div>
+            <div class="experience-card experience-select-card">
+              <span><strong>Active-nav style</strong><small>Choose how the current section is highlighted.</small></span>
+              <select id="fNavHighlightStyle"><option value="underline">Underline</option><option value="pill">Pill</option><option value="text">Text only</option></select>
+            </div>
+            <div class="experience-card experience-select-card">
+              <span><strong>Social links style</strong><small>Show academic links with labels or as compact icons.</small></span>
+              <select id="fSocialStyle"><option value="labels">Icons + labels</option><option value="icons">Icons only</option></select>
+            </div>
           </div>
         </div>
       </div>
 
+
+      <div class="admin-panel" data-panel="preview">
+        <div class="admin-card preview-admin-card">
+          <div class="settings-head">
+            <div>
+              <h2>Live preview</h2>
+              <p class="muted">Preview unsaved Admin changes before publishing.</p>
+            </div>
+            <button id="refreshPreviewBtn" class="secondary" type="button">Refresh preview</button>
+          </div>
+          <div class="preview-device-bar">
+            <button class="secondary preview-device active" data-preview-device="desktop" type="button">Desktop</button>
+            <button class="secondary preview-device" data-preview-device="tablet" type="button">Tablet</button>
+            <button class="secondary preview-device" data-preview-device="mobile" type="button">Mobile</button>
+            <span id="previewDeviceLabel" class="helper">Desktop · 100%</span>
+          </div>
+          <div class="preview-stage">
+            <div id="previewFrameShell" class="preview-frame-shell preview-desktop">
+              <iframe id="sitePreviewFrame" title="Live website preview" src="index.html?adminPreview=1" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-panel" data-panel="history">
+        <div class="admin-card">
+          <div class="settings-head">
+            <div>
+              <h2>Undo & revision history</h2>
+              <p class="muted">Undo unsaved edits or restore an earlier saved version of the website.</p>
+            </div>
+            <div class="action-row">
+              <button id="globalUndoBtn" class="secondary" type="button" disabled>Undo</button>
+              <button id="globalRedoBtn" class="secondary" type="button" disabled>Redo</button>
+            </div>
+          </div>
+          <div class="history-summary">
+            <div><strong id="undoCount">0</strong><span>Undo steps</span></div>
+            <div><strong id="redoCount">0</strong><span>Redo steps</span></div>
+            <div><strong id="revisionCount">0</strong><span>Saved revisions</span></div>
+          </div>
+          <div class="settings-section">
+            <div class="settings-head">
+              <div><h3>Saved revisions</h3><p class="muted">The latest 12 saved website states are kept automatically.</p></div>
+              <button id="addManualRevisionBtn" class="secondary" type="button">Save checkpoint</button>
+            </div>
+            <div id="revisionList" class="revision-list"></div>
+          </div>
+        </div>
+      </div>
       <div class="admin-panel" data-panel="backup">
         <div class="admin-card">
           <h2>Backup & restore</h2>
@@ -876,6 +957,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260824-persistall1"></script>
+  <script src="admin.js?v=20260824-advanced3"></script>
 </body>
 </html>

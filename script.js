@@ -23,7 +23,7 @@ const DEFAULT_CONTENT={
   ],
   "education":[{"period":"B.Sc.","degree":"Mechanical Engineering","institution":"Shahjalal University of Science and Technology (SUST)","description":"Mechanical engineering education with growing focus on computational materials and atomistic simulation.","media":[]}],
   "contact":{"headline":"Interested in computational materials and nanoscale mechanics?","message":"I am open to research discussions, graduate opportunities, and collaborations related to computational materials science and atomistic simulation.","email":"","phone":"","location":"Bangladesh","media":[]},
-  "links":{"linkedin":"","github":"https://github.com/ibtidayasin","orcid":"","scholar":""},
+  "links":{"linkedin":"","github":"https://github.com/ibtidayasin","orcid":"","scholar":"","researchgate":"","scopus":"","wos":"","website":""},
   "cv":{"url":"","filename":"","updated_at":""},
   "photo_url":"",
   "defaultTheme":"classic-brown",
@@ -171,6 +171,8 @@ const DEFAULT_SITE_SETTINGS={
     cardRadius:11,
     portraitSize:190,
     portraitShape:"slight",
+    portraitFit:"cover",
+    portraitPosition:"center",
     projectColumns:3,
     skillsColumns:3,
     fontPair:"classic",
@@ -183,7 +185,9 @@ const DEFAULT_SITE_SETTINGS={
     backToTop:true,
     lightbox:true,
     smoothScroll:true,
-    copyButtons:true
+    copyButtons:true,
+    navHighlightStyle:"underline",
+    socialStyle:"labels"
   }
 };
 
@@ -234,6 +238,8 @@ function normalizeSiteSettings(content){
       cardRadius:clampNumber(l.cardRadius,0,28,DEFAULT_SITE_SETTINGS.layout.cardRadius),
       portraitSize:clampNumber(l.portraitSize,140,250,DEFAULT_SITE_SETTINGS.layout.portraitSize),
       portraitShape:["square","slight","rounded","circle"].includes(l.portraitShape)?l.portraitShape:DEFAULT_SITE_SETTINGS.layout.portraitShape,
+      portraitFit:["cover","contain"].includes(l.portraitFit)?l.portraitFit:DEFAULT_SITE_SETTINGS.layout.portraitFit,
+      portraitPosition:["center","top","bottom","left","right"].includes(l.portraitPosition)?l.portraitPosition:DEFAULT_SITE_SETTINGS.layout.portraitPosition,
       projectColumns:[1,2,3].includes(Number(l.projectColumns))?Number(l.projectColumns):DEFAULT_SITE_SETTINGS.layout.projectColumns,
       skillsColumns:[1,2,3].includes(Number(l.skillsColumns))?Number(l.skillsColumns):DEFAULT_SITE_SETTINGS.layout.skillsColumns,
       fontPair:Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,l.fontPair)?l.fontPair:DEFAULT_SITE_SETTINGS.layout.fontPair,
@@ -247,7 +253,9 @@ function normalizeSiteSettings(content){
       backToTop:experienceBool("backToTop"),
       lightbox:experienceBool("lightbox"),
       smoothScroll:experienceBool("smoothScroll"),
-      copyButtons:experienceBool("copyButtons")
+      copyButtons:experienceBool("copyButtons"),
+      navHighlightStyle:["underline","pill","text"].includes(e.navHighlightStyle)?e.navHighlightStyle:DEFAULT_SITE_SETTINGS.experience.navHighlightStyle,
+      socialStyle:["labels","icons"].includes(e.socialStyle)?e.socialStyle:DEFAULT_SITE_SETTINGS.experience.socialStyle
     }
   };
 
@@ -329,9 +337,11 @@ function ensureEnhancementUi(){
     }
 
     const img=e.target.closest(".media-public-image");
-    if(img&&currentSiteExperience.lightbox){
+    if(img){
+      const mode=img.dataset.lightbox||"inherit";
+      const allowLightbox=mode==="on"||(mode==="inherit"&&currentSiteExperience.lightbox);
       const anchor=img.closest("a");
-      if(anchor){
+      if(anchor&&allowLightbox){
         e.preventDefault();
         const box=$("siteLightbox");
         $("siteLightboxImage").src=img.src;
@@ -399,6 +409,8 @@ function applyLayoutSettings(d){
   root.style.setProperty("--site-card-radius",`${l.cardRadius}px`);
   root.style.setProperty("--site-portrait-size",`${l.portraitSize}px`);
   root.style.setProperty("--site-portrait-radius",portraitRadiusValue(l.portraitShape));
+  root.style.setProperty("--site-portrait-fit",l.portraitFit||"cover");
+  root.style.setProperty("--site-portrait-position",l.portraitPosition||"center");
   root.style.setProperty("--site-project-columns",String(l.projectColumns));
   root.style.setProperty("--site-skills-columns",String(l.skillsColumns));
   root.style.setProperty("--site-shadow",siteShadowValue(l.shadow));
@@ -475,6 +487,7 @@ function applyExperienceSettings(d){
   ensureEnhancementUi();
 
   document.documentElement.classList.toggle("no-smooth-scroll",!currentSiteExperience.smoothScroll);
+  document.documentElement.dataset.navHighlight=currentSiteExperience.navHighlightStyle||"underline";
   $("backToTopBtn")?.classList.toggle("feature-disabled",!currentSiteExperience.backToTop);
   if(!currentSiteExperience.lightbox)closeSiteLightbox();
 
@@ -521,7 +534,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=1;
+const BUILDER_SETTINGS_SCHEMA_VERSION=2;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -627,15 +640,20 @@ function profileIcon(type){
     github:`<svg ${common}><path d="M9 19c-4 .8-4-2-5-2"></path><path d="M15 19v-3.5a3 3 0 0 0-.9-2.3c3-.3 6.1-1.5 6.1-6.7a5.2 5.2 0 0 0-1.4-3.6 4.9 4.9 0 0 0-.1-3.5s-1.1-.4-3.7 1.4a12.8 12.8 0 0 0-6 0C6.4-1 5.3-.6 5.3-.6a4.9 4.9 0 0 0-.1 3.5 5.2 5.2 0 0 0-1.4 3.6c0 5.2 3.1 6.4 6.1 6.7A3 3 0 0 0 9 15.5V19"></path></svg>`,
     scholar:`<svg ${common}><path d="M12 4L3 9l9 5 9-5-9-5z"></path><path d="M6 11.5V15c0 1.7 2.7 3 6 3s6-1.3 6-3v-3.5"></path></svg>`,
     orcid:`<svg ${common}><circle cx="12" cy="12" r="8.5"></circle><circle cx="9" cy="8.3" r="1" class="profile-icon-fill"></circle><path d="M9 11v5"></path><path d="M12.5 16v-5h2a2.5 2.5 0 1 1 0 5h-2z"></path></svg>`,
+    website:`<svg ${common}><circle cx="12" cy="12" r="8.5"></circle><path d="M3.8 12h16.4"></path><path d="M12 3.5c2.4 2.4 3.6 5.2 3.6 8.5S14.4 18.1 12 20.5c-2.4-2.4-3.6-5.2-3.6-8.5S9.6 5.9 12 3.5z"></path></svg>`,
+    researchgate:`<svg ${common}><circle cx="12" cy="12" r="8.5"></circle><path d="M8.3 16V8h3.1c2 0 3.2 1 3.2 2.6 0 1.2-.7 2.1-1.9 2.5L15.4 16"></path><path d="M10.2 12.9h2.3"></path></svg>`,
+    scopus:`<svg ${common}><path d="M7 5h10v4H9v2h7v4H9v2h8v2H7z"></path></svg>`,
+    wos:`<svg ${common}><circle cx="8" cy="12" r="4"></circle><circle cx="16" cy="12" r="4"></circle><path d="M10.5 8.9l3 6.2"></path><path d="M13.5 8.9l-3 6.2"></path></svg>`,
     phone:`<svg ${common}><path d="M6.5 4.5l3 3-2 2.2a14 14 0 0 0 6.8 6.8l2.2-2 3 3-1.6 2c-.7.8-1.8 1.1-2.8.8C9.4 18.7 5.3 14.6 3.7 8.9c-.3-1 .1-2.1.8-2.8l2-1.6z"></path></svg>`,
     location:`<svg ${common}><path d="M12 21s6-5.4 6-11a6 6 0 1 0-12 0c0 5.6 6 11 6 11z"></path><circle cx="12" cy="10" r="2"></circle></svg>`
   };
   return icons[type]||icons.github;
 }
 
-function iconLinkHtml(type,label,url,isExternal=true){
+function iconLinkHtml(type,label,url,isExternal=true,style="labels"){
   if(!url)return "";
-  return `<a class="profile-icon-link" href="${escAttr(url)}" ${isExternal?'target="_blank" rel="noopener"':""}>
+  const iconOnly=style==="icons";
+  return `<a class="profile-icon-link ${iconOnly?"social-icons-only":""}" href="${escAttr(url)}" ${isExternal?'target="_blank" rel="noopener"':""} title="${escAttr(label)}" aria-label="${escAttr(label)}">
     ${profileIcon(type)}
     <span>${esc(label)}</span>
     ${isExternal?'<span class="profile-link-arrow">↗</span>':""}
@@ -764,7 +782,7 @@ function render(d){
   if(d.contact?.email)contactItems.push(["email","Email",`mailto:${d.contact.email}`,d.contact.email,false]);
   if(d.contact?.phone)contactItems.push(["phone","Phone","",d.contact.phone,false]);
   if(d.contact?.location)contactItems.push(["location","Location","",d.contact.location,false]);
-  [["linkedin","LinkedIn",d.links?.linkedin],["github","GitHub",d.links?.github],["orcid","ORCID",d.links?.orcid],["scholar","Google Scholar",d.links?.scholar]].forEach(([type,label,url])=>{
+  [["linkedin","LinkedIn",d.links?.linkedin],["github","GitHub",d.links?.github],["orcid","ORCID",d.links?.orcid],["scholar","Google Scholar",d.links?.scholar],["researchgate","ResearchGate",d.links?.researchgate],["scopus","Scopus",d.links?.scopus],["wos","Web of Science",d.links?.wos],["website","Website",d.links?.website]].forEach(([type,label,url])=>{
     const safe=safeUrl(url);
     if(safe)contactItems.push([type,label,safe,"Open profile",true]);
   });
@@ -777,16 +795,22 @@ function render(d){
     </div>`).join("");
   $("contactMedia").innerHTML=mediaHtml(d.contact?.media||[]);
 
+  const socialStyle=d.siteSettings?.experience?.socialStyle||"labels";
   const sideDefs=[
     ["email","Email",d.contact?.email?`mailto:${d.contact.email}`:"",false],
     ["linkedin","LinkedIn",safeUrl(d.links?.linkedin),true],
     ["github","GitHub",safeUrl(d.links?.github),true],
     ["orcid","ORCID",safeUrl(d.links?.orcid),true],
-    ["scholar","Google Scholar",safeUrl(d.links?.scholar),true]
+    ["scholar","Google Scholar",safeUrl(d.links?.scholar),true],
+    ["researchgate","ResearchGate",safeUrl(d.links?.researchgate),true],
+    ["scopus","Scopus",safeUrl(d.links?.scopus),true],
+    ["wos","Web of Science",safeUrl(d.links?.wos),true],
+    ["website","Website",safeUrl(d.links?.website),true]
   ];
+  $("sidebarLinks").classList.toggle("social-icons-layout",socialStyle==="icons");
   $("sidebarLinks").innerHTML=sideDefs
     .filter(([, ,url])=>url)
-    .map(([type,label,url,isExternal])=>iconLinkHtml(type,label,url,isExternal))
+    .map(([type,label,url,isExternal])=>iconLinkHtml(type,label,url,isExternal,socialStyle))
     .join("");
 
   if(d.cv?.url){
@@ -806,8 +830,16 @@ function mediaHtml(media){
   media.forEach(m=>{
     const type=m.type||"link",url=safeUrl(m.url),title=m.title||m.filename||labelFor(type),caption=m.caption||"";
     if(type==="image"){
-      visual.push(`<figure class="media-public-item">
-        <a href="${escAttr(url)}" target="_blank" rel="noopener"><img class="media-public-image" src="${escAttr(url)}" alt="${escAttr(title)}" loading="lazy"></a>
+      const alt=m.alt||title||"Image";
+      const aspect=["original","square","4x3","16x9"].includes(m.aspect)?m.aspect:"original";
+      const fit=["cover","contain"].includes(m.fit)?m.fit:"cover";
+      const position=["center","top","bottom","left","right"].includes(m.position)?m.position:"center";
+      const width=["auto","full","half","third"].includes(m.width)?m.width:"auto";
+      const enlarge=["inherit","on","off"].includes(m.enlarge)?m.enlarge:"inherit";
+      visual.push(`<figure class="media-public-item media-width-${escAttr(width)}">
+        <a class="media-image-stage media-aspect-${escAttr(aspect)}" href="${escAttr(url)}" target="_blank" rel="noopener">
+          <img class="media-public-image image-fit-${escAttr(fit)} crop-${escAttr(position)}" data-lightbox="${escAttr(enlarge)}" src="${escAttr(url)}" alt="${escAttr(alt)}" loading="lazy">
+        </a>
         ${(title||caption)?`<figcaption class="media-public-info">${title?`<strong>${esc(title)}</strong>`:""}${caption?`<p>${esc(caption)}</p>`:""}</figcaption>`:""}
       </figure>`);
     }else if(type==="video"){
@@ -868,5 +900,22 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 function escAttr(s){return esc(String(s??"").replace(/javascript:/gi,""))}
 function formatDate(v){try{return new Date(v).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"})}catch{return""}}
 
+
+const IS_ADMIN_PREVIEW=new URLSearchParams(location.search).get("adminPreview")==="1";
+if(IS_ADMIN_PREVIEW){
+  document.documentElement.classList.add("admin-preview-mode");
+  window.addEventListener("message",e=>{
+    if(e.origin!==location.origin)return;
+    if(e.data?.type!=="academic-site-preview"||!e.data.content)return;
+    try{
+      render(normalize(merge(DEFAULT_CONTENT,deepCloneSafe(e.data.content))));
+    }catch(err){console.error("Preview render failed:",err)}
+  });
+}
+
 $("year").textContent=new Date().getFullYear();
-loadContent();
+if(IS_ADMIN_PREVIEW){
+  render(normalize(structuredClone(DEFAULT_CONTENT)));
+}else{
+  loadContent();
+}
