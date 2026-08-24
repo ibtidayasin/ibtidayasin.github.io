@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260825-homefix1">
+  <link rel="stylesheet" href="styles.css?v=20260825-nocovercv1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -894,6 +894,17 @@
                     </div>
                   </div>
 
+
+                  <div class="field">
+                    <label>Gap below navigation</label>
+                    <select id="fSectionCoverGap">
+                      <option value="0">No gap</option>
+                      <option value="12">Tight · 12 px</option>
+                      <option value="24">Compact · 24 px</option>
+                      <option value="42">Standard · 42 px</option>
+                    </select>
+                  </div>
+
                   <label class="setting-toggle">
                     <input id="fSectionCoverDetails" type="checkbox">
                     Show institution, location & focus
@@ -901,7 +912,7 @@
 
                   <label class="setting-toggle">
                     <input id="fSectionCoverSocials" type="checkbox">
-                    Show social links & CV button
+                    Show social links
                   </label>
 
 
@@ -1094,6 +1105,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260825-homefix1"></script>
+  <script src="admin.js?v=20260825-covergap1"></script>
 </body>
 </html>

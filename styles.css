@@ -2656,3 +2656,29 @@ html[data-section-page="home"] body:not(.admin-body) .sidebar::before,
 html[data-section-page="home"] body:not(.admin-body) .sidebar::after{
   content:none!important;
 }
+
+
+/* =========================================================
+   INNER COVER TOP GAP CONTROL
+   Home/About is intentionally unaffected.
+   ========================================================= */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .layout{
+  padding-top:var(--section-cover-gap,12px)!important;
+}
+
+/* Exact flush option: cover begins directly beneath the navigation border. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-gap="0"] body:not(.admin-body) .layout{
+  padding-top:0!important;
+}
+
+/* Upward-blend Full Bleed intentionally overrides ordinary gap and overlaps nav. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-top-blend="on"] body:not(.admin-body) .layout{
+  padding-top:0!important;
+}
+
+
+/* Inner section cover: CV button intentionally removed.
+   The dedicated Curriculum Vitae section and header navigation remain available. */
+html[data-navigation-mode="sections"][data-section-page="inner"] body:not(.admin-body) .sidebar .sidebar-cv{
+  display:none!important;
+}
