@@ -1,9 +1,9 @@
 :root{
-  --bg:#fcfbf9;--surface:#ffffff;--text:#2b2926;--muted:#746e66;
-  --line:#e8e1d9;--accent:#9f8064;--accent-soft:#f5eee7;
-  --surface-alt:#f7f3ee;--surface-soft:#fcfaf7;--header-bg:rgba(252,251,249,.96);--media-bg:#f5f1ec;
-  --portrait-a:#d7c2ae;--portrait-b:#9a7d65;--danger:#a33535;--danger-border:#ebc7c7;
-  --shadow:0 12px 30px rgba(74,58,44,.055);--max:1180px
+  --bg:#fbfbfb;--surface:#fff;--text:#202328;--muted:#686f78;
+  --line:#e7e7e7;--accent:#a15d1d;--accent-soft:#f8f1e9;
+  --surface-alt:#f6f6f6;--surface-soft:#fcfcfc;--header-bg:rgba(251,251,251,.96);--media-bg:#f4f4f4;
+  --portrait-a:#d7a04a;--portrait-b:#885018;--danger:#a33535;--danger-border:#ebc7c7;
+  --shadow:0 12px 30px rgba(0,0,0,.055);--max:1180px
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:88px}
@@ -747,12 +747,6 @@ html[data-theme="dark-academic"] .button:hover{color:#171717}
   .theme-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* Nazifa: soft beige/taupe identity refinements */
-.portrait,.profile-photo{border-radius:13px}
-.research-card,.card,.pub-item,.contact-item,.media-public-item{border-radius:10px}
-html[data-theme="soft-beige"] .portrait{background:linear-gradient(145deg,#eadfd5,#d9c8b9)}
-html[data-theme="soft-beige"] .portrait span{background:rgba(255,255,255,.88);color:#9f8064}
-
 
 /* =========================================================
    Academic profile link icons
@@ -796,7 +790,6 @@ html[data-theme="soft-beige"] .portrait span{background:rgba(255,255,255,.88);co
   font-size:11px;
   opacity:.72;
 }
-
 .contact-item-with-icon .contact-item-heading{
   display:flex;
   align-items:center;
@@ -824,7 +817,6 @@ html[data-theme="soft-beige"] .portrait span{background:rgba(255,255,255,.88);co
 .contact-item-with-icon>a:hover{
   color:var(--accent);
 }
-
 @media(max-width:680px){
   .profile-icon-link{font-size:14px}
 }
@@ -2509,136 +2501,158 @@ html[data-navigation-mode="sections"][data-section-page="inner"][data-section-co
 
 
 /* =========================================================
-   COVER FADE REFINEMENT + PORTRAIT LIFT
-   - picture fades smoothly into the text side
-   - fade remains at every zoom level
-   - white studio background blends away to feel more alive
+   FINAL TRANSPARENT-CUTOUT COVER RENDERER
    ========================================================= */
-
 html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"]{
-  --cover-mask-solid:68%;
-  --cover-mask-soft:87%;
-  --cover-mask-end:100%;
-  --cover-top-blend-height:110px;
+  --cutout-fade-zone:22%;
+  --cutout-photo-pane:58%;
+  --cutout-zoom-scale:1;
 }
-html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-fade="soft"]{
-  --cover-mask-solid:73%;
-  --cover-mask-soft:91%;
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-fade="soft"]{--cutout-fade-zone:15%}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-fade="medium"]{--cutout-fade-zone:22%}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-fade="strong"]{--cutout-fade-zone:30%}
+
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar.has-section-cover-photo{
+  isolation:isolate;
+  background:var(--surface)!important;
+  background-image:none!important;
 }
-html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-fade="medium"]{
-  --cover-mask-solid:68%;
-  --cover-mask-soft:87%;
-}
-html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-fade="strong"]{
-  --cover-mask-solid:62%;
-  --cover-mask-soft:82%;
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar.has-section-cover-photo::before{
+  content:none!important;
 }
 
-/* Side fade should be created by the photo itself, not by a separate slab overlay. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar>.section-cover-photo-layer{
+  position:absolute!important;
+  z-index:0!important;
+  top:0!important;
+  bottom:0!important;
+  right:0!important;
+  left:auto!important;
+  width:var(--cutout-photo-pane)!important;
+  height:auto!important;
+  margin:0!important;
+  padding:0!important;
+  display:flex!important;
+  align-items:flex-end!important;
+  justify-content:flex-end!important;
+  overflow:hidden!important;
+  background:transparent!important;
+  pointer-events:none!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .sidebar>.section-cover-photo-layer{
+  left:0!important;
+  right:auto!important;
+  justify-content:flex-start!important;
+}
+
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .section-cover-photo-layer-img{
+  display:block!important;
+  width:auto!important;
+  max-width:none!important;
+  height:118%!important;
+  max-height:none!important;
+  object-fit:contain!important;
+  object-position:center bottom!important;
+  background:transparent!important;
+  transform:scale(var(--cutout-zoom-scale))!important;
+  transform-origin:right bottom!important;
+  transition:transform .3s cubic-bezier(.2,.72,.2,1),height .3s cubic-bezier(.2,.72,.2,1),opacity .18s ease!important;
+  will-change:transform;
+  filter:none!important;
+  mix-blend-mode:normal!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .section-cover-photo-layer-img{
+  transform-origin:left bottom!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"] body:not(.admin-body) .section-cover-photo-layer-img{
+  height:96%!important;
+  object-position:center bottom!important;
+}
+
+/* Fade the transparent PERSON toward the text side. Because the white background is gone,
+   the fade can never disappear when zoom changes and never creates a white rectangle. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="right"] body:not(.admin-body) .section-cover-photo-layer-img{
+  -webkit-mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.12) calc(var(--cutout-fade-zone)*.28),rgba(0,0,0,.55) calc(var(--cutout-fade-zone)*.62),#000 var(--cutout-fade-zone),#000 100%)!important;
+  mask-image:linear-gradient(to right,transparent 0%,rgba(0,0,0,.12) calc(var(--cutout-fade-zone)*.28),rgba(0,0,0,.55) calc(var(--cutout-fade-zone)*.62),#000 var(--cutout-fade-zone),#000 100%)!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .section-cover-photo-layer-img{
+  -webkit-mask-image:linear-gradient(to left,transparent 0%,rgba(0,0,0,.12) calc(var(--cutout-fade-zone)*.28),rgba(0,0,0,.55) calc(var(--cutout-fade-zone)*.62),#000 var(--cutout-fade-zone),#000 100%)!important;
+  mask-image:linear-gradient(to left,transparent 0%,rgba(0,0,0,.12) calc(var(--cutout-fade-zone)*.28),rgba(0,0,0,.55) calc(var(--cutout-fade-zone)*.62),#000 var(--cutout-fade-zone),#000 100%)!important;
+}
+
+/* No extra fade slab over the face. */
 html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar.has-section-cover-photo::after{
-  background:none!important;
+  content:none!important;
 }
 
-/* Keep the optional upward blend for full-bleed mode. */
+/* Upward full-bleed remains available, but only as a subtle top blend. */
 html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-top-blend="on"] body:not(.admin-body) .sidebar.has-section-cover-photo::after{
   content:""!important;
   position:absolute!important;
   inset:0!important;
   z-index:1!important;
   pointer-events:none!important;
-  background:linear-gradient(to bottom,color-mix(in srgb,var(--surface) 18%,transparent) 0,transparent var(--cover-top-blend-height))!important;
+  background:linear-gradient(to bottom,color-mix(in srgb,var(--surface) 18%,transparent) 0,transparent 92px)!important;
 }
 
-/* The photo layer itself remains clean and transparent. */
-html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar > .section-cover-photo-layer{
-  background:transparent!important;
-  overflow:hidden!important;
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar>:not(.portrait):not(.section-cover-photo-layer){
+  position:relative!important;
+  z-index:2!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="right"] body:not(.admin-body) .sidebar>:not(.portrait):not(.section-cover-photo-layer){
+  width:min(46%,560px)!important;
+  margin-left:0!important;
+  margin-right:auto!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .sidebar>:not(.portrait):not(.section-cover-photo-layer){
+  width:min(46%,560px)!important;
+  margin-left:auto!important;
+  margin-right:0!important;
 }
 
-/* Default crop mode: still cover-like, but less aggressive than before. */
-html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .section-cover-photo-layer-img{
-  height:116%!important;
-  width:auto!important;
-  max-width:none!important;
-  object-fit:contain!important;
-  object-position:center bottom!important;
-  background:transparent!important;
-  opacity:.999;
-  mix-blend-mode:multiply;
-  filter:saturate(1.03) contrast(1.02);
-  -webkit-mask-repeat:no-repeat;
-  mask-repeat:no-repeat;
-  -webkit-mask-size:100% 100%;
-  mask-size:100% 100%;
-  transition:
-    transform .28s cubic-bezier(.2,.7,.2,1),
-    height .28s cubic-bezier(.2,.7,.2,1),
-    opacity .18s ease,
-    -webkit-mask-image .18s ease,
-    mask-image .18s ease;
-}
-
-/* Full portrait / fit whole image: show the whole portrait comfortably inside the banner. */
-html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"] body:not(.admin-body) .section-cover-photo-layer-img{
-  height:96%!important;
-  object-position:center center!important;
-}
-
-/* Fade direction depends on which side the portrait sits on. */
-html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="right"] body:not(.admin-body) .section-cover-photo-layer-img{
-  -webkit-mask-image:linear-gradient(
-    to left,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,1) var(--cover-mask-solid),
-    rgba(0,0,0,.92) calc(var(--cover-mask-solid) + 7%),
-    rgba(0,0,0,.48) var(--cover-mask-soft),
-    rgba(0,0,0,0) var(--cover-mask-end)
-  );
-  mask-image:linear-gradient(
-    to left,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,1) var(--cover-mask-solid),
-    rgba(0,0,0,.92) calc(var(--cover-mask-solid) + 7%),
-    rgba(0,0,0,.48) var(--cover-mask-soft),
-    rgba(0,0,0,0) var(--cover-mask-end)
-  );
-}
-html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .section-cover-photo-layer-img{
-  -webkit-mask-image:linear-gradient(
-    to right,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,1) var(--cover-mask-solid),
-    rgba(0,0,0,.92) calc(var(--cover-mask-solid) + 7%),
-    rgba(0,0,0,.48) var(--cover-mask-soft),
-    rgba(0,0,0,0) var(--cover-mask-end)
-  );
-  mask-image:linear-gradient(
-    to right,
-    rgba(0,0,0,1) 0%,
-    rgba(0,0,0,1) var(--cover-mask-solid),
-    rgba(0,0,0,.92) calc(var(--cover-mask-solid) + 7%),
-    rgba(0,0,0,.48) var(--cover-mask-soft),
-    rgba(0,0,0,0) var(--cover-mask-end)
-  );
-}
-
-/* Split hero should stay clean without extra masking tricks. */
+/* Split Hero keeps the cutout crisp and unmasked. */
 html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="split"] body:not(.admin-body) .section-cover-photo-layer-img{
   -webkit-mask-image:none!important;
   mask-image:none!important;
-  mix-blend-mode:normal;
-  filter:none;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="split"] body:not(.admin-body) .sidebar>.section-cover-photo-layer{width:50%!important}
+
+/* Glass Overlay uses a full transparent cutout canvas. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="glass"] body:not(.admin-body) .sidebar>.section-cover-photo-layer{width:100%!important}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="glass"] body:not(.admin-body) .sidebar>:not(.portrait):not(.section-cover-photo-layer){
+  background:color-mix(in srgb,var(--surface) 87%,transparent)!important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
 }
 
-/* Mobile: simpler vertical fade is smoother and more predictable. */
 @media(max-width:760px){
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar>.section-cover-photo-layer{
+    top:0!important;bottom:auto!important;left:0!important;right:0!important;width:100%!important;height:245px!important;justify-content:center!important;align-items:flex-end!important;
+  }
   html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .section-cover-photo-layer-img{
-    height:118%!important;
-    object-position:center top!important;
-    -webkit-mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,1) 68%,rgba(0,0,0,.78) 78%,rgba(0,0,0,.18) 90%,rgba(0,0,0,0) 100%)!important;
-    mask-image:linear-gradient(to bottom,rgba(0,0,0,1) 0%,rgba(0,0,0,1) 68%,rgba(0,0,0,.78) 78%,rgba(0,0,0,.18) 90%,rgba(0,0,0,0) 100%)!important;
+    height:116%!important;transform-origin:center bottom!important;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 68%,rgba(0,0,0,.75) 80%,rgba(0,0,0,.18) 93%,transparent 100%)!important;
+    mask-image:linear-gradient(to bottom,#000 0%,#000 68%,rgba(0,0,0,.75) 80%,rgba(0,0,0,.18) 93%,transparent 100%)!important;
   }
-  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"] body:not(.admin-body) .section-cover-photo-layer-img{
-    height:94%!important;
-  }
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"] body:not(.admin-body) .section-cover-photo-layer-img{height:94%!important}
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar>:not(.portrait):not(.section-cover-photo-layer){width:100%!important;margin-left:0!important;margin-right:0!important}
+}
+
+
+/* =========================================================
+   HOME PROFILE SAFETY FIX
+   The inner-page cover photo layer must never participate in Home layout.
+   ========================================================= */
+.section-cover-photo-layer{
+  display:none!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar > .section-cover-photo-layer{
+  display:flex!important;
+}
+html[data-section-page="home"] body:not(.admin-body) .sidebar{
+  background-image:none!important;
+}
+html[data-section-page="home"] body:not(.admin-body) .sidebar::before,
+html[data-section-page="home"] body:not(.admin-body) .sidebar::after{
+  content:none!important;
 }

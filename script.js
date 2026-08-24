@@ -1,127 +1,34 @@
 const $=id=>document.getElementById(id);
 const DEFAULT_CONTENT={
-  "name": "Nazifa Khanom",
-  "title": "Mechanical Engineering Graduate",
-  "institution": "Shahjalal University of Science and Technology (SUST)",
-  "location": "Bangladesh",
-  "focus": "Computational Materials · Molecular Dynamics · Nanomechanics",
-  "aboutHeadline": "Mechanical engineering with an atomistic materials focus.",
-  "aboutLead": "I am a Mechanical Engineering graduate from Shahjalal University of Science and Technology (SUST), interested in computational materials science, molecular dynamics, nanoscale mechanics, and scientific computing.",
-  "aboutBio": "My research work focuses on atomistic simulation of compositionally graded metallic nanostructures, with emphasis on how composition, crystallographic orientation, temperature, and defects influence deformation and mechanical response.",
-  "researchInterests": [
-    "Computational materials science and atomistic simulation",
-    "Molecular dynamics of metallic nanostructures",
-    "Nanoscale deformation and plasticity",
-    "Compositionally graded materials",
-    "Crystallographic effects on mechanical behaviour",
-    "Scientific computing and research data analysis"
+  "name":"Ibtida Yasin",
+  "title":"Mechanical Engineering Graduate",
+  "institution":"Shahjalal University of Science and Technology (SUST)",
+  "location":"Bangladesh",
+  "focus":"Computational Materials · Molecular Dynamics · Nanomechanics",
+  "aboutHeadline":"Mechanical engineering with an atomistic materials focus.",
+  "aboutLead":"I am a Mechanical Engineering graduate from Shahjalal University of Science and Technology (SUST), interested in computational materials science, molecular dynamics, nanoscale mechanics, and scientific computing.",
+  "aboutBio":"My research work focuses on atomistic simulation of compositionally graded metallic nanostructures, with emphasis on how composition, crystallographic orientation, temperature, and defects influence deformation and mechanical response.",
+  "researchInterests":["Computational materials science and atomistic simulation","Molecular dynamics of metallic nanostructures","Nanoscale deformation and plasticity","Compositionally graded materials","Crystallographic effects on mechanical behaviour","Scientific computing and research data analysis"],
+  "featuredResearch":{"title":"Radially graded Cu–Ni nanowires under tensile loading","description":"A classical molecular dynamics study of how radial composition grading, crystallographic orientation, temperature, and surface defects influence tensile behaviour and deformation mechanisms in Cu–Ni nanowires.","tags":["LAMMPS","Python","OVITO","PTM","DXA","RDF"],"media":[]},
+  "publications":[],
+  "projects":[
+    {"title":"Atomistic Structure Generation","description":"Python-based generation and manipulation of nanoscale structures for molecular dynamics simulations.","meta":"Python · LAMMPS","url":"","media":[]},
+    {"title":"MD Data Analysis","description":"Post-processing of simulation data, stress–strain analysis, comparison across cases, and scientific plotting.","meta":"Python · Matplotlib","url":"","media":[]},
+    {"title":"Atomistic Mechanism Analysis","description":"Structural and defect analysis using PTM, DXA, RDF, atomic strain, and visualization workflows.","meta":"OVITO","url":"","media":[]}
   ],
-  "featuredResearch": {
-    "title": "Radially graded Cu–Ni nanowires under tensile loading",
-    "description": "A classical molecular dynamics study of how radial composition grading, crystallographic orientation, temperature, and surface defects influence tensile behaviour and deformation mechanisms in Cu–Ni nanowires.",
-    "tags": [
-      "LAMMPS",
-      "Python",
-      "OVITO",
-      "PTM",
-      "DXA",
-      "RDF"
-    ],
-    "media": []
-  },
-  "publications": [],
-  "projects": [
-    {
-      "title": "Atomistic Structure Generation",
-      "description": "Python-based generation and manipulation of nanoscale structures for molecular dynamics simulations.",
-      "meta": "Python · LAMMPS",
-      "url": "",
-      "media": []
-    },
-    {
-      "title": "MD Data Analysis",
-      "description": "Post-processing of simulation data, stress–strain analysis, comparison across cases, and scientific plotting.",
-      "meta": "Python · Matplotlib",
-      "url": "",
-      "media": []
-    },
-    {
-      "title": "Atomistic Mechanism Analysis",
-      "description": "Structural and defect analysis using PTM, DXA, RDF, atomic strain, and visualization workflows.",
-      "meta": "OVITO",
-      "url": "",
-      "media": []
-    }
+  "skills":[
+    {"category":"Simulation","items":["LAMMPS","Classical molecular dynamics","EAM potentials"],"media":[]},
+    {"category":"Scientific Computing","items":["Python","NumPy","Matplotlib"],"media":[]},
+    {"category":"Atomistic Analysis","items":["OVITO","PTM","DXA","RDF"],"media":[]}
   ],
-  "skills": [
-    {
-      "category": "Simulation",
-      "items": [
-        "LAMMPS",
-        "Classical molecular dynamics",
-        "EAM potentials"
-      ],
-      "media": []
-    },
-    {
-      "category": "Scientific Computing",
-      "items": [
-        "Python",
-        "NumPy",
-        "Matplotlib"
-      ],
-      "media": []
-    },
-    {
-      "category": "Atomistic Analysis",
-      "items": [
-        "OVITO",
-        "PTM",
-        "DXA",
-        "RDF"
-      ],
-      "media": []
-    }
-  ],
-  "education": [
-    {
-      "period": "B.Sc.",
-      "degree": "Mechanical Engineering",
-      "institution": "Shahjalal University of Science and Technology (SUST)",
-      "description": "Mechanical engineering education with growing focus on computational materials and atomistic simulation.",
-      "media": []
-    }
-  ],
-  "contact": {
-    "headline": "Interested in computational materials and nanoscale mechanics?",
-    "message": "I am open to research discussions, graduate opportunities, and collaborations related to computational materials science and atomistic simulation.",
-    "email": "",
-    "phone": "",
-    "location": "Bangladesh",
-    "media": []
-  },
-  "links": {
-    "linkedin": "",
-    "github": "https://github.com/nazifa-khanom",
-    "orcid": "",
-    "scholar": ""
-  ,
-    "researchgate": "",
-    "scopus": "",
-    "wos": "",
-    "website": ""
-  },
-  "cv": {
-    "url": "",
-    "filename": "",
-    "updated_at": ""
-  },
-  "photo_url": "",
-  "defaultTheme": "soft-beige",
-  "sectionMedia": {
-    "profile": []
-  }
-}
+  "education":[{"period":"B.Sc.","degree":"Mechanical Engineering","institution":"Shahjalal University of Science and Technology (SUST)","description":"Mechanical engineering education with growing focus on computational materials and atomistic simulation.","media":[]}],
+  "contact":{"headline":"Interested in computational materials and nanoscale mechanics?","message":"I am open to research discussions, graduate opportunities, and collaborations related to computational materials science and atomistic simulation.","email":"","phone":"","location":"Bangladesh","media":[]},
+  "links":{"linkedin":"","github":"https://github.com/ibtidayasin","orcid":"","scholar":"","researchgate":"","scopus":"","wos":"","website":""},
+  "cv":{"url":"","filename":"","updated_at":""},
+  "photo_url":"",
+  "defaultTheme":"classic-brown",
+  "sectionMedia":{"profile":[]}
+};
 
 const DEFAULT_SECTION_HEADINGS={
   about:{title:"About Me",subtitle:"Mechanical engineering with an atomistic materials focus."},
@@ -600,6 +507,7 @@ function activateSectionPageNav(key){
 
 
 
+
 function ensureSectionCoverPhotoLayer(d){
   const sidebar=document.querySelector(".sidebar");
   if(!sidebar)return null;
@@ -648,21 +556,29 @@ function applySectionCoverState(d,key){
   const basePhotoSize=54;
   const coverHeight=clampNumber(l.sectionCoverHeight,220,420,300);
   root.style.setProperty("--cover-zoom-scale",String(zoom/100));
+  root.style.setProperty("--cutout-zoom-scale",String(zoom/100));
   root.style.setProperty("--section-cover-photo-size",`${basePhotoSize*(zoom/100)}%`);
   root.style.setProperty("--section-cover-fit-height",`${coverHeight*0.92*(zoom/100)}px`);
   root.style.setProperty("--mobile-cover-photo-height",`${230*(zoom/100)}px`);
   root.style.setProperty("--mobile-cover-full-height",`${220*(zoom/100)}px`);
 
-  ensureSectionCoverPhotoLayer(d);
+  if(enabled){
+    ensureSectionCoverPhotoLayer(d);
+  }else{
+    sidebar?.querySelector(".section-cover-photo-layer")?.remove();
+  }
 
   if(sidebar){
-    const hasPhoto=!!String(d.photo_url||"").trim();
+    const hasPhoto=enabled&&!!String(d.photo_url||"").trim();
     sidebar.classList.toggle("has-section-cover-photo",hasPhoto);
     if(hasPhoto){
       const safe=String(d.photo_url).replace(/["\\\n\r]/g,m=>m==="\""?"%22":"");
       sidebar.style.setProperty("--section-cover-image",`url("${safe}")`);
     }else{
       sidebar.style.setProperty("--section-cover-image","none");
+    }
+    if(!enabled){
+      sidebar.classList.remove("has-section-cover-photo");
     }
   }
 }
@@ -1070,7 +986,7 @@ function builderSettingsNeedMigration(content){
 
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
 const SITE_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream","custom-theme"];
-function validSiteTheme(t){return SITE_THEMES.includes(t)?t:"soft-beige"}
+function validSiteTheme(t){return SITE_THEMES.includes(t)?t:"classic-brown"}
 
 function merge(base,extra){
   if(Array.isArray(base))return Array.isArray(extra)?extra:base;
@@ -1137,7 +1053,7 @@ function iconLinkHtml(type,label,url,isExternal=true,style="labels"){
 
 function render(d){
   document.title=`${d.name} | Academic Profile`;
-  document.documentElement.dataset.theme=validSiteTheme(d.defaultTheme||"soft-beige");
+  document.documentElement.dataset.theme=validSiteTheme(d.defaultTheme||"classic-brown");
   if(validSiteTheme(d.defaultTheme||"")==="custom-theme"){
     normalizeCustomTheme(d);
     applyCustomThemeVariables(d.appearance.customTheme);
