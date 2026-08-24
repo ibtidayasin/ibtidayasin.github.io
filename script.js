@@ -180,7 +180,13 @@ const DEFAULT_SITE_SETTINGS={
     stickySidebar:true,
     navigationMode:"single",
     pageTransition:"fade",
-    pagePager:true
+    pagePager:true,
+    sectionCoverEnabled:true,
+    sectionCoverSide:"right",
+    sectionCoverHeight:300,
+    sectionCoverFade:"medium",
+    sectionCoverDetails:true,
+    sectionCoverSocials:true
   },
   experience:{
     activeNav:true,
@@ -250,7 +256,13 @@ function normalizeSiteSettings(content){
       stickySidebar:Object.prototype.hasOwnProperty.call(l,"stickySidebar")?l.stickySidebar!==false:DEFAULT_SITE_SETTINGS.layout.stickySidebar,
       navigationMode:["single","sections"].includes(l.navigationMode)?l.navigationMode:DEFAULT_SITE_SETTINGS.layout.navigationMode,
       pageTransition:["none","fade","slide"].includes(l.pageTransition)?l.pageTransition:DEFAULT_SITE_SETTINGS.layout.pageTransition,
-      pagePager:Object.prototype.hasOwnProperty.call(l,"pagePager")?l.pagePager!==false:DEFAULT_SITE_SETTINGS.layout.pagePager
+      pagePager:Object.prototype.hasOwnProperty.call(l,"pagePager")?l.pagePager!==false:DEFAULT_SITE_SETTINGS.layout.pagePager,
+      sectionCoverEnabled:Object.prototype.hasOwnProperty.call(l,"sectionCoverEnabled")?l.sectionCoverEnabled!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverEnabled,
+      sectionCoverSide:["left","right"].includes(l.sectionCoverSide)?l.sectionCoverSide:DEFAULT_SITE_SETTINGS.layout.sectionCoverSide,
+      sectionCoverHeight:clampNumber(l.sectionCoverHeight,220,420,DEFAULT_SITE_SETTINGS.layout.sectionCoverHeight),
+      sectionCoverFade:["soft","medium","strong"].includes(l.sectionCoverFade)?l.sectionCoverFade:DEFAULT_SITE_SETTINGS.layout.sectionCoverFade,
+      sectionCoverDetails:Object.prototype.hasOwnProperty.call(l,"sectionCoverDetails")?l.sectionCoverDetails!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverDetails,
+      sectionCoverSocials:Object.prototype.hasOwnProperty.call(l,"sectionCoverSocials")?l.sectionCoverSocials!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverSocials
     },
     experience:{
       ...e,
@@ -485,12 +497,43 @@ function activateSectionPageNav(key){
   });
 }
 
+
+function applySectionCoverState(d,key){
+  normalizeSiteSettings(d);
+  const l=d.siteSettings.layout;
+  const sectionMode=l.navigationMode==="sections";
+  const innerPage=sectionMode&&key!=="about";
+  const enabled=innerPage&&l.sectionCoverEnabled!==false;
+  const root=document.documentElement;
+  const sidebar=document.querySelector(".sidebar");
+
+  root.dataset.sectionPage=innerPage?"inner":"home";
+  root.dataset.sectionCover=enabled?"on":"off";
+  root.dataset.coverSide=l.sectionCoverSide||"right";
+  root.dataset.coverFade=l.sectionCoverFade||"medium";
+  root.dataset.coverDetails=l.sectionCoverDetails!==false?"show":"hide";
+  root.dataset.coverSocials=l.sectionCoverSocials!==false?"show":"hide";
+  root.style.setProperty("--section-cover-height",`${l.sectionCoverHeight||300}px`);
+
+  if(sidebar){
+    const hasPhoto=!!String(d.photo_url||"").trim();
+    sidebar.classList.toggle("has-section-cover-photo",hasPhoto);
+    if(hasPhoto){
+      const safe=String(d.photo_url).replace(/["\\\n\r]/g,m=>m==="\""?"%22":"");
+      sidebar.style.setProperty("--section-cover-image",`url("${safe}")`);
+    }else{
+      sidebar.style.setProperty("--section-cover-image","none");
+    }
+  }
+}
+
 function showSectionPage(d,requestedKey,{scrollTop=true}={}){
   const keys=visibleSectionKeys(d);
   if(!keys.length)return;
 
   let key=keys.includes(requestedKey)?requestedKey:keys[0];
   siteCurrentSectionKey=key;
+  applySectionCoverState(d,key);
 
   const transition=d.siteSettings.layout.pageTransition||"fade";
   document.documentElement.dataset.pageTransition=transition;
@@ -573,6 +616,7 @@ function applyNavigationMode(d){
   bindSectionPageNavigation();
 
   if(!sectionMode){
+    applySectionCoverState(d,"about");
     document.querySelectorAll(".content .section[data-section-key]").forEach(sec=>{
       sec.classList.remove("section-page-current","section-page-dormant","section-page-enter");
     });
@@ -825,7 +869,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=3;
+const BUILDER_SETTINGS_SCHEMA_VERSION=4;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260825-pagemode1">
+  <link rel="stylesheet" href="styles.css?v=20260825-cover1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -821,6 +821,58 @@
                 <input id="fPagePager" type="checkbox">
                 Show Previous / Next navigation
               </label>
+
+
+              <div class="section-cover-admin">
+                <div class="settings-head compact-settings-head">
+                  <div>
+                    <h4>Inner-page profile cover</h4>
+                    <p class="muted">On section pages other than Home, transform the profile area into a horizontal cover-style banner.</p>
+                  </div>
+                  <label class="setting-toggle strong-toggle">
+                    <input id="fSectionCoverEnabled" type="checkbox">
+                    Enable cover
+                  </label>
+                </div>
+
+                <div id="sectionCoverOptions" class="section-cover-options">
+                  <div class="field">
+                    <label>Photo side</label>
+                    <select id="fSectionCoverSide">
+                      <option value="right">Photo right · info left</option>
+                      <option value="left">Photo left · info right</option>
+                    </select>
+                  </div>
+
+                  <div class="field">
+                    <label>Fade strength</label>
+                    <select id="fSectionCoverFade">
+                      <option value="soft">Soft</option>
+                      <option value="medium">Medium</option>
+                      <option value="strong">Strong</option>
+                    </select>
+                  </div>
+
+                  <div class="range-setting section-cover-height-setting">
+                    <label>Cover height</label>
+                    <div>
+                      <input id="fSectionCoverHeight" type="range" min="220" max="420" step="10">
+                      <input id="fSectionCoverHeightNumber" type="number" min="220" max="420" step="10">
+                    </div>
+                  </div>
+
+                  <label class="setting-toggle">
+                    <input id="fSectionCoverDetails" type="checkbox">
+                    Show institution, location & focus
+                  </label>
+
+                  <label class="setting-toggle">
+                    <input id="fSectionCoverSocials" type="checkbox">
+                    Show social links & CV button
+                  </label>
+                </div>
+              </div>
+
             </div>
 
             <p class="helper">
@@ -1005,6 +1057,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260825-pagemode1"></script>
+  <script src="admin.js?v=20260825-cover1"></script>
 </body>
 </html>

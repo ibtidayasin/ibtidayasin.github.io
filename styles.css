@@ -1741,3 +1741,199 @@ html[data-navigation-mode="sections"] .topbar nav a{
 @media(prefers-reduced-motion:reduce){
   .section-page-enter{animation:none!important}
 }
+
+
+/* =========================================================
+   INNER SECTION PROFILE COVER
+   ========================================================= */
+
+/* Admin controls */
+.section-cover-admin{
+  grid-column:1/-1;
+  margin-top:2px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface);
+}
+.compact-settings-head{margin-bottom:10px}
+.compact-settings-head h4{margin:0 0 3px}
+.strong-toggle{font-weight:800;color:var(--text)}
+.section-cover-options{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px 16px;
+  padding-top:12px;
+  border-top:1px solid var(--line);
+  transition:opacity .16s ease;
+}
+.section-cover-options.disabled-options{opacity:.45}
+.section-cover-height-setting{grid-column:1/-1}
+
+/* Public: only section-page inner views. Home/About remains unchanged. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .layout{
+  grid-template-columns:1fr;
+  gap:30px;
+}
+
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar{
+  --cover-solid-stop:44%;
+  --cover-clear-stop:76%;
+  position:relative!important;
+  top:auto!important;
+  width:100%;
+  min-height:var(--section-cover-height,300px);
+  padding:28px 34px;
+  box-sizing:border-box;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:var(--site-card-radius);
+  background-color:var(--surface);
+  background-repeat:no-repeat,no-repeat;
+  background-size:100% 100%,54% auto;
+  box-shadow:var(--site-shadow);
+}
+
+html[data-cover-fade="soft"]{--cover-solid-stop:35%;--cover-clear-stop:82%}
+html[data-cover-fade="medium"]{--cover-solid-stop:44%;--cover-clear-stop:76%}
+html[data-cover-fade="strong"]{--cover-solid-stop:54%;--cover-clear-stop:70%}
+
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="right"] body:not(.admin-body) .sidebar{
+  background-image:
+    linear-gradient(to right,
+      var(--surface) 0%,
+      var(--surface) var(--cover-solid-stop),
+      transparent var(--cover-clear-stop)),
+    var(--section-cover-image);
+  background-position:center,right center;
+}
+
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .sidebar{
+  background-image:
+    linear-gradient(to left,
+      var(--surface) 0%,
+      var(--surface) var(--cover-solid-stop),
+      transparent var(--cover-clear-stop)),
+    var(--section-cover-image);
+  background-position:center,left center;
+}
+
+/* Keep all profile information on the side opposite the image. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="right"] body:not(.admin-body) .sidebar > :not(.portrait){
+  width:min(47%,560px);
+  margin-right:auto;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .sidebar > :not(.portrait){
+  width:min(47%,560px);
+  margin-left:auto;
+}
+
+/* The uploaded portrait becomes the cover image. Avoid showing it twice. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar.has-section-cover-photo .portrait{
+  display:none!important;
+}
+
+/* Graceful fallback if no profile photo exists: keep initials portrait on image side. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar:not(.has-section-cover-photo) .portrait{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  margin:0;
+  width:min(31vw,210px);
+  height:min(31vw,210px);
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="right"] body:not(.admin-body) .sidebar:not(.has-section-cover-photo) .portrait{
+  right:7%;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .sidebar:not(.has-section-cover-photo) .portrait{
+  left:7%;
+}
+
+/* Cover-specific profile typography and compact details. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar h1{
+  font-size:clamp(28px,3.2vw,43px);
+  margin-bottom:7px;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar .role{
+  font-size:17px;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar .small{
+  margin:4px 0 0;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar .meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px 26px;
+  padding:11px 0;
+  margin:14px 0;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar .meta p{
+  margin:0;
+  min-width:120px;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar .links{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px 12px;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar .sidebar-cv{
+  display:inline-flex;
+  width:max-content!important;
+  margin-top:12px!important;
+}
+
+/* Optional info controls */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-details="hide"] body:not(.admin-body) .sidebar .small,
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-details="hide"] body:not(.admin-body) .sidebar .meta{
+  display:none!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-socials="hide"] body:not(.admin-body) .sidebar .links,
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-socials="hide"] body:not(.admin-body) .sidebar .sidebar-cv{
+  display:none!important;
+}
+
+/* Inner section content becomes a full-width page beneath the cover. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .content{
+  width:100%;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .section-page-current{
+  min-height:0;
+}
+
+/* Mobile: retain the cover feel but stack information below the photo area. */
+@media(max-width:760px){
+  .section-cover-options{grid-template-columns:1fr}
+  .section-cover-height-setting{grid-column:auto}
+
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar{
+    min-height:0;
+    padding:235px 22px 24px;
+    background-size:100% 100%,100% auto;
+    background-position:center,center top;
+  }
+
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="right"] body:not(.admin-body) .sidebar,
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .sidebar{
+    background-image:
+      linear-gradient(to bottom,transparent 0%,transparent 29%,var(--surface) 61%,var(--surface) 100%),
+      var(--section-cover-image);
+  }
+
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar > :not(.portrait){
+    width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+  }
+
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar:not(.has-section-cover-photo) .portrait{
+    top:24px;
+    left:50%!important;
+    right:auto!important;
+    transform:translateX(-50%);
+    width:170px;
+    height:170px;
+  }
+}
