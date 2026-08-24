@@ -182,8 +182,10 @@ const DEFAULT_SITE_SETTINGS={
     pageTransition:"fade",
     pagePager:true,
     sectionCoverEnabled:true,
+    sectionCoverStyle:"framed",
     sectionCoverSide:"right",
     sectionCoverHeight:300,
+    sectionCoverZoom:100,
     sectionCoverFade:"medium",
     sectionCoverDetails:true,
     sectionCoverSocials:true
@@ -258,8 +260,10 @@ function normalizeSiteSettings(content){
       pageTransition:["none","fade","slide"].includes(l.pageTransition)?l.pageTransition:DEFAULT_SITE_SETTINGS.layout.pageTransition,
       pagePager:Object.prototype.hasOwnProperty.call(l,"pagePager")?l.pagePager!==false:DEFAULT_SITE_SETTINGS.layout.pagePager,
       sectionCoverEnabled:Object.prototype.hasOwnProperty.call(l,"sectionCoverEnabled")?l.sectionCoverEnabled!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverEnabled,
+      sectionCoverStyle:["framed","fullbleed","split","glass"].includes(l.sectionCoverStyle)?l.sectionCoverStyle:DEFAULT_SITE_SETTINGS.layout.sectionCoverStyle,
       sectionCoverSide:["left","right"].includes(l.sectionCoverSide)?l.sectionCoverSide:DEFAULT_SITE_SETTINGS.layout.sectionCoverSide,
       sectionCoverHeight:clampNumber(l.sectionCoverHeight,220,420,DEFAULT_SITE_SETTINGS.layout.sectionCoverHeight),
+      sectionCoverZoom:clampNumber(l.sectionCoverZoom,70,170,DEFAULT_SITE_SETTINGS.layout.sectionCoverZoom),
       sectionCoverFade:["soft","medium","strong"].includes(l.sectionCoverFade)?l.sectionCoverFade:DEFAULT_SITE_SETTINGS.layout.sectionCoverFade,
       sectionCoverDetails:Object.prototype.hasOwnProperty.call(l,"sectionCoverDetails")?l.sectionCoverDetails!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverDetails,
       sectionCoverSocials:Object.prototype.hasOwnProperty.call(l,"sectionCoverSocials")?l.sectionCoverSocials!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverSocials
@@ -509,11 +513,16 @@ function applySectionCoverState(d,key){
 
   root.dataset.sectionPage=innerPage?"inner":"home";
   root.dataset.sectionCover=enabled?"on":"off";
+  root.dataset.coverStyle=l.sectionCoverStyle||"framed";
   root.dataset.coverSide=l.sectionCoverSide||"right";
   root.dataset.coverFade=l.sectionCoverFade||"medium";
   root.dataset.coverDetails=l.sectionCoverDetails!==false?"show":"hide";
   root.dataset.coverSocials=l.sectionCoverSocials!==false?"show":"hide";
   root.style.setProperty("--section-cover-height",`${l.sectionCoverHeight||300}px`);
+  const zoom=clampNumber(l.sectionCoverZoom,70,170,100);
+  const basePhotoSize=54;
+  root.style.setProperty("--section-cover-photo-size",`${basePhotoSize*(zoom/100)}%`);
+  root.style.setProperty("--mobile-cover-photo-height",`${230*(zoom/100)}px`);
 
   if(sidebar){
     const hasPhoto=!!String(d.photo_url||"").trim();
@@ -869,7 +878,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=4;
+const BUILDER_SETTINGS_SCHEMA_VERSION=5;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){

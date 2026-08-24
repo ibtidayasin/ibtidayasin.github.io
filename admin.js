@@ -422,8 +422,10 @@ const DEFAULT_SITE_SETTINGS={
     pageTransition:"fade",
     pagePager:true,
     sectionCoverEnabled:true,
+    sectionCoverStyle:"framed",
     sectionCoverSide:"right",
     sectionCoverHeight:300,
+    sectionCoverZoom:100,
     sectionCoverFade:"medium",
     sectionCoverDetails:true,
     sectionCoverSocials:true
@@ -498,8 +500,10 @@ function normalizeSiteSettings(content){
       pageTransition:["none","fade","slide"].includes(l.pageTransition)?l.pageTransition:DEFAULT_SITE_SETTINGS.layout.pageTransition,
       pagePager:Object.prototype.hasOwnProperty.call(l,"pagePager")?l.pagePager!==false:DEFAULT_SITE_SETTINGS.layout.pagePager,
       sectionCoverEnabled:Object.prototype.hasOwnProperty.call(l,"sectionCoverEnabled")?l.sectionCoverEnabled!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverEnabled,
+      sectionCoverStyle:["framed","fullbleed","split","glass"].includes(l.sectionCoverStyle)?l.sectionCoverStyle:DEFAULT_SITE_SETTINGS.layout.sectionCoverStyle,
       sectionCoverSide:["left","right"].includes(l.sectionCoverSide)?l.sectionCoverSide:DEFAULT_SITE_SETTINGS.layout.sectionCoverSide,
       sectionCoverHeight:clampNumber(l.sectionCoverHeight,220,420,DEFAULT_SITE_SETTINGS.layout.sectionCoverHeight),
+      sectionCoverZoom:clampNumber(l.sectionCoverZoom,70,170,DEFAULT_SITE_SETTINGS.layout.sectionCoverZoom),
       sectionCoverFade:["soft","medium","strong"].includes(l.sectionCoverFade)?l.sectionCoverFade:DEFAULT_SITE_SETTINGS.layout.sectionCoverFade,
       sectionCoverDetails:Object.prototype.hasOwnProperty.call(l,"sectionCoverDetails")?l.sectionCoverDetails!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverDetails,
       sectionCoverSocials:Object.prototype.hasOwnProperty.call(l,"sectionCoverSocials")?l.sectionCoverSocials!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverSocials
@@ -538,13 +542,34 @@ function portraitRadiusValue(shape){
 
 
 
+
+function resetSectionCoverControls(){
+  const defaults=DEFAULT_SITE_SETTINGS.layout;
+  setHistoryMuted(()=>{
+    $("fSectionCoverEnabled").checked=defaults.sectionCoverEnabled!==false;
+    $("fSectionCoverStyle").value=defaults.sectionCoverStyle||"framed";
+    $("fSectionCoverSide").value=defaults.sectionCoverSide||"right";
+    $("fSectionCoverHeight").value=defaults.sectionCoverHeight||300;
+    $("fSectionCoverHeightNumber").value=defaults.sectionCoverHeight||300;
+    $("fSectionCoverZoom").value=defaults.sectionCoverZoom||100;
+    $("fSectionCoverZoomNumber").value=defaults.sectionCoverZoom||100;
+    $("fSectionCoverFade").value=defaults.sectionCoverFade||"medium";
+    $("fSectionCoverDetails").checked=defaults.sectionCoverDetails!==false;
+    $("fSectionCoverSocials").checked=defaults.sectionCoverSocials!==false;
+    updateSectionCoverAdminOptions();
+  });
+  syncSiteCustomizationFromControls();
+  scheduleAdminPreview(true);
+  setStatus("Inner-page cover reset to defaults. Save all changes to publish.");
+}
+
 function updateSectionCoverAdminOptions(){
   const sectionMode=$("fNavigationModeSections")?.checked===true;
   const coverEnabled=$("fSectionCoverEnabled")?.checked===true;
   const active=sectionMode&&coverEnabled;
   $("sectionCoverOptions")?.classList.toggle("disabled-options",!active);
 
-  ["fSectionCoverSide","fSectionCoverFade","fSectionCoverHeight","fSectionCoverHeightNumber","fSectionCoverDetails","fSectionCoverSocials"]
+  ["fSectionCoverStyle","fSectionCoverSide","fSectionCoverFade","fSectionCoverHeight","fSectionCoverHeightNumber","fSectionCoverZoom","fSectionCoverZoomNumber","fSectionCoverDetails","fSectionCoverSocials","resetSectionCoverBtn"]
     .forEach(id=>{if($(id))$(id).disabled=!active});
 }
 
@@ -588,9 +613,12 @@ function fillSiteCustomizationControls(){
   $("fPageTransition").value=l.pageTransition||"fade";
   $("fPagePager").checked=l.pagePager!==false;
   $("fSectionCoverEnabled").checked=l.sectionCoverEnabled!==false;
+  $("fSectionCoverStyle").value=l.sectionCoverStyle||"framed";
   $("fSectionCoverSide").value=l.sectionCoverSide||"right";
   $("fSectionCoverHeight").value=l.sectionCoverHeight||300;
   $("fSectionCoverHeightNumber").value=l.sectionCoverHeight||300;
+  $("fSectionCoverZoom").value=l.sectionCoverZoom||100;
+  $("fSectionCoverZoomNumber").value=l.sectionCoverZoom||100;
   $("fSectionCoverFade").value=l.sectionCoverFade||"medium";
   $("fSectionCoverDetails").checked=l.sectionCoverDetails!==false;
   $("fSectionCoverSocials").checked=l.sectionCoverSocials!==false;
@@ -654,8 +682,10 @@ function syncSiteCustomizationFromControls(){
   l.pageTransition=$("fPageTransition").value;
   l.pagePager=$("fPagePager").checked;
   l.sectionCoverEnabled=$("fSectionCoverEnabled").checked;
+  l.sectionCoverStyle=$("fSectionCoverStyle").value;
   l.sectionCoverSide=$("fSectionCoverSide").value;
   l.sectionCoverHeight=clampNumber($("fSectionCoverHeightNumber").value||$("fSectionCoverHeight").value,220,420,300);
+  l.sectionCoverZoom=clampNumber($("fSectionCoverZoomNumber").value||$("fSectionCoverZoom").value,70,170,100);
   l.sectionCoverFade=$("fSectionCoverFade").value;
   l.sectionCoverDetails=$("fSectionCoverDetails").checked;
   l.sectionCoverSocials=$("fSectionCoverSocials").checked;
@@ -810,7 +840,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=4;
+const BUILDER_SETTINGS_SCHEMA_VERSION=5;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -2129,6 +2159,7 @@ syncRangeNumber("fSectionSpacing","fSectionSpacingNumber",20,90,40);
 syncRangeNumber("fCardRadius","fCardRadiusNumber",0,28,11);
 syncRangeNumber("fPortraitSize","fPortraitSizeNumber",140,250,190);
 syncRangeNumber("fSectionCoverHeight","fSectionCoverHeightNumber",220,420,300);
+syncRangeNumber("fSectionCoverZoom","fSectionCoverZoomNumber",70,170,100);
 
 $("resetLayoutStyleBtn")?.addEventListener("click",resetLayoutStyleControls);
 $("resetSectionStructureBtn")?.addEventListener("click",resetSectionStructure);
@@ -2164,11 +2195,12 @@ $("fSectionCoverEnabled")?.addEventListener("change",()=>{
   updateSectionCoverAdminOptions();
   scheduleAdminPreview(true);
 });
-["fSectionCoverSide","fSectionCoverFade","fSectionCoverDetails","fSectionCoverSocials"].forEach(id=>{
+["fSectionCoverStyle","fSectionCoverSide","fSectionCoverFade","fSectionCoverDetails","fSectionCoverSocials"].forEach(id=>{
   $(id)?.addEventListener("change",()=>scheduleAdminPreview(true));
 });
-["fSectionCoverHeight","fSectionCoverHeightNumber"].forEach(id=>{
+["fSectionCoverHeight","fSectionCoverHeightNumber","fSectionCoverZoom","fSectionCoverZoomNumber"].forEach(id=>{
   $(id)?.addEventListener("input",()=>scheduleAdminPreview());
 });
+$("resetSectionCoverBtn")?.addEventListener("click",resetSectionCoverControls);
 
 boot();

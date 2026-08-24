@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260825-cover1">
+  <link rel="stylesheet" href="styles.css?v=20260825-coverstyle1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -836,6 +836,25 @@
                 </div>
 
                 <div id="sectionCoverOptions" class="section-cover-options">
+
+                  <div class="field">
+                    <label>Cover style</label>
+                    <select id="fSectionCoverStyle">
+                      <option value="framed">Framed Fade</option>
+                      <option value="fullbleed">Full Bleed</option>
+                      <option value="split">Split Hero</option>
+                      <option value="glass">Glass Overlay</option>
+                    </select>
+                  </div>
+
+                  <div class="range-setting section-cover-zoom-setting">
+                    <label>Photo zoom</label>
+                    <div>
+                      <input id="fSectionCoverZoom" type="range" min="70" max="170" step="5">
+                      <input id="fSectionCoverZoomNumber" type="number" min="70" max="170" step="5">
+                    </div>
+                  </div>
+
                   <div class="field">
                     <label>Photo side</label>
                     <select id="fSectionCoverSide">
@@ -870,6 +889,10 @@
                     <input id="fSectionCoverSocials" type="checkbox">
                     Show social links & CV button
                   </label>
+
+
+                  <button id="resetSectionCoverBtn" class="secondary section-cover-reset-btn" type="button">Reset cover to defaults</button>
+
                 </div>
               </div>
 
@@ -1057,6 +1080,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260825-cover1"></script>
+  <script src="admin.js?v=20260825-coverstyle1"></script>
 </body>
 </html>
