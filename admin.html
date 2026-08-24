@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260824-advanced3">
+  <link rel="stylesheet" href="styles.css?v=20260825-pagemode1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -780,6 +780,54 @@
           <h2>Layout</h2>
           <p class="muted">Control section order, visibility, spacing, card geometry, portrait shape, columns and font pairing.</p>
 
+
+          <div class="settings-section website-structure-settings">
+            <div class="settings-head">
+              <div>
+                <h3>Website structure</h3>
+                <p class="muted">Choose whether visitors scroll through one long page or view one section at a time.</p>
+              </div>
+            </div>
+
+            <div class="structure-mode-grid">
+              <label class="structure-mode-card">
+                <input id="fNavigationModeSingle" name="navigationMode" type="radio" value="single">
+                <span>
+                  <strong>Single page</strong>
+                  <small>Current format. All enabled sections appear on one scrolling page.</small>
+                </span>
+              </label>
+
+              <label class="structure-mode-card">
+                <input id="fNavigationModeSections" name="navigationMode" type="radio" value="sections">
+                <span>
+                  <strong>Section pages</strong>
+                  <small>Only one section appears at a time. Header links move between section views.</small>
+                </span>
+              </label>
+            </div>
+
+            <div id="sectionPageOptions" class="section-page-options">
+              <div class="field">
+                <label>Page transition</label>
+                <select id="fPageTransition">
+                  <option value="fade">Fade</option>
+                  <option value="slide">Slide</option>
+                  <option value="none">None</option>
+                </select>
+              </div>
+
+              <label class="setting-toggle">
+                <input id="fPagePager" type="checkbox">
+                Show Previous / Next navigation
+              </label>
+            </div>
+
+            <p class="helper">
+              Section-page mode uses the same website and URLs. Browser Back/Forward works, refresh keeps the current section, and hidden sections stay hidden.
+            </p>
+          </div>
+
           <div class="settings-section">
             <div class="settings-head">
               <div><h3>Sections</h3><p class="muted">Reorder or hide any public section without deleting its content.</p></div>
@@ -957,6 +1005,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260824-advanced3"></script>
+  <script src="admin.js?v=20260825-pagemode1"></script>
 </body>
 </html>

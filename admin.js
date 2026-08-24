@@ -417,7 +417,10 @@ const DEFAULT_SITE_SETTINGS={
     skillsColumns:3,
     fontPair:"classic",
     shadow:"theme",
-    stickySidebar:true
+    stickySidebar:true,
+    navigationMode:"single",
+    pageTransition:"fade",
+    pagePager:true
   },
   experience:{
     activeNav:true,
@@ -484,7 +487,10 @@ function normalizeSiteSettings(content){
       skillsColumns:[1,2,3].includes(Number(l.skillsColumns))?Number(l.skillsColumns):DEFAULT_SITE_SETTINGS.layout.skillsColumns,
       fontPair:Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,l.fontPair)?l.fontPair:DEFAULT_SITE_SETTINGS.layout.fontPair,
       shadow:["theme","none","subtle","medium"].includes(l.shadow)?l.shadow:DEFAULT_SITE_SETTINGS.layout.shadow,
-      stickySidebar:Object.prototype.hasOwnProperty.call(l,"stickySidebar")?l.stickySidebar!==false:DEFAULT_SITE_SETTINGS.layout.stickySidebar
+      stickySidebar:Object.prototype.hasOwnProperty.call(l,"stickySidebar")?l.stickySidebar!==false:DEFAULT_SITE_SETTINGS.layout.stickySidebar,
+      navigationMode:["single","sections"].includes(l.navigationMode)?l.navigationMode:DEFAULT_SITE_SETTINGS.layout.navigationMode,
+      pageTransition:["none","fade","slide"].includes(l.pageTransition)?l.pageTransition:DEFAULT_SITE_SETTINGS.layout.pageTransition,
+      pagePager:Object.prototype.hasOwnProperty.call(l,"pagePager")?l.pagePager!==false:DEFAULT_SITE_SETTINGS.layout.pagePager
     },
     experience:{
       ...e,
@@ -518,6 +524,14 @@ function portraitRadiusValue(shape){
 }
 
 
+
+function updateSectionPageAdminOptions(){
+  const sectionMode=$("fNavigationModeSections")?.checked===true;
+  $("sectionPageOptions")?.classList.toggle("disabled-options",!sectionMode);
+  if($("fPageTransition"))$("fPageTransition").disabled=!sectionMode;
+  if($("fPagePager"))$("fPagePager").disabled=!sectionMode;
+}
+
 function fillSiteCustomizationControls(){
   normalizeSiteSettings(currentContent);
   const l=currentContent.siteSettings.layout;
@@ -544,6 +558,11 @@ function fillSiteCustomizationControls(){
   $("fFontPair").value=l.fontPair;
   $("fShadow").value=l.shadow;
   $("fStickySidebar").checked=l.stickySidebar;
+  $("fNavigationModeSingle").checked=l.navigationMode!=="sections";
+  $("fNavigationModeSections").checked=l.navigationMode==="sections";
+  $("fPageTransition").value=l.pageTransition||"fade";
+  $("fPagePager").checked=l.pagePager!==false;
+  updateSectionPageAdminOptions();
 
   $("fActiveNav").checked=e.activeNav;
   $("fAnimations").value=e.animations;
@@ -599,6 +618,9 @@ function syncSiteCustomizationFromControls(){
   l.fontPair=$("fFontPair").value;
   l.shadow=$("fShadow").value;
   l.stickySidebar=$("fStickySidebar").checked;
+  l.navigationMode=$("fNavigationModeSections").checked?"sections":"single";
+  l.pageTransition=$("fPageTransition").value;
+  l.pagePager=$("fPagePager").checked;
 
   const e=currentContent.siteSettings.experience;
   e.activeNav=$("fActiveNav").checked;
@@ -750,7 +772,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=2;
+const BUILDER_SETTINGS_SCHEMA_VERSION=3;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -2088,4 +2110,14 @@ document.addEventListener("change",e=>{
 });
 
 bindAdvancedAdminSuite();
+
+["fNavigationModeSingle","fNavigationModeSections"].forEach(id=>{
+  $(id)?.addEventListener("change",()=>{
+    updateSectionPageAdminOptions();
+    scheduleAdminPreview(true);
+  });
+});
+$("fPageTransition")?.addEventListener("change",()=>scheduleAdminPreview(true));
+$("fPagePager")?.addEventListener("change",()=>scheduleAdminPreview(true));
+
 boot();

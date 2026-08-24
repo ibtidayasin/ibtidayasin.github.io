@@ -1600,3 +1600,144 @@ body:not(.admin-body) .profile-photo{
   object-fit:var(--site-portrait-fit,cover);
   object-position:var(--site-portrait-position,center);
 }
+
+
+/* =========================================================
+   SWITCHABLE WEBSITE STRUCTURE
+   ========================================================= */
+
+/* Admin */
+.website-structure-settings{margin-top:0!important;padding-top:0!important;border-top:0!important}
+.structure-mode-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin:14px 0;
+}
+.structure-mode-card{
+  display:flex;
+  gap:11px;
+  align-items:flex-start;
+  padding:15px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:var(--surface-soft);
+  cursor:pointer;
+  transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease;
+}
+.structure-mode-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.structure-mode-card:has(input:checked){
+  border-color:var(--accent);
+  box-shadow:0 0 0 2px var(--accent-soft);
+  background:var(--surface);
+}
+.structure-mode-card input{margin-top:3px}
+.structure-mode-card span{display:grid;gap:4px}
+.structure-mode-card strong{font-size:14px}
+.structure-mode-card small{color:var(--muted);line-height:1.45}
+.section-page-options{
+  display:grid;
+  grid-template-columns:minmax(220px,320px) minmax(0,1fr);
+  gap:16px;
+  align-items:end;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface-soft);
+  transition:opacity .16s ease;
+}
+.section-page-options.disabled-options{opacity:.48}
+
+/* Public one-section-at-a-time mode */
+html[data-navigation-mode="sections"] body:not(.admin-body) .content{
+  min-width:0;
+}
+html[data-navigation-mode="sections"] body:not(.admin-body) .content>.section.section-page-dormant{
+  display:none!important;
+}
+html[data-navigation-mode="sections"] body:not(.admin-body) .content>.section.section-page-current{
+  display:block!important;
+}
+html[data-navigation-mode="sections"] body:not(.admin-body) .section-page-current{
+  min-height:min(650px,calc(100vh - 180px));
+}
+html[data-navigation-mode="sections"] body:not(.admin-body) .section-page-current:last-of-type{
+  min-height:0;
+}
+
+/* Page transition choices */
+html[data-navigation-mode="sections"][data-page-transition="fade"] .section-page-enter{
+  animation:siteSectionPageFade .28s ease both;
+}
+html[data-navigation-mode="sections"][data-page-transition="slide"] .section-page-enter{
+  animation:siteSectionPageSlide .32s ease both;
+}
+@keyframes siteSectionPageFade{
+  from{opacity:0}
+  to{opacity:1}
+}
+@keyframes siteSectionPageSlide{
+  from{opacity:0;transform:translateX(14px)}
+  to{opacity:1;transform:none}
+}
+
+/* Previous / Next controls */
+.section-page-pager{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  margin:4px 0 30px;
+  padding-top:22px;
+  border-top:1px solid var(--line);
+}
+.section-page-nav-btn{
+  min-width:190px;
+  max-width:47%;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:flex-start;
+  border:1px solid var(--line);
+  border-radius:var(--site-card-radius);
+  background:var(--surface);
+  color:var(--text);
+  box-shadow:var(--site-shadow);
+  padding:11px 13px;
+  cursor:pointer;
+  text-align:left;
+  transition:border-color .16s ease,transform .16s ease;
+}
+.section-page-nav-btn:last-child{
+  margin-left:auto;
+  text-align:right;
+  justify-content:flex-end;
+}
+.section-page-nav-btn:hover{
+  border-color:var(--accent);
+  transform:translateY(-1px);
+}
+.section-page-nav-btn>span:not([aria-hidden]){display:grid;gap:2px}
+.section-page-nav-btn small{
+  color:var(--muted);
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:700;
+}
+.section-page-nav-btn strong{font-size:13px;color:var(--accent)}
+
+/* In section-page mode, active nav is route-based rather than scroll-based. */
+html[data-navigation-mode="sections"] .topbar nav a{
+  scroll-margin:0;
+}
+
+@media(max-width:760px){
+  .structure-mode-grid{grid-template-columns:1fr}
+  .section-page-options{grid-template-columns:1fr}
+  .section-page-pager{flex-direction:column}
+  .section-page-nav-btn,
+  .section-page-nav-btn:last-child{width:100%;max-width:none;margin:0}
+}
+@media(prefers-reduced-motion:reduce){
+  .section-page-enter{animation:none!important}
+}

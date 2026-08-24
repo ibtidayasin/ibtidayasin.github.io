@@ -177,7 +177,10 @@ const DEFAULT_SITE_SETTINGS={
     skillsColumns:3,
     fontPair:"classic",
     shadow:"theme",
-    stickySidebar:true
+    stickySidebar:true,
+    navigationMode:"single",
+    pageTransition:"fade",
+    pagePager:true
   },
   experience:{
     activeNav:true,
@@ -244,7 +247,10 @@ function normalizeSiteSettings(content){
       skillsColumns:[1,2,3].includes(Number(l.skillsColumns))?Number(l.skillsColumns):DEFAULT_SITE_SETTINGS.layout.skillsColumns,
       fontPair:Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,l.fontPair)?l.fontPair:DEFAULT_SITE_SETTINGS.layout.fontPair,
       shadow:["theme","none","subtle","medium"].includes(l.shadow)?l.shadow:DEFAULT_SITE_SETTINGS.layout.shadow,
-      stickySidebar:Object.prototype.hasOwnProperty.call(l,"stickySidebar")?l.stickySidebar!==false:DEFAULT_SITE_SETTINGS.layout.stickySidebar
+      stickySidebar:Object.prototype.hasOwnProperty.call(l,"stickySidebar")?l.stickySidebar!==false:DEFAULT_SITE_SETTINGS.layout.stickySidebar,
+      navigationMode:["single","sections"].includes(l.navigationMode)?l.navigationMode:DEFAULT_SITE_SETTINGS.layout.navigationMode,
+      pageTransition:["none","fade","slide"].includes(l.pageTransition)?l.pageTransition:DEFAULT_SITE_SETTINGS.layout.pageTransition,
+      pagePager:Object.prototype.hasOwnProperty.call(l,"pagePager")?l.pagePager!==false:DEFAULT_SITE_SETTINGS.layout.pagePager
     },
     experience:{
       ...e,
@@ -283,6 +289,8 @@ let siteActiveNavScrollHandler=null;
 let siteRevealObserver=null;
 let siteEnhancementsBound=false;
 let currentSiteExperience=structuredClone(DEFAULT_SITE_SETTINGS.experience);
+let currentRenderedContent=null;
+
 
 function ensureEnhancementUi(){
   if(!$("backToTopBtn")){
@@ -374,6 +382,223 @@ function closeSiteLightbox(){
   document.body.classList.remove("lightbox-open");
 }
 
+
+/* =========================================================
+   SWITCHABLE WEBSITE STRUCTURE
+   Single-page scrolling / one-section-at-a-time
+   ========================================================= */
+let sitePageModeHashHandler=null;
+let sitePageModeClickBound=false;
+let siteCurrentSectionKey="about";
+
+function sectionKeyFromHash(hash=location.hash){
+  const raw=String(hash||"").replace(/^#/,"").trim();
+  if(!raw||raw==="home")return"about";
+  return SITE_SECTION_KEYS.includes(raw)?raw:"about";
+}
+
+function hashForSectionKey(key){
+  return key==="about"?"#home":`#${key}`;
+}
+
+function visibleSectionKeys(d){
+  normalizeSiteSettings(d);
+  return d.siteSettings.sectionOrder.filter(key=>
+    SITE_SECTION_KEYS.includes(key)&&d.siteSettings.sectionVisibility[key]!==false
+  );
+}
+
+function ensureSectionPager(){
+  let pager=$("sectionPagePager");
+  if(pager)return pager;
+  const footer=document.querySelector(".content footer");
+  if(!footer)return null;
+
+  pager=document.createElement("nav");
+  pager.id="sectionPagePager";
+  pager.className="section-page-pager hidden";
+  pager.setAttribute("aria-label","Section navigation");
+  pager.innerHTML=`
+    <button id="sectionPrevBtn" class="section-page-nav-btn" type="button">
+      <span aria-hidden="true">←</span>
+      <span><small>Previous</small><strong id="sectionPrevLabel"></strong></span>
+    </button>
+    <button id="sectionNextBtn" class="section-page-nav-btn" type="button">
+      <span><small>Next</small><strong id="sectionNextLabel"></strong></span>
+      <span aria-hidden="true">→</span>
+    </button>`;
+  footer.parentNode.insertBefore(pager,footer);
+
+  $("sectionPrevBtn").addEventListener("click",()=>{
+    const key=$("sectionPrevBtn").dataset.sectionKey;
+    if(key)navigateToSectionPage(key);
+  });
+  $("sectionNextBtn").addEventListener("click",()=>{
+    const key=$("sectionNextBtn").dataset.sectionKey;
+    if(key)navigateToSectionPage(key);
+  });
+  return pager;
+}
+
+function sectionPageLabel(key,d){
+  const headings=normalizeSectionHeadings(d).sectionHeadings;
+  return headings[key]?.title||DEFAULT_SECTION_HEADINGS[key]?.title||key;
+}
+
+function updateSectionPager(d,currentKey){
+  const pager=ensureSectionPager();
+  if(!pager)return;
+
+  const l=d.siteSettings.layout;
+  const keys=visibleSectionKeys(d);
+  const index=keys.indexOf(currentKey);
+  const enabled=l.pagePager!==false&&l.navigationMode==="sections"&&index>=0;
+  pager.classList.toggle("hidden",!enabled);
+  if(!enabled)return;
+
+  const prevKey=index>0?keys[index-1]:"";
+  const nextKey=index<keys.length-1?keys[index+1]:"";
+
+  const prev=$("sectionPrevBtn"),next=$("sectionNextBtn");
+  prev.classList.toggle("hidden",!prevKey);
+  next.classList.toggle("hidden",!nextKey);
+
+  if(prevKey){
+    prev.dataset.sectionKey=prevKey;
+    $("sectionPrevLabel").textContent=sectionPageLabel(prevKey,d);
+  }else{
+    delete prev.dataset.sectionKey;
+  }
+
+  if(nextKey){
+    next.dataset.sectionKey=nextKey;
+    $("sectionNextLabel").textContent=sectionPageLabel(nextKey,d);
+  }else{
+    delete next.dataset.sectionKey;
+  }
+}
+
+function activateSectionPageNav(key){
+  const navId=key==="about"?"home":key;
+  document.querySelectorAll(".topbar nav a").forEach(a=>{
+    a.classList.toggle("active-section",a.getAttribute("href")===`#${navId}`);
+  });
+}
+
+function showSectionPage(d,requestedKey,{scrollTop=true}={}){
+  const keys=visibleSectionKeys(d);
+  if(!keys.length)return;
+
+  let key=keys.includes(requestedKey)?requestedKey:keys[0];
+  siteCurrentSectionKey=key;
+
+  const transition=d.siteSettings.layout.pageTransition||"fade";
+  document.documentElement.dataset.pageTransition=transition;
+
+  document.querySelectorAll(".content .section[data-section-key]").forEach(sec=>{
+    const secKey=sec.dataset.sectionKey;
+    const current=secKey===key&&d.siteSettings.sectionVisibility[secKey]!==false;
+    sec.classList.toggle("section-page-current",current);
+    sec.classList.toggle("section-page-dormant",!current);
+    if(current){
+      sec.removeAttribute("aria-hidden");
+      // Restart the selected page's transition every time it becomes active.
+      sec.classList.remove("section-page-enter");
+      void sec.offsetWidth;
+      sec.classList.add("section-page-enter");
+    }
+  });
+
+  activateSectionPageNav(key);
+  updateSectionPager(d,key);
+
+  if(scrollTop){
+    window.scrollTo({top:0,behavior:"auto"});
+  }
+}
+
+function navigateToSectionPage(key,{replace=false}={}){
+  if(!currentRenderedContent)return;
+  const keys=visibleSectionKeys(currentRenderedContent);
+  if(!keys.includes(key))key=keys[0]||"about";
+
+  const targetHash=hashForSectionKey(key);
+  if(location.hash===targetHash){
+    showSectionPage(currentRenderedContent,key,{scrollTop:true});
+    return;
+  }
+
+  if(replace)history.replaceState(null,"",targetHash);
+  else history.pushState(null,"",targetHash);
+
+  showSectionPage(currentRenderedContent,key,{scrollTop:true});
+}
+
+function bindSectionPageNavigation(){
+  if(sitePageModeClickBound)return;
+  sitePageModeClickBound=true;
+
+  document.addEventListener("click",e=>{
+    const link=e.target.closest(".topbar nav a[href^='#'], .brand[href^='#']");
+    if(!link||!currentRenderedContent)return;
+    if(currentRenderedContent.siteSettings?.layout?.navigationMode!=="sections")return;
+
+    const href=link.getAttribute("href")||"#home";
+    const key=sectionKeyFromHash(href);
+    const visible=visibleSectionKeys(currentRenderedContent);
+    if(!visible.includes(key))return;
+
+    e.preventDefault();
+    navigateToSectionPage(key);
+  });
+}
+
+function applyNavigationMode(d){
+  normalizeSiteSettings(d);
+  currentRenderedContent=d;
+
+  const l=d.siteSettings.layout;
+  const sectionMode=l.navigationMode==="sections";
+  document.documentElement.dataset.navigationMode=sectionMode?"sections":"single";
+
+  const pager=ensureSectionPager();
+  if(pager)pager.classList.toggle("hidden",!sectionMode);
+
+  if(sitePageModeHashHandler){
+    window.removeEventListener("popstate",sitePageModeHashHandler);
+    window.removeEventListener("hashchange",sitePageModeHashHandler);
+    sitePageModeHashHandler=null;
+  }
+
+  bindSectionPageNavigation();
+
+  if(!sectionMode){
+    document.querySelectorAll(".content .section[data-section-key]").forEach(sec=>{
+      sec.classList.remove("section-page-current","section-page-dormant","section-page-enter");
+    });
+    document.documentElement.removeAttribute("data-page-transition");
+    if(pager)pager.classList.add("hidden");
+    return;
+  }
+
+  const keys=visibleSectionKeys(d);
+  let initial=sectionKeyFromHash();
+  if(!keys.includes(initial)){
+    initial=keys[0]||"about";
+    history.replaceState(null,"",hashForSectionKey(initial));
+  }
+
+  sitePageModeHashHandler=()=>{
+    if(!currentRenderedContent)return;
+    if(currentRenderedContent.siteSettings?.layout?.navigationMode!=="sections")return;
+    showSectionPage(currentRenderedContent,sectionKeyFromHash(),{scrollTop:true});
+  };
+  window.addEventListener("popstate",sitePageModeHashHandler);
+  window.addEventListener("hashchange",sitePageModeHashHandler);
+
+  showSectionPage(d,initial,{scrollTop:false});
+}
+
 function applySectionStructure(d){
   normalizeSiteSettings(d);
   const settings=d.siteSettings;
@@ -391,7 +616,8 @@ function applySectionStructure(d){
   });
 
   document.querySelectorAll(".topbar nav a[href^='#']").forEach(a=>{
-    const id=(a.getAttribute("href")||"").slice(1);
+    const raw=(a.getAttribute("href")||"").slice(1);
+    const id=raw==="home"?"about":raw;
     if(!SITE_SECTION_KEYS.includes(id))return;
     a.classList.toggle("nav-section-hidden",settings.sectionVisibility[id]===false);
   });
@@ -421,6 +647,21 @@ function applyLayoutSettings(d){
 }
 
 function setupActiveNavigation(d){
+  if(d.siteSettings?.layout?.navigationMode==="sections"){
+    if(siteActiveNavObserver){
+      siteActiveNavObserver.disconnect();
+      siteActiveNavObserver=null;
+    }
+    if(siteActiveNavScrollHandler){
+      window.removeEventListener("scroll",siteActiveNavScrollHandler);
+      window.removeEventListener("resize",siteActiveNavScrollHandler);
+      siteActiveNavScrollHandler=null;
+    }
+    if(d.siteSettings.experience.activeNav)activateSectionPageNav(siteCurrentSectionKey);
+    else document.querySelectorAll(".topbar nav a").forEach(a=>a.classList.remove("active-section"));
+    return;
+  }
+
   if(siteActiveNavObserver){
     siteActiveNavObserver.disconnect();
     siteActiveNavObserver=null;
@@ -546,8 +787,10 @@ function applyExperienceSettings(d){
 
 function applySiteSettings(d){
   normalizeSiteSettings(d);
+  currentRenderedContent=d;
   applyLayoutSettings(d);
   applySectionStructure(d);
+  applyNavigationMode(d);
   applyExperienceSettings(d);
 }
 
@@ -582,7 +825,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=2;
+const BUILDER_SETTINGS_SCHEMA_VERSION=3;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
