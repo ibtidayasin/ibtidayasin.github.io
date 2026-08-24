@@ -183,6 +183,8 @@ const DEFAULT_SITE_SETTINGS={
     pagePager:true,
     sectionCoverEnabled:true,
     sectionCoverStyle:"framed",
+    sectionCoverPhotoFit:"crop",
+    sectionCoverTopBlend:false,
     sectionCoverSide:"right",
     sectionCoverHeight:300,
     sectionCoverZoom:100,
@@ -261,9 +263,11 @@ function normalizeSiteSettings(content){
       pagePager:Object.prototype.hasOwnProperty.call(l,"pagePager")?l.pagePager!==false:DEFAULT_SITE_SETTINGS.layout.pagePager,
       sectionCoverEnabled:Object.prototype.hasOwnProperty.call(l,"sectionCoverEnabled")?l.sectionCoverEnabled!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverEnabled,
       sectionCoverStyle:["framed","fullbleed","split","glass"].includes(l.sectionCoverStyle)?l.sectionCoverStyle:DEFAULT_SITE_SETTINGS.layout.sectionCoverStyle,
+      sectionCoverPhotoFit:["crop","full"].includes(l.sectionCoverPhotoFit)?l.sectionCoverPhotoFit:DEFAULT_SITE_SETTINGS.layout.sectionCoverPhotoFit,
+      sectionCoverTopBlend:Object.prototype.hasOwnProperty.call(l,"sectionCoverTopBlend")?l.sectionCoverTopBlend===true:DEFAULT_SITE_SETTINGS.layout.sectionCoverTopBlend,
       sectionCoverSide:["left","right"].includes(l.sectionCoverSide)?l.sectionCoverSide:DEFAULT_SITE_SETTINGS.layout.sectionCoverSide,
       sectionCoverHeight:clampNumber(l.sectionCoverHeight,220,420,DEFAULT_SITE_SETTINGS.layout.sectionCoverHeight),
-      sectionCoverZoom:clampNumber(l.sectionCoverZoom,70,170,DEFAULT_SITE_SETTINGS.layout.sectionCoverZoom),
+      sectionCoverZoom:clampNumber(l.sectionCoverZoom,40,170,DEFAULT_SITE_SETTINGS.layout.sectionCoverZoom),
       sectionCoverFade:["soft","medium","strong"].includes(l.sectionCoverFade)?l.sectionCoverFade:DEFAULT_SITE_SETTINGS.layout.sectionCoverFade,
       sectionCoverDetails:Object.prototype.hasOwnProperty.call(l,"sectionCoverDetails")?l.sectionCoverDetails!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverDetails,
       sectionCoverSocials:Object.prototype.hasOwnProperty.call(l,"sectionCoverSocials")?l.sectionCoverSocials!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverSocials
@@ -514,15 +518,20 @@ function applySectionCoverState(d,key){
   root.dataset.sectionPage=innerPage?"inner":"home";
   root.dataset.sectionCover=enabled?"on":"off";
   root.dataset.coverStyle=l.sectionCoverStyle||"framed";
+  root.dataset.coverPhotoFit=l.sectionCoverPhotoFit||"crop";
+  root.dataset.coverTopBlend=l.sectionCoverTopBlend===true?"on":"off";
   root.dataset.coverSide=l.sectionCoverSide||"right";
   root.dataset.coverFade=l.sectionCoverFade||"medium";
   root.dataset.coverDetails=l.sectionCoverDetails!==false?"show":"hide";
   root.dataset.coverSocials=l.sectionCoverSocials!==false?"show":"hide";
   root.style.setProperty("--section-cover-height",`${l.sectionCoverHeight||300}px`);
-  const zoom=clampNumber(l.sectionCoverZoom,70,170,100);
+  const zoom=clampNumber(l.sectionCoverZoom,40,170,100);
   const basePhotoSize=54;
+  const coverHeight=clampNumber(l.sectionCoverHeight,220,420,300);
   root.style.setProperty("--section-cover-photo-size",`${basePhotoSize*(zoom/100)}%`);
+  root.style.setProperty("--section-cover-fit-height",`${coverHeight*0.92*(zoom/100)}px`);
   root.style.setProperty("--mobile-cover-photo-height",`${230*(zoom/100)}px`);
+  root.style.setProperty("--mobile-cover-full-height",`${220*(zoom/100)}px`);
 
   if(sidebar){
     const hasPhoto=!!String(d.photo_url||"").trim();
@@ -878,7 +887,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=5;
+const BUILDER_SETTINGS_SCHEMA_VERSION=6;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){

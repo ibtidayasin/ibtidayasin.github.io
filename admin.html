@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260825-coverstyle1">
+  <link rel="stylesheet" href="styles.css?v=20260825-upbleed1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -847,11 +847,25 @@
                     </select>
                   </div>
 
+
+                  <div class="field">
+                    <label>Photo fit</label>
+                    <select id="fSectionCoverPhotoFit">
+                      <option value="crop">Fill cover / crop</option>
+                      <option value="full">Full portrait / fit whole image</option>
+                    </select>
+                  </div>
+
+                  <label class="setting-toggle fullbleed-topblend-toggle">
+                    <input id="fSectionCoverTopBlend" type="checkbox">
+                    Blend Full Bleed upward behind navigation
+                  </label>
+
                   <div class="range-setting section-cover-zoom-setting">
                     <label>Photo zoom</label>
                     <div>
-                      <input id="fSectionCoverZoom" type="range" min="70" max="170" step="5">
-                      <input id="fSectionCoverZoomNumber" type="number" min="70" max="170" step="5">
+                      <input id="fSectionCoverZoom" type="range" min="40" max="170" step="5">
+                      <input id="fSectionCoverZoomNumber" type="number" min="40" max="170" step="5">
                     </div>
                   </div>
 
@@ -1080,6 +1094,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260825-coverstyle1"></script>
+  <script src="admin.js?v=20260825-upbleed1"></script>
 </body>
 </html>

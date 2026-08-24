@@ -2121,3 +2121,98 @@ html[data-navigation-mode="sections"][data-section-page="inner"][data-section-co
     margin:0!important;
   }
 }
+
+
+/* =========================================================
+   UPWARD FULL-BLEED + FULL PORTRAIT FIT
+   ========================================================= */
+
+/* True upward bleed: the Full Bleed hero extends behind the sticky nav. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-top-blend="on"] body:not(.admin-body) .layout{
+  padding-top:0;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-top-blend="on"] body:not(.admin-body) .sidebar{
+  margin-top:-72px;
+  padding-top:calc(28px + 72px);
+  min-height:calc(var(--section-cover-height,300px) + 72px);
+}
+
+/* Let the cover softly show through the navigation bar while retaining readability. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-top-blend="on"] body:not(.admin-body) .topbar{
+  background:color-mix(in srgb,var(--header-bg) 76%,transparent);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  border-bottom-color:color-mix(in srgb,var(--line) 52%,transparent);
+}
+
+/* Extra upper fade so the banner and nav do not look like two hard blocks. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-top-blend="on"] body:not(.admin-body) .sidebar::after{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:100px;
+  pointer-events:none;
+  z-index:0;
+  background:linear-gradient(
+    to bottom,
+    color-mix(in srgb,var(--surface) 16%,transparent),
+    transparent
+  );
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-top-blend="on"] body:not(.admin-body) .sidebar > *{
+  position:relative;
+  z-index:1;
+}
+
+/* Full portrait mode: size from image height so the entire source can be shown.
+   100% zoom fits the image to ~92% of the cover height. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"][data-cover-style="framed"] body:not(.admin-body) .sidebar,
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"][data-cover-style="fullbleed"] body:not(.admin-body) .sidebar{
+  background-size:100% 100%,auto var(--section-cover-fit-height)!important;
+}
+
+/* Split Hero full portrait */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"][data-cover-style="split"] body:not(.admin-body) .sidebar::before{
+  background-size:auto var(--section-cover-fit-height)!important;
+  background-position:center!important;
+}
+
+/* Glass Overlay full portrait */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"][data-cover-style="glass"] body:not(.admin-body) .sidebar{
+  background-size:auto var(--section-cover-fit-height)!important;
+}
+
+/* With full portrait fit, keep the image aligned to the selected side. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"][data-cover-side="right"][data-cover-style="framed"] body:not(.admin-body) .sidebar,
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"][data-cover-side="right"][data-cover-style="fullbleed"] body:not(.admin-body) .sidebar{
+  background-position:center,right center!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"][data-cover-side="left"][data-cover-style="framed"] body:not(.admin-body) .sidebar,
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"][data-cover-side="left"][data-cover-style="fullbleed"] body:not(.admin-body) .sidebar{
+  background-position:center,left center!important;
+}
+
+/* Full portrait fit can intentionally show background around the image. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"] body:not(.admin-body) .sidebar{
+  background-color:var(--surface-alt);
+}
+
+/* Mobile: upward bleed becomes a direct join rather than overlapping the compact nav. */
+@media(max-width:760px){
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-top-blend="on"] body:not(.admin-body) .sidebar{
+    margin-top:0;
+    padding-top:235px;
+    min-height:0;
+  }
+
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"][data-cover-style="framed"] body:not(.admin-body) .sidebar,
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"][data-cover-style="fullbleed"] body:not(.admin-body) .sidebar,
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"][data-cover-style="glass"] body:not(.admin-body) .sidebar{
+    background-size:auto var(--mobile-cover-full-height)!important;
+    background-position:center top!important;
+  }
+
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"][data-cover-style="split"] body:not(.admin-body) .sidebar::before{
+    background-size:auto var(--mobile-cover-full-height)!important;
+  }
+}

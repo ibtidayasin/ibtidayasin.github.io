@@ -423,6 +423,8 @@ const DEFAULT_SITE_SETTINGS={
     pagePager:true,
     sectionCoverEnabled:true,
     sectionCoverStyle:"framed",
+    sectionCoverPhotoFit:"crop",
+    sectionCoverTopBlend:false,
     sectionCoverSide:"right",
     sectionCoverHeight:300,
     sectionCoverZoom:100,
@@ -501,9 +503,11 @@ function normalizeSiteSettings(content){
       pagePager:Object.prototype.hasOwnProperty.call(l,"pagePager")?l.pagePager!==false:DEFAULT_SITE_SETTINGS.layout.pagePager,
       sectionCoverEnabled:Object.prototype.hasOwnProperty.call(l,"sectionCoverEnabled")?l.sectionCoverEnabled!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverEnabled,
       sectionCoverStyle:["framed","fullbleed","split","glass"].includes(l.sectionCoverStyle)?l.sectionCoverStyle:DEFAULT_SITE_SETTINGS.layout.sectionCoverStyle,
+      sectionCoverPhotoFit:["crop","full"].includes(l.sectionCoverPhotoFit)?l.sectionCoverPhotoFit:DEFAULT_SITE_SETTINGS.layout.sectionCoverPhotoFit,
+      sectionCoverTopBlend:Object.prototype.hasOwnProperty.call(l,"sectionCoverTopBlend")?l.sectionCoverTopBlend===true:DEFAULT_SITE_SETTINGS.layout.sectionCoverTopBlend,
       sectionCoverSide:["left","right"].includes(l.sectionCoverSide)?l.sectionCoverSide:DEFAULT_SITE_SETTINGS.layout.sectionCoverSide,
       sectionCoverHeight:clampNumber(l.sectionCoverHeight,220,420,DEFAULT_SITE_SETTINGS.layout.sectionCoverHeight),
-      sectionCoverZoom:clampNumber(l.sectionCoverZoom,70,170,DEFAULT_SITE_SETTINGS.layout.sectionCoverZoom),
+      sectionCoverZoom:clampNumber(l.sectionCoverZoom,40,170,DEFAULT_SITE_SETTINGS.layout.sectionCoverZoom),
       sectionCoverFade:["soft","medium","strong"].includes(l.sectionCoverFade)?l.sectionCoverFade:DEFAULT_SITE_SETTINGS.layout.sectionCoverFade,
       sectionCoverDetails:Object.prototype.hasOwnProperty.call(l,"sectionCoverDetails")?l.sectionCoverDetails!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverDetails,
       sectionCoverSocials:Object.prototype.hasOwnProperty.call(l,"sectionCoverSocials")?l.sectionCoverSocials!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverSocials
@@ -543,11 +547,23 @@ function portraitRadiusValue(shape){
 
 
 
+
+function updateCoverStyleSpecificControls(){
+  const fullBleed=$("fSectionCoverStyle")?.value==="fullbleed";
+  const enabled=$("fSectionCoverEnabled")?.checked===true&&$("fNavigationModeSections")?.checked===true;
+  if($("fSectionCoverTopBlend")){
+    $("fSectionCoverTopBlend").disabled=!(enabled&&fullBleed);
+    $("fSectionCoverTopBlend").closest(".setting-toggle")?.classList.toggle("disabled-options",!(enabled&&fullBleed));
+  }
+}
+
 function resetSectionCoverControls(){
   const defaults=DEFAULT_SITE_SETTINGS.layout;
   setHistoryMuted(()=>{
     $("fSectionCoverEnabled").checked=defaults.sectionCoverEnabled!==false;
     $("fSectionCoverStyle").value=defaults.sectionCoverStyle||"framed";
+    $("fSectionCoverPhotoFit").value=defaults.sectionCoverPhotoFit||"crop";
+    $("fSectionCoverTopBlend").checked=defaults.sectionCoverTopBlend===true;
     $("fSectionCoverSide").value=defaults.sectionCoverSide||"right";
     $("fSectionCoverHeight").value=defaults.sectionCoverHeight||300;
     $("fSectionCoverHeightNumber").value=defaults.sectionCoverHeight||300;
@@ -557,6 +573,7 @@ function resetSectionCoverControls(){
     $("fSectionCoverDetails").checked=defaults.sectionCoverDetails!==false;
     $("fSectionCoverSocials").checked=defaults.sectionCoverSocials!==false;
     updateSectionCoverAdminOptions();
+    updateCoverStyleSpecificControls();
   });
   syncSiteCustomizationFromControls();
   scheduleAdminPreview(true);
@@ -569,8 +586,9 @@ function updateSectionCoverAdminOptions(){
   const active=sectionMode&&coverEnabled;
   $("sectionCoverOptions")?.classList.toggle("disabled-options",!active);
 
-  ["fSectionCoverStyle","fSectionCoverSide","fSectionCoverFade","fSectionCoverHeight","fSectionCoverHeightNumber","fSectionCoverZoom","fSectionCoverZoomNumber","fSectionCoverDetails","fSectionCoverSocials","resetSectionCoverBtn"]
+  ["fSectionCoverStyle","fSectionCoverPhotoFit","fSectionCoverSide","fSectionCoverFade","fSectionCoverHeight","fSectionCoverHeightNumber","fSectionCoverZoom","fSectionCoverZoomNumber","fSectionCoverDetails","fSectionCoverSocials","resetSectionCoverBtn"]
     .forEach(id=>{if($(id))$(id).disabled=!active});
+  updateCoverStyleSpecificControls();
 }
 
 function updateSectionPageAdminOptions(){
@@ -614,6 +632,8 @@ function fillSiteCustomizationControls(){
   $("fPagePager").checked=l.pagePager!==false;
   $("fSectionCoverEnabled").checked=l.sectionCoverEnabled!==false;
   $("fSectionCoverStyle").value=l.sectionCoverStyle||"framed";
+  $("fSectionCoverPhotoFit").value=l.sectionCoverPhotoFit||"crop";
+  $("fSectionCoverTopBlend").checked=l.sectionCoverTopBlend===true;
   $("fSectionCoverSide").value=l.sectionCoverSide||"right";
   $("fSectionCoverHeight").value=l.sectionCoverHeight||300;
   $("fSectionCoverHeightNumber").value=l.sectionCoverHeight||300;
@@ -683,9 +703,11 @@ function syncSiteCustomizationFromControls(){
   l.pagePager=$("fPagePager").checked;
   l.sectionCoverEnabled=$("fSectionCoverEnabled").checked;
   l.sectionCoverStyle=$("fSectionCoverStyle").value;
+  l.sectionCoverPhotoFit=$("fSectionCoverPhotoFit").value;
+  l.sectionCoverTopBlend=$("fSectionCoverTopBlend").checked;
   l.sectionCoverSide=$("fSectionCoverSide").value;
   l.sectionCoverHeight=clampNumber($("fSectionCoverHeightNumber").value||$("fSectionCoverHeight").value,220,420,300);
-  l.sectionCoverZoom=clampNumber($("fSectionCoverZoomNumber").value||$("fSectionCoverZoom").value,70,170,100);
+  l.sectionCoverZoom=clampNumber($("fSectionCoverZoomNumber").value||$("fSectionCoverZoom").value,40,170,100);
   l.sectionCoverFade=$("fSectionCoverFade").value;
   l.sectionCoverDetails=$("fSectionCoverDetails").checked;
   l.sectionCoverSocials=$("fSectionCoverSocials").checked;
@@ -840,7 +862,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=5;
+const BUILDER_SETTINGS_SCHEMA_VERSION=6;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -2159,7 +2181,7 @@ syncRangeNumber("fSectionSpacing","fSectionSpacingNumber",20,90,40);
 syncRangeNumber("fCardRadius","fCardRadiusNumber",0,28,11);
 syncRangeNumber("fPortraitSize","fPortraitSizeNumber",140,250,190);
 syncRangeNumber("fSectionCoverHeight","fSectionCoverHeightNumber",220,420,300);
-syncRangeNumber("fSectionCoverZoom","fSectionCoverZoomNumber",70,170,100);
+syncRangeNumber("fSectionCoverZoom","fSectionCoverZoomNumber",40,170,100);
 
 $("resetLayoutStyleBtn")?.addEventListener("click",resetLayoutStyleControls);
 $("resetSectionStructureBtn")?.addEventListener("click",resetSectionStructure);
@@ -2195,9 +2217,13 @@ $("fSectionCoverEnabled")?.addEventListener("change",()=>{
   updateSectionCoverAdminOptions();
   scheduleAdminPreview(true);
 });
-["fSectionCoverStyle","fSectionCoverSide","fSectionCoverFade","fSectionCoverDetails","fSectionCoverSocials"].forEach(id=>{
-  $(id)?.addEventListener("change",()=>scheduleAdminPreview(true));
+["fSectionCoverStyle","fSectionCoverPhotoFit","fSectionCoverSide","fSectionCoverFade","fSectionCoverDetails","fSectionCoverSocials"].forEach(id=>{
+  $(id)?.addEventListener("change",()=>{
+    updateCoverStyleSpecificControls();
+    scheduleAdminPreview(true);
+  });
 });
+$("fSectionCoverTopBlend")?.addEventListener("change",()=>scheduleAdminPreview(true));
 ["fSectionCoverHeight","fSectionCoverHeightNumber","fSectionCoverZoom","fSectionCoverZoomNumber"].forEach(id=>{
   $(id)?.addEventListener("input",()=>scheduleAdminPreview());
 });
