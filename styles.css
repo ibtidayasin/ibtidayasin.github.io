@@ -2216,3 +2216,285 @@ html[data-navigation-mode="sections"][data-section-page="inner"][data-section-co
     background-size:auto var(--mobile-cover-full-height)!important;
   }
 }
+
+
+/* =========================================================
+   SMOOTH COVER RENDERER v2
+   Photo, fade and information are independent layers.
+   This intentionally overrides the older compound-background renderer.
+   ========================================================= */
+
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"]{
+  --cover-photo-pane:60%;
+  --cover-zoom-scale:1;
+  --cover-fade-start:38%;
+  --cover-fade-mid:49%;
+  --cover-fade-end:60%;
+}
+
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-fade="soft"]{
+  --cover-fade-start:35%;
+  --cover-fade-mid:47%;
+  --cover-fade-end:59%;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-fade="medium"]{
+  --cover-fade-start:38%;
+  --cover-fade-mid:49%;
+  --cover-fade-end:60%;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-fade="strong"]{
+  --cover-fade-start:40%;
+  --cover-fade-mid:52%;
+  --cover-fade-end:63%;
+}
+
+/* The cover box itself is now only the structural/surface layer. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar.has-section-cover-photo{
+  isolation:isolate;
+  background-image:none!important;
+  background-color:var(--surface)!important;
+}
+
+/* Disable older pseudo-element photo renderers whenever a real photo exists. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar.has-section-cover-photo::before{
+  content:none!important;
+}
+
+/* Dedicated photo pane. Zoom changes only the image, never the fade. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar > .section-cover-photo-layer{
+  position:absolute!important;
+  z-index:0!important;
+  top:0!important;
+  bottom:0!important;
+  right:0!important;
+  left:auto!important;
+  width:var(--cover-photo-pane)!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  overflow:hidden!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:flex-end!important;
+  background:var(--surface-alt)!important;
+  border:0!important;
+  border-radius:0!important;
+  pointer-events:none;
+}
+
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .sidebar > .section-cover-photo-layer{
+  left:0!important;
+  right:auto!important;
+  justify-content:flex-start!important;
+}
+
+/* Portrait stays proportional. This avoids the extreme face-only crop produced by background-size:cover. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .section-cover-photo-layer-img{
+  display:block;
+  flex:0 0 auto;
+  width:auto;
+  max-width:none;
+  height:128%;
+  max-height:none;
+  object-fit:contain;
+  object-position:center;
+  transform:scale(var(--cover-zoom-scale));
+  transform-origin:right center;
+  transition:
+    transform .28s cubic-bezier(.2,.7,.2,1),
+    height .28s cubic-bezier(.2,.7,.2,1),
+    opacity .18s ease;
+  will-change:transform;
+  user-select:none;
+}
+
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .section-cover-photo-layer-img{
+  transform-origin:left center;
+}
+
+/* Full portrait is a true fit mode: at 100% the entire image is comfortably inside the banner. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"] body:not(.admin-body) .section-cover-photo-layer-img{
+  height:92%;
+}
+
+/* Stable horizontal fade layer. It no longer changes when photo zoom changes. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="right"] body:not(.admin-body) .sidebar.has-section-cover-photo::after{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  width:auto!important;
+  height:auto!important;
+  z-index:1!important;
+  pointer-events:none!important;
+  background:
+    linear-gradient(
+      to right,
+      var(--surface) 0%,
+      var(--surface) var(--cover-fade-start),
+      color-mix(in srgb,var(--surface) 88%,transparent) var(--cover-fade-mid),
+      transparent var(--cover-fade-end),
+      transparent 100%
+    )!important;
+}
+
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .sidebar.has-section-cover-photo::after{
+  content:""!important;
+  position:absolute!important;
+  inset:0!important;
+  width:auto!important;
+  height:auto!important;
+  z-index:1!important;
+  pointer-events:none!important;
+  background:
+    linear-gradient(
+      to left,
+      var(--surface) 0%,
+      var(--surface) var(--cover-fade-start),
+      color-mix(in srgb,var(--surface) 88%,transparent) var(--cover-fade-mid),
+      transparent var(--cover-fade-end),
+      transparent 100%
+    )!important;
+}
+
+/* Upward Full Bleed keeps the stable side fade and adds a separate vertical blend. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-top-blend="on"][data-cover-side="right"] body:not(.admin-body) .sidebar.has-section-cover-photo::after{
+  background:
+    linear-gradient(
+      to right,
+      var(--surface) 0%,
+      var(--surface) var(--cover-fade-start),
+      color-mix(in srgb,var(--surface) 88%,transparent) var(--cover-fade-mid),
+      transparent var(--cover-fade-end),
+      transparent 100%
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb,var(--surface) 18%,transparent) 0,
+      transparent 105px
+    )!important;
+}
+
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-top-blend="on"][data-cover-side="left"] body:not(.admin-body) .sidebar.has-section-cover-photo::after{
+  background:
+    linear-gradient(
+      to left,
+      var(--surface) 0%,
+      var(--surface) var(--cover-fade-start),
+      color-mix(in srgb,var(--surface) 88%,transparent) var(--cover-fade-mid),
+      transparent var(--cover-fade-end),
+      transparent 100%
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb,var(--surface) 18%,transparent) 0,
+      transparent 105px
+    )!important;
+}
+
+/* Information is always above both photo and fade. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar > :not(.portrait):not(.section-cover-photo-layer){
+  position:relative;
+  z-index:2;
+}
+
+/* Framed + Full Bleed: reserve the outer side for the portrait. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="framed"][data-cover-side="right"] body:not(.admin-body) .sidebar > :not(.portrait):not(.section-cover-photo-layer),
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-side="right"] body:not(.admin-body) .sidebar > :not(.portrait):not(.section-cover-photo-layer){
+  width:min(45%,560px)!important;
+  margin-left:0!important;
+  margin-right:auto!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="framed"][data-cover-side="left"] body:not(.admin-body) .sidebar > :not(.portrait):not(.section-cover-photo-layer),
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-side="left"] body:not(.admin-body) .sidebar > :not(.portrait):not(.section-cover-photo-layer){
+  width:min(45%,560px)!important;
+  margin-left:auto!important;
+  margin-right:0!important;
+}
+
+/* Split Hero: same independent image layer, but exactly half-width and no fade. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="split"] body:not(.admin-body) .sidebar.has-section-cover-photo{
+  display:grid!important;
+  grid-template-columns:1fr 1fr!important;
+  background:var(--surface)!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="split"] body:not(.admin-body) .sidebar > .section-cover-photo-layer{
+  width:50%!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="split"] body:not(.admin-body) .sidebar.has-section-cover-photo::after{
+  content:none!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="split"][data-cover-side="right"] body:not(.admin-body) .sidebar > :not(.portrait):not(.section-cover-photo-layer){
+  grid-column:1!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="split"][data-cover-side="left"] body:not(.admin-body) .sidebar > :not(.portrait):not(.section-cover-photo-layer){
+  grid-column:2!important;
+}
+
+/* Glass Overlay: full photo canvas + stable translucent info block. */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="glass"] body:not(.admin-body) .sidebar.has-section-cover-photo{
+  background:var(--surface-alt)!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="glass"] body:not(.admin-body) .sidebar > .section-cover-photo-layer{
+  width:100%!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="glass"] body:not(.admin-body) .sidebar.has-section-cover-photo::after{
+  background:linear-gradient(90deg,rgba(0,0,0,.035),rgba(0,0,0,.005))!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="glass"] body:not(.admin-body) .sidebar > :not(.portrait):not(.section-cover-photo-layer){
+  background:color-mix(in srgb,var(--surface) 86%,transparent)!important;
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+/* Mobile uses the same independent renderer and a vertical seam fade. */
+@media(max-width:760px){
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar.has-section-cover-photo{
+    padding-top:235px!important;
+    background:var(--surface)!important;
+  }
+
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar > .section-cover-photo-layer{
+    top:0!important;
+    bottom:auto!important;
+    left:0!important;
+    right:0!important;
+    width:100%!important;
+    height:245px!important;
+    justify-content:center!important;
+  }
+
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .section-cover-photo-layer-img{
+    height:128%;
+    transform-origin:center center;
+  }
+
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"] body:not(.admin-body) .section-cover-photo-layer-img{
+    height:92%;
+  }
+
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar.has-section-cover-photo::after,
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="left"] body:not(.admin-body) .sidebar.has-section-cover-photo::after,
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-side="right"] body:not(.admin-body) .sidebar.has-section-cover-photo::after{
+    content:""!important;
+    position:absolute!important;
+    inset:0!important;
+    z-index:1!important;
+    background:
+      linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 145px,
+        color-mix(in srgb,var(--surface) 45%,transparent) 190px,
+        var(--surface) 245px,
+        var(--surface) 100%
+      )!important;
+  }
+
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar > :not(.portrait):not(.section-cover-photo-layer){
+    width:100%!important;
+    margin-left:0!important;
+    margin-right:0!important;
+    grid-column:auto!important;
+  }
+}

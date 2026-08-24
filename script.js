@@ -506,6 +506,32 @@ function activateSectionPageNav(key){
 }
 
 
+
+function ensureSectionCoverPhotoLayer(d){
+  const sidebar=document.querySelector(".sidebar");
+  if(!sidebar)return null;
+
+  let layer=sidebar.querySelector(".section-cover-photo-layer");
+  if(!layer){
+    layer=document.createElement("div");
+    layer.className="section-cover-photo-layer";
+    layer.setAttribute("aria-hidden","true");
+    layer.innerHTML=`<img class="section-cover-photo-layer-img" alt="" draggable="false">`;
+    sidebar.prepend(layer);
+  }
+
+  const img=layer.querySelector("img");
+  const src=String(d?.photo_url||"").trim();
+  if(src){
+    if(img.getAttribute("src")!==src)img.src=src;
+    layer.classList.remove("hidden");
+  }else{
+    img.removeAttribute("src");
+    layer.classList.add("hidden");
+  }
+  return layer;
+}
+
 function applySectionCoverState(d,key){
   normalizeSiteSettings(d);
   const l=d.siteSettings.layout;
@@ -528,10 +554,13 @@ function applySectionCoverState(d,key){
   const zoom=clampNumber(l.sectionCoverZoom,40,170,100);
   const basePhotoSize=54;
   const coverHeight=clampNumber(l.sectionCoverHeight,220,420,300);
+  root.style.setProperty("--cover-zoom-scale",String(zoom/100));
   root.style.setProperty("--section-cover-photo-size",`${basePhotoSize*(zoom/100)}%`);
   root.style.setProperty("--section-cover-fit-height",`${coverHeight*0.92*(zoom/100)}px`);
   root.style.setProperty("--mobile-cover-photo-height",`${230*(zoom/100)}px`);
   root.style.setProperty("--mobile-cover-full-height",`${220*(zoom/100)}px`);
+
+  ensureSectionCoverPhotoLayer(d);
 
   if(sidebar){
     const hasPhoto=!!String(d.photo_url||"").trim();
