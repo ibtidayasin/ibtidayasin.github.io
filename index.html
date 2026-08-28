@@ -1,11 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="site-booting">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Ibtida Yasin — Mechanical Engineering and Computational Materials">
   <title>Ibtida Yasin | Academic Profile</title>
-  <link rel="stylesheet" href="styles.css?v=20260828-architecture1">
+  <link rel="stylesheet" href="styles.css?v=20260828-firstpaint1">
+
+  <style id="siteBootGuard">
+    /* Prevent the static fallback layout from flashing before saved site settings load. */
+    html.site-booting { overflow: hidden; }
+    html.site-booting body { opacity: 0; visibility: hidden; pointer-events: none; }
+    html.site-ready body { opacity: 1; visibility: visible; transition: opacity .12s ease; }
+    @media (prefers-reduced-motion: reduce) { html.site-ready body { transition: none; } }
+  </style>
+  <script>
+    /* Safety fallback: never leave the page hidden if a network/script error occurs. */
+    window.setTimeout(function(){
+      var h=document.documentElement;
+      if(h.classList.contains('site-booting')){
+        h.classList.remove('site-booting');
+        h.classList.add('site-ready');
+      }
+    },10000);
+  </script>
 </head>
 <body>
 <header class="topbar">
@@ -134,6 +152,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="script.js?v=20260828-architecture1"></script>
+<script src="script.js?v=20260828-firstpaint1"></script>
 </body>
 </html>
