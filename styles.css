@@ -2682,3 +2682,71 @@ html[data-navigation-mode="sections"][data-section-page="inner"][data-section-co
 html[data-navigation-mode="sections"][data-section-page="inner"] body:not(.admin-body) .sidebar .sidebar-cv{
   display:none!important;
 }
+
+
+/* =========================================================
+   PROJECTS & SIMULATIONS + ACADEMIC ACTIVITIES
+   ========================================================= */
+.project-type-badge,
+.activity-type-badge{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  padding:5px 9px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:var(--accent-soft);
+  color:var(--accent);
+  font-size:10px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+}
+.project-type-badge{margin-bottom:10px}
+.activity-tabs{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:0 0 18px;
+  padding-bottom:12px;
+  border-bottom:1px solid var(--line);
+}
+.activity-tab{
+  appearance:none;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--muted);
+  border-radius:999px;
+  padding:8px 12px;
+  font:inherit;
+  font-size:12px;
+  font-weight:750;
+  cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
+}
+.activity-tab:hover{border-color:var(--accent);color:var(--accent);transform:translateY(-1px)}
+.activity-tab.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.activity-tabs.single-activity-tab{border-bottom:0;padding-bottom:0}
+.activity-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:14px;
+}
+.activity-card{
+  border:1px solid var(--line);
+  border-radius:var(--site-card-radius);
+  background:var(--surface);
+  box-shadow:var(--site-shadow);
+  padding:18px;
+  min-width:0;
+}
+.activity-card-top{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:11px;flex-wrap:wrap}
+.activity-date{font-size:11px;color:var(--muted);font-weight:700}
+.activity-card h3{margin:0 0 7px;font-size:18px;line-height:1.35}
+.activity-organization{color:var(--accent);font-size:13px;font-weight:700;margin-bottom:9px}
+.activity-card .item-media{margin-top:12px}
+@media(max-width:760px){
+  .activity-grid{grid-template-columns:1fr}
+}

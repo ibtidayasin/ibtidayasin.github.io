@@ -16,6 +16,7 @@ const DEFAULT_CONTENT={
     {"title":"MD Data Analysis","description":"Post-processing of simulation data, stress–strain analysis, comparison across cases, and scientific plotting.","meta":"Python · Matplotlib","url":"","media":[]},
     {"title":"Atomistic Mechanism Analysis","description":"Structural and defect analysis using PTM, DXA, RDF, atomic strain, and visualization workflows.","meta":"OVITO","url":"","media":[]}
   ],
+  "academicActivities": [],
   "skills":[
     {"category":"Simulation","items":["LAMMPS","Classical molecular dynamics","EAM potentials"],"media":[]},
     {"category":"Scientific Computing","items":["Python","NumPy","Matplotlib"],"media":[]},
@@ -35,7 +36,8 @@ const DEFAULT_SECTION_HEADINGS={
   research:{title:"Research Interests",subtitle:"What I work on"},
   thesis:{title:"Undergraduate Thesis",subtitle:"Research Thesis"},
   publications:{title:"Publications",subtitle:"Research output"},
-  projects:{title:"Projects",subtitle:"Selected work"},
+  projects:{title:"Projects & Simulations",subtitle:"Selected technical and computational work"},
+  activities:{title:"Academic Activities",subtitle:"Presentations, training, and recognition"},
   skills:{title:"Skills",subtitle:"Research toolkit"},
   education:{title:"Education",subtitle:"Academic background"},
   contact:{title:"Contact",subtitle:"Interested in computational materials and nanoscale mechanics?"},
@@ -157,11 +159,11 @@ function applyCustomThemeVariables(theme){
 }
 
 
-const SITE_SECTION_KEYS=["about","research","thesis","publications","projects","skills","education","contact","cv"];
+const SITE_SECTION_KEYS=["about","research","thesis","publications","projects","activities","skills","education","contact","cv"];
 const DEFAULT_SITE_SETTINGS={
-  sectionOrder:["about","research","thesis","publications","projects","skills","education","contact","cv"],
+  sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
-    about:true,research:true,thesis:true,publications:true,projects:true,skills:true,education:true,contact:true,cv:true
+    about:true,research:true,thesis:true,publications:true,projects:true,activities:true,skills:true,education:true,contact:true,cv:true
   },
   layout:{
     maxWidth:1180,
@@ -217,7 +219,13 @@ const SITE_FONT_PAIRS={
 function normalizeSiteSettings(content){
   const raw=(content.siteSettings&&typeof content.siteSettings==="object")?content.siteSettings:{};
   const rawOrder=Array.isArray(raw.sectionOrder)?raw.sectionOrder.filter(x=>SITE_SECTION_KEYS.includes(x)):[];
-  const order=[...new Set([...rawOrder,...SITE_SECTION_KEYS])];
+  const mergedOrder=[...new Set([...rawOrder,...SITE_SECTION_KEYS])];
+  const order=rawOrder.includes("activities")?mergedOrder:(()=>{
+    const next=mergedOrder.filter(k=>k!=="activities");
+    const projectIndex=next.indexOf("projects");
+    next.splice(projectIndex>=0?projectIndex+1:next.length,0,"activities");
+    return next;
+  })();
   const rawVis=(raw.sectionVisibility&&typeof raw.sectionVisibility==="object")?raw.sectionVisibility:{};
   const l=(raw.layout&&typeof raw.layout==="object")?raw.layout:{};
   const e=(raw.experience&&typeof raw.experience==="object")?raw.experience:{};
@@ -426,7 +434,7 @@ function hashForSectionKey(key){
 function visibleSectionKeys(d){
   normalizeSiteSettings(d);
   return d.siteSettings.sectionOrder.filter(key=>
-    SITE_SECTION_KEYS.includes(key)&&d.siteSettings.sectionVisibility[key]!==false
+    SITE_SECTION_KEYS.includes(key)&&d.siteSettings.sectionVisibility[key]!==false&&sectionHasPublicContent(d,key)
   );
 }
 
@@ -714,7 +722,7 @@ function applySectionStructure(d){
   settings.sectionOrder.forEach(key=>{
     const sec=document.querySelector(`[data-section-key="${key}"]`);
     if(!sec)return;
-    const visible=settings.sectionVisibility[key]!==false;
+    const visible=settings.sectionVisibility[key]!==false&&sectionHasPublicContent(d,key);
     sec.classList.toggle("site-section-hidden",!visible);
     sec.setAttribute("aria-hidden",visible?"false":"true");
     content.insertBefore(sec,footer);
@@ -724,7 +732,7 @@ function applySectionStructure(d){
     const raw=(a.getAttribute("href")||"").slice(1);
     const id=raw==="home"?"about":raw;
     if(!SITE_SECTION_KEYS.includes(id))return;
-    a.classList.toggle("nav-section-hidden",settings.sectionVisibility[id]===false);
+    a.classList.toggle("nav-section-hidden",settings.sectionVisibility[id]===false||!sectionHasPublicContent(d,id));
   });
 }
 
@@ -930,7 +938,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=7;
+const BUILDER_SETTINGS_SCHEMA_VERSION=8;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -989,6 +997,45 @@ function builderSettingsNeedMigration(content){
   return Number(content?.builderState?.settingsSchemaVersion||0)<BUILDER_SETTINGS_SCHEMA_VERSION;
 }
 
+
+function normalizeAcademicArchitecture(content){
+  const marker=content?.builderState?.academicArchitectureV1===true;
+  const existingActivities=Array.isArray(content.academicActivities)?content.academicActivities:[];
+  content.academicActivities=existingActivities.map(x=>({
+    category:String(x?.category||"Presentation & Poster"),
+    title:String(x?.title||""),
+    organization:String(x?.organization||""),
+    date:String(x?.date||""),
+    description:String(x?.description||""),
+    url:String(x?.url||""),
+    visible:x?.visible!==false,
+    media:Array.isArray(x?.media)?x.media:[]
+  }));
+  content.projects=(content.projects||[]).map(x=>({
+    ...x,
+    type:String(x?.type||""),
+    media:Array.isArray(x?.media)?x.media:[]
+  }));
+
+  if(!marker&&content.sectionHeadings?.projects?.title&&String(content.sectionHeadings.projects.title).trim()==="Projects"){
+    content.sectionHeadings.projects.title="Projects & Simulations";
+  }
+  return content;
+}
+
+function academicActivityHasContent(item){
+  return !!(item&&item.visible!==false&&(
+    String(item.title||"").trim()||String(item.description||"").trim()||
+    String(item.organization||"").trim()||String(item.date||"").trim()||
+    (Array.isArray(item.media)&&item.media.length)
+  ));
+}
+
+function sectionHasPublicContent(d,key){
+  if(key==="activities")return (d.academicActivities||[]).some(academicActivityHasContent);
+  return true;
+}
+
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
 const SITE_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream","custom-theme"];
 function validSiteTheme(t){return SITE_THEMES.includes(t)?t:"classic-brown"}
@@ -1004,6 +1051,7 @@ function merge(base,extra){
 }
 function normalize(d){
   ensureBuilderState(d);
+  normalizeAcademicArchitecture(d);
   normalizeThesis(d);
   normalizeSiteSettings(d);
   normalizeCustomTheme(d);
@@ -1056,6 +1104,63 @@ function iconLinkHtml(type,label,url,isExternal=true,style="labels"){
   </a>`;
 }
 
+
+function activityCategoryLabel(value){
+  return {
+    "Presentation & Poster":"Presentations & Posters",
+    "Certification & Training":"Certifications & Training",
+    "Award & Honor":"Awards & Honors"
+  }[value]||value||"Academic Activities";
+}
+
+function activityLinkLabel(category){
+  if(category==="Certification & Training")return"View credential ↗";
+  if(category==="Presentation & Poster")return"View presentation ↗";
+  return"View details ↗";
+}
+
+function activateActivityCategory(category){
+  document.querySelectorAll("[data-activity-tab]").forEach(btn=>{
+    const active=btn.dataset.activityTab===category;
+    btn.classList.toggle("active",active);
+    btn.setAttribute("aria-selected",active?"true":"false");
+  });
+  document.querySelectorAll("[data-activity-panel]").forEach(panel=>{
+    const active=panel.dataset.activityPanel===category;
+    panel.classList.toggle("active",active);
+    panel.classList.toggle("hidden",!active);
+  });
+}
+
+function renderAcademicActivities(d){
+  const items=(d.academicActivities||[]).filter(academicActivityHasContent);
+  const categories=["Presentation & Poster","Certification & Training","Award & Honor"]
+    .filter(category=>items.some(item=>item.category===category));
+
+  const tabs=$("activityTabs"),list=$("activitiesList");
+  if(!tabs||!list)return;
+  tabs.innerHTML=categories.map((category,i)=>`<button type="button" class="activity-tab ${i===0?"active":""}" data-activity-tab="${escAttr(category)}" role="tab" aria-selected="${i===0?"true":"false"}">${esc(activityCategoryLabel(category))}</button>`).join("");
+  tabs.classList.toggle("single-activity-tab",categories.length<=1);
+
+  list.innerHTML=categories.map((category,index)=>{
+    const group=items.filter(item=>item.category===category);
+    return `<div class="activity-panel ${index===0?"active":"hidden"}" data-activity-panel="${escAttr(category)}" role="tabpanel">
+      <div class="activity-grid">${group.map(item=>`
+        <article class="activity-card">
+          <div class="activity-card-top">
+            <span class="activity-type-badge">${esc(activityCategoryLabel(category))}</span>
+            ${item.date?`<span class="activity-date">${esc(item.date)}</span>`:""}
+          </div>
+          <h3>${esc(item.title||"")}</h3>
+          ${item.organization?`<div class="activity-organization">${esc(item.organization)}</div>`:""}
+          ${item.description?`<p class="muted">${esc(item.description)}</p>`:""}
+          ${safeUrl(item.url)?`<a class="text-link" href="${escAttr(safeUrl(item.url))}" target="_blank" rel="noopener">${activityLinkLabel(category)}</a>`:""}
+          <div class="item-media">${mediaHtml(item.media||[])}</div>
+        </article>`).join("")}</div>
+    </div>`;
+  }).join("");
+}
+
 function render(d){
   document.title=`${d.name} | Academic Profile`;
   document.documentElement.dataset.theme=validSiteTheme(d.defaultTheme||"classic-brown");
@@ -1090,6 +1195,7 @@ function render(d){
   setPublicSection("thesis","thesisSectionTitle","thesisSectionSubtitle","navThesis");
   setPublicSection("publications","publicationsSectionTitle","publicationsSectionSubtitle","navPublications");
   setPublicSection("projects","projectsSectionTitle","projectsSectionSubtitle","navProjects");
+  setPublicSection("activities","activitiesSectionTitle","activitiesSectionSubtitle","navActivities");
   setPublicSection("skills","skillsSectionTitle","skillsSectionSubtitle","navSkills");
   setPublicSection("education","educationSectionTitle","educationSectionSubtitle","navEducation");
   setPublicSection("contact","contactSectionTitle","contactHeadline","navContact");
@@ -1148,12 +1254,15 @@ function render(d){
 
   $("projectsList").innerHTML=(d.projects||[]).filter(p=>p.visible!==false).map(p=>`
     <article class="card">
+      ${p.type?`<span class="project-type-badge">${esc(p.type)}</span>`:""}
       <h3>${esc(p.title||"")}</h3>
       <p class="muted">${esc(p.description||"")}</p>
       ${safeUrl(p.url)?`<a class="text-link" href="${escAttr(safeUrl(p.url))}" target="_blank" rel="noopener">View project ↗</a>`:""}
       <div class="item-media">${mediaHtml(p.media||[])}</div>
       <div class="meta-line">${esc(p.meta||"")}</div>
     </article>`).join("");
+
+  renderAcademicActivities(d);
 
   $("skillsList").innerHTML=(d.skills||[]).filter(g=>g.visible!==false).map(g=>`
     <article class="skill-card">
@@ -1308,6 +1417,11 @@ if(IS_ADMIN_PREVIEW){
     }catch(err){console.error("Preview render failed:",err)}
   });
 }
+
+document.addEventListener("click",e=>{
+  const tab=e.target.closest("[data-activity-tab]");
+  if(tab)activateActivityCategory(tab.dataset.activityTab);
+});
 
 $("year").textContent=new Date().getFullYear();
 if(IS_ADMIN_PREVIEW){

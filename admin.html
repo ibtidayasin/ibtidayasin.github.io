@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260825-nocovercv1">
+  <link rel="stylesheet" href="styles.css?v=20260828-architecture1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -32,7 +32,8 @@
         <button data-tab="research" type="button">Research</button>
       <button type="button" data-tab="thesis">Thesis</button>
         <button data-tab="publications" type="button">Publications</button>
-        <button data-tab="projects" type="button">Projects</button>
+        <button data-tab="projects" type="button">Projects &amp; Simulations</button>
+        <button data-tab="activities" type="button">Activities</button>
         <button data-tab="skills" type="button">Skills</button>
         <button data-tab="education" type="button">Education</button>
         <button data-tab="contact" type="button">Contact</button>
@@ -135,6 +136,17 @@
         <div id="projectsEditor"></div>
         <button id="addProjectBtn" class="secondary" type="button">+ Add project</button>
       </div>
+
+      <div class="admin-panel" data-panel="activities">
+        <div class="form-grid section-heading-editor">
+          <p class="heading-editor-note">One compact section for presentations, certifications/training, and awards/honors.</p>
+          <div class="field"><label>Section name</label><input id="fSectionActivitiesTitle"></div>
+          <div class="field"><label>Section subtitle</label><input id="fSectionActivitiesSubtitle"></div>
+        </div>
+        <div id="activitiesEditor"></div>
+        <button id="addActivityBtn" class="secondary" type="button">+ Add academic activity</button>
+      </div>
+
 
       <div class="admin-panel" data-panel="skills">
         <div class="form-grid section-heading-editor">
@@ -1105,6 +1117,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260825-covergap1"></script>
+  <script src="admin.js?v=20260828-architecture1"></script>
 </body>
 </html>
