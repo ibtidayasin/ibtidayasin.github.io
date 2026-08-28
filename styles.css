@@ -2954,3 +2954,56 @@ body:not(.admin-body) .media-image-stage{overflow:hidden}
     gap:18px!important;
   }
 }
+
+
+/* =========================================================
+   ADMIN LIVE PREVIEW ACCURACY
+   Exact CSS viewport sizes + custom viewport controls.
+   ========================================================= */
+.preview-stage{
+  overflow:auto!important;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+}
+.preview-frame-shell.preview-exact{
+  max-width:none!important;
+  flex:0 0 auto;
+}
+.preview-frame-shell.preview-exact iframe{
+  width:100%!important;
+  min-width:100%!important;
+  display:block;
+}
+.preview-custom-size{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin:8px 0 10px;
+  padding:10px 12px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:var(--surface-soft);
+}
+.preview-custom-size label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--muted);
+}
+.preview-custom-size input{
+  width:88px;
+  padding:7px 8px;
+  border:1px solid var(--line);
+  border-radius:7px;
+  background:var(--surface);
+  color:var(--text);
+}
+.preview-accuracy-note{margin:6px 0 12px}
+@media(max-width:700px){
+  .preview-stage{padding:10px}
+  .preview-device-bar{align-items:stretch}
+  .preview-device-bar .preview-device{flex:1 1 auto}
+}

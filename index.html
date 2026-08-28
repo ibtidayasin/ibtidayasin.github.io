@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Ibtida Yasin — Mechanical Engineering and Computational Materials">
   <title>Ibtida Yasin | Academic Profile</title>
-  <link rel="stylesheet" href="styles.css?v=20260828-mobilecover1">
+  <link id="siteStylesheet" rel="stylesheet" href="styles.css?v=20260828-previewaccuracy1">
+  <script>
+    (function(){
+      var b=new URLSearchParams(location.search).get('previewBust');
+      if(b) document.getElementById('siteStylesheet').href='styles.css?v=20260828-previewaccuracy1&previewBust='+encodeURIComponent(b);
+    })();
+  </script>
 
   <style id="siteBootGuard">
     /* Prevent the static fallback layout from flashing before saved site settings load. */
@@ -152,6 +158,14 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
-<script src="script.js?v=20260828-hoverviewer1"></script>
+<script>
+  (function(){
+    var b=new URLSearchParams(location.search).get('previewBust');
+    var s=document.createElement('script');
+    s.src='script.js?v=20260828-previewaccuracy1'+(b?'&previewBust='+encodeURIComponent(b):'');
+    s.async=false;
+    document.body.appendChild(s);
+  })();
+</script>
 </body>
 </html>

@@ -15,7 +15,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-  <link rel="stylesheet" href="styles.css?v=20260828-mobilecover1">
+  <link rel="stylesheet" href="styles.css?v=20260828-previewaccuracy1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -1116,11 +1116,20 @@
             <button id="refreshPreviewBtn" class="secondary" type="button">Refresh preview</button>
           </div>
           <div class="preview-device-bar">
-            <button class="secondary preview-device active" data-preview-device="desktop" type="button">Desktop</button>
-            <button class="secondary preview-device" data-preview-device="tablet" type="button">Tablet</button>
-            <button class="secondary preview-device" data-preview-device="mobile" type="button">Mobile</button>
-            <span id="previewDeviceLabel" class="helper">Desktop · 100%</span>
+            <button class="secondary preview-device active" data-preview-device="desktop" type="button">Desktop 1280</button>
+            <button class="secondary preview-device" data-preview-device="tablet" type="button">Tablet 768</button>
+            <button class="secondary preview-device" data-preview-device="mobile360" type="button">Mobile 360</button>
+            <button class="secondary preview-device" data-preview-device="mobile390" type="button">Mobile 390</button>
+            <button class="secondary preview-device" data-preview-device="mobile412" type="button">Mobile 412</button>
+            <button class="secondary preview-device" data-preview-device="custom" type="button">Custom</button>
+            <span id="previewDeviceLabel" class="helper">Desktop · 1280 × 800 CSS px</span>
           </div>
+          <div id="previewCustomSize" class="preview-custom-size hidden">
+            <label>Width <input id="previewCustomWidth" type="number" min="280" max="1600" step="1" value="390"> <span>px</span></label>
+            <label>Height <input id="previewCustomHeight" type="number" min="500" max="1600" step="1" value="844"> <span>px</span></label>
+            <span class="helper">Uses CSS viewport pixels, like browser responsive-device tools.</span>
+          </div>
+          <p class="helper preview-accuracy-note">The preview iframe uses an exact viewport size. <strong>Refresh preview</strong> performs a real cache-busted reload of the public page and then reapplies your unsaved Admin content.</p>
           <div class="preview-stage">
             <div id="previewFrameShell" class="preview-frame-shell preview-desktop">
               <iframe id="sitePreviewFrame" title="Live website preview" src="index.html?adminPreview=1" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
@@ -1197,6 +1206,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260828-hoverviewer1"></script>
+  <script src="admin.js?v=20260828-previewaccuracy1"></script>
 </body>
 </html>

@@ -1513,6 +1513,10 @@ function formatDate(v){try{return new Date(v).toLocaleDateString(undefined,{year
 
 
 const IS_ADMIN_PREVIEW=new URLSearchParams(location.search).get("adminPreview")==="1";
+function notifyAdminPreviewLocation(type="academic-site-preview-location"){
+  if(!IS_ADMIN_PREVIEW||window.parent===window)return;
+  try{window.parent.postMessage({type,hash:location.hash||"#home"},location.origin)}catch{}
+}
 if(IS_ADMIN_PREVIEW){
   document.documentElement.classList.add("admin-preview-mode");
   window.addEventListener("message",e=>{
@@ -1520,8 +1524,13 @@ if(IS_ADMIN_PREVIEW){
     if(e.data?.type!=="academic-site-preview"||!e.data.content)return;
     try{
       render(normalize(merge(DEFAULT_CONTENT,deepCloneSafe(e.data.content))));
+      releaseSiteBoot();
+      notifyAdminPreviewLocation("academic-site-preview-ready");
     }catch(err){console.error("Preview render failed:",err)}
   });
+  window.addEventListener("hashchange",()=>notifyAdminPreviewLocation());
+  window.addEventListener("popstate",()=>notifyAdminPreviewLocation());
+  notifyAdminPreviewLocation("academic-site-preview-shell-ready");
 }
 
 document.addEventListener("click",e=>{
@@ -1531,8 +1540,8 @@ document.addEventListener("click",e=>{
 
 $("year").textContent=new Date().getFullYear();
 if(IS_ADMIN_PREVIEW){
+  /* Keep the iframe hidden until the Admin sends the real saved/unsaved content. */
   render(normalize(structuredClone(DEFAULT_CONTENT)));
-  releaseSiteBoot();
 }else{
   loadContent();
 }
