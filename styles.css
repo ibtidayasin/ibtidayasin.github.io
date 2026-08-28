@@ -2760,3 +2760,33 @@ html[data-navigation-mode="sections"][data-section-page="inner"] body:not(.admin
 .cover-custom-grid label{display:flex;align-items:center;gap:.5rem;font-size:.9rem;line-height:1.35;cursor:pointer}
 .cover-custom-sections.disabled-options{opacity:.48}
 @media(max-width:720px){.cover-custom-grid{grid-template-columns:1fr}}
+
+
+/* =========================================================
+   SECTION-PAGE NORMAL SIDEBAR VISIBILITY
+   Home always keeps the normal profile sidebar. Cover-enabled
+   pages keep the cover; other inner pages can become full width.
+   ========================================================= */
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="off"][data-normal-sidebar="hide"] body:not(.admin-body) .layout{
+  grid-template-columns:minmax(0,1fr)!important;
+  gap:0!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="off"][data-normal-sidebar="hide"] body:not(.admin-body) .sidebar{
+  display:none!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="off"][data-normal-sidebar="hide"] body:not(.admin-body) .content{
+  width:100%!important;
+  min-width:0!important;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="off"][data-normal-sidebar="hide"] body:not(.admin-body) .section-page-current{
+  min-height:0;
+}
+
+/* Admin grouping for normal-sidebar controls. */
+.section-sidebar-admin{
+  grid-column:1/-1;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:16px;
+  background:var(--surface-soft);
+}

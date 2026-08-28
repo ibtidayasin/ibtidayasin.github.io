@@ -161,6 +161,7 @@ function applyCustomThemeVariables(theme){
 
 const SITE_SECTION_KEYS=["about","research","thesis","publications","projects","activities","skills","education","contact","cv"];
 const COVER_SECTION_KEYS=["research","thesis","publications","projects","activities","skills","education","contact","cv"];
+const SIDEBAR_SECTION_KEYS=[...COVER_SECTION_KEYS];
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -184,6 +185,8 @@ const DEFAULT_SITE_SETTINGS={
     navigationMode:"single",
     pageTransition:"fade",
     pagePager:true,
+    sidebarScope:"home-cv",
+    sidebarSections:{research:false,thesis:false,publications:false,projects:false,activities:false,skills:false,education:false,contact:false,cv:true},
     sectionCoverEnabled:true,
     sectionCoverScope:"research",
     sectionCoverSections:{research:true,thesis:true,publications:false,projects:false,activities:false,skills:false,education:false,contact:false,cv:false},
@@ -273,6 +276,8 @@ function normalizeSiteSettings(content){
       navigationMode:["single","sections"].includes(l.navigationMode)?l.navigationMode:DEFAULT_SITE_SETTINGS.layout.navigationMode,
       pageTransition:["none","fade","slide"].includes(l.pageTransition)?l.pageTransition:DEFAULT_SITE_SETTINGS.layout.pageTransition,
       pagePager:Object.prototype.hasOwnProperty.call(l,"pagePager")?l.pagePager!==false:DEFAULT_SITE_SETTINGS.layout.pagePager,
+      sidebarScope:["home-cv","all","home","custom"].includes(l.sidebarScope)?l.sidebarScope:DEFAULT_SITE_SETTINGS.layout.sidebarScope,
+      sidebarSections:Object.fromEntries(SIDEBAR_SECTION_KEYS.map(k=>[k,(l.sidebarSections&&Object.prototype.hasOwnProperty.call(l.sidebarSections,k))?l.sidebarSections[k]===true:DEFAULT_SITE_SETTINGS.layout.sidebarSections[k]===true])),
       sectionCoverEnabled:Object.prototype.hasOwnProperty.call(l,"sectionCoverEnabled")?l.sectionCoverEnabled!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverEnabled,
       sectionCoverScope:["research","all","none","custom"].includes(l.sectionCoverScope)?l.sectionCoverScope:DEFAULT_SITE_SETTINGS.layout.sectionCoverScope,
       sectionCoverSections:Object.fromEntries(COVER_SECTION_KEYS.map(k=>[k,(l.sectionCoverSections&&Object.prototype.hasOwnProperty.call(l.sectionCoverSections,k))?l.sectionCoverSections[k]===true:DEFAULT_SITE_SETTINGS.layout.sectionCoverSections[k]===true])),
@@ -559,11 +564,19 @@ function applySectionCoverState(d,key){
     (coverScope==="research"&&["research","thesis"].includes(key))||
     (coverScope==="custom"&&customSections[key]===true);
   const enabled=innerPage&&l.sectionCoverEnabled!==false&&coverScope!=="none"&&sectionAllowed;
+  const sidebarScope=l.sidebarScope||"home-cv";
+  const customSidebarSections=l.sidebarSections||{};
+  const normalSidebarAllowed=!innerPage||
+    sidebarScope==="all"||
+    (sidebarScope==="home-cv"&&key==="cv")||
+    (sidebarScope==="custom"&&customSidebarSections[key]===true);
+  const sidebarShown=enabled||normalSidebarAllowed;
   const root=document.documentElement;
   const sidebar=document.querySelector(".sidebar");
 
   root.dataset.sectionPage=innerPage?"inner":"home";
   root.dataset.sectionCover=enabled?"on":"off";
+  root.dataset.normalSidebar=sidebarShown?"show":"hide";
   root.dataset.coverStyle=l.sectionCoverStyle||"framed";
   root.dataset.coverPhotoFit=l.sectionCoverPhotoFit||"crop";
   root.dataset.coverTopBlend=l.sectionCoverTopBlend===true?"on":"off";
@@ -948,7 +961,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=9;
+const BUILDER_SETTINGS_SCHEMA_VERSION=10;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){

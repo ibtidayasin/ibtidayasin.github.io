@@ -15,7 +15,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-  <link rel="stylesheet" href="styles.css?v=20260828-covervisibility1">
+  <link rel="stylesheet" href="styles.css?v=20260828-sidebarvisibility1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -846,6 +846,45 @@
               </label>
 
 
+              <div class="section-sidebar-admin">
+                <div class="settings-head compact-settings-head">
+                  <div>
+                    <h4>Normal left sidebar</h4>
+                    <p class="muted">Choose which Section Pages keep the standard profile sidebar. Home always keeps it.</p>
+                  </div>
+                </div>
+
+                <div class="section-cover-options">
+                  <div class="field cover-visibility-field">
+                    <label>Sidebar visibility</label>
+                    <select id="fSidebarScope">
+                      <option value="home-cv">Home &amp; Curriculum Vitae</option>
+                      <option value="all">All sections</option>
+                      <option value="home">Home only</option>
+                      <option value="custom">Custom by section</option>
+                    </select>
+                    <p class="helper compact-helper">Recommended: keep the normal sidebar on Home and CV, while other non-cover sections use the full page width.</p>
+                  </div>
+
+                  <div id="sidebarCustomSections" class="cover-custom-sections">
+                    <strong>Custom inner sections</strong>
+                    <div class="cover-custom-grid">
+                      <label><input type="checkbox" data-sidebar-section="research"> Research Interests</label>
+                      <label><input type="checkbox" data-sidebar-section="thesis"> Undergraduate Thesis</label>
+                      <label><input type="checkbox" data-sidebar-section="publications"> Publications</label>
+                      <label><input type="checkbox" data-sidebar-section="projects"> Projects &amp; Simulations</label>
+                      <label><input type="checkbox" data-sidebar-section="activities"> Academic Activities</label>
+                      <label><input type="checkbox" data-sidebar-section="skills"> Skills</label>
+                      <label><input type="checkbox" data-sidebar-section="education"> Education</label>
+                      <label><input type="checkbox" data-sidebar-section="contact"> Contact</label>
+                      <label><input type="checkbox" data-sidebar-section="cv"> Curriculum Vitae</label>
+                    </div>
+                    <p class="helper compact-helper">Home is always shown and does not need a checkbox.</p>
+                  </div>
+                </div>
+              </div>
+
+
               <div class="section-cover-admin">
                 <div class="settings-head compact-settings-head">
                   <div>
@@ -1154,6 +1193,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260828-covervisibility1"></script>
+  <script src="admin.js?v=20260828-sidebarvisibility1"></script>
 </body>
 </html>
