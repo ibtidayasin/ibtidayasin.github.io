@@ -3302,3 +3302,33 @@ body:not(.admin-body) .skill-card::after{display:none!important;content:none!imp
   width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 9px;background:var(--surface);color:var(--text);font-size:12px;
 }
 @media(max-width:680px){.admin-body .card-style-mini-row{grid-template-columns:1fr}}
+
+
+/* =========================================================
+   ADMIN INFORMATION ARCHITECTURE + EXPANDED TYPOGRAPHY v14
+   ========================================================= */
+:root{
+  --public-body-size:16px;
+  --public-body-color:var(--text);
+  --public-line-height:1.7;
+  --public-card-title-size:20px;
+  --public-nav-text-size:13px;
+}
+body:not(.admin-body){font-size:var(--public-body-size);color:var(--public-body-color);line-height:var(--public-line-height)}
+body:not(.admin-body) .topbar nav a{font-size:var(--public-nav-text-size)}
+body:not(.admin-body) .pub-item h3,
+body:not(.admin-body) .card h3,
+body:not(.admin-body) .skill-card h3,
+body:not(.admin-body) .edu-heading h3,
+body:not(.admin-body) .activity-card h3,
+body:not(.admin-body) .thesis-card h3{font-size:var(--public-card-title-size)}
+
+.compact-settings-card{margin-top:18px}
+.compact-control-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card-style-select-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.typography-expanded-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.layout-compact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.admin-panel[data-panel="structure"] .website-structure-settings{margin-top:0}
+.admin-panel[data-panel="cover"] .section-cover-admin{margin-top:16px}
+.admin-panel[data-panel="appearance"]>.admin-card{margin-top:18px}
+@media(max-width:760px){.compact-control-grid,.typography-expanded-grid,.layout-compact-grid,.card-style-select-row{grid-template-columns:1fr}}

@@ -71,7 +71,12 @@ const DEFAULT_TYPOGRAPHY={
   sectionTitleSize:44,
   sectionTitleColor:"",
   sectionSubtitleSize:25,
-  sectionSubtitleColor:""
+  sectionSubtitleColor:"",
+  bodyTextSize:16,
+  bodyTextColor:"",
+  bodyLineHeight:1.7,
+  cardTitleSize:20,
+  navTextSize:13
 };
 
 function normalizeTypography(content){
@@ -83,7 +88,12 @@ function normalizeTypography(content){
       sectionTitleSize:clampNumber(raw.sectionTitleSize,30,60,DEFAULT_TYPOGRAPHY.sectionTitleSize),
       sectionTitleColor:validHex(raw.sectionTitleColor)?raw.sectionTitleColor:"",
       sectionSubtitleSize:clampNumber(raw.sectionSubtitleSize,16,34,DEFAULT_TYPOGRAPHY.sectionSubtitleSize),
-      sectionSubtitleColor:validHex(raw.sectionSubtitleColor)?raw.sectionSubtitleColor:""
+      sectionSubtitleColor:validHex(raw.sectionSubtitleColor)?raw.sectionSubtitleColor:"",
+      bodyTextSize:clampNumber(raw.bodyTextSize,14,20,DEFAULT_TYPOGRAPHY.bodyTextSize),
+      bodyTextColor:validHex(raw.bodyTextColor)?raw.bodyTextColor:"",
+      bodyLineHeight:clampNumber(raw.bodyLineHeight,1.4,2,DEFAULT_TYPOGRAPHY.bodyLineHeight),
+      cardTitleSize:clampNumber(raw.cardTitleSize,16,28,DEFAULT_TYPOGRAPHY.cardTitleSize),
+      navTextSize:clampNumber(raw.navTextSize,11,16,DEFAULT_TYPOGRAPHY.navTextSize)
     }
   };
   return content;
@@ -98,7 +108,7 @@ function validHex(value){
 }
 
 
-function applyPublicTypography(d){
+function applyPublicTypography(){
   normalizeTypography(d);
   const t=d.appearance.typography;
   const root=document.documentElement;
@@ -106,6 +116,11 @@ function applyPublicTypography(d){
   root.style.setProperty("--public-section-subtitle-size",`${t.sectionSubtitleSize}px`);
   root.style.setProperty("--public-section-title-color",t.sectionTitleColor||"var(--accent)");
   root.style.setProperty("--public-section-subtitle-color",t.sectionSubtitleColor||"var(--muted)");
+  root.style.setProperty("--public-body-size",`${t.bodyTextSize}px`);
+  root.style.setProperty("--public-body-color",t.bodyTextColor||"var(--text)");
+  root.style.setProperty("--public-line-height",String(t.bodyLineHeight));
+  root.style.setProperty("--public-card-title-size",`${t.cardTitleSize}px`);
+  root.style.setProperty("--public-nav-text-size",`${t.navTextSize}px`);
 }
 
 

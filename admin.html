@@ -1,1234 +1,1079 @@
 <!DOCTYPE html>
-<html lang="en" class="admin-booting">
+
+<html class="admin-booting" lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Website Admin | Ibtida Yasin</title>
-  <style id="admin-first-paint-gate">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Website Admin | Ibtida Yasin</title>
+<style id="admin-first-paint-gate">
     html.admin-booting .admin-shell { visibility: hidden; opacity: 0; }
     html.admin-ready .admin-shell { visibility: visible; opacity: 1; transition: opacity .12s ease; }
   </style>
-  <script>
+<script>
     // Safety fallback: never leave Admin hidden if an external script fails.
     window.__adminPaintFallback = setTimeout(function(){
       document.documentElement.classList.remove('admin-booting');
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-  <link rel="stylesheet" href="styles.css?v=20260828-cardstyles1">
+<link href="styles.css?v=20260828-adminreorg1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
-  <section id="loginView" class="admin-card login-wrap">
-    <p class="eyebrow">Private Admin</p>
-    <h1>Website login</h1>
-    <p class="muted">Use your Supabase admin email and password.</p>
-    <div class="form-grid">
-      <div class="field full"><label>Email</label><input id="loginEmail" type="email" autocomplete="username"></div>
-      <div class="field full"><label>Password</label><input id="loginPassword" type="password" autocomplete="current-password"></div>
-    </div>
-    <div class="action-row"><button id="loginBtn" class="primary" type="button">Log in</button><a class="secondary" href="index.html">Back to website</a></div>
-    <div id="loginStatus" class="status"></div>
-  </section>
-
-  <section id="adminView" class="hidden">
-    <div class="admin-card">
-      <div class="admin-head">
-        <div><p class="eyebrow">Private Admin</p><h1>Edit your website</h1></div>
-        <div class="action-row"><a class="secondary" href="index.html" target="_blank">View website</a><button id="logoutBtn" class="secondary" type="button">Log out</button></div>
-      </div>
-
-      <div class="admin-tabs">
-        <button class="active" data-tab="profile" type="button">Profile</button>
-        <button data-tab="research" type="button">Research</button>
-      <button type="button" data-tab="thesis">Thesis</button>
-        <button data-tab="publications" type="button">Publications</button>
-        <button data-tab="projects" type="button">Projects &amp; Simulations</button>
-        <button data-tab="activities" type="button">Activities</button>
-        <button data-tab="skills" type="button">Skills</button>
-        <button data-tab="education" type="button">Education</button>
-        <button data-tab="contact" type="button">Contact</button>
-        <button data-tab="cv" type="button">CV</button>
-        <button data-tab="appearance" type="button">Appearance</button>
-        <button data-tab="presets" type="button">Presets</button>
-      <button type="button" data-tab="typography">Typography</button>
-      <button type="button" data-tab="layout">Layout</button>
-      <button type="button" data-tab="experience">Experience</button>
-      <button type="button" data-tab="preview">Preview</button>
-      <button type="button" data-tab="history">History</button>
-      <button type="button" data-tab="backup">Backup</button>
-      </div>
-
-      <div class="admin-panel active" data-panel="profile">
-        <div class="form-grid">
-          <div class="field"><label>Name</label><input id="fName"></div>
-          <div class="field"><label>Professional title</label><input id="fTitle"></div>
-          <div class="field"><label>Institution</label><input id="fInstitution"></div>
-          <div class="field"><label>Location</label><input id="fLocation"></div>
-          <div class="field full"><label>Research focus</label><input id="fFocus"></div>
-          <div class="field"><label>About section name</label><input id="fSectionAboutTitle"></div>
-          <div class="field"><label>About section subtitle</label><input id="fAboutHeadline"></div>
-          <div class="field full"><label>Short introduction</label><textarea id="fAboutLead"></textarea></div>
-          <div class="field full"><label>Biography</label><textarea id="fAboutBio"></textarea></div>
-          <div class="field full">
-            <label>Profile photo</label>
-            <img id="photoPreview" class="preview-photo" alt="Current profile photo">
-            <input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp">
-            <span class="helper">JPEG, PNG or WebP · maximum 5 MB.</span>
-          </div>
-        </div>
-        <div id="profileMediaEditor" class="media-section-editor"></div>
-      </div>
-
-      <div class="admin-panel" data-panel="research">
-        <div class="form-grid section-heading-editor">
-          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
-          <div class="field"><label>Section name</label><input id="fSectionResearchTitle"></div>
-          <div class="field"><label>Section subtitle</label><input id="fSectionResearchSubtitle"></div>
-        </div>
-        <div class="form-grid">
-          <div class="field full"><label>Research interests — one per line</label><textarea id="fInterests"></textarea></div>
-        </div>
-      </div>
-      <div class="admin-panel" data-panel="thesis">
-        <div class="admin-card">
-          <h2>Undergraduate Thesis</h2>
-          <p class="muted">Add a dedicated thesis section. It can be shown, hidden or reordered later from Layout.</p>
-
-          <div class="form-grid section-heading-editor">
-            <p class="heading-editor-note">Controls the public section name and subtitle.</p>
-            <div class="field"><label>Section name</label><input id="fSectionThesisTitle"></div>
-            <div class="field"><label>Section subtitle</label><input id="fSectionThesisSubtitle"></div>
-          </div>
-
-          <div class="form-grid">
-            <div class="field full"><label>Thesis title</label><input id="fThesisTitle"></div>
-            <div class="field full"><label>Thesis description / abstract summary</label><textarea id="fThesisDescription"></textarea></div>
-            <div class="field"><label>Supervisor</label><input id="fThesisSupervisor"></div>
-            <div class="field"><label>Co-supervisor (optional)</label><input id="fThesisCoSupervisor"></div>
-            <div class="field"><label>Degree / program</label><input id="fThesisDegree"></div>
-            <div class="field"><label>Institution</label><input id="fThesisInstitution"></div>
-            <div class="field"><label>Period / year</label><input id="fThesisPeriod" placeholder="2025–2026"></div>
-            <div class="field"><label>Status</label>
-              <select id="fThesisStatus">
-                <option value="">—</option>
-                <option>Completed</option>
-                <option>Ongoing</option>
-                <option>Submitted</option>
-                <option>Defended</option>
-              </select>
-            </div>
-            <div class="field full"><label>Keywords / tools — comma separated</label><input id="fThesisKeywords" placeholder="LAMMPS, Python, OVITO, Molecular Dynamics"></div>
-          </div>
-
-          <div class="media-section-editor">
-            <div id="thesisMediaEditor"></div>
-          </div>
-        </div>
-      </div>
-
-
-      <div class="admin-panel" data-panel="publications">
-        <div class="form-grid section-heading-editor">
-          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
-          <div class="field"><label>Section name</label><input id="fSectionPublicationsTitle"></div>
-          <div class="field"><label>Section subtitle</label><input id="fSectionPublicationsSubtitle"></div>
-        </div>
-        <div id="publicationsEditor"></div>
-        <button id="addPublicationBtn" class="secondary" type="button">+ Add publication</button>
-      </div>
-
-      <div class="admin-panel" data-panel="projects">
-        <div class="form-grid section-heading-editor">
-          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
-          <div class="field"><label>Section name</label><input id="fSectionProjectsTitle"></div>
-          <div class="field"><label>Section subtitle</label><input id="fSectionProjectsSubtitle"></div>
-        </div>
-        <div id="projectsEditor"></div>
-        <button id="addProjectBtn" class="secondary" type="button">+ Add project</button>
-      </div>
-
-      <div class="admin-panel" data-panel="activities">
-        <div class="form-grid section-heading-editor">
-          <p class="heading-editor-note">One compact section for presentations, certifications/training, and awards/honors.</p>
-          <div class="field"><label>Section name</label><input id="fSectionActivitiesTitle"></div>
-          <div class="field"><label>Section subtitle</label><input id="fSectionActivitiesSubtitle"></div>
-        </div>
-        <div id="activitiesEditor"></div>
-        <button id="addActivityBtn" class="secondary" type="button">+ Add academic activity</button>
-      </div>
-
-
-      <div class="admin-panel" data-panel="skills">
-        <div class="form-grid section-heading-editor">
-          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
-          <div class="field"><label>Section name</label><input id="fSectionSkillsTitle"></div>
-          <div class="field"><label>Section subtitle</label><input id="fSectionSkillsSubtitle"></div>
-        </div>
-        <div id="skillsEditor"></div>
-        <button id="addSkillGroupBtn" class="secondary" type="button">+ Add skill group</button>
-      </div>
-
-      <div class="admin-panel" data-panel="education">
-        <div class="form-grid section-heading-editor">
-          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it. Each education entry can also include CGPA, an academic-standing note, and a compact Important Courses list.</p>
-          <div class="field"><label>Section name</label><input id="fSectionEducationTitle"></div>
-          <div class="field"><label>Section subtitle</label><input id="fSectionEducationSubtitle"></div>
-        </div>
-        <div id="educationEditor"></div>
-        <button id="addEducationBtn" class="secondary" type="button">+ Add education</button>
-      </div>
-
-      <div class="admin-panel" data-panel="contact">
-        <div class="form-grid section-heading-editor">
-          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
-          <div class="field"><label>Section name</label><input id="fSectionContactTitle"></div>
-          <div class="field"><label>Section subtitle</label><input id="fContactHeadline"></div>
-        </div>
-        <div class="form-grid">
-          <div class="field full"><label>Contact message</label><textarea id="fContactMessage"></textarea></div>
-          <div class="field"><label>Public email</label><input id="fEmail" type="email"></div>
-          <div class="field"><label>Phone (optional)</label><input id="fPhone"></div>
-          <div class="field"><label>Location</label><input id="fContactLocation"></div>
-          <div class="field"><label>LinkedIn URL</label><input id="fLinkedIn"></div>
-          <div class="field"><label>GitHub URL</label><input id="fGitHub"></div>
-          <div class="field"><label>ORCID URL</label><input id="fOrcid"></div>
-          <div class="field"><label>Google Scholar URL</label><input id="fScholar"></div>
-          <div class="field"><label>ResearchGate URL</label><input id="fResearchGate"></div>
-          <div class="field"><label>Scopus author URL</label><input id="fScopus"></div>
-          <div class="field"><label>Web of Science researcher URL</label><input id="fWos"></div>
-          <div class="field"><label>Personal / professional website URL</label><input id="fWebsite"></div>
-        </div>
-        <div id="contactMediaEditor" class="media-section-editor"></div>
-      </div>
-
-      <div class="admin-panel" data-panel="cv">
-        <div class="form-grid section-heading-editor">
-          <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
-          <div class="field"><label>Section name</label><input id="fSectionCvTitle"></div>
-          <div class="field"><label>Section subtitle</label><input id="fSectionCvSubtitle"></div>
-        </div>
-        <div class="cv-manager">
-          <div class="cv-current">
-            <h3>Current CV</h3>
-            <p id="currentCvName" class="muted">No CV uploaded yet.</p>
-            <p id="currentCvDate" class="muted"></p>
-            <div class="action-row">
-              <a id="currentCvLink" class="secondary hidden" href="#" target="_blank" rel="noopener">Open current CV</a>
-              <button id="removeCvBtn" class="danger hidden" type="button">Remove CV</button>
-            </div>
-          </div>
-          <div>
-            <div class="field">
-              <label>Upload / replace CV</label>
-              <input id="cvFile" type="file" accept="application/pdf,.pdf">
-              <span class="helper">PDF only · maximum 10 MB. Uploading a new PDF replaces the previous one.</span>
-            </div>
-            <div class="field" style="margin-top:14px">
-              <label>Or use an external CV URL</label>
-              <input id="fCvExternal" placeholder="https://...">
-              <span class="helper">Optional. If entered, this link will be used instead of an uploaded PDF.</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <div class="admin-panel" data-panel="appearance">
-        <div class="appearance-head">
-          <div>
-            <p class="eyebrow">Appearance</p>
-            <h2 class="admin-section-title">Website theme</h2>
-            <p class="muted">Choose the color theme visitors will see. The public website itself will not show a theme selector.</p>
-          </div>
-        </div>
-
-        <div class="theme-choice-grid">
-                    <div class="theme-group-title">Original 10</div>
-<label class="theme-choice" data-theme-card="classic-brown">
-            <input type="radio" name="siteTheme" value="classic-brown">
-            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#a15d1d;--tc-soft:#f8f1e9">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Classic Brown</span>
-          </label>
-          <label class="theme-choice" data-theme-card="soft-beige">
-            <input type="radio" name="siteTheme" value="soft-beige">
-            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#9f8064;--tc-soft:#f5eee7">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Soft Beige</span>
-          </label>
-          <label class="theme-choice" data-theme-card="slate-blue">
-            <input type="radio" name="siteTheme" value="slate-blue">
-            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#536f87;--tc-soft:#edf3f7">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Slate Blue</span>
-          </label>
-          <label class="theme-choice" data-theme-card="deep-navy">
-            <input type="radio" name="siteTheme" value="deep-navy">
-            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#2f506d;--tc-soft:#eaf1f6">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Deep Navy</span>
-          </label>
-          <label class="theme-choice" data-theme-card="forest-sage">
-            <input type="radio" name="siteTheme" value="forest-sage">
-            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#587569;--tc-soft:#edf4f0">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Forest Sage</span>
-          </label>
-          <label class="theme-choice" data-theme-card="olive-stone">
-            <input type="radio" name="siteTheme" value="olive-stone">
-            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#777750;--tc-soft:#f2f2e6">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Olive Stone</span>
-          </label>
-          <label class="theme-choice" data-theme-card="burgundy">
-            <input type="radio" name="siteTheme" value="burgundy">
-            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#7d4b58;--tc-soft:#f5eaed">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Burgundy</span>
-          </label>
-          <label class="theme-choice" data-theme-card="dusty-plum">
-            <input type="radio" name="siteTheme" value="dusty-plum">
-            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#6e6278;--tc-soft:#f1edf4">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Dusty Plum</span>
-          </label>
-          <label class="theme-choice" data-theme-card="charcoal">
-            <input type="radio" name="siteTheme" value="charcoal">
-            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#5b6469;--tc-soft:#edf0f1">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Charcoal</span>
-          </label>
-          <label class="theme-choice" data-theme-card="dark-academic">
-            <input type="radio" name="siteTheme" value="dark-academic">
-            <span class="theme-choice-preview" style="--tc-bg:#151718;--tc-text:#eef0ef;--tc-accent:#c69a67;--tc-soft:#1d2022">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Dark Academic</span>
-          </label>
-        
-          <div class="theme-group-title">Bright palettes</div>
-          <label class="theme-choice" data-theme-card="solar-citrus">
-            <input type="radio" name="siteTheme" value="solar-citrus">
-            <span class="theme-choice-preview" style="--tc-bg:#fffdf7;--tc-text:#202124;--tc-accent:#ff8a00;--tc-soft:#fff0c7">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Solar Citrus</span>
-          </label>
-          <label class="theme-choice" data-theme-card="electric-azure">
-            <input type="radio" name="siteTheme" value="electric-azure">
-            <span class="theme-choice-preview" style="--tc-bg:#f8fdff;--tc-text:#11212d;--tc-accent:#0077ff;--tc-soft:#dff3ff">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Electric Azure</span>
-          </label>
-          <label class="theme-choice" data-theme-card="coral-bloom">
-            <input type="radio" name="siteTheme" value="coral-bloom">
-            <span class="theme-choice-preview" style="--tc-bg:#fffafa;--tc-text:#2b2022;--tc-accent:#ff536b;--tc-soft:#ffe3e8">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Coral Bloom</span>
-          </label>
-          <label class="theme-choice" data-theme-card="mint-pop">
-            <input type="radio" name="siteTheme" value="mint-pop">
-            <span class="theme-choice-preview" style="--tc-bg:#f8fffc;--tc-text:#162723;--tc-accent:#00a87c;--tc-soft:#d9fff1">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Mint Pop</span>
-          </label>
-          <label class="theme-choice" data-theme-card="lemon-sky">
-            <input type="radio" name="siteTheme" value="lemon-sky">
-            <span class="theme-choice-preview" style="--tc-bg:#fffef6;--tc-text:#22272c;--tc-accent:#3878e8;--tc-soft:#fff4a8">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Lemon Sky</span>
-          </label>
-          <label class="theme-choice" data-theme-card="aqua-lime">
-            <input type="radio" name="siteTheme" value="aqua-lime">
-            <span class="theme-choice-preview" style="--tc-bg:#f8ffff;--tc-text:#122829;--tc-accent:#00a6a6;--tc-soft:#e6ffd5">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Aqua Lime</span>
-          </label>
-          <label class="theme-choice" data-theme-card="berry-fizz">
-            <input type="radio" name="siteTheme" value="berry-fizz">
-            <span class="theme-choice-preview" style="--tc-bg:#fff9ff;--tc-text:#281d2a;--tc-accent:#b737d5;--tc-soft:#f7dfff">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Berry Fizz</span>
-          </label>
-          <label class="theme-choice" data-theme-card="peach-punch">
-            <input type="radio" name="siteTheme" value="peach-punch">
-            <span class="theme-choice-preview" style="--tc-bg:#fffaf6;--tc-text:#2b211d;--tc-accent:#ee6b2f;--tc-soft:#ffe2cf">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Peach Punch</span>
-          </label>
-          <label class="theme-choice" data-theme-card="lavender-glow">
-            <input type="radio" name="siteTheme" value="lavender-glow">
-            <span class="theme-choice-preview" style="--tc-bg:#fcfaff;--tc-text:#241f2d;--tc-accent:#7857d9;--tc-soft:#ebe3ff">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Lavender Glow</span>
-          </label>
-          <label class="theme-choice" data-theme-card="spring-green">
-            <input type="radio" name="siteTheme" value="spring-green">
-            <span class="theme-choice-preview" style="--tc-bg:#fbfff8;--tc-text:#1d271b;--tc-accent:#41a600;--tc-soft:#e6ffd2">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Spring Green</span>
-          </label>
-          <div class="theme-group-title">High-contrast palettes</div>
-          <label class="theme-choice" data-theme-card="midnight-gold">
-            <input type="radio" name="siteTheme" value="midnight-gold">
-            <span class="theme-choice-preview" style="--tc-bg:#0d1420;--tc-text:#f8f0dc;--tc-accent:#f5b83b;--tc-soft:#2c2518">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Midnight Gold</span>
-          </label>
-          <label class="theme-choice" data-theme-card="ink-cyan">
-            <input type="radio" name="siteTheme" value="ink-cyan">
-            <span class="theme-choice-preview" style="--tc-bg:#071417;--tc-text:#e8ffff;--tc-accent:#29e3e3;--tc-soft:#103237">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Ink Cyan</span>
-          </label>
-          <label class="theme-choice" data-theme-card="black-coral">
-            <input type="radio" name="siteTheme" value="black-coral">
-            <span class="theme-choice-preview" style="--tc-bg:#121012;--tc-text:#fff0f0;--tc-accent:#ff6b6b;--tc-soft:#341b1f">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Black Coral</span>
-          </label>
-          <label class="theme-choice" data-theme-card="graphite-lime">
-            <input type="radio" name="siteTheme" value="graphite-lime">
-            <span class="theme-choice-preview" style="--tc-bg:#151716;--tc-text:#f4ffe8;--tc-accent:#9eea3a;--tc-soft:#27321a">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Graphite Lime</span>
-          </label>
-          <label class="theme-choice" data-theme-card="royal-cream">
-            <input type="radio" name="siteTheme" value="royal-cream">
-            <span class="theme-choice-preview" style="--tc-bg:#101a3a;--tc-text:#fff7dc;--tc-accent:#ffd45c;--tc-soft:#2b2e48">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Royal Cream</span>
-          </label>
-          <label class="theme-choice" data-theme-card="espresso-ivory">
-            <input type="radio" name="siteTheme" value="espresso-ivory">
-            <span class="theme-choice-preview" style="--tc-bg:#1b1310;--tc-text:#fff7e8;--tc-accent:#e7b66b;--tc-soft:#3a2b21">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Espresso Ivory</span>
-          </label>
-          <label class="theme-choice" data-theme-card="aubergine-gold">
-            <input type="radio" name="siteTheme" value="aubergine-gold">
-            <span class="theme-choice-preview" style="--tc-bg:#1c1024;--tc-text:#fff1dc;--tc-accent:#f3ba58;--tc-soft:#392448">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Aubergine Gold</span>
-          </label>
-          <label class="theme-choice" data-theme-card="emerald-night">
-            <input type="radio" name="siteTheme" value="emerald-night">
-            <span class="theme-choice-preview" style="--tc-bg:#071a15;--tc-text:#eafff6;--tc-accent:#63e6b4;--tc-soft:#18362d">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Emerald Night</span>
-          </label>
-          <label class="theme-choice" data-theme-card="crimson-slate">
-            <input type="radio" name="siteTheme" value="crimson-slate">
-            <span class="theme-choice-preview" style="--tc-bg:#17191f;--tc-text:#fff1f3;--tc-accent:#ff5e78;--tc-soft:#3a2028">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Crimson Slate</span>
-          </label>
-          <label class="theme-choice" data-theme-card="arctic-black">
-            <input type="radio" name="siteTheme" value="arctic-black">
-            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#101214;--tc-accent:#1559d6;--tc-soft:#e8f0ff">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Arctic Black</span>
-          </label>
-
-          <div class="theme-group-title">Light high-contrast palettes</div>
-          <label class="theme-choice" data-theme-card="cobalt-white">
-            <input type="radio" name="siteTheme" value="cobalt-white">
-            <span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#111827;--tc-accent:#1746c4;--tc-soft:#e8efff">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Cobalt White</span>
-          </label>
-          <label class="theme-choice" data-theme-card="scarlet-paper">
-            <input type="radio" name="siteTheme" value="scarlet-paper">
-            <span class="theme-choice-preview" style="--tc-bg:#fffdfd;--tc-text:#1b1113;--tc-accent:#c9182b;--tc-soft:#ffe8ec">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Scarlet Paper</span>
-          </label>
-          <label class="theme-choice" data-theme-card="emerald-white">
-            <input type="radio" name="siteTheme" value="emerald-white">
-            <span class="theme-choice-preview" style="--tc-bg:#fbfffd;--tc-text:#10231b;--tc-accent:#087a52;--tc-soft:#def7eb">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Emerald White</span>
-          </label>
-          <label class="theme-choice" data-theme-card="violet-ivory">
-            <input type="radio" name="siteTheme" value="violet-ivory">
-            <span class="theme-choice-preview" style="--tc-bg:#fffdf8;--tc-text:#1e1726;--tc-accent:#6b35b5;--tc-soft:#eee4ff">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Violet Ivory</span>
-          </label>
-          <label class="theme-choice" data-theme-card="teal-porcelain">
-            <input type="radio" name="siteTheme" value="teal-porcelain">
-            <span class="theme-choice-preview" style="--tc-bg:#fbffff;--tc-text:#102324;--tc-accent:#00757a;--tc-soft:#ddf7f8">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Teal Porcelain</span>
-          </label>
-          <label class="theme-choice" data-theme-card="navy-sand">
-            <input type="radio" name="siteTheme" value="navy-sand">
-            <span class="theme-choice-preview" style="--tc-bg:#fffaf0;--tc-text:#111a2b;--tc-accent:#153d7a;--tc-soft:#e7eefb">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Navy Sand</span>
-          </label>
-          <label class="theme-choice" data-theme-card="magenta-frost">
-            <input type="radio" name="siteTheme" value="magenta-frost">
-            <span class="theme-choice-preview" style="--tc-bg:#fffaff;--tc-text:#23131f;--tc-accent:#a71972;--tc-soft:#f9e2f1">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Magenta Frost</span>
-          </label>
-          <label class="theme-choice" data-theme-card="orange-ink">
-            <input type="radio" name="siteTheme" value="orange-ink">
-            <span class="theme-choice-preview" style="--tc-bg:#fffdf8;--tc-text:#181512;--tc-accent:#b84a00;--tc-soft:#ffe6d4">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Orange Ink</span>
-          </label>
-          <label class="theme-choice" data-theme-card="indigo-mint">
-            <input type="radio" name="siteTheme" value="indigo-mint">
-            <span class="theme-choice-preview" style="--tc-bg:#f8fffB;--tc-text:#13182a;--tc-accent:#3f3a9e;--tc-soft:#e8e7ff">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Indigo Mint</span>
-          </label>
-          <label class="theme-choice" data-theme-card="crimson-cream">
-            <input type="radio" name="siteTheme" value="crimson-cream">
-            <span class="theme-choice-preview" style="--tc-bg:#fff9ee;--tc-text:#211316;--tc-accent:#a6112b;--tc-soft:#f9dfe5">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Crimson Cream</span>
-          </label>
-
-          <div class="theme-group-title">Custom</div>
-<div class="theme-group-title">Custom</div>
-          <label class="theme-choice" data-theme-card="custom-theme">
-            <input type="radio" name="siteTheme" value="custom-theme">
-            <span class="theme-choice-preview custom-theme-mini-preview" style="--tc-bg:#FCFBF9;--tc-text:#2B2926;--tc-accent:#9F8064;--tc-soft:#F5EEE7">
-              <span class="theme-mini-header"></span>
-              <span class="theme-mini-title"></span>
-              <span class="theme-mini-line"></span>
-              <span class="theme-mini-button"></span>
-            </span>
-            <span class="theme-choice-name">Custom Theme</span>
-          </label>
+<section class="admin-card login-wrap" id="loginView">
+<p class="eyebrow">Private Admin</p>
+<h1>Website login</h1>
+<p class="muted">Use your Supabase admin email and password.</p>
+<div class="form-grid">
+<div class="field full"><label>Email</label><input autocomplete="username" id="loginEmail" type="email"/></div>
+<div class="field full"><label>Password</label><input autocomplete="current-password" id="loginPassword" type="password"/></div>
 </div>
+<div class="action-row"><button class="primary" id="loginBtn" type="button">Log in</button><a class="secondary" href="index.html">Back to website</a></div>
+<div class="status" id="loginStatus"></div>
+</section>
+<section class="hidden" id="adminView">
+<div class="admin-card">
+<div class="admin-head">
+<div><p class="eyebrow">Private Admin</p><h1>Edit your website</h1></div>
+<div class="action-row"><a class="secondary" href="index.html" target="_blank">View website</a><button class="secondary" id="logoutBtn" type="button">Log out</button></div>
+</div>
+<div class="admin-tabs">
+<button class="active" data-tab="profile" type="button">Profile</button>
+<button data-tab="research" type="button">Research</button>
+<button data-tab="thesis" type="button">Thesis</button>
+<button data-tab="publications" type="button">Publications</button>
+<button data-tab="projects" type="button">Projects &amp; Simulations</button>
+<button data-tab="activities" type="button">Activities</button>
+<button data-tab="skills" type="button">Skills</button>
+<button data-tab="education" type="button">Education</button>
+<button data-tab="contact" type="button">Contact</button>
+<button data-tab="cv" type="button">CV</button>
+<button data-tab="appearance" type="button">Appearance</button>
+<button data-tab="typography" type="button">Typography</button>
+<button data-tab="layout" type="button">Layout</button>
+<button data-tab="structure" type="button">Structure</button>
+<button data-tab="cover" type="button">Cover</button>
+<button data-tab="experience" type="button">Experience</button>
+<button data-tab="preview" type="button">Preview</button>
+<button data-tab="history" type="button">History</button>
+<button data-tab="backup" type="button">Backup</button>
+</div>
+<div class="admin-panel active" data-panel="profile">
+<div class="form-grid">
+<div class="field"><label>Name</label><input id="fName"/></div>
+<div class="field"><label>Professional title</label><input id="fTitle"/></div>
+<div class="field"><label>Institution</label><input id="fInstitution"/></div>
+<div class="field"><label>Location</label><input id="fLocation"/></div>
+<div class="field full"><label>Research focus</label><input id="fFocus"/></div>
+<div class="field"><label>About section name</label><input id="fSectionAboutTitle"/></div>
+<div class="field"><label>About section subtitle</label><input id="fAboutHeadline"/></div>
+<div class="field full"><label>Short introduction</label><textarea id="fAboutLead"></textarea></div>
+<div class="field full"><label>Biography</label><textarea id="fAboutBio"></textarea></div>
+<div class="field full">
+<label>Profile photo</label>
+<img alt="Current profile photo" class="preview-photo" id="photoPreview"/>
+<input accept="image/jpeg,image/png,image/webp" id="photoFile" type="file"/>
+<span class="helper">JPEG, PNG or WebP · maximum 5 MB.</span>
+</div>
+</div>
+<div class="media-section-editor" id="profileMediaEditor"></div>
+<div class="admin-card compact-settings-card profile-display-settings">
+<div class="settings-head">
+<div><h3>Profile display</h3><p class="muted">Control how your main portrait appears on the public site.</p></div>
+</div>
+<div class="compact-control-grid">
+<div class="range-setting"><label>Portrait size</label><div><input id="fPortraitSize" max="250" min="140" step="5" type="range"/><input id="fPortraitSizeNumber" max="250" min="140" step="5" type="number"/></div></div>
+<div class="field"><label>Portrait shape</label><select id="fPortraitShape"><option value="square">Square</option><option value="slight">Slightly rounded</option><option value="rounded">Rounded</option><option value="circle">Circle</option></select></div>
+<div class="field"><label>Portrait image fit</label><select id="fPortraitFit"><option value="cover">Cover / crop</option><option value="contain">Contain</option></select></div>
+<div class="field"><label>Portrait crop position</label><select id="fPortraitPosition"><option value="center">Center</option><option value="top">Top</option><option value="bottom">Bottom</option><option value="left">Left</option><option value="right">Right</option></select></div>
+</div>
+</div></div>
+<div class="admin-panel" data-panel="research">
+<div class="form-grid section-heading-editor">
+<p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+<div class="field"><label>Section name</label><input id="fSectionResearchTitle"/></div>
+<div class="field"><label>Section subtitle</label><input id="fSectionResearchSubtitle"/></div>
+</div>
+<div class="form-grid">
+<div class="field full"><label>Research interests — one per line</label><textarea id="fInterests"></textarea></div>
+</div>
+</div>
+<div class="admin-panel" data-panel="thesis">
+<div class="admin-card">
+<h2>Undergraduate Thesis</h2>
+<p class="muted">Add a dedicated thesis section. It can be shown, hidden or reordered later from Structure.</p>
+<div class="form-grid section-heading-editor">
+<p class="heading-editor-note">Controls the public section name and subtitle.</p>
+<div class="field"><label>Section name</label><input id="fSectionThesisTitle"/></div>
+<div class="field"><label>Section subtitle</label><input id="fSectionThesisSubtitle"/></div>
+</div>
+<div class="form-grid">
+<div class="field full"><label>Thesis title</label><input id="fThesisTitle"/></div>
+<div class="field full"><label>Thesis description / abstract summary</label><textarea id="fThesisDescription"></textarea></div>
+<div class="field"><label>Supervisor</label><input id="fThesisSupervisor"/></div>
+<div class="field"><label>Co-supervisor (optional)</label><input id="fThesisCoSupervisor"/></div>
+<div class="field"><label>Degree / program</label><input id="fThesisDegree"/></div>
+<div class="field"><label>Institution</label><input id="fThesisInstitution"/></div>
+<div class="field"><label>Period / year</label><input id="fThesisPeriod" placeholder="2025–2026"/></div>
+<div class="field"><label>Status</label>
+<select id="fThesisStatus">
+<option value="">—</option>
+<option>Completed</option>
+<option>Ongoing</option>
+<option>Submitted</option>
+<option>Defended</option>
+</select>
+</div>
+<div class="field full"><label>Keywords / tools — comma separated</label><input id="fThesisKeywords" placeholder="LAMMPS, Python, OVITO, Molecular Dynamics"/></div>
+</div>
+<div class="media-section-editor">
+<div id="thesisMediaEditor"></div>
+</div>
+</div>
+</div>
+<div class="admin-panel" data-panel="publications">
+<div class="form-grid section-heading-editor">
+<p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+<div class="field"><label>Section name</label><input id="fSectionPublicationsTitle"/></div>
+<div class="field"><label>Section subtitle</label><input id="fSectionPublicationsSubtitle"/></div>
+</div>
+<div id="publicationsEditor"></div>
+<button class="secondary" id="addPublicationBtn" type="button">+ Add publication</button>
+</div>
+<div class="admin-panel" data-panel="projects">
+<div class="form-grid section-heading-editor">
+<p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+<div class="field"><label>Section name</label><input id="fSectionProjectsTitle"/></div>
+<div class="field"><label>Section subtitle</label><input id="fSectionProjectsSubtitle"/></div>
+</div>
+<div id="projectsEditor"></div>
+<button class="secondary" id="addProjectBtn" type="button">+ Add project</button>
+</div>
+<div class="admin-panel" data-panel="activities">
+<div class="form-grid section-heading-editor">
+<p class="heading-editor-note">One compact section for presentations, certifications/training, and awards/honors.</p>
+<div class="field"><label>Section name</label><input id="fSectionActivitiesTitle"/></div>
+<div class="field"><label>Section subtitle</label><input id="fSectionActivitiesSubtitle"/></div>
+</div>
+<div id="activitiesEditor"></div>
+<button class="secondary" id="addActivityBtn" type="button">+ Add academic activity</button>
+</div>
+<div class="admin-panel" data-panel="skills">
+<div class="form-grid section-heading-editor">
+<p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+<div class="field"><label>Section name</label><input id="fSectionSkillsTitle"/></div>
+<div class="field"><label>Section subtitle</label><input id="fSectionSkillsSubtitle"/></div>
+</div>
+<div id="skillsEditor"></div>
+<button class="secondary" id="addSkillGroupBtn" type="button">+ Add skill group</button>
+</div>
+<div class="admin-panel" data-panel="education">
+<div class="form-grid section-heading-editor">
+<p class="heading-editor-note">Controls the large public section name and the smaller line beneath it. Each education entry can also include CGPA, an academic-standing note, and a compact Important Courses list.</p>
+<div class="field"><label>Section name</label><input id="fSectionEducationTitle"/></div>
+<div class="field"><label>Section subtitle</label><input id="fSectionEducationSubtitle"/></div>
+</div>
+<div id="educationEditor"></div>
+<button class="secondary" id="addEducationBtn" type="button">+ Add education</button>
+</div>
+<div class="admin-panel" data-panel="contact">
+<div class="form-grid section-heading-editor">
+<p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+<div class="field"><label>Section name</label><input id="fSectionContactTitle"/></div>
+<div class="field"><label>Section subtitle</label><input id="fContactHeadline"/></div>
+</div>
+<div class="form-grid">
+<div class="field full"><label>Contact message</label><textarea id="fContactMessage"></textarea></div>
+<div class="field"><label>Public email</label><input id="fEmail" type="email"/></div>
+<div class="field"><label>Phone (optional)</label><input id="fPhone"/></div>
+<div class="field"><label>Location</label><input id="fContactLocation"/></div>
+<div class="field"><label>LinkedIn URL</label><input id="fLinkedIn"/></div>
+<div class="field"><label>GitHub URL</label><input id="fGitHub"/></div>
+<div class="field"><label>ORCID URL</label><input id="fOrcid"/></div>
+<div class="field"><label>Google Scholar URL</label><input id="fScholar"/></div>
+<div class="field"><label>ResearchGate URL</label><input id="fResearchGate"/></div>
+<div class="field"><label>Scopus author URL</label><input id="fScopus"/></div>
+<div class="field"><label>Web of Science researcher URL</label><input id="fWos"/></div>
+<div class="field"><label>Personal / professional website URL</label><input id="fWebsite"/></div>
+</div>
+<div class="media-section-editor" id="contactMediaEditor"></div>
+</div>
+<div class="admin-panel" data-panel="cv">
+<div class="form-grid section-heading-editor">
+<p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+<div class="field"><label>Section name</label><input id="fSectionCvTitle"/></div>
+<div class="field"><label>Section subtitle</label><input id="fSectionCvSubtitle"/></div>
+</div>
+<div class="cv-manager">
+<div class="cv-current">
+<h3>Current CV</h3>
+<p class="muted" id="currentCvName">No CV uploaded yet.</p>
+<p class="muted" id="currentCvDate"></p>
+<div class="action-row">
+<a class="secondary hidden" href="#" id="currentCvLink" rel="noopener" target="_blank">Open current CV</a>
+<button class="danger hidden" id="removeCvBtn" type="button">Remove CV</button>
+</div>
+</div>
+<div>
+<div class="field">
+<label>Upload / replace CV</label>
+<input accept="application/pdf,.pdf" id="cvFile" type="file"/>
+<span class="helper">PDF only · maximum 10 MB. Uploading a new PDF replaces the previous one.</span>
+</div>
+<div class="field" style="margin-top:14px">
+<label>Or use an external CV URL</label>
+<input id="fCvExternal" placeholder="https://..."/>
+<span class="helper">Optional. If entered, this link will be used instead of an uploaded PDF.</span>
+</div>
+</div>
+</div>
+</div>
+<div class="admin-panel" data-panel="appearance">
+<div class="appearance-head">
+<div>
+<p class="eyebrow">Appearance</p>
+<h2 class="admin-section-title">Website theme</h2>
+<p class="muted">Choose the color theme visitors will see. The public website itself will not show a theme selector.</p>
+</div>
+</div>
+<div class="theme-choice-grid">
+<div class="theme-group-title">Original 10</div>
+<label class="theme-choice" data-theme-card="classic-brown">
+<input name="siteTheme" type="radio" value="classic-brown"/>
+<span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#a15d1d;--tc-soft:#f8f1e9">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Classic Brown</span>
+</label>
+<label class="theme-choice" data-theme-card="soft-beige">
+<input name="siteTheme" type="radio" value="soft-beige"/>
+<span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#9f8064;--tc-soft:#f5eee7">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Soft Beige</span>
+</label>
+<label class="theme-choice" data-theme-card="slate-blue">
+<input name="siteTheme" type="radio" value="slate-blue"/>
+<span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#536f87;--tc-soft:#edf3f7">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Slate Blue</span>
+</label>
+<label class="theme-choice" data-theme-card="deep-navy">
+<input name="siteTheme" type="radio" value="deep-navy"/>
+<span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#2f506d;--tc-soft:#eaf1f6">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Deep Navy</span>
+</label>
+<label class="theme-choice" data-theme-card="forest-sage">
+<input name="siteTheme" type="radio" value="forest-sage"/>
+<span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#587569;--tc-soft:#edf4f0">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Forest Sage</span>
+</label>
+<label class="theme-choice" data-theme-card="olive-stone">
+<input name="siteTheme" type="radio" value="olive-stone"/>
+<span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#777750;--tc-soft:#f2f2e6">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Olive Stone</span>
+</label>
+<label class="theme-choice" data-theme-card="burgundy">
+<input name="siteTheme" type="radio" value="burgundy"/>
+<span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#7d4b58;--tc-soft:#f5eaed">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Burgundy</span>
+</label>
+<label class="theme-choice" data-theme-card="dusty-plum">
+<input name="siteTheme" type="radio" value="dusty-plum"/>
+<span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#6e6278;--tc-soft:#f1edf4">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Dusty Plum</span>
+</label>
+<label class="theme-choice" data-theme-card="charcoal">
+<input name="siteTheme" type="radio" value="charcoal"/>
+<span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#202328;--tc-accent:#5b6469;--tc-soft:#edf0f1">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Charcoal</span>
+</label>
+<label class="theme-choice" data-theme-card="dark-academic">
+<input name="siteTheme" type="radio" value="dark-academic"/>
+<span class="theme-choice-preview" style="--tc-bg:#151718;--tc-text:#eef0ef;--tc-accent:#c69a67;--tc-soft:#1d2022">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Dark Academic</span>
+</label>
+<div class="theme-group-title">Bright palettes</div>
+<label class="theme-choice" data-theme-card="solar-citrus">
+<input name="siteTheme" type="radio" value="solar-citrus"/>
+<span class="theme-choice-preview" style="--tc-bg:#fffdf7;--tc-text:#202124;--tc-accent:#ff8a00;--tc-soft:#fff0c7">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Solar Citrus</span>
+</label>
+<label class="theme-choice" data-theme-card="electric-azure">
+<input name="siteTheme" type="radio" value="electric-azure"/>
+<span class="theme-choice-preview" style="--tc-bg:#f8fdff;--tc-text:#11212d;--tc-accent:#0077ff;--tc-soft:#dff3ff">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Electric Azure</span>
+</label>
+<label class="theme-choice" data-theme-card="coral-bloom">
+<input name="siteTheme" type="radio" value="coral-bloom"/>
+<span class="theme-choice-preview" style="--tc-bg:#fffafa;--tc-text:#2b2022;--tc-accent:#ff536b;--tc-soft:#ffe3e8">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Coral Bloom</span>
+</label>
+<label class="theme-choice" data-theme-card="mint-pop">
+<input name="siteTheme" type="radio" value="mint-pop"/>
+<span class="theme-choice-preview" style="--tc-bg:#f8fffc;--tc-text:#162723;--tc-accent:#00a87c;--tc-soft:#d9fff1">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Mint Pop</span>
+</label>
+<label class="theme-choice" data-theme-card="lemon-sky">
+<input name="siteTheme" type="radio" value="lemon-sky"/>
+<span class="theme-choice-preview" style="--tc-bg:#fffef6;--tc-text:#22272c;--tc-accent:#3878e8;--tc-soft:#fff4a8">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Lemon Sky</span>
+</label>
+<label class="theme-choice" data-theme-card="aqua-lime">
+<input name="siteTheme" type="radio" value="aqua-lime"/>
+<span class="theme-choice-preview" style="--tc-bg:#f8ffff;--tc-text:#122829;--tc-accent:#00a6a6;--tc-soft:#e6ffd5">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Aqua Lime</span>
+</label>
+<label class="theme-choice" data-theme-card="berry-fizz">
+<input name="siteTheme" type="radio" value="berry-fizz"/>
+<span class="theme-choice-preview" style="--tc-bg:#fff9ff;--tc-text:#281d2a;--tc-accent:#b737d5;--tc-soft:#f7dfff">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Berry Fizz</span>
+</label>
+<label class="theme-choice" data-theme-card="peach-punch">
+<input name="siteTheme" type="radio" value="peach-punch"/>
+<span class="theme-choice-preview" style="--tc-bg:#fffaf6;--tc-text:#2b211d;--tc-accent:#ee6b2f;--tc-soft:#ffe2cf">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Peach Punch</span>
+</label>
+<label class="theme-choice" data-theme-card="lavender-glow">
+<input name="siteTheme" type="radio" value="lavender-glow"/>
+<span class="theme-choice-preview" style="--tc-bg:#fcfaff;--tc-text:#241f2d;--tc-accent:#7857d9;--tc-soft:#ebe3ff">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Lavender Glow</span>
+</label>
+<label class="theme-choice" data-theme-card="spring-green">
+<input name="siteTheme" type="radio" value="spring-green"/>
+<span class="theme-choice-preview" style="--tc-bg:#fbfff8;--tc-text:#1d271b;--tc-accent:#41a600;--tc-soft:#e6ffd2">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Spring Green</span>
+</label>
+<div class="theme-group-title">High-contrast palettes</div>
+<label class="theme-choice" data-theme-card="midnight-gold">
+<input name="siteTheme" type="radio" value="midnight-gold"/>
+<span class="theme-choice-preview" style="--tc-bg:#0d1420;--tc-text:#f8f0dc;--tc-accent:#f5b83b;--tc-soft:#2c2518">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Midnight Gold</span>
+</label>
+<label class="theme-choice" data-theme-card="ink-cyan">
+<input name="siteTheme" type="radio" value="ink-cyan"/>
+<span class="theme-choice-preview" style="--tc-bg:#071417;--tc-text:#e8ffff;--tc-accent:#29e3e3;--tc-soft:#103237">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Ink Cyan</span>
+</label>
+<label class="theme-choice" data-theme-card="black-coral">
+<input name="siteTheme" type="radio" value="black-coral"/>
+<span class="theme-choice-preview" style="--tc-bg:#121012;--tc-text:#fff0f0;--tc-accent:#ff6b6b;--tc-soft:#341b1f">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Black Coral</span>
+</label>
+<label class="theme-choice" data-theme-card="graphite-lime">
+<input name="siteTheme" type="radio" value="graphite-lime"/>
+<span class="theme-choice-preview" style="--tc-bg:#151716;--tc-text:#f4ffe8;--tc-accent:#9eea3a;--tc-soft:#27321a">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Graphite Lime</span>
+</label>
+<label class="theme-choice" data-theme-card="royal-cream">
+<input name="siteTheme" type="radio" value="royal-cream"/>
+<span class="theme-choice-preview" style="--tc-bg:#101a3a;--tc-text:#fff7dc;--tc-accent:#ffd45c;--tc-soft:#2b2e48">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Royal Cream</span>
+</label>
+<label class="theme-choice" data-theme-card="espresso-ivory">
+<input name="siteTheme" type="radio" value="espresso-ivory"/>
+<span class="theme-choice-preview" style="--tc-bg:#1b1310;--tc-text:#fff7e8;--tc-accent:#e7b66b;--tc-soft:#3a2b21">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Espresso Ivory</span>
+</label>
+<label class="theme-choice" data-theme-card="aubergine-gold">
+<input name="siteTheme" type="radio" value="aubergine-gold"/>
+<span class="theme-choice-preview" style="--tc-bg:#1c1024;--tc-text:#fff1dc;--tc-accent:#f3ba58;--tc-soft:#392448">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Aubergine Gold</span>
+</label>
+<label class="theme-choice" data-theme-card="emerald-night">
+<input name="siteTheme" type="radio" value="emerald-night"/>
+<span class="theme-choice-preview" style="--tc-bg:#071a15;--tc-text:#eafff6;--tc-accent:#63e6b4;--tc-soft:#18362d">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Emerald Night</span>
+</label>
+<label class="theme-choice" data-theme-card="crimson-slate">
+<input name="siteTheme" type="radio" value="crimson-slate"/>
+<span class="theme-choice-preview" style="--tc-bg:#17191f;--tc-text:#fff1f3;--tc-accent:#ff5e78;--tc-soft:#3a2028">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Crimson Slate</span>
+</label>
+<label class="theme-choice" data-theme-card="arctic-black">
+<input name="siteTheme" type="radio" value="arctic-black"/>
+<span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#101214;--tc-accent:#1559d6;--tc-soft:#e8f0ff">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Arctic Black</span>
+</label>
+<div class="theme-group-title">Light high-contrast palettes</div>
+<label class="theme-choice" data-theme-card="cobalt-white">
+<input name="siteTheme" type="radio" value="cobalt-white"/>
+<span class="theme-choice-preview" style="--tc-bg:#ffffff;--tc-text:#111827;--tc-accent:#1746c4;--tc-soft:#e8efff">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Cobalt White</span>
+</label>
+<label class="theme-choice" data-theme-card="scarlet-paper">
+<input name="siteTheme" type="radio" value="scarlet-paper"/>
+<span class="theme-choice-preview" style="--tc-bg:#fffdfd;--tc-text:#1b1113;--tc-accent:#c9182b;--tc-soft:#ffe8ec">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Scarlet Paper</span>
+</label>
+<label class="theme-choice" data-theme-card="emerald-white">
+<input name="siteTheme" type="radio" value="emerald-white"/>
+<span class="theme-choice-preview" style="--tc-bg:#fbfffd;--tc-text:#10231b;--tc-accent:#087a52;--tc-soft:#def7eb">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Emerald White</span>
+</label>
+<label class="theme-choice" data-theme-card="violet-ivory">
+<input name="siteTheme" type="radio" value="violet-ivory"/>
+<span class="theme-choice-preview" style="--tc-bg:#fffdf8;--tc-text:#1e1726;--tc-accent:#6b35b5;--tc-soft:#eee4ff">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Violet Ivory</span>
+</label>
+<label class="theme-choice" data-theme-card="teal-porcelain">
+<input name="siteTheme" type="radio" value="teal-porcelain"/>
+<span class="theme-choice-preview" style="--tc-bg:#fbffff;--tc-text:#102324;--tc-accent:#00757a;--tc-soft:#ddf7f8">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Teal Porcelain</span>
+</label>
+<label class="theme-choice" data-theme-card="navy-sand">
+<input name="siteTheme" type="radio" value="navy-sand"/>
+<span class="theme-choice-preview" style="--tc-bg:#fffaf0;--tc-text:#111a2b;--tc-accent:#153d7a;--tc-soft:#e7eefb">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Navy Sand</span>
+</label>
+<label class="theme-choice" data-theme-card="magenta-frost">
+<input name="siteTheme" type="radio" value="magenta-frost"/>
+<span class="theme-choice-preview" style="--tc-bg:#fffaff;--tc-text:#23131f;--tc-accent:#a71972;--tc-soft:#f9e2f1">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Magenta Frost</span>
+</label>
+<label class="theme-choice" data-theme-card="orange-ink">
+<input name="siteTheme" type="radio" value="orange-ink"/>
+<span class="theme-choice-preview" style="--tc-bg:#fffdf8;--tc-text:#181512;--tc-accent:#b84a00;--tc-soft:#ffe6d4">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Orange Ink</span>
+</label>
+<label class="theme-choice" data-theme-card="indigo-mint">
+<input name="siteTheme" type="radio" value="indigo-mint"/>
+<span class="theme-choice-preview" style="--tc-bg:#f8fffB;--tc-text:#13182a;--tc-accent:#3f3a9e;--tc-soft:#e8e7ff">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Indigo Mint</span>
+</label>
+<label class="theme-choice" data-theme-card="crimson-cream">
+<input name="siteTheme" type="radio" value="crimson-cream"/>
+<span class="theme-choice-preview" style="--tc-bg:#fff9ee;--tc-text:#211316;--tc-accent:#a6112b;--tc-soft:#f9dfe5">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Crimson Cream</span>
+</label>
+<div class="theme-group-title">Custom</div>
+<div class="theme-group-title">Custom</div>
+<label class="theme-choice" data-theme-card="custom-theme">
+<input name="siteTheme" type="radio" value="custom-theme"/>
+<span class="theme-choice-preview custom-theme-mini-preview" style="--tc-bg:#FCFBF9;--tc-text:#2B2926;--tc-accent:#9F8064;--tc-soft:#F5EEE7">
+<span class="theme-mini-header"></span>
+<span class="theme-mini-title"></span>
+<span class="theme-mini-line"></span>
+<span class="theme-mini-button"></span>
+</span>
+<span class="theme-choice-name">Custom Theme</span>
+</label>
+</div>
+<div class="custom-theme-builder">
+<div class="custom-theme-builder-head">
+<div>
+<h3>Create your own theme</h3>
+<p class="muted">Choose <strong>Custom Theme</strong> above, then adjust these colors. Changes preview instantly.</p>
+</div>
+<button class="secondary" id="resetCustomThemeBtn" type="button">Reset custom palette</button>
+</div>
+<div class="custom-theme-grid">
+<div class="custom-theme-card">
+<h4>Page &amp; cards</h4>
+<div class="custom-color-control"><label>Page background</label><div><input id="fCustomBg" type="color"/><input id="fCustomBgHex" maxlength="7"/></div></div>
+<div class="custom-color-control"><label>Card / surface</label><div><input id="fCustomSurface" type="color"/><input id="fCustomSurfaceHex" maxlength="7"/></div></div>
+<div class="custom-color-control"><label>Secondary surface</label><div><input id="fCustomSurfaceAlt" type="color"/><input id="fCustomSurfaceAltHex" maxlength="7"/></div></div>
+<div class="custom-color-control"><label>Borders / lines</label><div><input id="fCustomLine" type="color"/><input id="fCustomLineHex" maxlength="7"/></div></div>
+</div>
+<div class="custom-theme-card">
+<h4>Typography &amp; accent</h4>
+<div class="custom-color-control"><label>Main text</label><div><input id="fCustomText" type="color"/><input id="fCustomTextHex" maxlength="7"/></div></div>
+<div class="custom-color-control"><label>Muted text</label><div><input id="fCustomMuted" type="color"/><input id="fCustomMutedHex" maxlength="7"/></div></div>
+<div class="custom-color-control"><label>Accent</label><div><input id="fCustomAccent" type="color"/><input id="fCustomAccentHex" maxlength="7"/></div></div>
+<div class="custom-color-control"><label>Accent soft</label><div><input id="fCustomAccentSoft" type="color"/><input id="fCustomAccentSoftHex" maxlength="7"/></div></div>
+</div>
+<div class="custom-theme-card">
+<h4>Profile portrait gradient</h4>
+<div class="custom-color-control"><label>Gradient color 1</label><div><input id="fCustomPortraitA" type="color"/><input id="fCustomPortraitAHex" maxlength="7"/></div></div>
+<div class="custom-color-control"><label>Gradient color 2</label><div><input id="fCustomPortraitB" type="color"/><input id="fCustomPortraitBHex" maxlength="7"/></div></div>
+</div>
+</div>
+</div>
+<div class="theme-preview-note">
+<strong>Live preview</strong>
+<span>Choosing a theme previews it immediately in this private admin page. Click <b>Save all changes</b> to publish it.</span>
+</div>
+<div class="admin-card">
+<div class="settings-head">
+<div>
+<h2>Design presets</h2>
+<p class="muted">Apply a complete visual starting point, then customize every setting afterward.</p>
+</div>
+<span class="preset-current" id="currentPresetLabel">Custom</span>
+</div>
+<div class="preset-grid" id="designPresetGrid"></div>
+<p class="helper">Presets change design settings only. Your text, publications, projects, thesis, media and CV are not replaced.</p>
+</div><div class="admin-card compact-settings-card">
+<div class="settings-head"><div><h3>Cards</h3><p class="muted">Choose the card treatment without mixing it with portrait or page-layout controls.</p></div></div>
+<div class="compact-control-grid">
+<div class="range-setting"><label>Card corner radius</label><div><input id="fCardRadius" max="28" min="0" step="1" type="range"/><input id="fCardRadiusNumber" max="28" min="0" step="1" type="number"/></div></div>
+<div class="field card-style-compact-control"><label>Card style</label><div class="card-style-select-row"><select id="fCardStyleSection"><option value="thesis">Thesis</option><option value="publications">Publications</option><option value="projects">Projects &amp; Simulations</option><option value="activities">Academic Activities</option><option value="skills">Skills</option><option value="education">Education</option><option value="contact">Contact</option></select><select id="fCardStyleValue"><option value="classic">Classic</option><option value="clean">Clean</option><option value="outline">Outline</option><option value="soft">Soft</option><option value="accent">Accent</option><option value="elevated">Elevated</option></select></div></div>
+<div class="field"><label>Shadow</label><select id="fShadow"><option value="theme">Theme default</option><option value="none">None</option><option value="subtle">Subtle</option><option value="medium">Medium</option></select></div>
+</div>
+</div></div>
 
-
-
-        <div class="custom-theme-builder">
-          <div class="custom-theme-builder-head">
-            <div>
-              <h3>Create your own theme</h3>
-              <p class="muted">Choose <strong>Custom Theme</strong> above, then adjust these colors. Changes preview instantly.</p>
-            </div>
-            <button id="resetCustomThemeBtn" class="secondary" type="button">Reset custom palette</button>
-          </div>
-
-          <div class="custom-theme-grid">
-            <div class="custom-theme-card">
-              <h4>Page & cards</h4>
-              <div class="custom-color-control"><label>Page background</label><div><input id="fCustomBg" type="color"><input id="fCustomBgHex" maxlength="7"></div></div>
-              <div class="custom-color-control"><label>Card / surface</label><div><input id="fCustomSurface" type="color"><input id="fCustomSurfaceHex" maxlength="7"></div></div>
-              <div class="custom-color-control"><label>Secondary surface</label><div><input id="fCustomSurfaceAlt" type="color"><input id="fCustomSurfaceAltHex" maxlength="7"></div></div>
-              <div class="custom-color-control"><label>Borders / lines</label><div><input id="fCustomLine" type="color"><input id="fCustomLineHex" maxlength="7"></div></div>
-            </div>
-
-            <div class="custom-theme-card">
-              <h4>Typography & accent</h4>
-              <div class="custom-color-control"><label>Main text</label><div><input id="fCustomText" type="color"><input id="fCustomTextHex" maxlength="7"></div></div>
-              <div class="custom-color-control"><label>Muted text</label><div><input id="fCustomMuted" type="color"><input id="fCustomMutedHex" maxlength="7"></div></div>
-              <div class="custom-color-control"><label>Accent</label><div><input id="fCustomAccent" type="color"><input id="fCustomAccentHex" maxlength="7"></div></div>
-              <div class="custom-color-control"><label>Accent soft</label><div><input id="fCustomAccentSoft" type="color"><input id="fCustomAccentSoftHex" maxlength="7"></div></div>
-            </div>
-
-            <div class="custom-theme-card">
-              <h4>Profile portrait gradient</h4>
-              <div class="custom-color-control"><label>Gradient color 1</label><div><input id="fCustomPortraitA" type="color"><input id="fCustomPortraitAHex" maxlength="7"></div></div>
-              <div class="custom-color-control"><label>Gradient color 2</label><div><input id="fCustomPortraitB" type="color"><input id="fCustomPortraitBHex" maxlength="7"></div></div>
-            </div>
-          </div>
-        </div>
-
-        
-
-        <div class="theme-preview-note">
-          <strong>Live preview</strong>
-          <span>Choosing a theme previews it immediately in this private admin page. Click <b>Save all changes</b> to publish it.</span>
-        </div>
-      </div>
-
-      <div class="admin-panel" data-panel="presets">
-        <div class="admin-card">
-          <div class="settings-head">
-            <div>
-              <h2>Design presets</h2>
-              <p class="muted">Apply a complete visual starting point, then customize every setting afterward.</p>
-            </div>
-            <span id="currentPresetLabel" class="preset-current">Custom</span>
-          </div>
-          <div id="designPresetGrid" class="preset-grid"></div>
-          <p class="helper">Presets change design settings only. Your text, publications, projects, thesis, media and CV are not replaced.</p>
-        </div>
-      </div>
-      <div class="admin-panel" data-panel="typography">
-        <div class="admin-card">
-          <h2>Typography</h2>
-          <p class="muted">Control public section-name and section-subtitle sizes and colors independently from the selected theme.</p>
-<div class="typography-controls">
-          <h3>Manual typography</h3>
-          <p class="muted">Override the public section heading sizes and colors. You can return colors to the active theme at any time.</p>
-
-          <div class="typography-control-grid">
-            <div class="typography-control-card">
-              <h4>Section names</h4>
-              <div class="typography-size-row">
-                <div class="field">
-                  <label>Font size (30–60 px)</label>
-                  <input id="fSectionTitleSize" type="range" min="30" max="60" step="1">
-                </div>
-                <div class="field">
-                  <label>Size</label>
-                  <input id="fSectionTitleSizeNumber" type="number" min="30" max="60" step="1">
-                </div>
-              </div>
-
-              <div class="typography-color-row">
-                <div class="field">
-                  <label>Color</label>
-                  <input id="fSectionTitleColor" type="color">
-                </div>
-                <div class="field">
-                  <label>Hex color</label>
-                  <input id="fSectionTitleColorText" placeholder="#A15D1D" maxlength="7">
-                </div>
-              </div>
-
-              <label class="typography-theme-toggle">
-                <input id="useThemeSectionTitleColor" type="checkbox">
-                Use active theme color
-              </label>
-            </div>
-
-            <div class="typography-control-card">
-              <h4>Section subtitles</h4>
-              <div class="typography-size-row">
-                <div class="field">
-                  <label>Font size (16–34 px)</label>
-                  <input id="fSectionSubtitleSize" type="range" min="16" max="34" step="1">
-                </div>
-                <div class="field">
-                  <label>Size</label>
-                  <input id="fSectionSubtitleSizeNumber" type="number" min="16" max="34" step="1">
-                </div>
-              </div>
-
-              <div class="typography-color-row">
-                <div class="field">
-                  <label>Color</label>
-                  <input id="fSectionSubtitleColor" type="color">
-                </div>
-                <div class="field">
-                  <label>Hex color</label>
-                  <input id="fSectionSubtitleColorText" placeholder="#746E66" maxlength="7">
-                </div>
-              </div>
-
-              <label class="typography-theme-toggle">
-                <input id="useThemeSectionSubtitleColor" type="checkbox">
-                Use theme muted color
-              </label>
-            </div>
-          </div>
-
-          <div class="typography-reset-row">
-            <button id="resetTypographyBtn" class="secondary" type="button">Reset typography to defaults</button>
-            <button id="undoTypographyBtn" class="secondary" type="button" disabled>Undo unsaved changes</button>
-          </div></div>
-        </div>
-      </div>
-      <div class="admin-panel" data-panel="layout">
-        <div class="admin-card">
-          <h2>Layout</h2>
-          <p class="muted">Control section order, visibility, spacing, card geometry, portrait shape, columns and font pairing.</p>
-
-
-          <div class="settings-section website-structure-settings">
-            <div class="settings-head">
-              <div>
-                <h3>Website structure</h3>
-                <p class="muted">Choose whether visitors scroll through one long page or view one section at a time.</p>
-              </div>
-            </div>
-
-            <div class="structure-mode-grid">
-              <label class="structure-mode-card">
-                <input id="fNavigationModeSingle" name="navigationMode" type="radio" value="single">
-                <span>
-                  <strong>Single page</strong>
-                  <small>Current format. All enabled sections appear on one scrolling page.</small>
-                </span>
-              </label>
-
-              <label class="structure-mode-card">
-                <input id="fNavigationModeSections" name="navigationMode" type="radio" value="sections">
-                <span>
-                  <strong>Section pages</strong>
-                  <small>Only one section appears at a time. Header links move between section views.</small>
-                </span>
-              </label>
-            </div>
-
-            <div id="sectionPageOptions" class="section-page-options">
-              <div class="field">
-                <label>Page transition</label>
-                <select id="fPageTransition">
-                  <option value="fade">Fade</option>
-                  <option value="slide">Slide</option>
-                  <option value="none">None</option>
-                </select>
-              </div>
-
-              <label class="setting-toggle">
-                <input id="fPagePager" type="checkbox">
+<div class="admin-panel" data-panel="typography">
+<div class="admin-card">
+<h2>Typography</h2>
+<p class="muted">Control the font pairing, hierarchy, body readability, navigation text and card titles from one place.</p>
+<div class="typography-control-grid typography-expanded-grid">
+<div class="typography-control-card">
+<h4>Font system</h4>
+<div class="field"><label>Font pairing</label><select id="fFontPair"><option value="classic">Classic Academic — Georgia + Arial</option><option value="modern">Modern Sans — Segoe UI</option><option value="humanist">Humanist — Georgia + Segoe UI</option><option value="editorial">Editorial Serif — Georgia</option><option value="palatino">Modern Academic — Palatino + Segoe UI</option><option value="bookish">Bookish — Georgia + Palatino</option></select></div>
+<div class="typography-size-row"><div class="field"><label>Body text size (14–20 px)</label><input id="fBodyTextSize" max="20" min="14" step="1" type="range"/></div><div class="field"><label>Size</label><input id="fBodyTextSizeNumber" max="20" min="14" step="1" type="number"/></div></div>
+<div class="typography-size-row"><div class="field"><label>Paragraph line height (1.4–2.0)</label><input id="fBodyLineHeight" max="2" min="1.4" step="0.05" type="range"/></div><div class="field"><label>Line height</label><input id="fBodyLineHeightNumber" max="2" min="1.4" step="0.05" type="number"/></div></div>
+<div class="typography-color-row"><div class="field"><label>Body text color</label><input id="fBodyTextColor" type="color"/></div><div class="field"><label>Hex color</label><input id="fBodyTextColorText" maxlength="7" placeholder="#202328"/></div></div>
+<label class="typography-theme-toggle"><input id="useThemeBodyTextColor" type="checkbox"/> Use active theme text color</label>
+</div>
+<div class="typography-control-card">
+<h4>Section names</h4>
+<div class="typography-size-row"><div class="field"><label>Font size (30–60 px)</label><input id="fSectionTitleSize" max="60" min="30" step="1" type="range"/></div><div class="field"><label>Size</label><input id="fSectionTitleSizeNumber" max="60" min="30" step="1" type="number"/></div></div>
+<div class="typography-color-row"><div class="field"><label>Color</label><input id="fSectionTitleColor" type="color"/></div><div class="field"><label>Hex color</label><input id="fSectionTitleColorText" maxlength="7" placeholder="#A15D1D"/></div></div>
+<label class="typography-theme-toggle"><input id="useThemeSectionTitleColor" type="checkbox"/> Use active theme color</label>
+</div>
+<div class="typography-control-card">
+<h4>Section subtitles</h4>
+<div class="typography-size-row"><div class="field"><label>Font size (16–34 px)</label><input id="fSectionSubtitleSize" max="34" min="16" step="1" type="range"/></div><div class="field"><label>Size</label><input id="fSectionSubtitleSizeNumber" max="34" min="16" step="1" type="number"/></div></div>
+<div class="typography-color-row"><div class="field"><label>Color</label><input id="fSectionSubtitleColor" type="color"/></div><div class="field"><label>Hex color</label><input id="fSectionSubtitleColorText" maxlength="7" placeholder="#746E66"/></div></div>
+<label class="typography-theme-toggle"><input id="useThemeSectionSubtitleColor" type="checkbox"/> Use theme muted color</label>
+</div>
+<div class="typography-control-card">
+<h4>Cards &amp; navigation</h4>
+<div class="typography-size-row"><div class="field"><label>Card title size (16–28 px)</label><input id="fCardTitleSize" max="28" min="16" step="1" type="range"/></div><div class="field"><label>Size</label><input id="fCardTitleSizeNumber" max="28" min="16" step="1" type="number"/></div></div>
+<div class="typography-size-row"><div class="field"><label>Navigation text size (11–16 px)</label><input id="fNavTextSize" max="16" min="11" step="1" type="range"/></div><div class="field"><label>Size</label><input id="fNavTextSizeNumber" max="16" min="11" step="1" type="number"/></div></div>
+<p class="helper">Card title size applies to publication, project, activity, skill, education and thesis card headings.</p>
+</div>
+</div>
+<div class="typography-reset-row"><button class="secondary" id="resetTypographyBtn" type="button">Reset typography to defaults</button><button class="secondary" disabled="" id="undoTypographyBtn" type="button">Undo unsaved changes</button></div>
+</div>
+</div>
+<div class="admin-panel" data-panel="layout">
+<div class="admin-card">
+<div class="settings-head"><div><h2>Layout</h2><p class="muted">Only the overall page proportions, spacing and column counts live here.</p></div><button class="secondary" id="resetLayoutStyleBtn" type="button">Reset layout</button></div>
+<div class="layout-control-grid layout-compact-grid">
+<div class="layout-control-card"><h4>Dimensions</h4>
+<div class="range-setting"><label>Content width</label><div><input id="fMaxWidth" max="1500" min="960" step="10" type="range"/><input id="fMaxWidthNumber" max="1500" min="960" step="10" type="number"/></div></div>
+<div class="range-setting"><label>Sidebar width</label><div><input id="fSidebarWidth" max="340" min="210" step="5" type="range"/><input id="fSidebarWidthNumber" max="340" min="210" step="5" type="number"/></div></div>
+<div class="range-setting"><label>Sidebar/content gap</label><div><input id="fLayoutGap" max="100" min="20" step="2" type="range"/><input id="fLayoutGapNumber" max="100" min="20" step="2" type="number"/></div></div>
+<div class="range-setting"><label>Section spacing</label><div><input id="fSectionSpacing" max="90" min="20" step="2" type="range"/><input id="fSectionSpacingNumber" max="90" min="20" step="2" type="number"/></div></div>
+</div>
+<div class="layout-control-card"><h4>Columns &amp; sidebar</h4>
+<div class="field"><label>Project columns</label><select id="fProjectColumns"><option value="1">1 column</option><option value="2">2 columns</option><option value="3">3 columns</option></select></div>
+<div class="field"><label>Skills columns</label><select id="fSkillsColumns"><option value="1">1 column</option><option value="2">2 columns</option><option value="3">3 columns</option></select></div>
+<label class="setting-toggle"><input id="fStickySidebar" type="checkbox"/> Keep profile sidebar sticky while scrolling</label>
+</div>
+</div>
+</div>
+</div><div class="admin-panel" data-panel="structure"><div class="admin-card"><div class="settings-head"><div><h2>Structure</h2><p class="muted">Control page mode, section order, visibility, sidebar rules and section navigation.</p></div></div><div class="settings-section website-structure-settings">
+<div class="settings-head">
+<div>
+<h3>Page mode &amp; navigation</h3>
+<p class="muted">Choose whether visitors scroll through one long page or view one section at a time.</p>
+</div>
+</div>
+<div class="structure-mode-grid">
+<label class="structure-mode-card">
+<input id="fNavigationModeSingle" name="navigationMode" type="radio" value="single"/>
+<span>
+<strong>Single page</strong>
+<small>Current format. All enabled sections appear on one scrolling page.</small>
+</span>
+</label>
+<label class="structure-mode-card">
+<input id="fNavigationModeSections" name="navigationMode" type="radio" value="sections"/>
+<span>
+<strong>Section pages</strong>
+<small>Only one section appears at a time. Header links move between section views.</small>
+</span>
+</label>
+</div>
+<div class="section-page-options" id="sectionPageOptions">
+<div class="field">
+<label>Page transition</label>
+<select id="fPageTransition">
+<option value="fade">Fade</option>
+<option value="slide">Slide</option>
+<option value="none">None</option>
+</select>
+</div>
+<label class="setting-toggle">
+<input id="fPagePager" type="checkbox"/>
                 Show Previous / Next navigation
               </label>
+<div class="section-sidebar-admin">
+<div class="settings-head compact-settings-head">
+<div>
+<h4>Normal left sidebar</h4>
+<p class="muted">Choose which Section Pages keep the standard profile sidebar. Home always keeps it.</p>
+</div>
+</div>
+<div class="section-cover-options">
+<div class="field cover-visibility-field">
+<label>Sidebar visibility</label>
+<select id="fSidebarScope">
+<option value="home-cv">Home &amp; Curriculum Vitae</option>
+<option value="all">All sections</option>
+<option value="home">Home only</option>
+<option value="custom">Custom by section</option>
+</select>
+<p class="helper compact-helper">Recommended: keep the normal sidebar on Home and CV, while other non-cover sections use the full page width.</p>
+</div>
+<div class="cover-custom-sections" id="sidebarCustomSections">
+<strong>Custom inner sections</strong>
+<div class="cover-custom-grid">
+<label><input data-sidebar-section="research" type="checkbox"/> Research Interests</label>
+<label><input data-sidebar-section="thesis" type="checkbox"/> Undergraduate Thesis</label>
+<label><input data-sidebar-section="publications" type="checkbox"/> Publications</label>
+<label><input data-sidebar-section="projects" type="checkbox"/> Projects &amp; Simulations</label>
+<label><input data-sidebar-section="activities" type="checkbox"/> Academic Activities</label>
+<label><input data-sidebar-section="skills" type="checkbox"/> Skills</label>
+<label><input data-sidebar-section="education" type="checkbox"/> Education</label>
+<label><input data-sidebar-section="contact" type="checkbox"/> Contact</label>
+<label><input data-sidebar-section="cv" type="checkbox"/> Curriculum Vitae</label>
+</div>
+<p class="helper compact-helper">Home is always shown and does not need a checkbox.</p>
+</div>
+</div>
+</div>
 
-
-              <div class="section-sidebar-admin">
-                <div class="settings-head compact-settings-head">
-                  <div>
-                    <h4>Normal left sidebar</h4>
-                    <p class="muted">Choose which Section Pages keep the standard profile sidebar. Home always keeps it.</p>
-                  </div>
-                </div>
-
-                <div class="section-cover-options">
-                  <div class="field cover-visibility-field">
-                    <label>Sidebar visibility</label>
-                    <select id="fSidebarScope">
-                      <option value="home-cv">Home &amp; Curriculum Vitae</option>
-                      <option value="all">All sections</option>
-                      <option value="home">Home only</option>
-                      <option value="custom">Custom by section</option>
-                    </select>
-                    <p class="helper compact-helper">Recommended: keep the normal sidebar on Home and CV, while other non-cover sections use the full page width.</p>
-                  </div>
-
-                  <div id="sidebarCustomSections" class="cover-custom-sections">
-                    <strong>Custom inner sections</strong>
-                    <div class="cover-custom-grid">
-                      <label><input type="checkbox" data-sidebar-section="research"> Research Interests</label>
-                      <label><input type="checkbox" data-sidebar-section="thesis"> Undergraduate Thesis</label>
-                      <label><input type="checkbox" data-sidebar-section="publications"> Publications</label>
-                      <label><input type="checkbox" data-sidebar-section="projects"> Projects &amp; Simulations</label>
-                      <label><input type="checkbox" data-sidebar-section="activities"> Academic Activities</label>
-                      <label><input type="checkbox" data-sidebar-section="skills"> Skills</label>
-                      <label><input type="checkbox" data-sidebar-section="education"> Education</label>
-                      <label><input type="checkbox" data-sidebar-section="contact"> Contact</label>
-                      <label><input type="checkbox" data-sidebar-section="cv"> Curriculum Vitae</label>
-                    </div>
-                    <p class="helper compact-helper">Home is always shown and does not need a checkbox.</p>
-                  </div>
-                </div>
-              </div>
-
-
-              <div class="section-cover-admin">
-                <div class="settings-head compact-settings-head">
-                  <div>
-                    <h4>Inner-page profile cover</h4>
-                    <p class="muted">On section pages other than Home, transform the profile area into a horizontal cover-style banner.</p>
-                  </div>
-                  <label class="setting-toggle strong-toggle">
-                    <input id="fSectionCoverEnabled" type="checkbox">
-                    Enable cover
-                  </label>
-                </div>
-
-                <div id="sectionCoverOptions" class="section-cover-options">
-
-                  <div class="field cover-visibility-field">
-                    <label>Cover visibility</label>
-                    <select id="fSectionCoverScope">
-                      <option value="research">Research-focused only</option>
-                      <option value="all">All inner sections</option>
-                      <option value="none">No inner-page covers</option>
-                      <option value="custom">Custom by section</option>
-                    </select>
-                    <p class="helper compact-helper">Research-focused shows the cover only on Research Interests and Undergraduate Thesis.</p>
-                  </div>
-
-                  <div id="sectionCoverCustomSections" class="cover-custom-sections">
-                    <strong>Custom sections</strong>
-                    <div class="cover-custom-grid">
-                      <label><input type="checkbox" data-cover-section="research"> Research Interests</label>
-                      <label><input type="checkbox" data-cover-section="thesis"> Undergraduate Thesis</label>
-                      <label><input type="checkbox" data-cover-section="publications"> Publications</label>
-                      <label><input type="checkbox" data-cover-section="projects"> Projects &amp; Simulations</label>
-                      <label><input type="checkbox" data-cover-section="activities"> Academic Activities</label>
-                      <label><input type="checkbox" data-cover-section="skills"> Skills</label>
-                      <label><input type="checkbox" data-cover-section="education"> Education</label>
-                      <label><input type="checkbox" data-cover-section="contact"> Contact</label>
-                      <label><input type="checkbox" data-cover-section="cv"> Curriculum Vitae</label>
-                    </div>
-                  </div>
-
-                  <div class="field">
-                    <label>Cover style</label>
-                    <select id="fSectionCoverStyle">
-                      <option value="framed">Framed Fade</option>
-                      <option value="fullbleed">Full Bleed</option>
-                      <option value="split">Split Hero</option>
-                      <option value="glass">Glass Overlay</option>
-                    </select>
-                  </div>
-
-
-                  <div class="field">
-                    <label>Photo fit</label>
-                    <select id="fSectionCoverPhotoFit">
-                      <option value="crop">Fill cover / crop</option>
-                      <option value="full">Full portrait / fit whole image</option>
-                    </select>
-                  </div>
-
-                  <label class="setting-toggle fullbleed-topblend-toggle">
-                    <input id="fSectionCoverTopBlend" type="checkbox">
-                    Blend Full Bleed upward behind navigation
-                  </label>
-
-                  <div class="range-setting section-cover-zoom-setting">
-                    <label>Photo zoom</label>
-                    <div>
-                      <input id="fSectionCoverZoom" type="range" min="40" max="170" step="5">
-                      <input id="fSectionCoverZoomNumber" type="number" min="40" max="170" step="5">
-                    </div>
-                  </div>
-
-                  <div class="field">
-                    <label>Photo side</label>
-                    <select id="fSectionCoverSide">
-                      <option value="right">Photo right · info left</option>
-                      <option value="left">Photo left · info right</option>
-                    </select>
-                  </div>
-
-                  <div class="field">
-                    <label>Fade strength</label>
-                    <select id="fSectionCoverFade">
-                      <option value="soft">Soft</option>
-                      <option value="medium">Medium</option>
-                      <option value="strong">Strong</option>
-                    </select>
-                  </div>
-
-                  <div class="range-setting section-cover-height-setting">
-                    <label>Cover height</label>
-                    <div>
-                      <input id="fSectionCoverHeight" type="range" min="220" max="420" step="10">
-                      <input id="fSectionCoverHeightNumber" type="number" min="220" max="420" step="10">
-                    </div>
-                  </div>
-
-
-                  <div class="field">
-                    <label>Gap below navigation</label>
-                    <select id="fSectionCoverGap">
-                      <option value="0">No gap</option>
-                      <option value="12">Tight · 12 px</option>
-                      <option value="24">Compact · 24 px</option>
-                      <option value="42">Standard · 42 px</option>
-                    </select>
-                  </div>
-
-                  <label class="setting-toggle">
-                    <input id="fSectionCoverDetails" type="checkbox">
-                    Show institution, location & focus
-                  </label>
-
-                  <label class="setting-toggle">
-                    <input id="fSectionCoverSocials" type="checkbox">
-                    Show social links
-                  </label>
-
-
-                  <button id="resetSectionCoverBtn" class="secondary section-cover-reset-btn" type="button">Reset cover to defaults</button>
-
-                </div>
-              </div>
-
-            </div>
-
-            <p class="helper">
+</div>
+<p class="helper">
               Section-page mode uses the same website and URLs. Browser Back/Forward works, refresh keeps the current section, and hidden sections stay hidden.
             </p>
-          </div>
-
-          <div class="settings-section">
-            <div class="settings-head">
-              <div><h3>Sections</h3><p class="muted">Reorder or hide any public section without deleting its content.</p></div>
-              <button id="resetSectionStructureBtn" class="secondary" type="button">Reset sections</button>
-            </div>
-            <div id="sectionManager" class="section-manager"></div>
-          </div>
-
-          <div class="settings-section">
-            <div class="settings-head">
-              <div><h3>Page layout</h3><p class="muted">Adjust the overall proportions of the public site.</p></div>
-              <button id="resetLayoutStyleBtn" class="secondary" type="button">Reset layout style</button>
-            </div>
-
-            <div class="layout-control-grid">
-              <div class="layout-control-card">
-                <h4>Dimensions</h4>
-                <div class="range-setting"><label>Content width</label><div><input id="fMaxWidth" type="range" min="960" max="1500" step="10"><input id="fMaxWidthNumber" type="number" min="960" max="1500" step="10"></div></div>
-                <div class="range-setting"><label>Sidebar width</label><div><input id="fSidebarWidth" type="range" min="210" max="340" step="5"><input id="fSidebarWidthNumber" type="number" min="210" max="340" step="5"></div></div>
-                <div class="range-setting"><label>Sidebar/content gap</label><div><input id="fLayoutGap" type="range" min="20" max="100" step="2"><input id="fLayoutGapNumber" type="number" min="20" max="100" step="2"></div></div>
-                <div class="range-setting"><label>Section spacing</label><div><input id="fSectionSpacing" type="range" min="20" max="90" step="2"><input id="fSectionSpacingNumber" type="number" min="20" max="90" step="2"></div></div>
-              </div>
-
-              <div class="layout-control-card">
-                <h4>Cards & portrait</h4>
-                <div class="range-setting"><label>Card corner radius</label><div><input id="fCardRadius" type="range" min="0" max="28" step="1"><input id="fCardRadiusNumber" type="number" min="0" max="28" step="1"></div></div>
-
-                <div class="card-style-mini-control">
-                  <label>Card style</label>
-                  <div class="card-style-mini-row">
-                    <select id="fCardStyleSection" aria-label="Card section">
-                      <option value="thesis">Thesis</option>
-                      <option value="publications">Publications</option>
-                      <option value="projects">Projects &amp; Simulations</option>
-                      <option value="activities">Academic Activities</option>
-                      <option value="skills" selected>Skills</option>
-                      <option value="education">Education</option>
-                      <option value="contact">Contact</option>
-                    </select>
-                    <select id="fCardStyleValue" aria-label="Card style">
-                      <option value="classic">Classic</option>
-                      <option value="clean">Clean</option>
-                      <option value="outline">Outline</option>
-                      <option value="soft">Soft</option>
-                      <option value="accent">Accent</option>
-                      <option value="elevated">Elevated</option>
-                    </select>
-                  </div>
-                </div>
-                <div class="range-setting"><label>Portrait size</label><div><input id="fPortraitSize" type="range" min="140" max="250" step="5"><input id="fPortraitSizeNumber" type="number" min="140" max="250" step="5"></div></div>
-                <div class="field"><label>Portrait shape</label><select id="fPortraitShape"><option value="square">Square</option><option value="slight">Slightly rounded</option><option value="rounded">Rounded</option><option value="circle">Circle</option></select></div>
-                <div class="field"><label>Portrait image fit</label><select id="fPortraitFit"><option value="cover">Cover / crop</option><option value="contain">Contain</option></select></div>
-                <div class="field"><label>Portrait crop position</label><select id="fPortraitPosition"><option value="center">Center</option><option value="top">Top</option><option value="bottom">Bottom</option><option value="left">Left</option><option value="right">Right</option></select></div>
-                <div class="field"><label>Shadow</label><select id="fShadow"><option value="theme">Theme default</option><option value="none">None</option><option value="subtle">Subtle</option><option value="medium">Medium</option></select></div>
-              </div>
-
-              <div class="layout-control-card">
-                <h4>Columns & fonts</h4>
-                <div class="field"><label>Project columns</label><select id="fProjectColumns"><option value="1">1 column</option><option value="2">2 columns</option><option value="3">3 columns</option></select></div>
-                <div class="field"><label>Skills columns</label><select id="fSkillsColumns"><option value="1">1 column</option><option value="2">2 columns</option><option value="3">3 columns</option></select></div>
-                <div class="field"><label>Font pairing</label><select id="fFontPair">
-                  <option value="classic">Classic Academic — Georgia + Arial</option>
-                  <option value="modern">Modern Sans — Segoe UI</option>
-                  <option value="humanist">Humanist — Georgia + Segoe UI</option>
-                  <option value="editorial">Editorial Serif — Georgia</option>
-                  <option value="palatino">Modern Academic — Palatino + Segoe UI</option>
-                  <option value="bookish">Bookish — Georgia + Palatino</option>
-                </select></div>
-                <label class="setting-toggle"><input id="fStickySidebar" type="checkbox"> Keep profile sidebar sticky while scrolling</label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="admin-panel" data-panel="experience">
-        <div class="admin-card">
-          <div class="settings-head">
-            <div>
-              <h2>Experience</h2>
-              <p class="muted">Turn optional interaction and motion features on or off.</p>
-            </div>
-            <button id="resetExperienceBtn" class="secondary" type="button">Reset experience</button>
-          </div>
-
-          <div class="experience-grid">
-            <label class="experience-card"><input id="fActiveNav" type="checkbox"><span><strong>Active navigation highlight</strong><small>Highlights the section currently being viewed.</small></span></label>
-            <label class="experience-card"><input id="fBackToTop" type="checkbox"><span><strong>Back-to-top button</strong><small>Shows a small ↑ button after scrolling down.</small></span></label>
-            <label class="experience-card"><input id="fLightbox" type="checkbox"><span><strong>Full-image viewer + download</strong><small>Click the profile photo or enabled site images to view the original at full size and download it.</small></span></label>
-            <label class="experience-card"><input id="fSmoothScroll" type="checkbox"><span><strong>Smooth scrolling</strong><small>Smoothly moves between navigation sections.</small></span></label>
-            <label class="experience-card"><input id="fCopyButtons" type="checkbox"><span><strong>Copy contact buttons</strong><small>Adds one-click Copy buttons for email and phone.</small></span></label>
-
-            <div class="experience-card experience-select-card">
-              <span><strong>Entrance animations</strong><small>Keep motion subtle for an academic site.</small></span>
-              <select id="fAnimations"><option value="off">Off</option><option value="subtle">Subtle</option><option value="normal">Normal</option></select>
-            </div>
-            <div class="experience-card experience-select-card">
-              <span><strong>Hover interactions</strong><small>Add restrained feedback when visitors hover over cards, images, links, and buttons.</small></span>
-              <select id="fHoverInteractions"><option value="off">Off</option><option value="subtle">Subtle</option><option value="lift">Lift</option><option value="glow">Glow</option></select>
-            </div>
-            <div class="experience-card experience-select-card">
-              <span><strong>Active-nav style</strong><small>Choose how the current section is highlighted.</small></span>
-              <select id="fNavHighlightStyle"><option value="underline">Underline</option><option value="pill">Pill</option><option value="text">Text only</option></select>
-            </div>
-            <div class="experience-card experience-select-card">
-              <span><strong>Social links style</strong><small>Show academic links with labels or as compact icons.</small></span>
-              <select id="fSocialStyle"><option value="labels">Icons + labels</option><option value="icons">Icons only</option></select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <div class="admin-panel" data-panel="preview">
-        <div class="admin-card preview-admin-card">
-          <div class="settings-head">
-            <div>
-              <h2>Live preview</h2>
-              <p class="muted">Preview unsaved Admin changes before publishing.</p>
-            </div>
-            <button id="refreshPreviewBtn" class="secondary" type="button">Refresh preview</button>
-          </div>
-          <div class="preview-device-bar">
-            <button class="secondary preview-device active" data-preview-device="desktop" type="button">Desktop 1280</button>
-            <button class="secondary preview-device" data-preview-device="tablet" type="button">Tablet 768</button>
-            <button class="secondary preview-device" data-preview-device="mobile360" type="button">Mobile 360</button>
-            <button class="secondary preview-device" data-preview-device="mobile390" type="button">Mobile 390</button>
-            <button class="secondary preview-device" data-preview-device="mobile412" type="button">Mobile 412</button>
-            <button class="secondary preview-device" data-preview-device="custom" type="button">Custom</button>
-            <span id="previewDeviceLabel" class="helper">Desktop · 1280 × 800 CSS px</span>
-          </div>
-          <div id="previewCustomSize" class="preview-custom-size hidden">
-            <label>Width <input id="previewCustomWidth" type="number" min="280" max="1600" step="1" value="390"> <span>px</span></label>
-            <label>Height <input id="previewCustomHeight" type="number" min="500" max="1600" step="1" value="844"> <span>px</span></label>
-            <span class="helper">Uses CSS viewport pixels, like browser responsive-device tools.</span>
-          </div>
-          <p class="helper preview-accuracy-note">The preview iframe uses an exact viewport size. <strong>Refresh preview</strong> performs a real cache-busted reload of the public page and then reapplies your unsaved Admin content.</p>
-          <div class="preview-stage">
-            <div id="previewFrameShell" class="preview-frame-shell preview-desktop">
-              <iframe id="sitePreviewFrame" title="Live website preview" src="index.html?adminPreview=1" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="admin-panel" data-panel="history">
-        <div class="admin-card">
-          <div class="settings-head">
-            <div>
-              <h2>Undo & revision history</h2>
-              <p class="muted">Undo unsaved edits or restore an earlier saved version of the website.</p>
-            </div>
-            <div class="action-row">
-              <button id="globalUndoBtn" class="secondary" type="button" disabled>Undo</button>
-              <button id="globalRedoBtn" class="secondary" type="button" disabled>Redo</button>
-            </div>
-          </div>
-          <div class="history-summary">
-            <div><strong id="undoCount">0</strong><span>Undo steps</span></div>
-            <div><strong id="redoCount">0</strong><span>Redo steps</span></div>
-            <div><strong id="revisionCount">0</strong><span>Saved revisions</span></div>
-          </div>
-          <div class="settings-section">
-            <div class="settings-head">
-              <div><h3>Saved revisions</h3><p class="muted">The latest 12 saved website states are kept automatically.</p></div>
-              <button id="addManualRevisionBtn" class="secondary" type="button">Save checkpoint</button>
-            </div>
-            <div id="revisionList" class="revision-list"></div>
-          </div>
-        </div>
-      </div>
-      <div class="admin-panel" data-panel="backup">
-        <div class="admin-card">
-          <h2>Backup & restore</h2>
-          <p class="muted">Export the entire editable website configuration as JSON, or load it back later. Imported data is not public until you click Save all changes.</p>
-
-          <div class="backup-grid">
-            <div class="backup-card">
-              <h3>Export backup</h3>
-              <p class="muted">Includes content, section settings, theme, custom theme, typography, layout and experience settings.</p>
-              <button id="exportBackupBtn" class="secondary" type="button">Export website backup</button>
-            </div>
-
-            <div class="backup-card">
-              <h3>Import backup</h3>
-              <p class="muted">Choose a JSON backup previously exported from this admin system.</p>
-              <input id="backupImportFile" type="file" accept=".json,application/json">
-              <button id="importBackupBtn" class="secondary" type="button">Load backup into editor</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-
-      <div class="save-footer">
-        <div class="action-row">
-          <button id="saveBtn" class="primary" type="button">Save all changes</button>
-          <span id="saveStatus" class="status"></span>
-        </div>
-      </div>
-    </div>
-  </section>
+</div><div class="settings-section">
+<div class="settings-head">
+<div><h3>Sections</h3><p class="muted">Reorder or hide any public section without deleting its content.</p></div>
+<button class="secondary" id="resetSectionStructureBtn" type="button">Reset sections</button>
+</div>
+<div class="section-manager" id="sectionManager"></div>
+</div></div></div><div class="admin-panel" data-panel="cover"><div class="admin-card"><h2>Cover</h2><p class="muted">Control the optional inner-page profile cover independently from the rest of the layout.</p><div class="section-cover-admin">
+<div class="settings-head compact-settings-head">
+<div>
+<h4>Inner-page profile cover</h4>
+<p class="muted">On section pages other than Home, transform the profile area into a horizontal cover-style banner.</p>
+</div>
+<label class="setting-toggle strong-toggle">
+<input id="fSectionCoverEnabled" type="checkbox"/>
+                    Enable cover
+                  </label>
+</div>
+<div class="section-cover-options" id="sectionCoverOptions">
+<div class="field cover-visibility-field">
+<label>Cover visibility</label>
+<select id="fSectionCoverScope">
+<option value="research">Research-focused only</option>
+<option value="all">All inner sections</option>
+<option value="none">No inner-page covers</option>
+<option value="custom">Custom by section</option>
+</select>
+<p class="helper compact-helper">Research-focused shows the cover only on Research Interests and Undergraduate Thesis.</p>
+</div>
+<div class="cover-custom-sections" id="sectionCoverCustomSections">
+<strong>Custom sections</strong>
+<div class="cover-custom-grid">
+<label><input data-cover-section="research" type="checkbox"/> Research Interests</label>
+<label><input data-cover-section="thesis" type="checkbox"/> Undergraduate Thesis</label>
+<label><input data-cover-section="publications" type="checkbox"/> Publications</label>
+<label><input data-cover-section="projects" type="checkbox"/> Projects &amp; Simulations</label>
+<label><input data-cover-section="activities" type="checkbox"/> Academic Activities</label>
+<label><input data-cover-section="skills" type="checkbox"/> Skills</label>
+<label><input data-cover-section="education" type="checkbox"/> Education</label>
+<label><input data-cover-section="contact" type="checkbox"/> Contact</label>
+<label><input data-cover-section="cv" type="checkbox"/> Curriculum Vitae</label>
+</div>
+</div>
+<div class="field">
+<label>Cover style</label>
+<select id="fSectionCoverStyle">
+<option value="framed">Framed Fade</option>
+<option value="fullbleed">Full Bleed</option>
+<option value="split">Split Hero</option>
+<option value="glass">Glass Overlay</option>
+</select>
+</div>
+<div class="field">
+<label>Photo fit</label>
+<select id="fSectionCoverPhotoFit">
+<option value="crop">Fill cover / crop</option>
+<option value="full">Full portrait / fit whole image</option>
+</select>
+</div>
+<label class="setting-toggle fullbleed-topblend-toggle">
+<input id="fSectionCoverTopBlend" type="checkbox"/>
+                    Blend Full Bleed upward behind navigation
+                  </label>
+<div class="range-setting section-cover-zoom-setting">
+<label>Photo zoom</label>
+<div>
+<input id="fSectionCoverZoom" max="170" min="40" step="5" type="range"/>
+<input id="fSectionCoverZoomNumber" max="170" min="40" step="5" type="number"/>
+</div>
+</div>
+<div class="field">
+<label>Photo side</label>
+<select id="fSectionCoverSide">
+<option value="right">Photo right · info left</option>
+<option value="left">Photo left · info right</option>
+</select>
+</div>
+<div class="field">
+<label>Fade strength</label>
+<select id="fSectionCoverFade">
+<option value="soft">Soft</option>
+<option value="medium">Medium</option>
+<option value="strong">Strong</option>
+</select>
+</div>
+<div class="range-setting section-cover-height-setting">
+<label>Cover height</label>
+<div>
+<input id="fSectionCoverHeight" max="420" min="220" step="10" type="range"/>
+<input id="fSectionCoverHeightNumber" max="420" min="220" step="10" type="number"/>
+</div>
+</div>
+<div class="field">
+<label>Gap below navigation</label>
+<select id="fSectionCoverGap">
+<option value="0">No gap</option>
+<option value="12">Tight · 12 px</option>
+<option value="24">Compact · 24 px</option>
+<option value="42">Standard · 42 px</option>
+</select>
+</div>
+<label class="setting-toggle">
+<input id="fSectionCoverDetails" type="checkbox"/>
+                    Show institution, location &amp; focus
+                  </label>
+<label class="setting-toggle">
+<input id="fSectionCoverSocials" type="checkbox"/>
+                    Show social links
+                  </label>
+<button class="secondary section-cover-reset-btn" id="resetSectionCoverBtn" type="button">Reset cover to defaults</button>
+</div>
+</div></div></div>
+<div class="admin-panel" data-panel="experience">
+<div class="admin-card">
+<div class="settings-head">
+<div>
+<h2>Experience</h2>
+<p class="muted">Turn optional interaction and motion features on or off.</p>
+</div>
+<button class="secondary" id="resetExperienceBtn" type="button">Reset experience</button>
+</div>
+<div class="experience-grid">
+<label class="experience-card"><input id="fActiveNav" type="checkbox"/><span><strong>Active navigation highlight</strong><small>Highlights the section currently being viewed.</small></span></label>
+<label class="experience-card"><input id="fBackToTop" type="checkbox"/><span><strong>Back-to-top button</strong><small>Shows a small ↑ button after scrolling down.</small></span></label>
+<label class="experience-card"><input id="fLightbox" type="checkbox"/><span><strong>Full-image viewer + download</strong><small>Click the profile photo or enabled site images to view the original at full size and download it.</small></span></label>
+<label class="experience-card"><input id="fSmoothScroll" type="checkbox"/><span><strong>Smooth scrolling</strong><small>Smoothly moves between navigation sections.</small></span></label>
+<label class="experience-card"><input id="fCopyButtons" type="checkbox"/><span><strong>Copy contact buttons</strong><small>Adds one-click Copy buttons for email and phone.</small></span></label>
+<div class="experience-card experience-select-card">
+<span><strong>Entrance animations</strong><small>Keep motion subtle for an academic site.</small></span>
+<select id="fAnimations"><option value="off">Off</option><option value="subtle">Subtle</option><option value="normal">Normal</option></select>
+</div>
+<div class="experience-card experience-select-card">
+<span><strong>Hover interactions</strong><small>Add restrained feedback when visitors hover over cards, images, links, and buttons.</small></span>
+<select id="fHoverInteractions"><option value="off">Off</option><option value="subtle">Subtle</option><option value="lift">Lift</option><option value="glow">Glow</option></select>
+</div>
+<div class="experience-card experience-select-card">
+<span><strong>Active-nav style</strong><small>Choose how the current section is highlighted.</small></span>
+<select id="fNavHighlightStyle"><option value="underline">Underline</option><option value="pill">Pill</option><option value="text">Text only</option></select>
+</div>
+<div class="experience-card experience-select-card">
+<span><strong>Social links style</strong><small>Show academic links with labels or as compact icons.</small></span>
+<select id="fSocialStyle"><option value="labels">Icons + labels</option><option value="icons">Icons only</option></select>
+</div>
+</div>
+</div>
+</div>
+<div class="admin-panel" data-panel="preview">
+<div class="admin-card preview-admin-card">
+<div class="settings-head">
+<div>
+<h2>Live preview</h2>
+<p class="muted">Preview unsaved Admin changes before publishing.</p>
+</div>
+<button class="secondary" id="refreshPreviewBtn" type="button">Refresh preview</button>
+</div>
+<div class="preview-device-bar">
+<button class="secondary preview-device active" data-preview-device="desktop" type="button">Desktop 1280</button>
+<button class="secondary preview-device" data-preview-device="tablet" type="button">Tablet 768</button>
+<button class="secondary preview-device" data-preview-device="mobile360" type="button">Mobile 360</button>
+<button class="secondary preview-device" data-preview-device="mobile390" type="button">Mobile 390</button>
+<button class="secondary preview-device" data-preview-device="mobile412" type="button">Mobile 412</button>
+<button class="secondary preview-device" data-preview-device="custom" type="button">Custom</button>
+<span class="helper" id="previewDeviceLabel">Desktop · 1280 × 800 CSS px</span>
+</div>
+<div class="preview-custom-size hidden" id="previewCustomSize">
+<label>Width <input id="previewCustomWidth" max="1600" min="280" step="1" type="number" value="390"/> <span>px</span></label>
+<label>Height <input id="previewCustomHeight" max="1600" min="500" step="1" type="number" value="844"/> <span>px</span></label>
+<span class="helper">Uses CSS viewport pixels, like browser responsive-device tools.</span>
+</div>
+<p class="helper preview-accuracy-note">The preview iframe uses an exact viewport size. <strong>Refresh preview</strong> performs a real cache-busted reload of the public page and then reapplies your unsaved Admin content.</p>
+<div class="preview-stage">
+<div class="preview-frame-shell preview-desktop" id="previewFrameShell">
+<iframe id="sitePreviewFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" src="index.html?adminPreview=1" title="Live website preview"></iframe>
+</div>
+</div>
+</div>
+</div>
+<div class="admin-panel" data-panel="history">
+<div class="admin-card">
+<div class="settings-head">
+<div>
+<h2>Undo &amp; revision history</h2>
+<p class="muted">Undo unsaved edits or restore an earlier saved version of the website.</p>
+</div>
+<div class="action-row">
+<button class="secondary" disabled="" id="globalUndoBtn" type="button">Undo</button>
+<button class="secondary" disabled="" id="globalRedoBtn" type="button">Redo</button>
+</div>
+</div>
+<div class="history-summary">
+<div><strong id="undoCount">0</strong><span>Undo steps</span></div>
+<div><strong id="redoCount">0</strong><span>Redo steps</span></div>
+<div><strong id="revisionCount">0</strong><span>Saved revisions</span></div>
+</div>
+<div class="settings-section">
+<div class="settings-head">
+<div><h3>Saved revisions</h3><p class="muted">The latest 12 saved website states are kept automatically.</p></div>
+<button class="secondary" id="addManualRevisionBtn" type="button">Save checkpoint</button>
+</div>
+<div class="revision-list" id="revisionList"></div>
+</div>
+</div>
+</div>
+<div class="admin-panel" data-panel="backup">
+<div class="admin-card">
+<h2>Backup &amp; restore</h2>
+<p class="muted">Export the entire editable website configuration as JSON, or load it back later. Imported data is not public until you click Save all changes.</p>
+<div class="backup-grid">
+<div class="backup-card">
+<h3>Export backup</h3>
+<p class="muted">Includes content, section settings, theme, custom theme, typography, layout and experience settings.</p>
+<button class="secondary" id="exportBackupBtn" type="button">Export website backup</button>
+</div>
+<div class="backup-card">
+<h3>Import backup</h3>
+<p class="muted">Choose a JSON backup previously exported from this admin system.</p>
+<input accept=".json,application/json" id="backupImportFile" type="file"/>
+<button class="secondary" id="importBackupBtn" type="button">Load backup into editor</button>
+</div>
+</div>
+</div>
+</div>
+<div class="save-footer">
+<div class="action-row">
+<button class="primary" id="saveBtn" type="button">Save all changes</button>
+<span class="status" id="saveStatus"></span>
+</div>
+</div>
+</div>
+</section>
 </main>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-  <script>
+<script>
     if (window.pdfjsLib) {
       pdfjsLib.GlobalWorkerOptions.workerSrc =
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260828-cardstyles1"></script>
+<script src="admin.js?v=20260828-adminreorg1"></script>
 </body>
 </html>

@@ -71,7 +71,12 @@ const DEFAULT_TYPOGRAPHY={
   sectionTitleSize:44,
   sectionTitleColor:"",
   sectionSubtitleSize:25,
-  sectionSubtitleColor:""
+  sectionSubtitleColor:"",
+  bodyTextSize:16,
+  bodyTextColor:"",
+  bodyLineHeight:1.7,
+  cardTitleSize:20,
+  navTextSize:13
 };
 
 function normalizeTypography(content){
@@ -83,7 +88,12 @@ function normalizeTypography(content){
       sectionTitleSize:clampNumber(raw.sectionTitleSize,30,60,DEFAULT_TYPOGRAPHY.sectionTitleSize),
       sectionTitleColor:validHex(raw.sectionTitleColor)?raw.sectionTitleColor:"",
       sectionSubtitleSize:clampNumber(raw.sectionSubtitleSize,16,34,DEFAULT_TYPOGRAPHY.sectionSubtitleSize),
-      sectionSubtitleColor:validHex(raw.sectionSubtitleColor)?raw.sectionSubtitleColor:""
+      sectionSubtitleColor:validHex(raw.sectionSubtitleColor)?raw.sectionSubtitleColor:"",
+      bodyTextSize:clampNumber(raw.bodyTextSize,14,20,DEFAULT_TYPOGRAPHY.bodyTextSize),
+      bodyTextColor:validHex(raw.bodyTextColor)?raw.bodyTextColor:"",
+      bodyLineHeight:clampNumber(raw.bodyLineHeight,1.4,2,DEFAULT_TYPOGRAPHY.bodyLineHeight),
+      cardTitleSize:clampNumber(raw.cardTitleSize,16,28,DEFAULT_TYPOGRAPHY.cardTitleSize),
+      navTextSize:clampNumber(raw.navTextSize,11,16,DEFAULT_TYPOGRAPHY.navTextSize)
     }
   };
   return content;
@@ -106,6 +116,11 @@ function applyAdminTypographyPreview(){
   root.style.setProperty("--public-section-subtitle-size",`${t.sectionSubtitleSize}px`);
   root.style.setProperty("--public-section-title-color",t.sectionTitleColor||"var(--accent)");
   root.style.setProperty("--public-section-subtitle-color",t.sectionSubtitleColor||"var(--muted)");
+  root.style.setProperty("--public-body-size",`${t.bodyTextSize}px`);
+  root.style.setProperty("--public-body-color",t.bodyTextColor||"var(--text)");
+  root.style.setProperty("--public-line-height",String(t.bodyLineHeight));
+  root.style.setProperty("--public-card-title-size",`${t.cardTitleSize}px`);
+  root.style.setProperty("--public-nav-text-size",`${t.navTextSize}px`);
 }
 
 
@@ -245,7 +260,8 @@ let typographySavedSnapshot=null;
 
 function typographyStateFromContent(){
   normalizeTypography(currentContent);
-  return structuredClone(currentContent.appearance.typography);
+  normalizeSiteSettings(currentContent);
+  return {...structuredClone(currentContent.appearance.typography),fontPair:currentContent.siteSettings.layout.fontPair};
 }
 
 function typographyStatesEqual(a,b){
@@ -264,54 +280,61 @@ function currentThemeTypographyColors(){
   const cs=getComputedStyle(document.documentElement);
   const accent=cs.getPropertyValue("--accent").trim();
   const muted=cs.getPropertyValue("--muted").trim();
+  const text=cs.getPropertyValue("--text").trim();
   return {
     title:validHex(accent)?accent.toUpperCase():"#9F8064",
-    subtitle:validHex(muted)?muted.toUpperCase():"#746E66"
+    subtitle:validHex(muted)?muted.toUpperCase():"#746E66",
+    body:validHex(text)?text.toUpperCase():"#202328"
   };
 }
 
 function showCurrentThemeColorsInBoxes(){
   const colors=currentThemeTypographyColors();
-
   $("useThemeSectionTitleColor").checked=true;
   $("useThemeSectionSubtitleColor").checked=true;
-
+  $("useThemeBodyTextColor").checked=true;
   $("fSectionTitleColor").value=colors.title;
   $("fSectionTitleColorText").value=colors.title;
   $("fSectionSubtitleColor").value=colors.subtitle;
   $("fSectionSubtitleColorText").value=colors.subtitle;
-
+  $("fBodyTextColor").value=colors.body;
+  $("fBodyTextColorText").value=colors.body;
   normalizeTypography(currentContent);
   currentContent.appearance.typography.sectionTitleColor="";
   currentContent.appearance.typography.sectionSubtitleColor="";
-
+  currentContent.appearance.typography.bodyTextColor="";
   syncTypographyDisabledState();
   applyAdminTypographyPreview();
   updateTypographyUndoButton();
 }
 
 function renderTypographyControlsFromState(t){
+  normalizeSiteSettings(currentContent);
   const state={
     sectionTitleSize:clampNumber(t?.sectionTitleSize,30,60,DEFAULT_TYPOGRAPHY.sectionTitleSize),
     sectionTitleColor:validHex(t?.sectionTitleColor)?t.sectionTitleColor:"",
     sectionSubtitleSize:clampNumber(t?.sectionSubtitleSize,16,34,DEFAULT_TYPOGRAPHY.sectionSubtitleSize),
-    sectionSubtitleColor:validHex(t?.sectionSubtitleColor)?t.sectionSubtitleColor:""
+    sectionSubtitleColor:validHex(t?.sectionSubtitleColor)?t.sectionSubtitleColor:"",
+    bodyTextSize:clampNumber(t?.bodyTextSize,14,20,DEFAULT_TYPOGRAPHY.bodyTextSize),
+    bodyTextColor:validHex(t?.bodyTextColor)?t.bodyTextColor:"",
+    bodyLineHeight:clampNumber(t?.bodyLineHeight,1.4,2,DEFAULT_TYPOGRAPHY.bodyLineHeight),
+    cardTitleSize:clampNumber(t?.cardTitleSize,16,28,DEFAULT_TYPOGRAPHY.cardTitleSize),
+    navTextSize:clampNumber(t?.navTextSize,11,16,DEFAULT_TYPOGRAPHY.navTextSize)
   };
-
-  $("fSectionTitleSize").value=state.sectionTitleSize;
-  $("fSectionTitleSizeNumber").value=state.sectionTitleSize;
-  $("fSectionSubtitleSize").value=state.sectionSubtitleSize;
-  $("fSectionSubtitleSizeNumber").value=state.sectionSubtitleSize;
-
+  const fontPair=Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,t?.fontPair)?t.fontPair:currentContent.siteSettings.layout.fontPair;
+  [["fSectionTitleSize","fSectionTitleSizeNumber",state.sectionTitleSize],["fSectionSubtitleSize","fSectionSubtitleSizeNumber",state.sectionSubtitleSize],["fBodyTextSize","fBodyTextSizeNumber",state.bodyTextSize],["fBodyLineHeight","fBodyLineHeightNumber",state.bodyLineHeight],["fCardTitleSize","fCardTitleSizeNumber",state.cardTitleSize],["fNavTextSize","fNavTextSizeNumber",state.navTextSize]].forEach(([a,b,v])=>{if($(a))$(a).value=v;if($(b))$(b).value=v});
+  if($("fFontPair"))$("fFontPair").value=fontPair;
+  currentContent.siteSettings.layout.fontPair=fontPair;
   const themeColors=currentThemeTypographyColors();
   $("fSectionTitleColor").value=state.sectionTitleColor||themeColors.title;
   $("fSectionSubtitleColor").value=state.sectionSubtitleColor||themeColors.subtitle;
+  $("fBodyTextColor").value=state.bodyTextColor||themeColors.body;
   $("fSectionTitleColorText").value=state.sectionTitleColor||themeColors.title;
   $("fSectionSubtitleColorText").value=state.sectionSubtitleColor||themeColors.subtitle;
-
+  $("fBodyTextColorText").value=state.bodyTextColor||themeColors.body;
   $("useThemeSectionTitleColor").checked=!state.sectionTitleColor;
   $("useThemeSectionSubtitleColor").checked=!state.sectionSubtitleColor;
-
+  $("useThemeBodyTextColor").checked=!state.bodyTextColor;
   syncTypographyDisabledState();
   currentContent.appearance.typography=structuredClone(state);
   applyAdminTypographyPreview();
@@ -320,18 +343,14 @@ function renderTypographyControlsFromState(t){
 
 function fillTypographyControls(){
   normalizeTypography(currentContent);
-  const t=structuredClone(currentContent.appearance.typography);
+  normalizeSiteSettings(currentContent);
+  const t=typographyStateFromContent();
   typographySavedSnapshot=structuredClone(t);
   renderTypographyControlsFromState(t);
 }
 
 function syncTypographyDisabledState(){
-  /* Color boxes stay editable even while showing the theme's current colors.
-     Editing a box automatically switches that item to manual override mode. */
-  $("fSectionTitleColor").disabled=false;
-  $("fSectionTitleColorText").disabled=false;
-  $("fSectionSubtitleColor").disabled=false;
-  $("fSectionSubtitleColorText").disabled=false;
+  ["fSectionTitleColor","fSectionTitleColorText","fSectionSubtitleColor","fSectionSubtitleColorText","fBodyTextColor","fBodyTextColorText"].forEach(id=>{if($(id))$(id).disabled=false});
 }
 
 function syncColorPickerToText(pickerId,textId,themeToggleId){
@@ -356,37 +375,34 @@ function syncColorPickerToText(pickerId,textId,themeToggleId){
 
 function previewTypographyFromControls(){
   normalizeTypography(currentContent);
-  currentContent.appearance.typography.sectionTitleSize=clampNumber($("fSectionTitleSize").value,30,60,44);
-  currentContent.appearance.typography.sectionSubtitleSize=clampNumber($("fSectionSubtitleSize").value,16,34,25);
-  currentContent.appearance.typography.sectionTitleColor=$("useThemeSectionTitleColor").checked?"":($("fSectionTitleColorText").value.trim()||$("fSectionTitleColor").value);
-  currentContent.appearance.typography.sectionSubtitleColor=$("useThemeSectionSubtitleColor").checked?"":($("fSectionSubtitleColorText").value.trim()||$("fSectionSubtitleColor").value);
-  if(currentContent.appearance.typography.sectionTitleColor&&!validHex(currentContent.appearance.typography.sectionTitleColor))currentContent.appearance.typography.sectionTitleColor="";
-  if(currentContent.appearance.typography.sectionSubtitleColor&&!validHex(currentContent.appearance.typography.sectionSubtitleColor))currentContent.appearance.typography.sectionSubtitleColor="";
+  normalizeSiteSettings(currentContent);
+  const t=currentContent.appearance.typography;
+  t.sectionTitleSize=clampNumber($("fSectionTitleSize").value,30,60,44);
+  t.sectionSubtitleSize=clampNumber($("fSectionSubtitleSize").value,16,34,25);
+  t.bodyTextSize=clampNumber($("fBodyTextSize").value,14,20,16);
+  t.bodyLineHeight=clampNumber($("fBodyLineHeight").value,1.4,2,1.7);
+  t.cardTitleSize=clampNumber($("fCardTitleSize").value,16,28,20);
+  t.navTextSize=clampNumber($("fNavTextSize").value,11,16,13);
+  t.sectionTitleColor=$("useThemeSectionTitleColor").checked?"":($("fSectionTitleColorText").value.trim()||$("fSectionTitleColor").value);
+  t.sectionSubtitleColor=$("useThemeSectionSubtitleColor").checked?"":($("fSectionSubtitleColorText").value.trim()||$("fSectionSubtitleColor").value);
+  t.bodyTextColor=$("useThemeBodyTextColor").checked?"":($("fBodyTextColorText").value.trim()||$("fBodyTextColor").value);
+  ["sectionTitleColor","sectionSubtitleColor","bodyTextColor"].forEach(k=>{if(t[k]&&!validHex(t[k]))t[k]=""});
+  if($("fFontPair"))currentContent.siteSettings.layout.fontPair=$("fFontPair").value;
   applyAdminTypographyPreview();
   updateTypographyUndoButton();
 }
 
 function resetTypographyControls(){
   const defaults=structuredClone(DEFAULT_TYPOGRAPHY);
-
-  /* Keep range sliders and numeric boxes synchronized. */
-  $("fSectionTitleSize").value=defaults.sectionTitleSize;
-  $("fSectionTitleSizeNumber").value=defaults.sectionTitleSize;
-  $("fSectionSubtitleSize").value=defaults.sectionSubtitleSize;
-  $("fSectionSubtitleSizeNumber").value=defaults.sectionSubtitleSize;
-
-  /* Default colors follow the currently selected theme and the color boxes
-     visibly show those exact theme colors. */
   const themeColors=currentThemeTypographyColors();
-  $("useThemeSectionTitleColor").checked=true;
-  $("useThemeSectionSubtitleColor").checked=true;
-  $("fSectionTitleColor").value=themeColors.title;
-  $("fSectionTitleColorText").value=themeColors.title;
-  $("fSectionSubtitleColor").value=themeColors.subtitle;
-  $("fSectionSubtitleColorText").value=themeColors.subtitle;
-
-  syncTypographyDisabledState();
-  previewTypographyFromControls();
+  [["fSectionTitleSize","fSectionTitleSizeNumber",defaults.sectionTitleSize],["fSectionSubtitleSize","fSectionSubtitleSizeNumber",defaults.sectionSubtitleSize],["fBodyTextSize","fBodyTextSizeNumber",defaults.bodyTextSize],["fBodyLineHeight","fBodyLineHeightNumber",defaults.bodyLineHeight],["fCardTitleSize","fCardTitleSizeNumber",defaults.cardTitleSize],["fNavTextSize","fNavTextSizeNumber",defaults.navTextSize]].forEach(([a,b,v])=>{$(a).value=v;$(b).value=v});
+  $("fFontPair").value=DEFAULT_SITE_SETTINGS.layout.fontPair;
+  $("useThemeSectionTitleColor").checked=true; $("useThemeSectionSubtitleColor").checked=true; $("useThemeBodyTextColor").checked=true;
+  $("fSectionTitleColor").value=themeColors.title; $("fSectionTitleColorText").value=themeColors.title;
+  $("fSectionSubtitleColor").value=themeColors.subtitle; $("fSectionSubtitleColorText").value=themeColors.subtitle;
+  $("fBodyTextColor").value=themeColors.body; $("fBodyTextColorText").value=themeColors.body;
+  normalizeSiteSettings(currentContent); currentContent.siteSettings.layout.fontPair=DEFAULT_SITE_SETTINGS.layout.fontPair;
+  syncTypographyDisabledState(); previewTypographyFromControls();
   setStatus("Typography reset to defaults. Click Save all changes to publish it.");
 }
 
@@ -807,9 +823,10 @@ function syncSiteCustomizationFromControls(){
 
 function resetLayoutStyleControls(){
   normalizeSiteSettings(currentContent);
-  currentContent.siteSettings.layout=structuredClone(DEFAULT_SITE_SETTINGS.layout);
+  const l=currentContent.siteSettings.layout,d=DEFAULT_SITE_SETTINGS.layout;
+  Object.assign(l,{maxWidth:d.maxWidth,sidebarWidth:d.sidebarWidth,layoutGap:d.layoutGap,sectionSpacing:d.sectionSpacing,projectColumns:d.projectColumns,skillsColumns:d.skillsColumns,stickySidebar:d.stickySidebar});
   fillSiteCustomizationControls();
-  setStatus("Layout style reset to defaults. Save all changes to publish.");
+  setStatus("Layout reset to defaults. Other Appearance, Profile, Typography, Structure and Cover settings were kept.");
 }
 
 function resetSectionStructure(){
@@ -945,7 +962,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=13;
+const BUILDER_SETTINGS_SCHEMA_VERSION=14;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1415,7 +1432,7 @@ function bindAdvancedAdminSuite(){
 
   const markCustomIfDesignEdit=(target)=>{
     if(!target?.closest)return;
-    if(target.closest('[data-panel="appearance"],[data-panel="typography"],[data-panel="layout"],[data-panel="experience"]')){
+    if(target.closest('[data-panel="appearance"],[data-panel="typography"],[data-panel="layout"],[data-panel="structure"],[data-panel="cover"],[data-panel="experience"]')||target.matches?.('#fPortraitSize,#fPortraitSizeNumber,#fPortraitShape,#fPortraitFit,#fPortraitPosition')){
       currentContent.appearance=currentContent.appearance||{};
       currentContent.appearance.designPreset="custom";
       renderDesignPresets();
@@ -2440,6 +2457,7 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 });
 syncColorPickerToText("fSectionTitleColor","fSectionTitleColorText","useThemeSectionTitleColor");
 syncColorPickerToText("fSectionSubtitleColor","fSectionSubtitleColorText","useThemeSectionSubtitleColor");
+syncColorPickerToText("fBodyTextColor","fBodyTextColorText","useThemeBodyTextColor");
 $("useThemeSectionTitleColor")?.addEventListener("change",()=>{
   if($("useThemeSectionTitleColor").checked){
     const c=currentThemeTypographyColors().title;
@@ -2458,6 +2476,10 @@ $("useThemeSectionSubtitleColor")?.addEventListener("change",()=>{
   syncTypographyDisabledState();
   previewTypographyFromControls();
 });
+$("useThemeBodyTextColor")?.addEventListener("change",()=>{
+  if($("useThemeBodyTextColor").checked){const c=currentThemeTypographyColors().body;$("fBodyTextColor").value=c;$("fBodyTextColorText").value=c;}
+  syncTypographyDisabledState();previewTypographyFromControls();
+});
 $("resetTypographyBtn")?.addEventListener("click",resetTypographyControls);
 $("undoTypographyBtn")?.addEventListener("click",undoTypographyControls);
 
@@ -2472,6 +2494,10 @@ syncRangeNumber("fLayoutGap","fLayoutGapNumber",20,100,58);
 syncRangeNumber("fSectionSpacing","fSectionSpacingNumber",20,90,40);
 syncRangeNumber("fCardRadius","fCardRadiusNumber",0,28,11);
 syncRangeNumber("fPortraitSize","fPortraitSizeNumber",140,250,190);
+syncRangeNumber("fBodyTextSize","fBodyTextSizeNumber",14,20,16);
+syncRangeNumber("fBodyLineHeight","fBodyLineHeightNumber",1.4,2,1.7);
+syncRangeNumber("fCardTitleSize","fCardTitleSizeNumber",16,28,20);
+syncRangeNumber("fNavTextSize","fNavTextSizeNumber",11,16,13);
 syncRangeNumber("fSectionCoverHeight","fSectionCoverHeightNumber",220,420,300);
 syncRangeNumber("fSectionCoverZoom","fSectionCoverZoomNumber",40,170,100);
 
