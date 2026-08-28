@@ -37,7 +37,12 @@ h3{margin:0 0 8px;font-size:20px}.lead{font-size:18px}.interest-list{padding-lef
 .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.card{border:1px solid var(--line);background:var(--surface);border-radius:11px;padding:19px;min-height:220px;box-shadow:var(--shadow);display:flex;flex-direction:column}
 .card p{font-size:14px}.card .meta-line{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);font-size:12px;font-weight:700;color:var(--muted)}
 .skills-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.skill-card{border-top:2px solid var(--accent);padding:18px 0 0}.skill-card ul{margin:10px 0 0;padding-left:18px;color:var(--muted)}
-.edu{display:grid;grid-template-columns:90px 1fr;gap:18px;padding:13px 0}.edu .period{font-size:13px;color:var(--muted);font-weight:700}
+.edu{border:1px solid var(--line);background:var(--surface);border-radius:var(--site-card-radius,11px);padding:20px;box-shadow:var(--site-shadow,var(--shadow));margin-bottom:14px;display:block;overflow:hidden}
+.edu-top{display:flex;align-items:flex-start;justify-content:space-between;gap:18px}
+.edu-heading{min-width:0}.edu-heading h3{margin:0 0 7px;font-size:20px;line-height:1.35}
+.edu-institution{margin:0;color:var(--accent);font-weight:700;font-size:14px;line-height:1.5}
+.edu-period-badge{flex:0 0 auto;display:inline-flex;align-items:center;min-height:28px;padding:5px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:800;white-space:nowrap}
+.edu-description{margin:14px 0 0}
 .contact-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px}.contact-item{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:14px 16px}
 .contact-item span{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:3px}.contact-item a,.contact-item strong{font-size:14px}
 .button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:0 15px;border-radius:8px;border:1px solid var(--accent);color:var(--accent);font-size:13px;font-weight:700;background:var(--surface)}
@@ -62,7 +67,7 @@ footer{display:flex;justify-content:space-between;gap:20px;font-size:13px;color:
 .cv-manager{display:grid;grid-template-columns:1fr 1fr;gap:18px}.cv-current{border:1px solid var(--line);border-radius:10px;padding:16px;background:var(--surface-soft)}.cv-current h3{font-size:16px}.cv-current p{margin:5px 0;font-size:13px}
 .save-footer{position:sticky;bottom:0;background:linear-gradient(transparent,#fff 18%);padding-top:24px;margin-top:10px}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{position:static}.research-card{grid-template-columns:1fr}.research-side{border-left:0;border-top:1px solid var(--line)}.cards,.skills-grid{grid-template-columns:1fr}.card{min-height:170px}.cv-manager{grid-template-columns:1fr}}
-@media(max-width:680px){.topbar-inner{align-items:flex-start;flex-direction:column;padding:10px 0}.layout{padding-top:28px}.edu{grid-template-columns:1fr}footer{flex-direction:column}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.contact-grid{grid-template-columns:1fr}.pub-top{display:block}.pub-status{display:inline-block;margin-top:5px}}
+@media(max-width:680px){.topbar-inner{align-items:flex-start;flex-direction:column;padding:10px 0}.layout{padding-top:28px}.edu-top{display:block}.edu-period-badge{margin-top:10px}footer{flex-direction:column}.form-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.contact-grid{grid-template-columns:1fr}.pub-top{display:block}.pub-status{display:inline-block;margin-top:5px}}
 
 
 /* Universal media / attachments */
@@ -3011,11 +3016,11 @@ body:not(.admin-body) .media-image-stage{overflow:hidden}
 
 /* Education academic details: CGPA, distinctions and important courses */
 .edu-main{min-width:0}
-.edu-cgpa{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"label value" "note note";align-items:center;column-gap:10px;row-gap:2px;width:max-content;max-width:100%;margin:10px 0 12px;padding:8px 11px;border-left:3px solid var(--accent);border-radius:0 9px 9px 0;background:var(--accent-soft)}
+.edu-cgpa{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"label value" "note note";align-items:center;column-gap:10px;row-gap:3px;width:max-content;max-width:100%;margin:16px 0 0;padding:9px 11px;border-left:3px solid var(--accent);border-radius:0 9px 9px 0;background:var(--accent-soft)}
 .edu-cgpa-label{grid-area:label;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
 .edu-cgpa-value{grid-area:value;font-size:14px;line-height:1.35;color:var(--text)}
 .edu-cgpa-subtitle{grid-area:note;font-size:12px;line-height:1.45;color:var(--muted);max-width:620px}
-.edu-courses{margin-top:14px}
+.edu-courses{margin-top:16px}
 .edu-courses-label{display:block;margin-bottom:7px;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
 .edu-course-list{display:flex;flex-wrap:wrap;gap:7px}
 .edu-course-chip{display:inline-flex;align-items:center;min-height:28px;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12px;line-height:1.35;color:var(--text)}

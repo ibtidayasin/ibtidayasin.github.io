@@ -1378,24 +1378,28 @@ function render(d){
     </article>`).join("");
 
   $("educationList").innerHTML=(d.education||[]).filter(e=>e.visible!==false).map(e=>`
-    <div class="edu">
-      <div class="period">${esc(e.period||"")}</div>
+    <article class="edu">
+      <div class="edu-top">
+        <div class="edu-heading">
+          <h3>${esc(e.degree||"")}</h3>
+          ${e.institution?`<p class="edu-institution">${esc(e.institution)}</p>`:""}
+        </div>
+        ${e.period?`<span class="edu-period-badge">${esc(e.period)}</span>`:""}
+      </div>
       <div class="edu-main">
-        <h3>${esc(e.degree||"")}</h3>
-        <p style="color:var(--accent);font-weight:700">${esc(e.institution||"")}</p>
         ${(e.cgpa||e.cgpaSubtitle)?`<div class="edu-cgpa">
           <span class="edu-cgpa-label">CGPA</span>
           ${e.cgpa?`<strong class="edu-cgpa-value">${esc(e.cgpa)}</strong>`:""}
           ${e.cgpaSubtitle?`<span class="edu-cgpa-subtitle">${esc(e.cgpaSubtitle)}</span>`:""}
         </div>`:""}
-        <p class="muted small">${esc(e.description||"")}</p>
+        ${e.description?`<p class="muted small edu-description">${esc(e.description)}</p>`:""}
         ${(e.courses||[]).length?`<div class="edu-courses">
           <span class="edu-courses-label">Important Courses</span>
           <div class="edu-course-list">${(e.courses||[]).map(course=>`<span class="edu-course-chip">${esc(course)}</span>`).join("")}</div>
         </div>`:""}
         <div class="item-media">${mediaHtml(e.media||[])}</div>
       </div>
-    </div>`).join("");
+    </article>`).join("");
 
   $("contactMessage").textContent=d.contact?.message||"";
   const contactItems=[];
