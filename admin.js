@@ -1256,7 +1256,17 @@ function bindPreviewMessages(){
         previewLastHash=String(e.data.hash);
         localStorage.setItem("academicPreviewHash",previewLastHash);
       }
-      scheduleAdminPreview(true);
+      /*
+       * Do NOT send preview content again here. The iframe's load handler
+       * already sends the Admin state once, and ordinary editor changes
+       * schedule their own updates. Re-sending on the child's "ready"
+       * acknowledgement creates an infinite parent/iframe message loop:
+       * send -> render -> ready -> send -> render -> ...
+       */
+      if(e.data?.type==="academic-site-preview-ready"&&$("previewDeviceLabel")){
+        const spec=currentPreviewDevice==="custom"?previewCustomSize():(PREVIEW_DEVICE_SIZES[currentPreviewDevice]||PREVIEW_DEVICE_SIZES.desktop);
+        $("previewDeviceLabel").textContent=spec.label;
+      }
     }
   });
 }
