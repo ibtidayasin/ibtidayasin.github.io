@@ -15,7 +15,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-  <link rel="stylesheet" href="styles.css?v=20260828-adminflash1">
+  <link rel="stylesheet" href="styles.css?v=20260828-covervisibility1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -860,6 +860,32 @@
 
                 <div id="sectionCoverOptions" class="section-cover-options">
 
+                  <div class="field cover-visibility-field">
+                    <label>Cover visibility</label>
+                    <select id="fSectionCoverScope">
+                      <option value="research">Research-focused only</option>
+                      <option value="all">All inner sections</option>
+                      <option value="none">No inner-page covers</option>
+                      <option value="custom">Custom by section</option>
+                    </select>
+                    <p class="helper compact-helper">Research-focused shows the cover only on Research Interests and Undergraduate Thesis.</p>
+                  </div>
+
+                  <div id="sectionCoverCustomSections" class="cover-custom-sections">
+                    <strong>Custom sections</strong>
+                    <div class="cover-custom-grid">
+                      <label><input type="checkbox" data-cover-section="research"> Research Interests</label>
+                      <label><input type="checkbox" data-cover-section="thesis"> Undergraduate Thesis</label>
+                      <label><input type="checkbox" data-cover-section="publications"> Publications</label>
+                      <label><input type="checkbox" data-cover-section="projects"> Projects &amp; Simulations</label>
+                      <label><input type="checkbox" data-cover-section="activities"> Academic Activities</label>
+                      <label><input type="checkbox" data-cover-section="skills"> Skills</label>
+                      <label><input type="checkbox" data-cover-section="education"> Education</label>
+                      <label><input type="checkbox" data-cover-section="contact"> Contact</label>
+                      <label><input type="checkbox" data-cover-section="cv"> Curriculum Vitae</label>
+                    </div>
+                  </div>
+
                   <div class="field">
                     <label>Cover style</label>
                     <select id="fSectionCoverStyle">
@@ -1128,6 +1154,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260828-adminflash1"></script>
+  <script src="admin.js?v=20260828-covervisibility1"></script>
 </body>
 </html>

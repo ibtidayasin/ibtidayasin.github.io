@@ -160,6 +160,7 @@ function applyCustomThemeVariables(theme){
 
 
 const SITE_SECTION_KEYS=["about","research","thesis","publications","projects","activities","skills","education","contact","cv"];
+const COVER_SECTION_KEYS=["research","thesis","publications","projects","activities","skills","education","contact","cv"];
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -184,6 +185,8 @@ const DEFAULT_SITE_SETTINGS={
     pageTransition:"fade",
     pagePager:true,
     sectionCoverEnabled:true,
+    sectionCoverScope:"research",
+    sectionCoverSections:{research:true,thesis:true,publications:false,projects:false,activities:false,skills:false,education:false,contact:false,cv:false},
     sectionCoverStyle:"framed",
     sectionCoverPhotoFit:"crop",
     sectionCoverTopBlend:false,
@@ -271,6 +274,8 @@ function normalizeSiteSettings(content){
       pageTransition:["none","fade","slide"].includes(l.pageTransition)?l.pageTransition:DEFAULT_SITE_SETTINGS.layout.pageTransition,
       pagePager:Object.prototype.hasOwnProperty.call(l,"pagePager")?l.pagePager!==false:DEFAULT_SITE_SETTINGS.layout.pagePager,
       sectionCoverEnabled:Object.prototype.hasOwnProperty.call(l,"sectionCoverEnabled")?l.sectionCoverEnabled!==false:DEFAULT_SITE_SETTINGS.layout.sectionCoverEnabled,
+      sectionCoverScope:["research","all","none","custom"].includes(l.sectionCoverScope)?l.sectionCoverScope:DEFAULT_SITE_SETTINGS.layout.sectionCoverScope,
+      sectionCoverSections:Object.fromEntries(COVER_SECTION_KEYS.map(k=>[k,(l.sectionCoverSections&&Object.prototype.hasOwnProperty.call(l.sectionCoverSections,k))?l.sectionCoverSections[k]===true:DEFAULT_SITE_SETTINGS.layout.sectionCoverSections[k]===true])),
       sectionCoverStyle:["framed","fullbleed","split","glass"].includes(l.sectionCoverStyle)?l.sectionCoverStyle:DEFAULT_SITE_SETTINGS.layout.sectionCoverStyle,
       sectionCoverPhotoFit:["crop","full"].includes(l.sectionCoverPhotoFit)?l.sectionCoverPhotoFit:DEFAULT_SITE_SETTINGS.layout.sectionCoverPhotoFit,
       sectionCoverTopBlend:Object.prototype.hasOwnProperty.call(l,"sectionCoverTopBlend")?l.sectionCoverTopBlend===true:DEFAULT_SITE_SETTINGS.layout.sectionCoverTopBlend,
@@ -548,7 +553,12 @@ function applySectionCoverState(d,key){
   const l=d.siteSettings.layout;
   const sectionMode=l.navigationMode==="sections";
   const innerPage=sectionMode&&key!=="about";
-  const enabled=innerPage&&l.sectionCoverEnabled!==false;
+  const coverScope=l.sectionCoverScope||"research";
+  const customSections=l.sectionCoverSections||{};
+  const sectionAllowed=coverScope==="all"||
+    (coverScope==="research"&&["research","thesis"].includes(key))||
+    (coverScope==="custom"&&customSections[key]===true);
+  const enabled=innerPage&&l.sectionCoverEnabled!==false&&coverScope!=="none"&&sectionAllowed;
   const root=document.documentElement;
   const sidebar=document.querySelector(".sidebar");
 
@@ -938,7 +948,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=8;
+const BUILDER_SETTINGS_SCHEMA_VERSION=9;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){

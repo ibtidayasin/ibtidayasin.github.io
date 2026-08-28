@@ -2750,3 +2750,13 @@ html[data-navigation-mode="sections"][data-section-page="inner"] body:not(.admin
 @media(max-width:760px){
   .activity-grid{grid-template-columns:1fr}
 }
+
+
+/* Per-section cover visibility controls */
+.cover-visibility-field .compact-helper{margin:.45rem 0 0;font-size:.88rem;line-height:1.45}
+.cover-custom-sections{margin:.25rem 0 .9rem;padding:.85rem 1rem;border:1px solid var(--line);border-radius:10px;background:var(--surface-alt)}
+.cover-custom-sections>strong{display:block;margin-bottom:.65rem;font-size:.92rem}
+.cover-custom-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.5rem 1rem}
+.cover-custom-grid label{display:flex;align-items:center;gap:.5rem;font-size:.9rem;line-height:1.35;cursor:pointer}
+.cover-custom-sections.disabled-options{opacity:.48}
+@media(max-width:720px){.cover-custom-grid{grid-template-columns:1fr}}
