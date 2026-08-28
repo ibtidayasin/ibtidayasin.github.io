@@ -920,7 +920,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=11;
+const BUILDER_SETTINGS_SCHEMA_VERSION=12;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1576,7 +1576,7 @@ function normalizeMedia(content){
   content.projects=(content.projects||[]).map(x=>({...x,type:String(x.type||""),media:Array.isArray(x.media)?x.media:[]}));
   content.academicActivities=(content.academicActivities||[]).map(x=>({...x,media:Array.isArray(x.media)?x.media:[]}));
   content.skills=(content.skills||[]).map(x=>({...x,media:Array.isArray(x.media)?x.media:[]}));
-  content.education=(content.education||[]).map(x=>({...x,media:Array.isArray(x.media)?x.media:[]}));
+  content.education=(content.education||[]).map(x=>({...x,cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:Array.isArray(x.media)?x.media:[]}));
   content.contact=content.contact||{};
   content.contact.media=Array.isArray(content.contact.media)?content.contact.media:[];
   return content;
@@ -1751,7 +1751,11 @@ function renderSkillsEditor(){
 function renderEducationEditor(){
   $("educationEditor").innerHTML=(currentContent.education||[]).map((e,i)=>repeatBlock("education",i,`Education ${i+1}`,[
     {label:"Period",key:"period",value:e.period},{label:"Degree",key:"degree",value:e.degree},
-    {label:"Institution",key:"institution",value:e.institution,full:true},{label:"Description",key:"description",value:e.description,kind:"textarea",full:true}
+    {label:"Institution",key:"institution",value:e.institution,full:true},
+    {label:"CGPA / GPA",key:"cgpa",value:e.cgpa||""},
+    {label:"CGPA subtitle / academic distinction",key:"cgpaSubtitle",value:e.cgpaSubtitle||"",full:true},
+    {label:"Description",key:"description",value:e.description,kind:"textarea",full:true},
+    {label:"Important Courses — one per line",key:"courses",value:(e.courses||[]).join("\n"),kind:"textarea",full:true}
   ],e.media||[],e.visible!==false)).join("")||`<div class="empty-state">No education entries added.</div>`;
 }
 
@@ -1885,7 +1889,7 @@ $("addSkillGroupBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.skills.push({category:"",items:[],visible:true,media:[]});renderSkillsEditor();
 });
 $("addEducationBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.education.push({period:"",degree:"",institution:"",description:"",visible:true,media:[]});renderEducationEditor();
+  syncAllForms();currentContent.education.push({period:"",degree:"",institution:"",cgpa:"",cgpaSubtitle:"",description:"",courses:[],visible:true,media:[]});renderEducationEditor();
 });
 
 document.addEventListener("click",async e=>{
@@ -2028,8 +2032,8 @@ function readRepeaters(){
 
   currentContent.education=[...document.querySelectorAll("[data-education]")].map((r,i)=>{
     const old=currentContent.education[i]||{};
-    return {period:get(r,"period"),degree:get(r,"degree"),institution:get(r,"institution"),description:get(r,"description"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
-  }).filter(x=>x.degree||x.institution||x.media.length);
+    return {period:get(r,"period"),degree:get(r,"degree"),institution:get(r,"institution"),cgpa:get(r,"cgpa"),cgpaSubtitle:get(r,"cgpaSubtitle"),description:get(r,"description"),courses:get(r,"courses").split("\n").map(x=>x.trim()).filter(Boolean),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
+  }).filter(x=>x.period||x.degree||x.institution||x.cgpa||x.cgpaSubtitle||x.description||x.courses.length||x.media.length);
 }
 function get(r,k){return(r.querySelector(`[data-k="${k}"]`)?.value||"").trim()}
 

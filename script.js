@@ -1031,7 +1031,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=11;
+const BUILDER_SETTINGS_SCHEMA_VERSION=12;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1156,7 +1156,7 @@ function normalize(d){
   d.publications=(d.publications||[]).map(x=>({...x,media:x.media||[]}));
   d.projects=(d.projects||[]).map(x=>({...x,media:x.media||[]}));
   d.skills=(d.skills||[]).map(x=>({...x,media:x.media||[]}));
-  d.education=(d.education||[]).map(x=>({...x,media:x.media||[]}));
+  d.education=(d.education||[]).map(x=>({...x,cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:x.media||[]}));
   d.contact=d.contact||{};d.contact.media=d.contact.media||[];
   return d;
 }
@@ -1380,10 +1380,19 @@ function render(d){
   $("educationList").innerHTML=(d.education||[]).filter(e=>e.visible!==false).map(e=>`
     <div class="edu">
       <div class="period">${esc(e.period||"")}</div>
-      <div>
+      <div class="edu-main">
         <h3>${esc(e.degree||"")}</h3>
         <p style="color:var(--accent);font-weight:700">${esc(e.institution||"")}</p>
+        ${(e.cgpa||e.cgpaSubtitle)?`<div class="edu-cgpa">
+          <span class="edu-cgpa-label">CGPA</span>
+          ${e.cgpa?`<strong class="edu-cgpa-value">${esc(e.cgpa)}</strong>`:""}
+          ${e.cgpaSubtitle?`<span class="edu-cgpa-subtitle">${esc(e.cgpaSubtitle)}</span>`:""}
+        </div>`:""}
         <p class="muted small">${esc(e.description||"")}</p>
+        ${(e.courses||[]).length?`<div class="edu-courses">
+          <span class="edu-courses-label">Important Courses</span>
+          <div class="edu-course-list">${(e.courses||[]).map(course=>`<span class="edu-course-chip">${esc(course)}</span>`).join("")}</div>
+        </div>`:""}
         <div class="item-media">${mediaHtml(e.media||[])}</div>
       </div>
     </div>`).join("");

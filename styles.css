@@ -3007,3 +3007,20 @@ body:not(.admin-body) .media-image-stage{overflow:hidden}
   .preview-device-bar{align-items:stretch}
   .preview-device-bar .preview-device{flex:1 1 auto}
 }
+
+
+/* Education academic details: CGPA, distinctions and important courses */
+.edu-main{min-width:0}
+.edu-cgpa{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"label value" "note note";align-items:center;column-gap:10px;row-gap:2px;width:max-content;max-width:100%;margin:10px 0 12px;padding:8px 11px;border-left:3px solid var(--accent);border-radius:0 9px 9px 0;background:var(--accent-soft)}
+.edu-cgpa-label{grid-area:label;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--accent)}
+.edu-cgpa-value{grid-area:value;font-size:14px;line-height:1.35;color:var(--text)}
+.edu-cgpa-subtitle{grid-area:note;font-size:12px;line-height:1.45;color:var(--muted);max-width:620px}
+.edu-courses{margin-top:14px}
+.edu-courses-label{display:block;margin-bottom:7px;font-size:10px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.edu-course-list{display:flex;flex-wrap:wrap;gap:7px}
+.edu-course-chip{display:inline-flex;align-items:center;min-height:28px;padding:4px 9px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:12px;line-height:1.35;color:var(--text)}
+@media(max-width:680px){
+  .edu-cgpa{width:100%;grid-template-columns:auto 1fr}
+  .edu-course-list{gap:6px}
+  .edu-course-chip{font-size:11px}
+}
