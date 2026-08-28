@@ -3374,3 +3374,130 @@ body:not(.admin-body) .thesis-card h3{font-size:var(--public-card-title-size)}
   .appearance-fold>summary{min-height:58px;padding:12px 13px}
   .appearance-fold-body{padding:12px}
 }
+
+
+/* =========================================================
+   DISTINCT CARD DESIGNS v15
+   Card Finish = subtle surface treatment (existing control).
+   Card Design = a separate, structural visual system.
+   ========================================================= */
+
+/* Keep the new selector compact in Appearance. */
+.card-options-three{grid-template-columns:minmax(0,1.1fr) repeat(2,minmax(0,1fr))!important}
+.card-style-compact-control>.helper{display:block;margin-top:7px;line-height:1.45}
+@media(max-width:900px){.card-options-three{grid-template-columns:1fr!important}}
+
+/* The section owns one design; the finish rules above can still tune surface/shadow. */
+.section[data-card-design] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
+  transition:border-color .18s ease,background .18s ease,box-shadow .18s ease,transform .18s ease;
+}
+
+/* 1. Standard design — preserves the familiar card architecture. */
+.section[data-card-design="standard"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
+  position:relative;
+}
+
+/* 2. Editorial Rail — square, publication-like blocks with a strong journal-margin rail. */
+.section[data-card-design="editorial"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
+  position:relative;
+  border-radius:2px!important;
+  border-top:0!important;
+  border-right:0!important;
+  border-bottom:1px solid var(--line)!important;
+  border-left:6px solid var(--accent)!important;
+  box-shadow:none!important;
+  padding-left:26px!important;
+  background:var(--surface)!important;
+}
+.section[data-card-design="editorial"] :is(.pub-item,.card,.activity-card,.skill-card,.edu) h3{
+  letter-spacing:-.025em;
+}
+.section[data-card-design="editorial"] .skill-card::before{display:none!important;content:none!important}
+.section[data-card-design="editorial"] .skill-card h3::after{
+  display:block!important;content:""!important;width:54px;height:2px;background:var(--accent);margin-top:10px;
+}
+.section[data-card-design="editorial"] .pub-status,
+.section[data-card-design="editorial"] .edu-period-badge,
+.section[data-card-design="editorial"] .activity-type-badge{border-radius:2px!important}
+
+/* 3. Header Band — a real header zone across every card. */
+.section[data-card-design="banded"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
+  position:relative;
+  overflow:hidden!important;
+  border-radius:14px!important;
+  padding-top:26px!important;
+  isolation:isolate;
+}
+.section[data-card-design="banded"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item)::before{
+  content:""!important;display:block!important;position:absolute!important;z-index:0!important;
+  inset:0 0 auto 0!important;height:82px!important;
+  background:var(--accent-soft)!important;border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,var(--line))!important;
+}
+.section[data-card-design="banded"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item)>*{position:relative;z-index:1}
+.section[data-card-design="banded"] .skill-card h3::after{display:none!important;content:none!important}
+.section[data-card-design="banded"] .skill-card::after{display:none!important;content:none!important}
+.section[data-card-design="banded"] .pub-status,
+.section[data-card-design="banded"] .edu-period-badge,
+.section[data-card-design="banded"] .activity-type-badge{
+  background:var(--surface)!important;border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));
+}
+.section[data-card-design="banded"] .thesis-meta{background:color-mix(in srgb,var(--surface) 88%,var(--accent-soft))}
+
+/* 4. Academic Ledger — no boxes: ruled academic records / CV-style entries. */
+.section[data-card-design="ledger"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
+  border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;
+  border-top:1px solid var(--line)!important;border-bottom:1px solid var(--line)!important;
+  padding:20px 2px!important;min-height:0!important;
+}
+.section[data-card-design="ledger"] :is(.cards,.skills-grid,.activity-grid,.contact-grid,.stack-list){gap:12px 28px!important}
+.section[data-card-design="ledger"] .skill-card::before,
+.section[data-card-design="ledger"] .skill-card h3::after{display:none!important;content:none!important}
+.section[data-card-design="ledger"] :is(.pub-status,.edu-period-badge,.activity-type-badge,.tag){
+  background:transparent!important;border:1px solid var(--line)!important;border-radius:3px!important;
+}
+.section[data-card-design="ledger"] .edu-cgpa{border-radius:2px!important;background:transparent!important;border:1px solid var(--line)!important}
+.section[data-card-design="ledger"] .card .meta-line{border-top:1px dashed var(--line)}
+
+/* 5. Spotlight Block — bold, soft-filled research tiles with oversized breathing room. */
+.section[data-card-design="spotlight"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
+  background:var(--accent-soft)!important;
+  border:0!important;border-radius:24px!important;
+  box-shadow:none!important;padding:28px!important;
+}
+.section[data-card-design="spotlight"] :is(.pub-item,.card,.activity-card,.skill-card,.edu) h3{color:var(--accent);font-weight:800}
+.section[data-card-design="spotlight"] .skill-card::before,
+.section[data-card-design="spotlight"] .skill-card h3::after{display:none!important;content:none!important}
+.section[data-card-design="spotlight"] .skill-card li{border-bottom-color:color-mix(in srgb,var(--accent) 18%,transparent)!important}
+.section[data-card-design="spotlight"] :is(.pub-status,.edu-period-badge,.activity-type-badge,.tag){
+  background:var(--surface)!important;border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));
+}
+.section[data-card-design="spotlight"] .edu-cgpa{background:var(--surface)!important;border-left-width:0!important;border-radius:14px!important}
+.section[data-card-design="spotlight"] .thesis-meta{background:color-mix(in srgb,var(--surface) 92%,var(--accent-soft));border-radius:16px}
+
+/* 6. Double Frame — formal academic certificate / portfolio framing. */
+.section[data-card-design="framed"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
+  position:relative;
+  border:1px solid color-mix(in srgb,var(--accent) 64%,var(--line))!important;
+  border-radius:5px!important;
+  padding:28px!important;
+  background:var(--surface)!important;
+  box-shadow:
+    inset 0 0 0 5px var(--surface),
+    inset 0 0 0 6px color-mix(in srgb,var(--accent) 25%,var(--line)),
+    var(--site-shadow,var(--shadow))!important;
+}
+.section[data-card-design="framed"] .skill-card::before{display:none!important;content:none!important}
+.section[data-card-design="framed"] .skill-card h3::after{
+  display:block!important;content:""!important;width:100%;height:1px;background:color-mix(in srgb,var(--accent) 35%,var(--line));margin-top:11px;
+}
+.section[data-card-design="framed"] :is(.pub-status,.edu-period-badge,.activity-type-badge){border-radius:3px!important}
+
+/* Do not let hover effects distort the deliberately flat Ledger design. */
+html[data-hover-interactions="lift"] .section[data-card-design="ledger"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item),
+html[data-hover-interactions="glow"] .section[data-card-design="ledger"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){transform:none!important}
+
+@media(max-width:680px){
+  .section[data-card-design="editorial"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){padding-left:20px!important}
+  .section[data-card-design="spotlight"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item),
+  .section[data-card-design="framed"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){padding:22px!important}
+}

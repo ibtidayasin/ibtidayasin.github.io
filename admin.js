@@ -420,6 +420,7 @@ const COVER_SECTION_KEYS=["research","thesis","publications","projects","activit
 const SIDEBAR_SECTION_KEYS=[...COVER_SECTION_KEYS];
 const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","skills","education","contact"];
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
+const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed"];
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -432,6 +433,7 @@ const DEFAULT_SITE_SETTINGS={
     sectionSpacing:40,
     cardRadius:11,
     cardStyles:{thesis:"classic",publications:"classic",projects:"classic",activities:"classic",skills:"clean",education:"classic",contact:"classic"},
+    cardDesigns:{thesis:"standard",publications:"standard",projects:"standard",activities:"standard",skills:"standard",education:"standard",contact:"standard"},
     portraitSize:190,
     portraitShape:"slight",
     portraitFit:"cover",
@@ -525,6 +527,7 @@ function normalizeSiteSettings(content){
       sectionSpacing:clampNumber(l.sectionSpacing,20,90,DEFAULT_SITE_SETTINGS.layout.sectionSpacing),
       cardRadius:clampNumber(l.cardRadius,0,28,DEFAULT_SITE_SETTINGS.layout.cardRadius),
       cardStyles:Object.fromEntries(CARD_STYLE_SECTION_KEYS.map(k=>[k,CARD_STYLE_VALUES.includes(l.cardStyles?.[k])?l.cardStyles[k]:DEFAULT_SITE_SETTINGS.layout.cardStyles[k]])),
+      cardDesigns:Object.fromEntries(CARD_STYLE_SECTION_KEYS.map(k=>[k,CARD_DESIGN_VALUES.includes(l.cardDesigns?.[k])?l.cardDesigns[k]:DEFAULT_SITE_SETTINGS.layout.cardDesigns[k]])),
       portraitSize:clampNumber(l.portraitSize,140,250,DEFAULT_SITE_SETTINGS.layout.portraitSize),
       portraitShape:["square","slight","rounded","circle"].includes(l.portraitShape)?l.portraitShape:DEFAULT_SITE_SETTINGS.layout.portraitShape,
       portraitFit:["cover","contain"].includes(l.portraitFit)?l.portraitFit:DEFAULT_SITE_SETTINGS.layout.portraitFit,
@@ -693,6 +696,7 @@ function fillSiteCustomizationControls(){
   const cardSection=(CARD_STYLE_SECTION_KEYS.includes($("fCardStyleSection")?.value)?$("fCardStyleSection").value:"skills");
   if($("fCardStyleSection"))$("fCardStyleSection").value=cardSection;
   if($("fCardStyleValue"))$("fCardStyleValue").value=l.cardStyles?.[cardSection]||DEFAULT_SITE_SETTINGS.layout.cardStyles[cardSection];
+  if($("fCardDesignValue"))$("fCardDesignValue").value=l.cardDesigns?.[cardSection]||DEFAULT_SITE_SETTINGS.layout.cardDesigns[cardSection];
   $("fStickySidebar").checked=l.stickySidebar;
   $("fNavigationModeSingle").checked=l.navigationMode!=="sections";
   $("fNavigationModeSections").checked=l.navigationMode==="sections";
@@ -739,6 +743,7 @@ function refreshCardStyleMiniControl(){
   normalizeSiteSettings(currentContent);
   const section=$("fCardStyleSection")?.value||"skills";
   if($("fCardStyleValue"))$("fCardStyleValue").value=currentContent.siteSettings.layout.cardStyles?.[section]||DEFAULT_SITE_SETTINGS.layout.cardStyles[section]||"classic";
+  if($("fCardDesignValue"))$("fCardDesignValue").value=currentContent.siteSettings.layout.cardDesigns?.[section]||DEFAULT_SITE_SETTINGS.layout.cardDesigns[section]||"standard";
 }
 
 function storeCardStyleMiniControl(){
@@ -747,6 +752,14 @@ function storeCardStyleMiniControl(){
   const value=$("fCardStyleValue")?.value;
   if(!CARD_STYLE_SECTION_KEYS.includes(section)||!CARD_STYLE_VALUES.includes(value))return;
   currentContent.siteSettings.layout.cardStyles={...DEFAULT_SITE_SETTINGS.layout.cardStyles,...(currentContent.siteSettings.layout.cardStyles||{}),[section]:value};
+}
+
+function storeCardDesignMiniControl(){
+  normalizeSiteSettings(currentContent);
+  const section=$("fCardStyleSection")?.value;
+  const value=$("fCardDesignValue")?.value;
+  if(!CARD_STYLE_SECTION_KEYS.includes(section)||!CARD_DESIGN_VALUES.includes(value))return;
+  currentContent.siteSettings.layout.cardDesigns={...DEFAULT_SITE_SETTINGS.layout.cardDesigns,...(currentContent.siteSettings.layout.cardDesigns||{}),[section]:value};
 }
 
 function renderSectionManager(){
@@ -778,9 +791,12 @@ function syncSiteCustomizationFromControls(){
   l.sectionSpacing=clampNumber($("fSectionSpacingNumber").value||$("fSectionSpacing").value,20,90,40);
   l.cardRadius=clampNumber($("fCardRadiusNumber").value||$("fCardRadius").value,0,28,11);
   l.cardStyles={...DEFAULT_SITE_SETTINGS.layout.cardStyles,...(l.cardStyles||{})};
+  l.cardDesigns={...DEFAULT_SITE_SETTINGS.layout.cardDesigns,...(l.cardDesigns||{})};
   const cardStyleSection=$("fCardStyleSection")?.value;
   const cardStyleValue=$("fCardStyleValue")?.value;
+  const cardDesignValue=$("fCardDesignValue")?.value;
   if(CARD_STYLE_SECTION_KEYS.includes(cardStyleSection)&&CARD_STYLE_VALUES.includes(cardStyleValue))l.cardStyles[cardStyleSection]=cardStyleValue;
+  if(CARD_STYLE_SECTION_KEYS.includes(cardStyleSection)&&CARD_DESIGN_VALUES.includes(cardDesignValue))l.cardDesigns[cardStyleSection]=cardDesignValue;
   l.portraitSize=clampNumber($("fPortraitSizeNumber").value||$("fPortraitSize").value,140,250,190);
   l.portraitShape=$("fPortraitShape").value;
   l.portraitFit=$("fPortraitFit").value;
@@ -962,7 +978,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=14;
+const BUILDER_SETTINGS_SCHEMA_VERSION=15;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -2537,6 +2553,10 @@ $("fCardStyleValue")?.addEventListener("change",()=>{
   storeCardStyleMiniControl();
   scheduleAdminPreview(true);
 });
+$("fCardDesignValue")?.addEventListener("change",()=>{
+  storeCardDesignMiniControl();
+  scheduleAdminPreview(true);
+});
 $("fSidebarScope")?.addEventListener("change",()=>{
   updateSidebarAdminOptions();
   scheduleAdminPreview(true);
@@ -2603,7 +2623,7 @@ function setupAppearanceAccordions(){
   const customBuilder=panel.querySelector('.custom-theme-builder');
   const previewNote=panel.querySelector('.theme-preview-note');
   const presetCard=[...panel.querySelectorAll(':scope > .admin-card')].find(el=>el.querySelector('#designPresetGrid'));
-  const cardsCard=[...panel.querySelectorAll(':scope > .admin-card')].find(el=>el.querySelector('#fCardStyleValue'));
+  const cardsCard=[...panel.querySelectorAll(':scope > .admin-card')].find(el=>el.querySelector('#fCardStyleValue')||el.querySelector('#fCardDesignValue'));
 
   function addFold(key,title,description,nodes){
     const valid=nodes.filter(Boolean);
@@ -2630,7 +2650,7 @@ function setupAppearanceAccordions(){
   addFold('themes','Website themes','All color palettes and the Custom Theme choice.',[grid,previewNote]);
   addFold('custom','Custom theme builder','Fine-tune page, card, text, accent and portrait colors.',[customBuilder]);
   addFold('presets','Design presets','Apply a complete visual starting point without replacing your content.',[presetCard]);
-  addFold('cards','Cards','Choose section card style, corner radius and shadow.',[cardsCard]);
+  addFold('cards','Cards','Choose a subtle finish or switch to a completely different card design.',[cardsCard]);
 
   panel.addEventListener('click',e=>{
     const btn=e.target.closest('[data-appearance-fold-all]');
