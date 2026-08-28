@@ -2566,4 +2566,82 @@ $("fSectionCoverTopBlend")?.addEventListener("change",()=>scheduleAdminPreview(t
 $("resetSectionCoverBtn")?.addEventListener("click",resetSectionCoverControls);
 
 $("fSectionCoverGap")?.addEventListener("change",()=>scheduleAdminPreview(true));
+
+/* =========================================================
+   COMPACT / COLLAPSIBLE APPEARANCE PANEL
+   ========================================================= */
+function setupAppearanceAccordions(){
+  const panel=document.querySelector('[data-panel="appearance"]');
+  if(!panel||panel.classList.contains('appearance-fold-ready'))return;
+  panel.classList.add('appearance-fold-ready');
+
+  const head=panel.querySelector('.appearance-head');
+  if(head){
+    const eyebrow=head.querySelector('.eyebrow');
+    const title=head.querySelector('.admin-section-title');
+    const desc=head.querySelector('.muted');
+    if(eyebrow)eyebrow.textContent='Appearance';
+    if(title)title.textContent='Appearance settings';
+    if(desc)desc.textContent='Expand only the group you want to edit. Collapse it again to keep this page short.';
+
+    const actions=document.createElement('div');
+    actions.className='appearance-fold-actions';
+    actions.innerHTML='<button class="secondary" type="button" data-appearance-fold-all="open">Expand all</button><button class="secondary" type="button" data-appearance-fold-all="close">Collapse all</button>';
+    head.appendChild(actions);
+  }
+
+  // Clean a historical duplicate "Custom" theme-group heading if present.
+  const grid=panel.querySelector('.theme-choice-grid');
+  if(grid){
+    const groupTitles=[...grid.querySelectorAll(':scope > .theme-group-title')];
+    groupTitles.forEach((el,i)=>{
+      const prev=groupTitles[i-1];
+      if(prev&&prev.textContent.trim()===el.textContent.trim()&&prev.nextElementSibling===el)el.remove();
+    });
+  }
+
+  const customBuilder=panel.querySelector('.custom-theme-builder');
+  const previewNote=panel.querySelector('.theme-preview-note');
+  const presetCard=[...panel.querySelectorAll(':scope > .admin-card')].find(el=>el.querySelector('#designPresetGrid'));
+  const cardsCard=[...panel.querySelectorAll(':scope > .admin-card')].find(el=>el.querySelector('#fCardStyleValue'));
+
+  function addFold(key,title,description,nodes){
+    const valid=nodes.filter(Boolean);
+    if(!valid.length)return null;
+    const details=document.createElement('details');
+    details.className='appearance-fold';
+    details.dataset.appearanceFold=key;
+
+    const saved=localStorage.getItem('academicAppearanceFold:'+key);
+    details.open=saved==='1';
+
+    const summary=document.createElement('summary');
+    summary.innerHTML=`<span class="appearance-fold-title"><strong>${title}</strong><small>${description}</small></span><span class="appearance-fold-chevron" aria-hidden="true"></span>`;
+    const body=document.createElement('div');
+    body.className='appearance-fold-body';
+
+    valid[0].before(details);
+    valid.forEach(node=>body.appendChild(node));
+    details.append(summary,body);
+    details.addEventListener('toggle',()=>localStorage.setItem('academicAppearanceFold:'+key,details.open?'1':'0'));
+    return details;
+  }
+
+  addFold('themes','Website themes','All color palettes and the Custom Theme choice.',[grid,previewNote]);
+  addFold('custom','Custom theme builder','Fine-tune page, card, text, accent and portrait colors.',[customBuilder]);
+  addFold('presets','Design presets','Apply a complete visual starting point without replacing your content.',[presetCard]);
+  addFold('cards','Cards','Choose section card style, corner radius and shadow.',[cardsCard]);
+
+  panel.addEventListener('click',e=>{
+    const btn=e.target.closest('[data-appearance-fold-all]');
+    if(!btn)return;
+    const open=btn.dataset.appearanceFoldAll==='open';
+    panel.querySelectorAll('.appearance-fold').forEach(fold=>{
+      fold.open=open;
+      localStorage.setItem('academicAppearanceFold:'+fold.dataset.appearanceFold,open?'1':'0');
+    });
+  });
+}
+
+setupAppearanceAccordions();
 boot();

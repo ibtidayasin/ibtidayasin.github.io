@@ -3332,3 +3332,45 @@ body:not(.admin-body) .thesis-card h3{font-size:var(--public-card-title-size)}
 .admin-panel[data-panel="cover"] .section-cover-admin{margin-top:16px}
 .admin-panel[data-panel="appearance"]>.admin-card{margin-top:18px}
 @media(max-width:760px){.compact-control-grid,.typography-expanded-grid,.layout-compact-grid,.card-style-select-row{grid-template-columns:1fr}}
+
+
+/* =========================================================
+   COMPACT / COLLAPSIBLE APPEARANCE PANEL
+   ========================================================= */
+[data-panel="appearance"] .appearance-head{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px;
+}
+[data-panel="appearance"] .appearance-head .admin-section-title{margin-bottom:5px}
+.appearance-fold-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.appearance-fold-actions button{padding:6px 9px;font-size:11px;border-radius:8px}
+.appearance-fold{
+  border:1px solid var(--line);border-radius:12px;background:var(--surface);margin:10px 0;overflow:hidden;
+  box-shadow:0 6px 18px rgba(0,0,0,.025);
+}
+.appearance-fold>summary{
+  list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:18px;
+  min-height:64px;padding:13px 15px;user-select:none;transition:background .16s ease,border-color .16s ease;
+}
+.appearance-fold>summary::-webkit-details-marker{display:none}
+.appearance-fold>summary:hover{background:var(--surface-soft)}
+.appearance-fold[open]>summary{background:var(--surface-soft);border-bottom:1px solid var(--line)}
+.appearance-fold-title{display:grid;gap:2px;min-width:0}
+.appearance-fold-title strong{font-size:14px;color:var(--text)}
+.appearance-fold-title small{font-size:11px;color:var(--muted);font-weight:500;line-height:1.45}
+.appearance-fold-chevron{
+  flex:0 0 30px;width:30px;height:30px;border:1px solid var(--line);border-radius:999px;
+  display:grid;place-items:center;color:var(--accent);background:var(--surface);font-size:18px;font-weight:500;
+}
+.appearance-fold-chevron::before{content:"+";transform:translateY(-1px)}
+.appearance-fold[open] .appearance-fold-chevron::before{content:"−"}
+.appearance-fold-body{padding:16px}
+.appearance-fold-body>.admin-card{margin:0;border:0;box-shadow:none;padding:0;background:transparent}
+.appearance-fold-body>.custom-theme-builder{margin-top:0}
+.appearance-fold-body>.theme-preview-note{margin-bottom:0}
+[data-panel="appearance"].appearance-fold-ready>.appearance-head{padding-bottom:3px}
+@media(max-width:680px){
+  [data-panel="appearance"] .appearance-head{display:block}
+  .appearance-fold-actions{margin-top:10px}
+  .appearance-fold>summary{min-height:58px;padding:12px 13px}
+  .appearance-fold-body{padding:12px}
+}
