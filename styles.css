@@ -2876,3 +2876,81 @@ body:not(.admin-body) .media-image-stage{overflow:hidden}
 @media (prefers-reduced-motion:reduce){
   html[data-hover-interactions] body:not(.admin-body) *{transition:none!important}
 }
+
+
+/* =========================================================
+   MOBILE COVER: PICTURE ONLY
+   On section-page covers, mobile shows only the Admin profile photo.
+   Identity/details/socials stay available on Home/CV and desktop cover layouts.
+   ========================================================= */
+@media (max-width:760px){
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar{
+    position:relative!important;
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+    height:clamp(220px,62vw,270px)!important;
+    min-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    background:var(--surface)!important;
+    background-image:none!important;
+  }
+
+  /* Hide all cover text/details on phones. */
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar > :not(.section-cover-photo-layer){
+    display:none!important;
+  }
+
+  /* Disable legacy style layers/fades that can add extra mobile height. */
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar::before,
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar::after{
+    content:none!important;
+    display:none!important;
+  }
+
+  /* The cover itself is just the profile photo uploaded in Admin. */
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar > .section-cover-photo-layer{
+    display:flex!important;
+    position:absolute!important;
+    inset:0!important;
+    width:100%!important;
+    height:100%!important;
+    align-items:flex-end!important;
+    justify-content:center!important;
+    overflow:hidden!important;
+    background:transparent!important;
+    pointer-events:auto!important;
+  }
+
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .section-cover-photo-layer-img,
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-photo-fit="full"] body:not(.admin-body) .section-cover-photo-layer-img{
+    display:block!important;
+    width:auto!important;
+    max-width:100%!important;
+    height:100%!important;
+    max-height:100%!important;
+    object-fit:contain!important;
+    object-position:center bottom!important;
+    transform:scale(var(--cutout-zoom-scale,1))!important;
+    transform-origin:center bottom!important;
+    -webkit-mask-image:none!important;
+    mask-image:none!important;
+    filter:none!important;
+    mix-blend-mode:normal!important;
+  }
+
+  /* Full-bleed/top-blend desktop options must not create mobile overlap. */
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"] body:not(.admin-body) .sidebar,
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"][data-cover-style="fullbleed"][data-cover-top-blend="on"] body:not(.admin-body) .sidebar{
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+  }
+
+  /* Bring the actual section content up immediately after the photo. */
+  html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .layout{
+    gap:18px!important;
+  }
+}
