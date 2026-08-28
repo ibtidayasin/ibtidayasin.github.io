@@ -402,6 +402,8 @@ function undoTypographyControls(){
 const SITE_SECTION_KEYS=["about","research","thesis","publications","projects","activities","skills","education","contact","cv"];
 const COVER_SECTION_KEYS=["research","thesis","publications","projects","activities","skills","education","contact","cv"];
 const SIDEBAR_SECTION_KEYS=[...COVER_SECTION_KEYS];
+const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","skills","education","contact"];
+const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -413,6 +415,7 @@ const DEFAULT_SITE_SETTINGS={
     layoutGap:58,
     sectionSpacing:40,
     cardRadius:11,
+    cardStyles:{thesis:"classic",publications:"classic",projects:"classic",activities:"classic",skills:"clean",education:"classic",contact:"classic"},
     portraitSize:190,
     portraitShape:"slight",
     portraitFit:"cover",
@@ -505,6 +508,7 @@ function normalizeSiteSettings(content){
       layoutGap:clampNumber(l.layoutGap,20,100,DEFAULT_SITE_SETTINGS.layout.layoutGap),
       sectionSpacing:clampNumber(l.sectionSpacing,20,90,DEFAULT_SITE_SETTINGS.layout.sectionSpacing),
       cardRadius:clampNumber(l.cardRadius,0,28,DEFAULT_SITE_SETTINGS.layout.cardRadius),
+      cardStyles:Object.fromEntries(CARD_STYLE_SECTION_KEYS.map(k=>[k,CARD_STYLE_VALUES.includes(l.cardStyles?.[k])?l.cardStyles[k]:DEFAULT_SITE_SETTINGS.layout.cardStyles[k]])),
       portraitSize:clampNumber(l.portraitSize,140,250,DEFAULT_SITE_SETTINGS.layout.portraitSize),
       portraitShape:["square","slight","rounded","circle"].includes(l.portraitShape)?l.portraitShape:DEFAULT_SITE_SETTINGS.layout.portraitShape,
       portraitFit:["cover","contain"].includes(l.portraitFit)?l.portraitFit:DEFAULT_SITE_SETTINGS.layout.portraitFit,
@@ -670,6 +674,9 @@ function fillSiteCustomizationControls(){
   $("fSkillsColumns").value=String(l.skillsColumns);
   $("fFontPair").value=l.fontPair;
   $("fShadow").value=l.shadow;
+  const cardSection=(CARD_STYLE_SECTION_KEYS.includes($("fCardStyleSection")?.value)?$("fCardStyleSection").value:"skills");
+  if($("fCardStyleSection"))$("fCardStyleSection").value=cardSection;
+  if($("fCardStyleValue"))$("fCardStyleValue").value=l.cardStyles?.[cardSection]||DEFAULT_SITE_SETTINGS.layout.cardStyles[cardSection];
   $("fStickySidebar").checked=l.stickySidebar;
   $("fNavigationModeSingle").checked=l.navigationMode!=="sections";
   $("fNavigationModeSections").checked=l.navigationMode==="sections";
@@ -712,6 +719,20 @@ function sectionDisplayName(key){
   return headings[key]?.title||DEFAULT_SECTION_HEADINGS[key]?.title||key;
 }
 
+function refreshCardStyleMiniControl(){
+  normalizeSiteSettings(currentContent);
+  const section=$("fCardStyleSection")?.value||"skills";
+  if($("fCardStyleValue"))$("fCardStyleValue").value=currentContent.siteSettings.layout.cardStyles?.[section]||DEFAULT_SITE_SETTINGS.layout.cardStyles[section]||"classic";
+}
+
+function storeCardStyleMiniControl(){
+  normalizeSiteSettings(currentContent);
+  const section=$("fCardStyleSection")?.value;
+  const value=$("fCardStyleValue")?.value;
+  if(!CARD_STYLE_SECTION_KEYS.includes(section)||!CARD_STYLE_VALUES.includes(value))return;
+  currentContent.siteSettings.layout.cardStyles={...DEFAULT_SITE_SETTINGS.layout.cardStyles,...(currentContent.siteSettings.layout.cardStyles||{}),[section]:value};
+}
+
 function renderSectionManager(){
   normalizeSiteSettings(currentContent);
   const s=currentContent.siteSettings;
@@ -740,6 +761,10 @@ function syncSiteCustomizationFromControls(){
   l.layoutGap=clampNumber($("fLayoutGapNumber").value||$("fLayoutGap").value,20,100,58);
   l.sectionSpacing=clampNumber($("fSectionSpacingNumber").value||$("fSectionSpacing").value,20,90,40);
   l.cardRadius=clampNumber($("fCardRadiusNumber").value||$("fCardRadius").value,0,28,11);
+  l.cardStyles={...DEFAULT_SITE_SETTINGS.layout.cardStyles,...(l.cardStyles||{})};
+  const cardStyleSection=$("fCardStyleSection")?.value;
+  const cardStyleValue=$("fCardStyleValue")?.value;
+  if(CARD_STYLE_SECTION_KEYS.includes(cardStyleSection)&&CARD_STYLE_VALUES.includes(cardStyleValue))l.cardStyles[cardStyleSection]=cardStyleValue;
   l.portraitSize=clampNumber($("fPortraitSizeNumber").value||$("fPortraitSize").value,140,250,190);
   l.portraitShape=$("fPortraitShape").value;
   l.portraitFit=$("fPortraitFit").value;
@@ -920,7 +945,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=12;
+const BUILDER_SETTINGS_SCHEMA_VERSION=13;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -2478,6 +2503,14 @@ bindAdvancedAdminSuite();
 });
 $("fPageTransition")?.addEventListener("change",()=>scheduleAdminPreview(true));
 $("fPagePager")?.addEventListener("change",()=>scheduleAdminPreview(true));
+$("fCardStyleSection")?.addEventListener("change",()=>{
+  refreshCardStyleMiniControl();
+  scheduleAdminPreview(true);
+});
+$("fCardStyleValue")?.addEventListener("change",()=>{
+  storeCardStyleMiniControl();
+  scheduleAdminPreview(true);
+});
 $("fSidebarScope")?.addEventListener("change",()=>{
   updateSidebarAdminOptions();
   scheduleAdminPreview(true);

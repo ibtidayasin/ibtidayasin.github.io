@@ -15,7 +15,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-  <link rel="stylesheet" href="styles.css?v=20260828-education-skills-polish1">
+  <link rel="stylesheet" href="styles.css?v=20260828-cardstyles1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -1042,6 +1042,29 @@
               <div class="layout-control-card">
                 <h4>Cards & portrait</h4>
                 <div class="range-setting"><label>Card corner radius</label><div><input id="fCardRadius" type="range" min="0" max="28" step="1"><input id="fCardRadiusNumber" type="number" min="0" max="28" step="1"></div></div>
+
+                <div class="card-style-mini-control">
+                  <label>Card style</label>
+                  <div class="card-style-mini-row">
+                    <select id="fCardStyleSection" aria-label="Card section">
+                      <option value="thesis">Thesis</option>
+                      <option value="publications">Publications</option>
+                      <option value="projects">Projects &amp; Simulations</option>
+                      <option value="activities">Academic Activities</option>
+                      <option value="skills" selected>Skills</option>
+                      <option value="education">Education</option>
+                      <option value="contact">Contact</option>
+                    </select>
+                    <select id="fCardStyleValue" aria-label="Card style">
+                      <option value="classic">Classic</option>
+                      <option value="clean">Clean</option>
+                      <option value="outline">Outline</option>
+                      <option value="soft">Soft</option>
+                      <option value="accent">Accent</option>
+                      <option value="elevated">Elevated</option>
+                    </select>
+                  </div>
+                </div>
                 <div class="range-setting"><label>Portrait size</label><div><input id="fPortraitSize" type="range" min="140" max="250" step="5"><input id="fPortraitSizeNumber" type="number" min="140" max="250" step="5"></div></div>
                 <div class="field"><label>Portrait shape</label><select id="fPortraitShape"><option value="square">Square</option><option value="slight">Slightly rounded</option><option value="rounded">Rounded</option><option value="circle">Circle</option></select></div>
                 <div class="field"><label>Portrait image fit</label><select id="fPortraitFit"><option value="cover">Cover / crop</option><option value="contain">Contain</option></select></div>
@@ -1206,6 +1229,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260828-education-skills-polish1"></script>
+  <script src="admin.js?v=20260828-cardstyles1"></script>
 </body>
 </html>
