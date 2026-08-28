@@ -108,9 +108,9 @@ function validHex(value){
 }
 
 
-function applyPublicTypography(){
-  normalizeTypography(d);
-  const t=d.appearance.typography;
+function applyPublicTypography(content){
+  normalizeTypography(content);
+  const t=content.appearance.typography;
   const root=document.documentElement;
   root.style.setProperty("--public-section-title-size",`${t.sectionTitleSize}px`);
   root.style.setProperty("--public-section-subtitle-size",`${t.sectionSubtitleSize}px`);
