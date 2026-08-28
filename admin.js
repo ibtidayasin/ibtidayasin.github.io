@@ -444,6 +444,7 @@ const DEFAULT_SITE_SETTINGS={
   experience:{
     activeNav:true,
     animations:"subtle",
+    hoverInteractions:"subtle",
     backToTop:true,
     lightbox:true,
     smoothScroll:true,
@@ -536,6 +537,7 @@ function normalizeSiteSettings(content){
       ...e,
       activeNav:experienceBool("activeNav"),
       animations:["off","subtle","normal"].includes(e.animations)?e.animations:DEFAULT_SITE_SETTINGS.experience.animations,
+      hoverInteractions:["off","subtle","lift","glow"].includes(e.hoverInteractions)?e.hoverInteractions:DEFAULT_SITE_SETTINGS.experience.hoverInteractions,
       backToTop:experienceBool("backToTop"),
       lightbox:experienceBool("lightbox"),
       smoothScroll:experienceBool("smoothScroll"),
@@ -694,6 +696,7 @@ function fillSiteCustomizationControls(){
 
   $("fActiveNav").checked=e.activeNav;
   $("fAnimations").value=e.animations;
+  if($("fHoverInteractions"))$("fHoverInteractions").value=e.hoverInteractions||"subtle";
   $("fBackToTop").checked=e.backToTop;
   $("fLightbox").checked=e.lightbox;
   $("fSmoothScroll").checked=e.smoothScroll;
@@ -768,6 +771,7 @@ function syncSiteCustomizationFromControls(){
   const e=currentContent.siteSettings.experience;
   e.activeNav=$("fActiveNav").checked;
   e.animations=$("fAnimations").value;
+  e.hoverInteractions=$("fHoverInteractions")?.value||"subtle";
   e.backToTop=$("fBackToTop").checked;
   e.lightbox=$("fLightbox").checked;
   e.smoothScroll=$("fSmoothScroll").checked;
@@ -916,7 +920,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=10;
+const BUILDER_SETTINGS_SCHEMA_VERSION=11;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){

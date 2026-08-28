@@ -2790,3 +2790,89 @@ html[data-navigation-mode="sections"][data-section-page="inner"][data-section-co
   padding:16px;
   background:var(--surface-soft);
 }
+
+
+/* =========================================================
+   HOVER INTERACTIONS + FULL IMAGE VIEWER
+   ========================================================= */
+body:not(.admin-body) .profile-photo,
+body:not(.admin-body) .media-public-image,
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .section-cover-photo-layer-img{
+  cursor:zoom-in;
+}
+html[data-navigation-mode="sections"][data-section-page="inner"][data-section-cover="on"] body:not(.admin-body) .sidebar > .section-cover-photo-layer{
+  pointer-events:auto!important;
+}
+
+.site-lightbox-actions{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:9px;
+}
+.site-lightbox-action{
+  appearance:none;
+  border:1px solid rgba(255,255,255,.34);
+  border-radius:999px;
+  background:rgba(255,255,255,.94);
+  color:#202020;
+  padding:9px 15px;
+  font:700 13px/1.2 Arial,Helvetica,sans-serif;
+  text-decoration:none;
+  cursor:pointer;
+  box-shadow:0 8px 24px rgba(0,0,0,.18);
+  transition:transform .16s ease,background .16s ease,box-shadow .16s ease;
+}
+.site-lightbox-action:hover{
+  transform:translateY(-1px);
+  background:#fff;
+  box-shadow:0 11px 28px rgba(0,0,0,.24);
+}
+.site-lightbox-action:disabled{opacity:.65;cursor:wait;transform:none}
+.site-lightbox img{cursor:default}
+
+/* Shared transition targets. Motion level is controlled from Admin > Experience. */
+html[data-hover-interactions]:not([data-hover-interactions="off"]) body:not(.admin-body) :is(.pub-item,.card,.skill-card,.edu,.activity-card,.thesis-card,.contact-item,.media-public-item){
+  transition:transform .2s cubic-bezier(.2,.7,.2,1),box-shadow .2s ease,border-color .2s ease,background-color .2s ease;
+}
+html[data-hover-interactions]:not([data-hover-interactions="off"]) body:not(.admin-body) :is(.media-public-image,.profile-photo,.profile-link-icon,.text-link,.button,.topbar nav a){
+  transition:transform .2s cubic-bezier(.2,.7,.2,1),filter .2s ease,color .2s ease,background-color .2s ease,box-shadow .2s ease;
+}
+
+html[data-hover-interactions="subtle"] body:not(.admin-body) :is(.pub-item,.card,.skill-card,.edu,.activity-card,.thesis-card,.contact-item):hover{
+  transform:translateY(-2px);
+  border-color:var(--accent);
+  box-shadow:0 11px 28px rgba(0,0,0,.075);
+}
+html[data-hover-interactions="subtle"] body:not(.admin-body) :is(.profile-photo,.media-public-image):hover{filter:brightness(1.025);transform:scale(1.012)}
+html[data-hover-interactions="subtle"] body:not(.admin-body) .profile-link-icon:hover{transform:scale(1.07)}
+
+html[data-hover-interactions="lift"] body:not(.admin-body) :is(.pub-item,.card,.skill-card,.edu,.activity-card,.thesis-card,.contact-item):hover{
+  transform:translateY(-5px);
+  border-color:var(--accent);
+  box-shadow:0 18px 40px rgba(0,0,0,.12);
+}
+html[data-hover-interactions="lift"] body:not(.admin-body) :is(.profile-photo,.media-public-image):hover{filter:brightness(1.035);transform:scale(1.025)}
+html[data-hover-interactions="lift"] body:not(.admin-body) .profile-link-icon:hover{transform:scale(1.12)}
+
+html[data-hover-interactions="glow"] body:not(.admin-body) :is(.pub-item,.card,.skill-card,.edu,.activity-card,.thesis-card,.contact-item):hover{
+  transform:translateY(-2px);
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--accent-soft),0 15px 34px rgba(0,0,0,.10);
+}
+html[data-hover-interactions="glow"] body:not(.admin-body) :is(.profile-photo,.media-public-image):hover{filter:brightness(1.045);transform:scale(1.018);box-shadow:0 0 0 3px var(--accent-soft)}
+html[data-hover-interactions="glow"] body:not(.admin-body) .profile-link-icon:hover{filter:drop-shadow(0 0 5px var(--accent));transform:scale(1.08)}
+
+/* Keep image zoom contained inside image cards. */
+body:not(.admin-body) .media-image-stage{overflow:hidden}
+
+@media (hover:none){
+  html[data-hover-interactions] body:not(.admin-body) :is(.pub-item,.card,.skill-card,.edu,.activity-card,.thesis-card,.contact-item,.profile-photo,.media-public-image):hover{
+    transform:none;
+    filter:none;
+    box-shadow:inherit;
+  }
+}
+@media (prefers-reduced-motion:reduce){
+  html[data-hover-interactions] body:not(.admin-body) *{transition:none!important}
+}

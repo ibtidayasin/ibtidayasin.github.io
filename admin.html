@@ -15,7 +15,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-  <link rel="stylesheet" href="styles.css?v=20260828-sidebarvisibility1">
+  <link rel="stylesheet" href="styles.css?v=20260828-hoverviewer1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -1081,13 +1081,17 @@
           <div class="experience-grid">
             <label class="experience-card"><input id="fActiveNav" type="checkbox"><span><strong>Active navigation highlight</strong><small>Highlights the section currently being viewed.</small></span></label>
             <label class="experience-card"><input id="fBackToTop" type="checkbox"><span><strong>Back-to-top button</strong><small>Shows a small ↑ button after scrolling down.</small></span></label>
-            <label class="experience-card"><input id="fLightbox" type="checkbox"><span><strong>Image lightbox</strong><small>Opens research/project images in a clean enlarged viewer.</small></span></label>
+            <label class="experience-card"><input id="fLightbox" type="checkbox"><span><strong>Full-image viewer + download</strong><small>Click the profile photo or enabled site images to view the original at full size and download it.</small></span></label>
             <label class="experience-card"><input id="fSmoothScroll" type="checkbox"><span><strong>Smooth scrolling</strong><small>Smoothly moves between navigation sections.</small></span></label>
             <label class="experience-card"><input id="fCopyButtons" type="checkbox"><span><strong>Copy contact buttons</strong><small>Adds one-click Copy buttons for email and phone.</small></span></label>
 
             <div class="experience-card experience-select-card">
               <span><strong>Entrance animations</strong><small>Keep motion subtle for an academic site.</small></span>
               <select id="fAnimations"><option value="off">Off</option><option value="subtle">Subtle</option><option value="normal">Normal</option></select>
+            </div>
+            <div class="experience-card experience-select-card">
+              <span><strong>Hover interactions</strong><small>Add restrained feedback when visitors hover over cards, images, links, and buttons.</small></span>
+              <select id="fHoverInteractions"><option value="off">Off</option><option value="subtle">Subtle</option><option value="lift">Lift</option><option value="glow">Glow</option></select>
             </div>
             <div class="experience-card experience-select-card">
               <span><strong>Active-nav style</strong><small>Choose how the current section is highlighted.</small></span>
@@ -1193,6 +1197,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260828-sidebarvisibility1"></script>
+  <script src="admin.js?v=20260828-hoverviewer1"></script>
 </body>
 </html>

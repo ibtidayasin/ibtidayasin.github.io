@@ -204,6 +204,7 @@ const DEFAULT_SITE_SETTINGS={
   experience:{
     activeNav:true,
     animations:"subtle",
+    hoverInteractions:"subtle",
     backToTop:true,
     lightbox:true,
     smoothScroll:true,
@@ -296,6 +297,7 @@ function normalizeSiteSettings(content){
       ...e,
       activeNav:experienceBool("activeNav"),
       animations:["off","subtle","normal"].includes(e.animations)?e.animations:DEFAULT_SITE_SETTINGS.experience.animations,
+      hoverInteractions:["off","subtle","lift","glow"].includes(e.hoverInteractions)?e.hoverInteractions:DEFAULT_SITE_SETTINGS.experience.hoverInteractions,
       backToTop:experienceBool("backToTop"),
       lightbox:experienceBool("lightbox"),
       smoothScroll:experienceBool("smoothScroll"),
@@ -354,6 +356,10 @@ function ensureEnhancementUi(){
       <div class="site-lightbox-inner">
         <img id="siteLightboxImage" alt="">
         <div id="siteLightboxCaption" class="site-lightbox-caption"></div>
+        <div class="site-lightbox-actions">
+          <button id="siteLightboxDownload" class="site-lightbox-action" type="button">Download image</button>
+          <a id="siteLightboxOriginal" class="site-lightbox-action" href="#" target="_blank" rel="noopener">Open original ↗</a>
+        </div>
       </div>`;
     document.body.appendChild(box);
   }
@@ -364,6 +370,8 @@ function ensureEnhancementUi(){
   $("backToTopBtn").addEventListener("click",()=>{
     window.scrollTo({top:0,behavior:currentSiteExperience.smoothScroll?"smooth":"auto"});
   });
+
+  $("siteLightboxDownload")?.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();downloadLightboxImage();});
 
   window.addEventListener("scroll",()=>{
     const b=$("backToTopBtn");
@@ -385,22 +393,24 @@ function ensureEnhancementUi(){
       return;
     }
 
-    const img=e.target.closest(".media-public-image");
+    const img=e.target.closest(".profile-photo, .section-cover-photo-layer-img, .media-public-image");
     if(img){
-      const mode=img.dataset.lightbox||"inherit";
+      const isProfile=img.matches(".profile-photo, .section-cover-photo-layer-img");
+      const mode=img.dataset.lightbox||(isProfile?"on":"inherit");
       const allowLightbox=mode==="on"||(mode==="inherit"&&currentSiteExperience.lightbox);
-      const anchor=img.closest("a");
-      if(anchor&&allowLightbox){
-        e.preventDefault();
-        const box=$("siteLightbox");
-        $("siteLightboxImage").src=img.src;
-        $("siteLightboxImage").alt=img.alt||"";
+      if(allowLightbox){
+        const anchor=img.closest("a");
+        if(anchor)e.preventDefault();
         const fig=img.closest("figure");
-        const info=fig?.querySelector(".media-public-info")?.innerText?.trim()||img.alt||"";
-        $("siteLightboxCaption").textContent=info;
-        box.classList.remove("hidden");
-        document.body.classList.add("lightbox-open");
+        const info=fig?.querySelector(".media-public-info")?.innerText?.trim()||img.dataset.lightboxCaption||img.alt||"";
+        openSiteLightbox(img,info);
       }
+      return;
+    }
+
+    if(e.target.closest("#siteLightboxDownload")){
+      e.preventDefault();
+      downloadLightboxImage();
       return;
     }
 
@@ -414,11 +424,67 @@ function ensureEnhancementUi(){
   });
 }
 
+function lightboxFilenameFromImage(img,src){
+  const explicit=String(img?.dataset?.downloadName||"").trim();
+  if(explicit)return explicit.replace(/[\/:*?"<>|]+/g,"-");
+  try{
+    const u=new URL(src,location.href);
+    const last=decodeURIComponent(u.pathname.split("/").filter(Boolean).pop()||"");
+    if(last&&last.includes("."))return last;
+  }catch{}
+  const base=String(img?.alt||"image").trim().replace(/[^a-z0-9._-]+/gi,"-").replace(/^-+|-+$/g,"")||"image";
+  return `${base}.jpg`;
+}
+
+function openSiteLightbox(img,caption=""){
+  const box=$("siteLightbox");
+  if(!box||!img?.src)return;
+  const src=img.currentSrc||img.src;
+  $("siteLightboxImage").src=src;
+  $("siteLightboxImage").alt=img.alt||"";
+  $("siteLightboxCaption").textContent=caption||img.dataset.lightboxCaption||img.alt||"";
+  box.dataset.imageSrc=src;
+  box.dataset.downloadName=lightboxFilenameFromImage(img,src);
+  const original=$("siteLightboxOriginal");
+  if(original)original.href=src;
+  box.classList.remove("hidden");
+  document.body.classList.add("lightbox-open");
+}
+
+async function downloadLightboxImage(){
+  const box=$("siteLightbox");
+  const src=box?.dataset.imageSrc||$("siteLightboxImage")?.src||"";
+  if(!src)return;
+  const name=box?.dataset.downloadName||"image.jpg";
+  const btn=$("siteLightboxDownload");
+  const originalText=btn?.textContent||"Download image";
+  if(btn){btn.disabled=true;btn.textContent="Downloading…";}
+  try{
+    const response=await fetch(src,{mode:"cors",cache:"no-store"});
+    if(!response.ok)throw new Error(`Download failed (${response.status})`);
+    const blob=await response.blob();
+    const objectUrl=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=objectUrl;a.download=name;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(objectUrl),1500);
+  }catch(err){
+    console.warn("Direct image download was blocked; opening the original instead.",err);
+    const a=document.createElement("a");
+    a.href=src;a.target="_blank";a.rel="noopener";a.download=name;document.body.appendChild(a);a.click();a.remove();
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent=originalText;}
+  }
+}
+
 function closeSiteLightbox(){
   const box=$("siteLightbox");
   if(!box)return;
   box.classList.add("hidden");
   $("siteLightboxImage").removeAttribute("src");
+  delete box.dataset.imageSrc;
+  delete box.dataset.downloadName;
+  const original=$("siteLightboxOriginal");
+  if(original)original.href="#";
   document.body.classList.remove("lightbox-open");
 }
 
@@ -545,6 +611,9 @@ function ensureSectionCoverPhotoLayer(d){
   const src=String(d?.photo_url||"").trim();
   if(src){
     if(img.getAttribute("src")!==src)img.src=src;
+    img.dataset.lightbox="on";
+    img.dataset.lightboxCaption=d?.name||"Profile photo";
+    img.dataset.downloadName=`${String(d?.name||"profile").trim().replace(/[^a-z0-9_-]+/gi,"_")}_Profile_Photo`;
     layer.classList.remove("hidden");
   }else{
     img.removeAttribute("src");
@@ -913,6 +982,7 @@ function applyExperienceSettings(d){
 
   document.documentElement.classList.toggle("no-smooth-scroll",!currentSiteExperience.smoothScroll);
   document.documentElement.dataset.navHighlight=currentSiteExperience.navHighlightStyle||"underline";
+  document.documentElement.dataset.hoverInteractions=currentSiteExperience.hoverInteractions||"subtle";
   $("backToTopBtn")?.classList.toggle("feature-disabled",!currentSiteExperience.backToTop);
   if(!currentSiteExperience.lightbox)closeSiteLightbox();
 
@@ -961,7 +1031,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=10;
+const BUILDER_SETTINGS_SCHEMA_VERSION=11;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1238,6 +1308,9 @@ function render(d){
 
   if(d.photo_url){
     $("profilePhoto").src=d.photo_url;
+    $("profilePhoto").dataset.lightbox="on";
+    $("profilePhoto").dataset.lightboxCaption=d.name||"Profile photo";
+    $("profilePhoto").dataset.downloadName=`${String(d.name||"profile").trim().replace(/[^a-z0-9_-]+/gi,"_")}_Profile_Photo`;
     $("profilePhoto").classList.remove("hidden");
     $("initials").classList.add("hidden");
     document.querySelector(".portrait")?.classList.add("has-photo");
@@ -1376,7 +1449,7 @@ function mediaHtml(media){
       const enlarge=["inherit","on","off"].includes(m.enlarge)?m.enlarge:"inherit";
       visual.push(`<figure class="media-public-item media-width-${escAttr(width)}">
         <a class="media-image-stage media-aspect-${escAttr(aspect)}" href="${escAttr(url)}" target="_blank" rel="noopener">
-          <img class="media-public-image image-fit-${escAttr(fit)} crop-${escAttr(position)}" data-lightbox="${escAttr(enlarge)}" src="${escAttr(url)}" alt="${escAttr(alt)}" loading="lazy">
+          <img class="media-public-image image-fit-${escAttr(fit)} crop-${escAttr(position)}" data-lightbox="${escAttr(enlarge)}" data-download-name="${escAttr(m.filename||title||"image")}" src="${escAttr(url)}" alt="${escAttr(alt)}" loading="lazy">
         </a>
         ${(title||caption)?`<figcaption class="media-public-info">${title?`<strong>${esc(title)}</strong>`:""}${caption?`<p>${esc(caption)}</p>`:""}</figcaption>`:""}
       </figure>`);
