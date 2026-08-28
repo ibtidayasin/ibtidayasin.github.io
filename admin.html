@@ -1,10 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="admin-booting">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Website Admin | Ibtida Yasin</title>
-  <link rel="stylesheet" href="styles.css?v=20260828-architecture1">
+  <style id="admin-first-paint-gate">
+    html.admin-booting .admin-shell { visibility: hidden; opacity: 0; }
+    html.admin-ready .admin-shell { visibility: visible; opacity: 1; transition: opacity .12s ease; }
+  </style>
+  <script>
+    // Safety fallback: never leave Admin hidden if an external script fails.
+    window.__adminPaintFallback = setTimeout(function(){
+      document.documentElement.classList.remove('admin-booting');
+      document.documentElement.classList.add('admin-ready');
+    }, 6000);
+  </script>
+  <link rel="stylesheet" href="styles.css?v=20260828-adminflash1">
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -1117,6 +1128,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-  <script src="admin.js?v=20260828-architecture1"></script>
+  <script src="admin.js?v=20260828-adminflash1"></script>
 </body>
 </html>

@@ -1340,21 +1340,51 @@ document.addEventListener("change",e=>{
 const $=id=>document.getElementById(id);
 let currentContent=structuredClone(DEFAULT_CONTENT);
 
-async function boot(){
-  const{data:{session}}=await sb.auth.getSession();
-  if(session)await verifyAdminAndOpen();else showLogin();
+function revealAdminUi(){
+  if(window.__adminPaintFallback){
+    clearTimeout(window.__adminPaintFallback);
+    window.__adminPaintFallback=null;
+  }
+  document.documentElement.classList.remove("admin-booting");
+  document.documentElement.classList.add("admin-ready");
 }
-function showLogin(){$("loginView").classList.remove("hidden");$("adminView").classList.add("hidden")}
+
+async function boot(){
+  try{
+    const{data:{session}}=await sb.auth.getSession();
+    if(session){
+      await verifyAdminAndOpen();
+    }else{
+      showLogin();
+      revealAdminUi();
+    }
+  }catch(err){
+    console.error("Admin boot failed:",err);
+    showLogin();
+    $("loginStatus").textContent="Could not initialize Admin. Please reload and try again.";
+    revealAdminUi();
+  }
+}
+function showLogin(){
+  $("loginView").classList.remove("hidden");
+  $("adminView").classList.add("hidden");
+}
 async function verifyAdminAndOpen(){
   const{data,error}=await sb.rpc("is_site_admin");
   if(error||data!==true){
     await sb.auth.signOut();
     $("loginStatus").textContent="This account is not authorized to edit the website.";
-    showLogin();return;
+    showLogin();
+    revealAdminUi();
+    return;
   }
+
+  // Keep the current screen hidden (during reload) or keep the login screen
+  // visible (after a manual sign-in) until every saved field is populated.
+  await loadContent();
   $("loginView").classList.add("hidden");
   $("adminView").classList.remove("hidden");
-  await loadContent();
+  revealAdminUi();
 }
 $("loginBtn").addEventListener("click",async()=>{
   $("loginStatus").textContent="Signing in...";
