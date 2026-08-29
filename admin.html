@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260830-bio-spacing1" rel="stylesheet"/>
+<link href="styles.css?v=20260830-research-groups1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -94,8 +94,17 @@
 <div class="field"><label>Section name</label><input id="fSectionResearchTitle"/></div>
 <div class="field"><label>Section subtitle</label><input id="fSectionResearchSubtitle"/></div>
 </div>
-<div class="form-grid">
-<div class="field full"><label>Research interests — one per line</label><textarea id="fInterests"></textarea></div>
+<div class="form-grid research-interest-admin-grid">
+<div class="field full">
+<label>Primary Research Interests — one per line</label>
+<textarea id="fPrimaryInterests"></textarea>
+<span class="helper">Use this for your strongest or most directly supported research areas.</span>
+</div>
+<div class="field full">
+<label>Additional Research Interests — one per line</label>
+<textarea id="fAdditionalInterests"></textarea>
+<span class="helper">Use this for genuine broader interests without implying equal research experience.</span>
+</div>
 </div>
 </div>
 <div class="admin-panel" data-panel="thesis">
@@ -1074,6 +1083,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-<script src="admin.js?v=20260829-cardarchitecture2"></script>
+<script src="admin.js?v=20260830-research-groups1"></script>
 </body>
 </html>

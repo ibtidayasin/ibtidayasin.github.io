@@ -3614,7 +3614,40 @@ html[data-hover-interactions="glow"] .section[data-card-design="ledger"] :is(.th
   .section[data-card-design="ledger"] .thesis-card{grid-template-columns:1fr!important}
 }
 
-/* Preserve paragraph breaks entered in the Admin Biography field */
+/* =========================================================
+   RESEARCH INTEREST GROUPS
+   Primary + Additional interests, editable separately in Admin.
+   ========================================================= */
+.research-interest-groups{
+  display:grid;
+  gap:26px;
+  margin-top:22px;
+}
+.research-interest-group{
+  padding-top:16px;
+  border-top:1px solid var(--line);
+}
+.research-interest-group:first-child{
+  border-top:2px solid var(--accent);
+}
+.research-interest-group h3{
+  margin:0 0 10px;
+  font-size:16px;
+  line-height:1.35;
+  letter-spacing:.01em;
+  color:var(--text);
+}
+.research-interest-group .interest-list{
+  margin:0;
+}
+.research-interest-group.hidden{
+  display:none!important;
+}
+.admin-body .research-interest-admin-grid textarea{
+  min-height:150px;
+}
+
+/* Preserve paragraph breaks entered in the Admin Biography field. */
 #aboutBio{
   white-space:pre-line;
 }

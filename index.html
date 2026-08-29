@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Ibtida Yasin — Mechanical Engineering and Computational Materials">
   <title>Ibtida Yasin | Academic Profile</title>
-  <link id="siteStylesheet" rel="stylesheet" href="styles.css?v=20260830-bio-spacing1">
+  <link id="siteStylesheet" rel="stylesheet" href="styles.css?v=20260830-research-groups1">
   <script>
     (function(){
       var b=new URLSearchParams(location.search).get('previewBust');
-      if(b) document.getElementById('siteStylesheet').href='styles.css?v=20260830-bio-spacing1&previewBust='+encodeURIComponent(b);
+      if(b) document.getElementById('siteStylesheet').href='styles.css?v=20260830-research-groups1&previewBust='+encodeURIComponent(b);
     })();
   </script>
 
@@ -81,7 +81,16 @@
     <section class="section" id="research" data-section-key="research">
       <h2 class="section-title" id="researchSectionTitle">Research Interests</h2>
       <p class="section-subtitle" id="researchSectionSubtitle">What I work on</p>
-      <ul class="interest-list" id="researchInterests"></ul>
+      <div class="research-interest-groups" id="researchInterestGroups">
+        <div class="research-interest-group" id="primaryResearchGroup">
+          <h3>Primary Research Interests</h3>
+          <ul class="interest-list" id="primaryResearchInterests"></ul>
+        </div>
+        <div class="research-interest-group" id="additionalResearchGroup">
+          <h3>Additional Research Interests</h3>
+          <ul class="interest-list" id="additionalResearchInterests"></ul>
+        </div>
+      </div>
     </section>
 
 
@@ -162,7 +171,7 @@
   (function(){
     var b=new URLSearchParams(location.search).get('previewBust');
     var s=document.createElement('script');
-    s.src='script.js?v=20260829-cardarchitecture2'+(b?'&previewBust='+encodeURIComponent(b):'');
+    s.src='script.js?v=20260830-research-groups1'+(b?'&previewBust='+encodeURIComponent(b):'');
     s.async=false;
     document.body.appendChild(s);
   })();
