@@ -978,7 +978,7 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=15;
+const BUILDER_SETTINGS_SCHEMA_VERSION=16;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){

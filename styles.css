@@ -3377,127 +3377,240 @@ body:not(.admin-body) .thesis-card h3{font-size:var(--public-card-title-size)}
 
 
 /* =========================================================
-   DISTINCT CARD DESIGNS v15
-   Card Finish = subtle surface treatment (existing control).
-   Card Design = a separate, structural visual system.
+   DISTINCT CARD ARCHITECTURES v16
+   Card Finish = subtle surface treatment.
+   Card Design = a genuinely different layout/composition.
+
+   Stored value mapping kept for backward compatibility:
+   standard  -> Native Section
+   editorial -> Publication Record
+   banded    -> Thesis Split
+   ledger    -> Minimal Index
+   spotlight -> Toolkit Chips
+   framed    -> Academic Timeline
    ========================================================= */
 
-/* Keep the new selector compact in Appearance. */
 .card-options-three{grid-template-columns:minmax(0,1.1fr) repeat(2,minmax(0,1fr))!important}
 .card-style-compact-control>.helper{display:block;margin-top:7px;line-height:1.45}
 @media(max-width:900px){.card-options-three{grid-template-columns:1fr!important}}
 
-/* The section owns one design; the finish rules above can still tune surface/shadow. */
 .section[data-card-design] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
   transition:border-color .18s ease,background .18s ease,box-shadow .18s ease,transform .18s ease;
 }
 
-/* 1. Standard design — preserves the familiar card architecture. */
-.section[data-card-design="standard"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
-  position:relative;
-}
+/* ---------------------------------------------------------
+   1. NATIVE SECTION
+   Every section keeps its own original visual language.
+   --------------------------------------------------------- */
+.section[data-card-design="standard"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){position:relative}
 
-/* 2. Editorial Rail — square, publication-like blocks with a strong journal-margin rail. */
+/* ---------------------------------------------------------
+   2. PUBLICATION RECORD
+   Everything becomes a wide, one-column research record,
+   deliberately close to the Publications visual language.
+   --------------------------------------------------------- */
+.section[data-card-design="editorial"] :is(.cards,.skills-grid,.activity-grid,.contact-grid,.stack-list){
+  grid-template-columns:1fr!important;gap:14px!important;
+}
 .section[data-card-design="editorial"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
-  position:relative;
-  border-radius:2px!important;
-  border-top:0!important;
-  border-right:0!important;
-  border-bottom:1px solid var(--line)!important;
-  border-left:6px solid var(--accent)!important;
-  box-shadow:none!important;
-  padding-left:26px!important;
-  background:var(--surface)!important;
-}
-.section[data-card-design="editorial"] :is(.pub-item,.card,.activity-card,.skill-card,.edu) h3{
-  letter-spacing:-.025em;
-}
-.section[data-card-design="editorial"] .skill-card::before{display:none!important;content:none!important}
-.section[data-card-design="editorial"] .skill-card h3::after{
-  display:block!important;content:""!important;width:54px;height:2px;background:var(--accent);margin-top:10px;
-}
-.section[data-card-design="editorial"] .pub-status,
-.section[data-card-design="editorial"] .edu-period-badge,
-.section[data-card-design="editorial"] .activity-type-badge{border-radius:2px!important}
-
-/* 3. Header Band — a real header zone across every card. */
-.section[data-card-design="banded"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
-  position:relative;
+  display:block!important;position:relative!important;min-height:0!important;
+  width:100%!important;padding:20px!important;
+  border:1px solid var(--line)!important;border-radius:var(--site-card-radius,11px)!important;
+  background:var(--surface)!important;box-shadow:var(--site-shadow,var(--shadow))!important;
   overflow:hidden!important;
-  border-radius:14px!important;
-  padding-top:26px!important;
-  isolation:isolate;
 }
-.section[data-card-design="banded"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item)::before{
-  content:""!important;display:block!important;position:absolute!important;z-index:0!important;
-  inset:0 0 auto 0!important;height:82px!important;
-  background:var(--accent-soft)!important;border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,var(--line))!important;
+.section[data-card-design="editorial"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item)::before{
+  content:""!important;position:absolute!important;display:block!important;left:0!important;top:0!important;bottom:0!important;width:4px!important;
+  background:var(--accent)!important;
 }
-.section[data-card-design="banded"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item)>*{position:relative;z-index:1}
-.section[data-card-design="banded"] .skill-card h3::after{display:none!important;content:none!important}
-.section[data-card-design="banded"] .skill-card::after{display:none!important;content:none!important}
-.section[data-card-design="banded"] .pub-status,
-.section[data-card-design="banded"] .edu-period-badge,
-.section[data-card-design="banded"] .activity-type-badge{
-  background:var(--surface)!important;border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));
+.section[data-card-design="editorial"] .skill-card h3{font-size:var(--public-card-title-size,20px)!important;margin:0 0 7px!important}
+.section[data-card-design="editorial"] .skill-card ul{margin:7px 0 0!important;padding-left:19px!important;display:block!important}
+.section[data-card-design="editorial"] .skill-card li{border:0!important;padding:2px 0!important;display:list-item!important;list-style:disc!important}
+.section[data-card-design="editorial"] .skill-card li::before{display:none!important;content:none!important}
+.section[data-card-design="editorial"] .skill-card h3::after,
+.section[data-card-design="editorial"] .skill-card::after{display:none!important;content:none!important}
+.section[data-card-design="editorial"] :is(.pub-status,.edu-period-badge,.activity-type-badge,.project-type-badge){
+  border-radius:999px!important;background:var(--accent-soft)!important;color:var(--accent)!important;
 }
-.section[data-card-design="banded"] .thesis-meta{background:color-mix(in srgb,var(--surface) 88%,var(--accent-soft))}
+.section[data-card-design="editorial"] .edu-cgpa{margin-top:14px!important}
 
-/* 4. Academic Ledger — no boxes: ruled academic records / CV-style entries. */
+/* ---------------------------------------------------------
+   3. THESIS SPLIT
+   Strong two-panel composition: identity/title on the left,
+   details/content on the right, echoing the Thesis card.
+   --------------------------------------------------------- */
+.section[data-card-design="banded"] :is(.cards,.skills-grid,.activity-grid,.contact-grid,.stack-list){
+  grid-template-columns:1fr!important;gap:16px!important;
+}
+.section[data-card-design="banded"] :is(.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
+  position:relative!important;display:grid!important;grid-template-columns:minmax(190px,34%) minmax(0,1fr)!important;
+  gap:0!important;min-height:0!important;padding:0!important;overflow:hidden!important;
+  border:1px solid var(--line)!important;border-radius:14px!important;background:var(--surface)!important;
+  box-shadow:var(--site-shadow,var(--shadow))!important;
+}
+.section[data-card-design="banded"] :is(.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item)::before{
+  content:""!important;position:absolute!important;display:block!important;inset:0 auto 0 0!important;width:34%!important;
+  background:var(--accent-soft)!important;border-right:1px solid var(--line)!important;z-index:0!important;
+}
+.section[data-card-design="banded"] :is(.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item)>*{position:relative;z-index:1}
+
+/* Skills: category left, actual toolkit right. */
+.section[data-card-design="banded"] .skill-card>h3{grid-column:1!important;grid-row:1 / span 2!important;padding:24px!important;margin:0!important;align-self:start!important;color:var(--accent)!important}
+.section[data-card-design="banded"] .skill-card>ul{grid-column:2!important;padding:22px 26px 18px 46px!important;margin:0!important;align-self:center!important}
+.section[data-card-design="banded"] .skill-card>.item-media{grid-column:2!important;padding:0 26px 24px!important}
+.section[data-card-design="banded"] .skill-card h3::after,
+.section[data-card-design="banded"] .skill-card::after{display:none!important;content:none!important}
+
+/* Education: degree/university left, CGPA/courses/details right. */
+.section[data-card-design="banded"] .edu>.edu-top{grid-column:1!important;padding:24px!important;display:block!important}
+.section[data-card-design="banded"] .edu>.edu-main{grid-column:2!important;padding:24px 26px!important}
+.section[data-card-design="banded"] .edu-period-badge{margin-top:12px!important}
+
+/* Publication: title/status left, publication data right. */
+.section[data-card-design="banded"] .pub-item>.pub-top{grid-column:1!important;grid-row:1 / span 5!important;padding:24px!important;display:block!important}
+.section[data-card-design="banded"] .pub-item>.pub-top .pub-status{display:inline-block!important;margin-top:12px!important}
+.section[data-card-design="banded"] .pub-item> .pub-meta,
+.section[data-card-design="banded"] .pub-item> p,
+.section[data-card-design="banded"] .pub-item> .pub-links,
+.section[data-card-design="banded"] .pub-item> .item-media{grid-column:2!important;margin-left:0!important;margin-right:0!important;padding-left:26px!important;padding-right:26px!important}
+.section[data-card-design="banded"] .pub-item> .pub-meta{padding-top:22px!important}
+.section[data-card-design="banded"] .pub-item> .item-media{padding-bottom:24px!important}
+
+/* Projects: project identity left, description/resources right. */
+.section[data-card-design="banded"] .card>.project-type-badge{grid-column:1!important;align-self:start!important;justify-self:start!important;margin:24px 24px 8px!important}
+.section[data-card-design="banded"] .card>h3{grid-column:1!important;padding:0 24px 24px!important;margin:0!important;color:var(--accent)!important}
+.section[data-card-design="banded"] .card>p,
+.section[data-card-design="banded"] .card>.text-link,
+.section[data-card-design="banded"] .card>.item-media,
+.section[data-card-design="banded"] .card>.meta-line{grid-column:2!important;margin-left:0!important;margin-right:0!important;padding-left:26px!important;padding-right:26px!important}
+.section[data-card-design="banded"] .card>p{padding-top:22px!important;margin-top:0!important}
+.section[data-card-design="banded"] .card>.meta-line{margin-top:14px!important;padding-bottom:22px!important}
+
+/* Activities: type/title left, narrative right. */
+.section[data-card-design="banded"] .activity-card>.activity-card-top,
+.section[data-card-design="banded"] .activity-card>h3,
+.section[data-card-design="banded"] .activity-card>.activity-organization{grid-column:1!important;margin-left:24px!important;margin-right:24px!important}
+.section[data-card-design="banded"] .activity-card>.activity-card-top{margin-top:24px!important}
+.section[data-card-design="banded"] .activity-card>h3{color:var(--accent)!important}
+.section[data-card-design="banded"] .activity-card>p,
+.section[data-card-design="banded"] .activity-card>.text-link,
+.section[data-card-design="banded"] .activity-card>.item-media{grid-column:2!important;margin-left:0!important;margin-right:0!important;padding-left:26px!important;padding-right:26px!important}
+.section[data-card-design="banded"] .activity-card>p{padding-top:20px!important;margin-top:0!important}
+.section[data-card-design="banded"] .activity-card>.item-media{padding-bottom:24px!important}
+
+/* Contact: label left, actual value right. */
+.section[data-card-design="banded"] .contact-item>.contact-item-heading{grid-column:1!important;padding:22px 24px!important;margin:0!important;color:var(--accent)!important}
+.section[data-card-design="banded"] .contact-item>a,
+.section[data-card-design="banded"] .contact-item>strong{grid-column:2!important;padding:22px 26px!important;align-self:center!important}
+
+/* Thesis is already a true split card; make the split more explicit. */
+.section[data-card-design="banded"] .thesis-card{grid-template-columns:minmax(0,1.25fr) minmax(220px,.75fr)!important;border-radius:14px!important;overflow:hidden!important}
+.section[data-card-design="banded"] .thesis-main{background:var(--surface)!important}
+.section[data-card-design="banded"] .thesis-meta{background:var(--accent-soft)!important;border-left:1px solid var(--line)!important}
+
+/* ---------------------------------------------------------
+   4. MINIMAL INDEX
+   No cards at all — typographic/index-style entries separated
+   by rules. This is intentionally the opposite of a card UI.
+   --------------------------------------------------------- */
+.section[data-card-design="ledger"] :is(.cards,.skills-grid,.activity-grid,.contact-grid,.stack-list){
+  grid-template-columns:1fr!important;gap:0!important;
+}
 .section[data-card-design="ledger"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
   border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;
-  border-top:1px solid var(--line)!important;border-bottom:1px solid var(--line)!important;
-  padding:20px 2px!important;min-height:0!important;
+  min-height:0!important;margin:0!important;padding:22px 0!important;border-top:1px solid var(--line)!important;
 }
-.section[data-card-design="ledger"] :is(.cards,.skills-grid,.activity-grid,.contact-grid,.stack-list){gap:12px 28px!important}
+.section[data-card-design="ledger"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item):last-child{border-bottom:1px solid var(--line)!important}
+.section[data-card-design="ledger"] .skill-card{display:grid!important;grid-template-columns:minmax(180px,28%) 1fr!important;gap:28px!important}
+.section[data-card-design="ledger"] .skill-card h3{margin:0!important;color:var(--accent)!important}
+.section[data-card-design="ledger"] .skill-card ul{margin:0!important;padding-left:18px!important;columns:2;column-gap:34px}
+.section[data-card-design="ledger"] .skill-card li{break-inside:avoid;border:0!important;padding:2px 0!important}
+.section[data-card-design="ledger"] .skill-card h3::after,
 .section[data-card-design="ledger"] .skill-card::before,
-.section[data-card-design="ledger"] .skill-card h3::after{display:none!important;content:none!important}
-.section[data-card-design="ledger"] :is(.pub-status,.edu-period-badge,.activity-type-badge,.tag){
-  background:transparent!important;border:1px solid var(--line)!important;border-radius:3px!important;
+.section[data-card-design="ledger"] .skill-card::after{display:none!important;content:none!important}
+.section[data-card-design="ledger"] :is(.pub-status,.edu-period-badge,.activity-type-badge,.project-type-badge,.tag){
+  background:transparent!important;border:0!important;border-radius:0!important;padding-left:0!important;padding-right:0!important;color:var(--accent)!important;
 }
-.section[data-card-design="ledger"] .edu-cgpa{border-radius:2px!important;background:transparent!important;border:1px solid var(--line)!important}
-.section[data-card-design="ledger"] .card .meta-line{border-top:1px dashed var(--line)}
-
-/* 5. Spotlight Block — bold, soft-filled research tiles with oversized breathing room. */
-.section[data-card-design="spotlight"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
-  background:var(--accent-soft)!important;
-  border:0!important;border-radius:24px!important;
-  box-shadow:none!important;padding:28px!important;
-}
-.section[data-card-design="spotlight"] :is(.pub-item,.card,.activity-card,.skill-card,.edu) h3{color:var(--accent);font-weight:800}
-.section[data-card-design="spotlight"] .skill-card::before,
-.section[data-card-design="spotlight"] .skill-card h3::after{display:none!important;content:none!important}
-.section[data-card-design="spotlight"] .skill-card li{border-bottom-color:color-mix(in srgb,var(--accent) 18%,transparent)!important}
-.section[data-card-design="spotlight"] :is(.pub-status,.edu-period-badge,.activity-type-badge,.tag){
-  background:var(--surface)!important;border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));
-}
-.section[data-card-design="spotlight"] .edu-cgpa{background:var(--surface)!important;border-left-width:0!important;border-radius:14px!important}
-.section[data-card-design="spotlight"] .thesis-meta{background:color-mix(in srgb,var(--surface) 92%,var(--accent-soft));border-radius:16px}
-
-/* 6. Double Frame — formal academic certificate / portfolio framing. */
-.section[data-card-design="framed"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
-  position:relative;
-  border:1px solid color-mix(in srgb,var(--accent) 64%,var(--line))!important;
-  border-radius:5px!important;
-  padding:28px!important;
-  background:var(--surface)!important;
-  box-shadow:
-    inset 0 0 0 5px var(--surface),
-    inset 0 0 0 6px color-mix(in srgb,var(--accent) 25%,var(--line)),
-    var(--site-shadow,var(--shadow))!important;
-}
-.section[data-card-design="framed"] .skill-card::before{display:none!important;content:none!important}
-.section[data-card-design="framed"] .skill-card h3::after{
-  display:block!important;content:""!important;width:100%;height:1px;background:color-mix(in srgb,var(--accent) 35%,var(--line));margin-top:11px;
-}
-.section[data-card-design="framed"] :is(.pub-status,.edu-period-badge,.activity-type-badge){border-radius:3px!important}
-
-/* Do not let hover effects distort the deliberately flat Ledger design. */
+.section[data-card-design="ledger"] .edu-cgpa{background:transparent!important;border-left:0!important;border-radius:0!important;padding-left:0!important}
+.section[data-card-design="ledger"] .thesis-card{display:grid!important;grid-template-columns:minmax(0,1.35fr) minmax(220px,.65fr)!important;gap:28px!important}
+.section[data-card-design="ledger"] .thesis-main,
+.section[data-card-design="ledger"] .thesis-meta{padding:0!important;background:transparent!important;border:0!important}
 html[data-hover-interactions="lift"] .section[data-card-design="ledger"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item),
 html[data-hover-interactions="glow"] .section[data-card-design="ledger"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){transform:none!important}
 
-@media(max-width:680px){
-  .section[data-card-design="editorial"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){padding-left:20px!important}
-  .section[data-card-design="spotlight"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item),
-  .section[data-card-design="framed"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){padding:22px!important}
+/* ---------------------------------------------------------
+   5. TOOLKIT CHIPS
+   Visual dashboard/skill-board architecture. Skill items become
+   real pills; other sections become compact modular tiles.
+   --------------------------------------------------------- */
+.section[data-card-design="spotlight"] :is(.cards,.skills-grid,.activity-grid,.contact-grid){gap:16px!important}
+.section[data-card-design="spotlight"] :is(.thesis-card,.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
+  position:relative!important;border:0!important;border-radius:20px!important;background:var(--accent-soft)!important;
+  box-shadow:none!important;padding:24px!important;min-height:0!important;overflow:hidden!important;
 }
+.section[data-card-design="spotlight"] :is(.pub-item,.card,.activity-card,.skill-card,.edu) h3{color:var(--accent)!important;font-weight:800!important}
+.section[data-card-design="spotlight"] .skill-card::before,
+.section[data-card-design="spotlight"] .skill-card::after,
+.section[data-card-design="spotlight"] .skill-card h3::after{display:none!important;content:none!important}
+.section[data-card-design="spotlight"] .skill-card ul{display:flex!important;flex-wrap:wrap!important;gap:9px!important;padding:0!important;margin:16px 0 0!important}
+.section[data-card-design="spotlight"] .skill-card li{
+  list-style:none!important;display:inline-flex!important;align-items:center!important;width:auto!important;
+  margin:0!important;padding:7px 11px!important;border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line))!important;
+  border-radius:999px!important;background:var(--surface)!important;color:var(--text)!important;font-weight:650!important;
+}
+.section[data-card-design="spotlight"] .skill-card li::before{display:none!important;content:none!important}
+.section[data-card-design="spotlight"] :is(.pub-status,.edu-period-badge,.activity-type-badge,.project-type-badge,.tag,.edu-course-chip){
+  background:var(--surface)!important;border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line))!important;border-radius:999px!important;
+}
+.section[data-card-design="spotlight"] .edu-cgpa{background:var(--surface)!important;border-left:0!important;border-radius:14px!important;padding:15px 17px!important}
+.section[data-card-design="spotlight"] .thesis-card{background:var(--accent-soft)!important}
+.section[data-card-design="spotlight"] .thesis-meta{background:var(--surface)!important;border-radius:15px!important;margin:14px!important}
+
+/* ---------------------------------------------------------
+   6. ACADEMIC TIMELINE
+   One-column chronological/portfolio rail with dots and no
+   conventional card boxes.
+   --------------------------------------------------------- */
+.section[data-card-design="framed"] :is(.stack-list,.cards,.skills-grid,.activity-grid,.contact-grid,#educationList){
+  grid-template-columns:1fr!important;position:relative!important;gap:0!important;
+}
+.section[data-card-design="framed"] :is(.stack-list,.cards,.skills-grid,.activity-grid,.contact-grid,#educationList)::before{
+  content:"";position:absolute;left:11px;top:8px;bottom:8px;width:2px;background:color-mix(in srgb,var(--accent) 38%,var(--line));
+}
+.section[data-card-design="framed"] :is(.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){
+  position:relative!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;
+  min-height:0!important;margin:0!important;padding:18px 0 22px 42px!important;
+}
+.section[data-card-design="framed"] :is(.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item)::before{
+  content:""!important;position:absolute!important;display:block!important;left:4px!important;top:28px!important;width:16px!important;height:16px!important;
+  border:4px solid var(--bg)!important;border-radius:50%!important;background:var(--accent)!important;box-shadow:0 0 0 1px var(--accent)!important;
+}
+.section[data-card-design="framed"] :is(.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item):not(:last-child)::after{
+  content:""!important;position:absolute!important;display:block!important;left:42px!important;right:0!important;bottom:0!important;height:1px!important;background:var(--line)!important;
+}
+.section[data-card-design="framed"] .skill-card h3::after{display:none!important;content:none!important}
+.section[data-card-design="framed"] .skill-card ul{margin-top:8px!important}
+.section[data-card-design="framed"] .thesis-card{
+  position:relative!important;border:0!important;border-left:3px solid var(--accent)!important;border-radius:0!important;box-shadow:none!important;background:transparent!important;
+}
+.section[data-card-design="framed"] .thesis-main,
+.section[data-card-design="framed"] .thesis-meta{background:transparent!important}
+
+@media(max-width:760px){
+  .section[data-card-design="banded"] :is(.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item){display:block!important}
+  .section[data-card-design="banded"] :is(.pub-item,.card,.activity-card,.skill-card,.edu,.contact-item)::before{
+    inset:0 0 auto 0!important;width:100%!important;height:112px!important;border-right:0!important;border-bottom:1px solid var(--line)!important;
+  }
+  .section[data-card-design="banded"] .skill-card>h3,
+  .section[data-card-design="banded"] .skill-card>ul,
+  .section[data-card-design="banded"] .skill-card>.item-media,
+  .section[data-card-design="banded"] .edu>.edu-top,
+  .section[data-card-design="banded"] .edu>.edu-main,
+  .section[data-card-design="banded"] .pub-item>*{display:block!important;padding-left:20px!important;padding-right:20px!important}
+  .section[data-card-design="banded"] .skill-card>h3{padding-top:24px!important;padding-bottom:32px!important}
+  .section[data-card-design="banded"] .skill-card>ul{padding-top:22px!important;padding-left:38px!important}
+  .section[data-card-design="ledger"] .skill-card{grid-template-columns:1fr!important;gap:10px!important}
+  .section[data-card-design="ledger"] .skill-card ul{columns:1}
+  .section[data-card-design="ledger"] .thesis-card{grid-template-columns:1fr!important}
+}
+
