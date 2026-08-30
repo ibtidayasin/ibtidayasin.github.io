@@ -3822,3 +3822,35 @@ body:not(.admin-body) :is(.pub-item,.card,.skill-card,.edu,.thesis-card) .media-
   body:not(.admin-body) .media-public-item.media-size-original .media-image-stage,
   body:not(.admin-body) .media-public-item.media-size-original .pdf-cover-link{width:100%!important}
 }
+
+/* =========================================================
+   LIGHTBOX CLOSE BUTTON — optical centering fix
+   Draw the cross geometrically so it stays perfectly centered
+   regardless of the active website font.
+   ========================================================= */
+.site-lightbox-close{
+  display:grid;
+  place-items:center;
+  padding:0;
+  line-height:1;
+  font-size:0;
+  overflow:hidden;
+}
+.site-lightbox-close::before,
+.site-lightbox-close::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:18px;
+  height:2.5px;
+  border-radius:999px;
+  background:currentColor;
+  transform-origin:center;
+}
+.site-lightbox-close::before{
+  transform:translate(-50%,-50%) rotate(45deg);
+}
+.site-lightbox-close::after{
+  transform:translate(-50%,-50%) rotate(-45deg);
+}
