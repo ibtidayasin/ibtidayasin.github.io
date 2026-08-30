@@ -440,6 +440,7 @@ const DEFAULT_SITE_SETTINGS={
     portraitFit:"cover",
     portraitPosition:"center",
     projectColumns:3,
+    projectFlow:"grid",
     skillsColumns:3,
     fontPair:"classic",
     shadow:"theme",
@@ -556,6 +557,7 @@ function normalizeSiteSettings(content){
       portraitFit:["cover","contain"].includes(l.portraitFit)?l.portraitFit:DEFAULT_SITE_SETTINGS.layout.portraitFit,
       portraitPosition:["center","top","bottom","left","right"].includes(l.portraitPosition)?l.portraitPosition:DEFAULT_SITE_SETTINGS.layout.portraitPosition,
       projectColumns:[1,2,3].includes(Number(l.projectColumns))?Number(l.projectColumns):DEFAULT_SITE_SETTINGS.layout.projectColumns,
+      projectFlow:["grid","masonry"].includes(l.projectFlow)?l.projectFlow:DEFAULT_SITE_SETTINGS.layout.projectFlow,
       skillsColumns:[1,2,3].includes(Number(l.skillsColumns))?Number(l.skillsColumns):DEFAULT_SITE_SETTINGS.layout.skillsColumns,
       fontPair:Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,l.fontPair)?l.fontPair:DEFAULT_SITE_SETTINGS.layout.fontPair,
       shadow:["theme","none","subtle","medium"].includes(l.shadow)?l.shadow:DEFAULT_SITE_SETTINGS.layout.shadow,
@@ -713,6 +715,7 @@ function fillSiteCustomizationControls(){
   $("fPortraitFit").value=l.portraitFit||"cover";
   $("fPortraitPosition").value=l.portraitPosition||"center";
   $("fProjectColumns").value=String(l.projectColumns);
+  if($("fProjectFlow"))$("fProjectFlow").value=l.projectFlow||"grid";
   $("fSkillsColumns").value=String(l.skillsColumns);
   $("fFontPair").value=l.fontPair;
   $("fShadow").value=l.shadow;
@@ -825,6 +828,7 @@ function syncSiteCustomizationFromControls(){
   l.portraitFit=$("fPortraitFit").value;
   l.portraitPosition=$("fPortraitPosition").value;
   l.projectColumns=Number($("fProjectColumns").value);
+  l.projectFlow=$("fProjectFlow")?.value==="masonry"?"masonry":"grid";
   l.skillsColumns=Number($("fSkillsColumns").value);
   l.fontPair=$("fFontPair").value;
   l.shadow=$("fShadow").value;
@@ -863,7 +867,7 @@ function syncSiteCustomizationFromControls(){
 function resetLayoutStyleControls(){
   normalizeSiteSettings(currentContent);
   const l=currentContent.siteSettings.layout,d=DEFAULT_SITE_SETTINGS.layout;
-  Object.assign(l,{maxWidth:d.maxWidth,sidebarWidth:d.sidebarWidth,layoutGap:d.layoutGap,sectionSpacing:d.sectionSpacing,projectColumns:d.projectColumns,skillsColumns:d.skillsColumns,stickySidebar:d.stickySidebar});
+  Object.assign(l,{maxWidth:d.maxWidth,sidebarWidth:d.sidebarWidth,layoutGap:d.layoutGap,sectionSpacing:d.sectionSpacing,projectColumns:d.projectColumns,projectFlow:d.projectFlow,skillsColumns:d.skillsColumns,stickySidebar:d.stickySidebar});
   fillSiteCustomizationControls();
   setStatus("Layout reset to defaults. Other Appearance, Profile, Typography, Structure and Cover settings were kept.");
 }
@@ -1030,7 +1034,7 @@ function normalizeMediaDisplayList(value){
   return (Array.isArray(value)?value:[]).map(normalizeMediaDisplayItem);
 }
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=21;
+const BUILDER_SETTINGS_SCHEMA_VERSION=22;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){

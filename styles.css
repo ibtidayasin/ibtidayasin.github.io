@@ -3854,3 +3854,34 @@ body:not(.admin-body) :is(.pub-item,.card,.skill-card,.edu,.thesis-card) .media-
 .site-lightbox-close::after{
   transform:translate(-50%,-50%) rotate(-45deg);
 }
+
+
+/* =========================================================
+   PROJECT CARD ARRANGEMENT
+   Optional masonry flow keeps cards at natural height and
+   packs each next card into the shortest available column.
+   ========================================================= */
+body:not(.admin-body) #projectsList.project-flow-masonry{
+  display:block!important;
+  position:relative!important;
+}
+body:not(.admin-body) #projectsList.project-flow-masonry>.card{
+  position:absolute!important;
+  min-height:0!important;
+  margin:0!important;
+  align-self:start!important;
+}
+@media(max-width:900px){
+  body:not(.admin-body) #projectsList.project-flow-masonry{
+    display:grid!important;
+    position:static!important;
+    height:auto!important;
+    grid-template-columns:1fr!important;
+  }
+  body:not(.admin-body) #projectsList.project-flow-masonry>.card{
+    position:relative!important;
+    width:auto!important;
+    left:auto!important;
+    top:auto!important;
+  }
+}
