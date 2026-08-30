@@ -1005,10 +1005,18 @@ function normalizeMediaDisplayItem(item){
   if(!item||typeof item!=="object")return item;
   const out={...item};
   const type=String(out.type||"link");
+  if(type==="image"||type==="pdf"||type==="video"){
+    const legacySize={third:"standard",half:"medium",full:"large",auto:"standard"};
+    out.displaySize=["standard","medium","large","full","original"].includes(out.displaySize)
+      ?out.displaySize
+      :(legacySize[out.width]||"standard");
+  }
   if(type==="image"||type==="pdf"){
     out.fitMode=["exact","center","fill","legacy"].includes(out.fitMode)?out.fitMode:(type==="pdf"?"exact":"legacy");
     out.width=["auto","full","half","third"].includes(out.width)?out.width:"auto";
     out.enlarge=["inherit","on","off"].includes(out.enlarge)?out.enlarge:(type==="pdf"?"on":"inherit");
+  }else if(type==="video"){
+    out.enlarge=["inherit","on","off"].includes(out.enlarge)?out.enlarge:"on";
   }
   if(type==="image"){
     out.aspect=["original","square","4x3","16x9"].includes(out.aspect)?out.aspect:"original";
@@ -1022,7 +1030,7 @@ function normalizeMediaDisplayList(value){
   return (Array.isArray(value)?value:[]).map(normalizeMediaDisplayItem);
 }
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=18;
+const BUILDER_SETTINGS_SCHEMA_VERSION=19;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1690,6 +1698,27 @@ function merge(base,extra){
   }
   return extra??base;
 }
+function normalizePublicationRecord(item){
+  const out={...(item||{})};
+  out.authorNote=String(out.authorNote||"").trim();
+  const description=String(out.description||"").trim();
+  if(!out.authorNote&&description){
+    const lines=description.split(/\r?\n/);
+    const contributionIndex=lines.findIndex(line=>/contributed\s+equally/i.test(line));
+    if(contributionIndex>=0){
+      out.authorNote=String(lines[contributionIndex]||"").trim();
+      lines.splice(contributionIndex,1);
+      out.description=lines.join("\n").trim();
+    }else{
+      out.description=description;
+    }
+  }else{
+    out.description=description;
+  }
+  out.media=normalizeMediaDisplayList(out.media);
+  return out;
+}
+
 function normalizeMedia(content){
   normalizeAcademicArchitecture(content);
   normalizeResearchInterests(content);
@@ -1700,7 +1729,7 @@ function normalizeMedia(content){
   normalizeSectionHeadings(content);
   content.sectionMedia=content.sectionMedia||{};
   content.sectionMedia.profile=normalizeMediaDisplayList(content.sectionMedia.profile);
-  content.publications=(content.publications||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
+  content.publications=(content.publications||[]).map(normalizePublicationRecord);
   content.projects=(content.projects||[]).map(x=>({...x,type:String(x.type||""),media:normalizeMediaDisplayList(x.media)}));
   content.academicActivities=(content.academicActivities||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
   content.skills=(content.skills||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
@@ -1850,6 +1879,7 @@ function repeatBlock(type,i,title,fields,media=[],visible=true){
 function renderPublicationsEditor(){
   $("publicationsEditor").innerHTML=(currentContent.publications||[]).map((p,i)=>repeatBlock("publication",i,`Publication ${i+1}`,[
     {label:"Title",key:"title",value:p.title,full:true},{label:"Authors",key:"authors",value:p.authors,full:true},
+    {label:"Author symbol / contribution note",key:"authorNote",value:p.authorNote||"",full:true},
     {label:"Journal / Conference",key:"venue",value:p.venue},{label:"Year",key:"year",value:p.year},
     {label:"Status",key:"status",value:p.status,kind:"select"},{label:"DOI",key:"doi",value:p.doi},
     {label:"Publication URL",key:"url",value:p.url,full:true},{label:"Short note / description",key:"description",value:p.description,kind:"textarea",full:true}
@@ -2000,11 +2030,12 @@ function mediaEditor(owner,media,title){
                     <option value="left" ${m.position==="left"?"selected":""}>Left</option>
                     <option value="right" ${m.position==="right"?"selected":""}>Right</option>
                   </select></label>
-                  <label>Display width<select data-media-field="width">
-                    <option value="auto" ${(m.width||"auto")==="auto"?"selected":""}>Auto</option>
-                    <option value="full" ${m.width==="full"?"selected":""}>Full width</option>
-                    <option value="half" ${m.width==="half"?"selected":""}>Half width</option>
-                    <option value="third" ${m.width==="third"?"selected":""}>Third width</option>
+                  <label>Display size<select data-media-field="displaySize">
+                    <option value="standard" ${(m.displaySize||"standard")==="standard"?"selected":""}>Standard</option>
+                    <option value="medium" ${m.displaySize==="medium"?"selected":""}>Medium</option>
+                    <option value="large" ${m.displaySize==="large"?"selected":""}>Large</option>
+                    <option value="full" ${m.displaySize==="full"?"selected":""}>Full width</option>
+                    <option value="original" ${m.displaySize==="original"?"selected":""}>Original size</option>
                   </select></label>
                   <label>Click to enlarge<select data-media-field="enlarge">
                     <option value="inherit" ${(m.enlarge||"inherit")==="inherit"?"selected":""}>Use site setting</option>
@@ -2014,6 +2045,25 @@ function mediaEditor(owner,media,title){
                 </div>
               </div>`:""}
             <span class="helper">${esc(m.url||"")}</span>
+            ${m.type==="video"?`
+              <div class="image-settings-admin media-display-admin">
+                <h5>Media display</h5>
+                <div class="image-settings-grid">
+                  <label>Display size<select data-media-field="displaySize">
+                    <option value="standard" ${(m.displaySize||"standard")==="standard"?"selected":""}>Standard</option>
+                    <option value="medium" ${m.displaySize==="medium"?"selected":""}>Medium</option>
+                    <option value="large" ${m.displaySize==="large"?"selected":""}>Large</option>
+                    <option value="full" ${m.displaySize==="full"?"selected":""}>Full width</option>
+                    <option value="original" ${m.displaySize==="original"?"selected":""}>Original size</option>
+                  </select></label>
+                  <label>Click to enlarge<select data-media-field="enlarge">
+                    <option value="on" ${(m.enlarge||"on")==="on"?"selected":""}>Always</option>
+                    <option value="inherit" ${m.enlarge==="inherit"?"selected":""}>Use site setting</option>
+                    <option value="off" ${m.enlarge==="off"?"selected":""}>Never</option>
+                  </select></label>
+                </div>
+                <span class="helper">Standard matches the normal attachment card size. Medium and Large make the media more prominent; Original keeps its native size where space allows.</span>
+              </div>`:""}
             ${m.type==="pdf"?`
               <div class="pdf-thumb-admin">
                 <h5>PDF preview image</h5>
@@ -2042,11 +2092,12 @@ function mediaEditor(owner,media,title){
                     <option value="fill" ${m.fitMode==="fill"?"selected":""}>Fill / crop</option>
                     <option value="legacy" ${(m.fitMode||"legacy")==="legacy"?"selected":""}>Current style</option>
                   </select></label>
-                  <label>Display width<select data-media-field="width">
-                    <option value="auto" ${(m.width||"auto")==="auto"?"selected":""}>Auto</option>
-                    <option value="full" ${m.width==="full"?"selected":""}>Full width</option>
-                    <option value="half" ${m.width==="half"?"selected":""}>Half width</option>
-                    <option value="third" ${m.width==="third"?"selected":""}>Third width</option>
+                  <label>Display size<select data-media-field="displaySize">
+                    <option value="standard" ${(m.displaySize||"standard")==="standard"?"selected":""}>Standard</option>
+                    <option value="medium" ${m.displaySize==="medium"?"selected":""}>Medium</option>
+                    <option value="large" ${m.displaySize==="large"?"selected":""}>Large</option>
+                    <option value="full" ${m.displaySize==="full"?"selected":""}>Full width</option>
+                    <option value="original" ${m.displaySize==="original"?"selected":""}>Original size</option>
                   </select></label>
                   <label>Click to enlarge<select data-media-field="enlarge">
                     <option value="on" ${(m.enlarge||"on")==="on"?"selected":""}>Always</option>
@@ -2054,7 +2105,7 @@ function mediaEditor(owner,media,title){
                     <option value="off" ${m.enlarge==="off"?"selected":""}>Never</option>
                   </select></label>
                 </div>
-                <span class="helper">Exact size removes blank framing. Center fit keeps the whole preview visible. Fill / crop fills the frame. Current style preserves the previous display.</span>
+                <span class="helper">Display size controls how large the media appears. Standard matches normal attachment cards; Medium and Large make it more prominent. Exact size removes blank framing; Center fit keeps the whole preview visible.</span>
               </div>`:""}
           </div>
           <button class="danger" data-media-remove="${esc(owner)}:${i}" type="button">Remove</button>
@@ -2106,7 +2157,7 @@ function renderCvState(){
 
 $("addPublicationBtn").addEventListener("click",()=>{
   syncAllForms();
-  currentContent.publications.push({title:"",authors:"",venue:"",year:"",status:"",doi:"",url:"",description:"",visible:true,media:[]});
+  currentContent.publications.push({title:"",authors:"",authorNote:"",venue:"",year:"",status:"",doi:"",url:"",description:"",visible:true,media:[]});
   renderPublicationsEditor();
 });
 $("addProjectBtn").addEventListener("click",()=>{
@@ -2254,7 +2305,7 @@ function syncAllForms(){
 function readRepeaters(){
   currentContent.publications=[...document.querySelectorAll("[data-publication]")].map((r,i)=>{
     const old=currentContent.publications[i]||{};
-    return {title:get(r,"title"),authors:get(r,"authors"),venue:get(r,"venue"),year:get(r,"year"),status:get(r,"status"),doi:get(r,"doi"),url:get(r,"url"),description:get(r,"description"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
+    return {title:get(r,"title"),authors:get(r,"authors"),authorNote:get(r,"authorNote"),venue:get(r,"venue"),year:get(r,"year"),status:get(r,"status"),doi:get(r,"doi"),url:get(r,"url"),description:get(r,"description"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
   }).filter(x=>x.title||x.venue||x.media.length);
 
   currentContent.projects=[...document.querySelectorAll("[data-project]")].map((r,i)=>{
@@ -2294,11 +2345,14 @@ function readMediaMetadata(){
         media[i].fitMode=row.querySelector('[data-media-field="fitMode"]')?.value||"legacy";
         media[i].fit=row.querySelector('[data-media-field="fit"]')?.value||"cover";
         media[i].position=row.querySelector('[data-media-field="position"]')?.value||"center";
-        media[i].width=row.querySelector('[data-media-field="width"]')?.value||"auto";
+        media[i].displaySize=row.querySelector('[data-media-field="displaySize"]')?.value||"standard";
         media[i].enlarge=row.querySelector('[data-media-field="enlarge"]')?.value||"inherit";
       }else if(media[i].type==="pdf"){
         media[i].fitMode=row.querySelector('[data-media-field="fitMode"]')?.value||"legacy";
-        media[i].width=row.querySelector('[data-media-field="width"]')?.value||"auto";
+        media[i].displaySize=row.querySelector('[data-media-field="displaySize"]')?.value||"standard";
+        media[i].enlarge=row.querySelector('[data-media-field="enlarge"]')?.value||"on";
+      }else if(media[i].type==="video"){
+        media[i].displaySize=row.querySelector('[data-media-field="displaySize"]')?.value||"standard";
         media[i].enlarge=row.querySelector('[data-media-field="enlarge"]')?.value||"on";
       }
     });
@@ -2432,7 +2486,7 @@ async function uploadMedia(owner,editor){
     path,
     title:file.name.replace(/\.[^.]+$/,""),
     caption:"",
-      ...(type==="image"?{alt:"",aspect:"original",fitMode:"exact",fit:"cover",position:"center",width:"auto",enlarge:"on"}:type==="pdf"?{fitMode:"exact",width:"auto",enlarge:"on"}:type==="video"?{enlarge:"on"}:{}),
+      ...(type==="image"?{alt:"",aspect:"original",fitMode:"exact",fit:"cover",position:"center",displaySize:"standard",width:"auto",enlarge:"on"}:type==="pdf"?{fitMode:"exact",displaySize:"standard",width:"auto",enlarge:"on"}:type==="video"?{displaySize:"standard",enlarge:"on"}:{}),
     uploaded_at:new Date().toISOString()
   };
   media.push(item);
@@ -2467,7 +2521,7 @@ async function addMediaLink(owner,editor){
 
   getOwnerMedia(owner).push({
     id:uid(),type,url,title:title||defaultLinkTitle(type),caption:"",filename:"",path:"",
-    ...(type==="image"?{alt:"",aspect:"original",fitMode:"exact",fit:"cover",position:"center",width:"auto",enlarge:"on"}:type==="pdf"?{fitMode:"exact",width:"auto",enlarge:"on"}:type==="video"?{enlarge:"on"}:{}),
+    ...(type==="image"?{alt:"",aspect:"original",fitMode:"exact",fit:"cover",position:"center",displaySize:"standard",width:"auto",enlarge:"on"}:type==="pdf"?{fitMode:"exact",displaySize:"standard",width:"auto",enlarge:"on"}:type==="video"?{displaySize:"standard",enlarge:"on"}:{}),
     uploaded_at:new Date().toISOString()
   });
   await persistContent("Link added.");

@@ -3758,3 +3758,50 @@ html[data-hover-interactions="glow"] .section[data-card-design="ledger"] :is(.th
 .site-lightbox-media>img{
   image-rendering:auto;
 }
+
+
+/* =========================================================
+   ROW-FIRST MEDIA GALLERY + DISPLAY SIZES + AUTHOR NOTE — v20260830
+   ========================================================= */
+/* Media follows document order across each row, then wraps to the next row. */
+body:not(.admin-body) .media-gallery{
+  display:flex!important;
+  flex-flow:row wrap!important;
+  align-items:flex-start!important;
+  align-content:flex-start!important;
+  justify-content:flex-start!important;
+  gap:12px!important;
+}
+body:not(.admin-body) .media-gallery>.media-public-item{margin:0!important;min-width:0}
+
+/* Consistent visual sizes for images, PDFs and videos. */
+body:not(.admin-body) .media-public-item.media-size-standard{flex:0 1 280px!important;width:min(280px,100%)!important;max-width:280px!important}
+body:not(.admin-body) .media-public-item.media-size-medium{flex:0 1 420px!important;width:min(420px,100%)!important;max-width:420px!important}
+body:not(.admin-body) .media-public-item.media-size-large{flex:0 1 620px!important;width:min(620px,100%)!important;max-width:620px!important}
+body:not(.admin-body) .media-public-item.media-size-full{flex:0 0 100%!important;width:100%!important;max-width:none!important}
+body:not(.admin-body) .media-public-item.media-size-original{flex:0 1 auto!important;width:max-content!important;max-width:100%!important}
+body:not(.admin-body) .media-public-item.media-size-original .media-image-stage,
+body:not(.admin-body) .media-public-item.media-size-original .pdf-cover-link{width:max-content!important;max-width:100%!important}
+body:not(.admin-body) .media-public-item.media-size-original.media-fit-exact .media-public-image,
+body:not(.admin-body) .media-public-item.media-size-original.media-fit-exact .pdf-cover-image{width:auto!important;max-width:100%!important}
+
+/* Override older publication/card rules that forced attachments into one vertical column. */
+body:not(.admin-body) :is(.pub-item,.card,.skill-card,.edu,.thesis-card) .media-gallery{
+  display:flex!important;
+  flex-flow:row wrap!important;
+}
+
+.pub-author-note{
+  margin-top:4px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.45;
+}
+.pub-description{white-space:pre-line}
+
+@media(max-width:680px){
+  body:not(.admin-body) .media-gallery{display:grid!important;grid-template-columns:1fr!important}
+  body:not(.admin-body) .media-gallery>.media-public-item{width:100%!important;max-width:none!important;flex:none!important}
+  body:not(.admin-body) .media-public-item.media-size-original .media-image-stage,
+  body:not(.admin-body) .media-public-item.media-size-original .pdf-cover-link{width:100%!important}
+}

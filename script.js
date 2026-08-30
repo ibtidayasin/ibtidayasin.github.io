@@ -1157,10 +1157,18 @@ function normalizeMediaDisplayItem(item){
   if(!item||typeof item!=="object")return item;
   const out={...item};
   const type=String(out.type||"link");
+  if(type==="image"||type==="pdf"||type==="video"){
+    const legacySize={third:"standard",half:"medium",full:"large",auto:"standard"};
+    out.displaySize=["standard","medium","large","full","original"].includes(out.displaySize)
+      ?out.displaySize
+      :(legacySize[out.width]||"standard");
+  }
   if(type==="image"||type==="pdf"){
     out.fitMode=["exact","center","fill","legacy"].includes(out.fitMode)?out.fitMode:(type==="pdf"?"exact":"legacy");
     out.width=["auto","full","half","third"].includes(out.width)?out.width:"auto";
     out.enlarge=["inherit","on","off"].includes(out.enlarge)?out.enlarge:(type==="pdf"?"on":"inherit");
+  }else if(type==="video"){
+    out.enlarge=["inherit","on","off"].includes(out.enlarge)?out.enlarge:"on";
   }
   if(type==="image"){
     out.aspect=["original","square","4x3","16x9"].includes(out.aspect)?out.aspect:"original";
@@ -1175,7 +1183,7 @@ function normalizeMediaDisplayList(value){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=18;
+const BUILDER_SETTINGS_SCHEMA_VERSION=19;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1311,6 +1319,27 @@ function merge(base,extra){
   }
   return extra??base;
 }
+function normalizePublicationRecord(item){
+  const out={...(item||{})};
+  out.authorNote=String(out.authorNote||"").trim();
+  const description=String(out.description||"").trim();
+  if(!out.authorNote&&description){
+    const lines=description.split(/\r?\n/);
+    const contributionIndex=lines.findIndex(line=>/contributed\s+equally/i.test(line));
+    if(contributionIndex>=0){
+      out.authorNote=String(lines[contributionIndex]||"").trim();
+      lines.splice(contributionIndex,1);
+      out.description=lines.join("\n").trim();
+    }else{
+      out.description=description;
+    }
+  }else{
+    out.description=description;
+  }
+  out.media=normalizeMediaDisplayList(out.media);
+  return out;
+}
+
 function normalize(d){
   ensureBuilderState(d);
   normalizeAcademicArchitecture(d);
@@ -1323,7 +1352,7 @@ function normalize(d){
   d.sectionMedia=d.sectionMedia||{profile:[]};
   d.sectionMedia.profile=normalizeMediaDisplayList(d.sectionMedia.profile);
   d.featuredResearch=d.featuredResearch||{};d.featuredResearch.media=normalizeMediaDisplayList(d.featuredResearch.media);
-  d.publications=(d.publications||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
+  d.publications=(d.publications||[]).map(normalizePublicationRecord);
   d.projects=(d.projects||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
   d.skills=(d.skills||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
   d.education=(d.education||[]).map(x=>({...x,cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:normalizeMediaDisplayList(x.media)}));
@@ -1528,11 +1557,12 @@ function render(d){
         <div>
           <h3>${esc(p.title||"")}</h3>
           ${p.authors?`<div class="pub-meta">${esc(p.authors)}</div>`:""}
+          ${p.authorNote?`<div class="pub-author-note">${esc(p.authorNote)}</div>`:""}
         </div>
         ${p.status?`<span class="pub-status">${esc(p.status)}</span>`:""}
       </div>
       <div class="pub-meta">${[p.venue,p.year].filter(Boolean).map(esc).join(" · ")}</div>
-      ${p.description?`<p class="muted small">${esc(p.description)}</p>`:""}
+      ${p.description?`<p class="muted small pub-description">${esc(p.description)}</p>`:""}
       <div class="pub-links">
         ${p.doi?`<a class="text-link" href="https://doi.org/${escAttr(p.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i,""))}" target="_blank" rel="noopener">DOI ↗</a>`:""}
         ${safeUrl(p.url)?`<a class="text-link" href="${escAttr(safeUrl(p.url))}" target="_blank" rel="noopener">Publication ↗</a>`:""}
@@ -1642,8 +1672,9 @@ function mediaHtml(media){
       const fitMode=["exact","center","fill","legacy"].includes(m.fitMode)?m.fitMode:"legacy";
       const position=["center","top","bottom","left","right"].includes(m.position)?m.position:"center";
       const width=["auto","full","half","third"].includes(m.width)?m.width:"auto";
+      const displaySize=["standard","medium","large","full","original"].includes(m.displaySize)?m.displaySize:"standard";
       const enlarge=["inherit","on","off"].includes(m.enlarge)?m.enlarge:"inherit";
-      visual.push(`<figure class="media-public-item media-width-${escAttr(width)} media-fit-${escAttr(fitMode)}">
+      visual.push(`<figure class="media-public-item media-size-${escAttr(displaySize)} media-width-${escAttr(width)} media-fit-${escAttr(fitMode)}">
         <a class="media-image-stage media-aspect-${escAttr(aspect)} media-fit-${escAttr(fitMode)}" href="${escAttr(url)}" target="_blank" rel="noopener">
           <img class="media-public-image image-fit-${escAttr(fit)} crop-${escAttr(position)}" data-lightbox="${escAttr(enlarge)}" data-download-name="${escAttr(m.filename||title||"image")}" src="${escAttr(url)}" alt="${escAttr(alt)}" loading="lazy">
         </a>
@@ -1651,8 +1682,9 @@ function mediaHtml(media){
       </figure>`);
     }else if(type==="video"){
       const embed=videoEmbed(url);
+      const displaySize=["standard","medium","large","full","original"].includes(m.displaySize)?m.displaySize:"standard";
       const enlarge=["inherit","on","off"].includes(m.enlarge)?m.enlarge:"on";
-      visual.push(`<div class="media-public-item media-video-card">
+      visual.push(`<div class="media-public-item media-video-card media-size-${escAttr(displaySize)}">
         <div class="media-video-stage">
           ${embed?`<div class="media-video-embed"><iframe src="${escAttr(embed)}" title="${escAttr(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`:
           `<video class="media-public-video" controls preload="metadata" src="${escAttr(url)}"></video>`}
@@ -1664,8 +1696,9 @@ function mediaHtml(media){
       const thumb=safeUrl(m.thumbnail_url);
       const fitMode=["exact","center","fill","legacy"].includes(m.fitMode)?m.fitMode:"exact";
       const width=["auto","full","half","third"].includes(m.width)?m.width:"auto";
+      const displaySize=["standard","medium","large","full","original"].includes(m.displaySize)?m.displaySize:"standard";
       const enlarge=["inherit","on","off"].includes(m.enlarge)?m.enlarge:"on";
-      visual.push(`<article class="media-public-item pdf-preview-card media-width-${escAttr(width)} media-fit-${escAttr(fitMode)}">
+      visual.push(`<article class="media-public-item pdf-preview-card media-size-${escAttr(displaySize)} media-width-${escAttr(width)} media-fit-${escAttr(fitMode)}">
         <a class="pdf-cover-link" href="${escAttr(url)}" target="_blank" rel="noopener" aria-label="Preview ${escAttr(title)}" data-lightbox-media-kind="pdf" data-lightbox-mode="${escAttr(enlarge)}" data-media-url="${escAttr(url)}" data-media-preview="${escAttr(thumb||"")}" data-media-title="${escAttr(title)}" data-media-caption="${escAttr(caption)}" data-media-download-name="${escAttr(m.filename||title||"document.pdf")}">
           ${thumb
             ? `<img class="pdf-cover-image" src="${escAttr(thumb)}" alt="Preview of ${escAttr(title)}" loading="lazy">`
