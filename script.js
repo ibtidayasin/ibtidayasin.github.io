@@ -1159,7 +1159,7 @@ function normalizeMediaDisplayItem(item){
   const type=String(out.type||"link");
   if(type==="image"||type==="pdf"||type==="video"){
     const legacySize={third:"standard",half:"medium",full:"large",auto:"standard"};
-    out.displaySize=["standard","medium","large","full","original"].includes(out.displaySize)
+    out.displaySize=["very-small","small","standard","medium","large","full","original"].includes(out.displaySize)
       ?out.displaySize
       :(legacySize[out.width]||"standard");
   }
@@ -1672,7 +1672,7 @@ function mediaHtml(media){
       const fitMode=["exact","center","fill","legacy"].includes(m.fitMode)?m.fitMode:"legacy";
       const position=["center","top","bottom","left","right"].includes(m.position)?m.position:"center";
       const width=["auto","full","half","third"].includes(m.width)?m.width:"auto";
-      const displaySize=["standard","medium","large","full","original"].includes(m.displaySize)?m.displaySize:"standard";
+      const displaySize=["very-small","small","standard","medium","large","full","original"].includes(m.displaySize)?m.displaySize:"standard";
       const enlarge=["inherit","on","off"].includes(m.enlarge)?m.enlarge:"inherit";
       visual.push(`<figure class="media-public-item media-size-${escAttr(displaySize)} media-width-${escAttr(width)} media-fit-${escAttr(fitMode)}">
         <a class="media-image-stage media-aspect-${escAttr(aspect)} media-fit-${escAttr(fitMode)}" href="${escAttr(url)}" target="_blank" rel="noopener">
@@ -1682,7 +1682,7 @@ function mediaHtml(media){
       </figure>`);
     }else if(type==="video"){
       const embed=videoEmbed(url);
-      const displaySize=["standard","medium","large","full","original"].includes(m.displaySize)?m.displaySize:"standard";
+      const displaySize=["very-small","small","standard","medium","large","full","original"].includes(m.displaySize)?m.displaySize:"standard";
       const enlarge=["inherit","on","off"].includes(m.enlarge)?m.enlarge:"on";
       visual.push(`<div class="media-public-item media-video-card media-size-${escAttr(displaySize)}">
         <div class="media-video-stage">
@@ -1696,7 +1696,7 @@ function mediaHtml(media){
       const thumb=safeUrl(m.thumbnail_url);
       const fitMode=["exact","center","fill","legacy"].includes(m.fitMode)?m.fitMode:"exact";
       const width=["auto","full","half","third"].includes(m.width)?m.width:"auto";
-      const displaySize=["standard","medium","large","full","original"].includes(m.displaySize)?m.displaySize:"standard";
+      const displaySize=["very-small","small","standard","medium","large","full","original"].includes(m.displaySize)?m.displaySize:"standard";
       const enlarge=["inherit","on","off"].includes(m.enlarge)?m.enlarge:"on";
       visual.push(`<article class="media-public-item pdf-preview-card media-size-${escAttr(displaySize)} media-width-${escAttr(width)} media-fit-${escAttr(fitMode)}">
         <a class="pdf-cover-link" href="${escAttr(url)}" target="_blank" rel="noopener" aria-label="Preview ${escAttr(title)}" data-lightbox-media-kind="pdf" data-lightbox-mode="${escAttr(enlarge)}" data-media-url="${escAttr(url)}" data-media-preview="${escAttr(thumb||"")}" data-media-title="${escAttr(title)}" data-media-caption="${escAttr(caption)}" data-media-download-name="${escAttr(m.filename||title||"document.pdf")}">

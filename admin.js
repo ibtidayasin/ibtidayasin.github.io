@@ -1007,7 +1007,7 @@ function normalizeMediaDisplayItem(item){
   const type=String(out.type||"link");
   if(type==="image"||type==="pdf"||type==="video"){
     const legacySize={third:"standard",half:"medium",full:"large",auto:"standard"};
-    out.displaySize=["standard","medium","large","full","original"].includes(out.displaySize)
+    out.displaySize=["very-small","small","standard","medium","large","full","original"].includes(out.displaySize)
       ?out.displaySize
       :(legacySize[out.width]||"standard");
   }
@@ -2031,6 +2031,8 @@ function mediaEditor(owner,media,title){
                     <option value="right" ${m.position==="right"?"selected":""}>Right</option>
                   </select></label>
                   <label>Display size<select data-media-field="displaySize">
+                    <option value="very-small" ${m.displaySize==="very-small"?"selected":""}>Very small</option>
+                    <option value="small" ${m.displaySize==="small"?"selected":""}>Small</option>
                     <option value="standard" ${(m.displaySize||"standard")==="standard"?"selected":""}>Standard</option>
                     <option value="medium" ${m.displaySize==="medium"?"selected":""}>Medium</option>
                     <option value="large" ${m.displaySize==="large"?"selected":""}>Large</option>
@@ -2050,6 +2052,8 @@ function mediaEditor(owner,media,title){
                 <h5>Media display</h5>
                 <div class="image-settings-grid">
                   <label>Display size<select data-media-field="displaySize">
+                    <option value="very-small" ${m.displaySize==="very-small"?"selected":""}>Very small</option>
+                    <option value="small" ${m.displaySize==="small"?"selected":""}>Small</option>
                     <option value="standard" ${(m.displaySize||"standard")==="standard"?"selected":""}>Standard</option>
                     <option value="medium" ${m.displaySize==="medium"?"selected":""}>Medium</option>
                     <option value="large" ${m.displaySize==="large"?"selected":""}>Large</option>
@@ -2093,6 +2097,8 @@ function mediaEditor(owner,media,title){
                     <option value="legacy" ${(m.fitMode||"legacy")==="legacy"?"selected":""}>Current style</option>
                   </select></label>
                   <label>Display size<select data-media-field="displaySize">
+                    <option value="very-small" ${m.displaySize==="very-small"?"selected":""}>Very small</option>
+                    <option value="small" ${m.displaySize==="small"?"selected":""}>Small</option>
                     <option value="standard" ${(m.displaySize||"standard")==="standard"?"selected":""}>Standard</option>
                     <option value="medium" ${m.displaySize==="medium"?"selected":""}>Medium</option>
                     <option value="large" ${m.displaySize==="large"?"selected":""}>Large</option>
