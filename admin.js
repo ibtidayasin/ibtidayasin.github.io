@@ -478,11 +478,33 @@ const DEFAULT_SITE_SETTINGS={
 
 const SITE_FONT_PAIRS={
   classic:{body:"Arial, Helvetica, sans-serif",heading:"Georgia, serif"},
-  modern:{body:"Segoe UI, Arial, sans-serif",heading:"Segoe UI, Arial, sans-serif"},
-  humanist:{body:"Segoe UI, Arial, sans-serif",heading:"Georgia, serif"},
-  editorial:{body:"Georgia, Times New Roman, serif",heading:"Georgia, Times New Roman, serif"},
-  palatino:{body:"Segoe UI, Arial, sans-serif",heading:"Palatino Linotype, Book Antiqua, Palatino, serif"},
-  bookish:{body:"Palatino Linotype, Book Antiqua, Palatino, serif",heading:"Georgia, serif"}
+  modern:{body:'"Segoe UI", Arial, sans-serif',heading:'"Segoe UI", Arial, sans-serif'},
+  humanist:{body:'"Segoe UI", Arial, sans-serif',heading:"Georgia, serif"},
+  editorial:{body:'Georgia, "Times New Roman", serif',heading:'Georgia, "Times New Roman", serif'},
+  palatino:{body:'"Segoe UI", Arial, sans-serif',heading:'"Palatino Linotype", "Book Antiqua", Palatino, serif'},
+  bookish:{body:'"Palatino Linotype", "Book Antiqua", Palatino, serif',heading:"Georgia, serif"},
+
+  // Popular single-font presets. Each applies consistently to body and headings.
+  timesNewRoman:{body:'"Times New Roman", Times, serif',heading:'"Times New Roman", Times, serif'},
+  georgiaFont:{body:'Georgia, "Times New Roman", serif',heading:'Georgia, "Times New Roman", serif'},
+  cambria:{body:'Cambria, Georgia, serif',heading:'Cambria, Georgia, serif'},
+  cambriaMath:{body:'"Cambria Math", Cambria, "Times New Roman", serif',heading:'"Cambria Math", Cambria, "Times New Roman", serif'},
+  garamond:{body:'Garamond, "Times New Roman", serif',heading:'Garamond, "Times New Roman", serif'},
+  palatinoFont:{body:'"Palatino Linotype", "Book Antiqua", Palatino, serif',heading:'"Palatino Linotype", "Book Antiqua", Palatino, serif'},
+  bookAntiquaFont:{body:'"Book Antiqua", "Palatino Linotype", Palatino, serif',heading:'"Book Antiqua", "Palatino Linotype", Palatino, serif'},
+  baskerville:{body:'Baskerville, "Times New Roman", serif',heading:'Baskerville, "Times New Roman", serif'},
+  arialFont:{body:'Arial, Helvetica, sans-serif',heading:'Arial, Helvetica, sans-serif'},
+  helvetica:{body:'Helvetica, Arial, sans-serif',heading:'Helvetica, Arial, sans-serif'},
+  segoeUI:{body:'"Segoe UI", Arial, sans-serif',heading:'"Segoe UI", Arial, sans-serif'},
+  calibri:{body:'Calibri, "Segoe UI", Arial, sans-serif',heading:'Calibri, "Segoe UI", Arial, sans-serif'},
+  verdana:{body:'Verdana, Geneva, sans-serif',heading:'Verdana, Geneva, sans-serif'},
+  tahoma:{body:'Tahoma, Verdana, sans-serif',heading:'Tahoma, Verdana, sans-serif'},
+  trebuchetMS:{body:'"Trebuchet MS", Arial, sans-serif',heading:'"Trebuchet MS", Arial, sans-serif'},
+  centuryGothic:{body:'"Century Gothic", Arial, sans-serif',heading:'"Century Gothic", Arial, sans-serif'},
+  arialNarrow:{body:'"Arial Narrow", Arial, sans-serif',heading:'"Arial Narrow", Arial, sans-serif'},
+  courierNew:{body:'"Courier New", Courier, monospace',heading:'"Courier New", Courier, monospace'},
+  consolas:{body:'Consolas, "Courier New", monospace',heading:'Consolas, "Courier New", monospace'},
+  lucidaSans:{body:'"Lucida Sans Unicode", "Lucida Grande", Arial, sans-serif',heading:'"Lucida Sans Unicode", "Lucida Grande", Arial, sans-serif'}
 };
 
 function normalizeSiteSettings(content){
