@@ -2015,6 +2015,24 @@ function mediaEditor(owner,media,title){
               </div>`:""}
             <span class="helper">${esc(m.url||"")}</span>
             ${m.type==="pdf"?`
+              <div class="pdf-thumb-admin">
+                <h5>PDF preview image</h5>
+                <div class="pdf-thumb-actions">
+                  <button class="primary" data-pdf-thumb-generate="${esc(owner)}:${i}" type="button">
+                    ${m.thumbnail_url?"Regenerate automatically":"Generate preview automatically"}
+                  </button>
+                </div>
+                <span class="helper">Automatic first-page preview is the default for uploaded PDFs.</span>
+                <label class="media-mini-label">Manual preview image (optional)
+                  <input type="file" data-pdf-thumb-file accept="image/jpeg,image/png,image/webp">
+                </label>
+                <div class="pdf-thumb-actions">
+                  <button class="secondary" data-pdf-thumb-upload="${esc(owner)}:${i}" type="button">
+                    ${m.thumbnail_url?"Replace manually":"Upload manually"}
+                  </button>
+                </div>
+                <span class="helper">Use a manual JPG/PNG/WebP only if you want to replace the automatic page-1 preview.</span>
+              </div>
               <div class="image-settings-admin media-display-admin">
                 <h5>Media display</h5>
                 <div class="image-settings-grid">
@@ -2037,20 +2055,6 @@ function mediaEditor(owner,media,title){
                   </select></label>
                 </div>
                 <span class="helper">Exact size removes blank framing. Center fit keeps the whole preview visible. Fill / crop fills the frame. Current style preserves the previous display.</span>
-              </div>
-              <div class="pdf-thumb-admin">
-                <label class="media-mini-label">PDF preview image
-                  <input type="file" data-pdf-thumb-file accept="image/jpeg,image/png,image/webp">
-                </label>
-                <div class="pdf-thumb-actions">
-                  <button class="secondary" data-pdf-thumb-generate="${esc(owner)}:${i}" type="button">
-                    ${m.thumbnail_url?"Regenerate automatically":"Generate preview automatically"}
-                  </button>
-                  <button class="secondary" data-pdf-thumb-upload="${esc(owner)}:${i}" type="button">
-                    ${m.thumbnail_url?"Replace manually":"Upload manually"}
-                  </button>
-                </div>
-                <span class="helper">Automatic preview uses page 1. Manual JPG/PNG/WebP upload remains available as backup.</span>
               </div>`:""}
           </div>
           <button class="danger" data-media-remove="${esc(owner)}:${i}" type="button">Remove</button>
