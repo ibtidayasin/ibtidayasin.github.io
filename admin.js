@@ -1030,7 +1030,7 @@ function normalizeMediaDisplayList(value){
   return (Array.isArray(value)?value:[]).map(normalizeMediaDisplayItem);
 }
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=20;
+const BUILDER_SETTINGS_SCHEMA_VERSION=21;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1964,11 +1964,12 @@ function adminMediaPreview(m){
 
   if(type==="video"){
     const embed=adminVideoEmbed(url);
+    const thumb=String(m?.thumbnail_url||"").trim();
     return `<div class="media-admin-preview media-admin-preview-video">
       ${embed
         ? `<div class="media-admin-video-frame"><iframe src="${esc(embed)}" title="Preview of ${esc(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`
-        : `<video controls preload="metadata" src="${esc(url)}"></video>`}
-      <div class="media-admin-preview-label">Video preview</div>
+        : `<video controls preload="metadata" ${thumb?`poster="${esc(thumb)}"`:""} src="${esc(url)}"></video>`}
+      <div class="media-admin-preview-label">${thumb?"Video preview image · play to view video":"Video preview · generate a preview image below"}</div>
     </div>`;
   }
 
@@ -2055,6 +2056,24 @@ function mediaEditor(owner,media,title){
               </div>`:""}
             <span class="helper">${esc(m.url||"")}</span>
             ${m.type==="video"?`
+              <div class="pdf-thumb-admin video-thumb-admin">
+                <h5>Video preview image</h5>
+                <div class="pdf-thumb-actions">
+                  <button class="primary" data-video-thumb-generate="${esc(owner)}:${i}" type="button">
+                    ${m.thumbnail_url?"Regenerate automatically":"Generate preview automatically"}
+                  </button>
+                </div>
+                <span class="helper">A representative early frame is generated automatically whenever you upload a video, so the preview does not start as a black frame.</span>
+                <label class="media-mini-label">Manual preview image (optional)
+                  <input type="file" data-video-thumb-file accept="image/jpeg,image/png,image/webp">
+                </label>
+                <div class="pdf-thumb-actions">
+                  <button class="secondary" data-video-thumb-upload="${esc(owner)}:${i}" type="button">
+                    ${m.thumbnail_url?"Replace manually":"Upload manually"}
+                  </button>
+                </div>
+                <span class="helper">Use a manual JPG/PNG/WebP only if you prefer a specific video thumbnail.</span>
+              </div>
               <div class="image-settings-admin media-display-admin">
                 <h5>Media display</h5>
                 <div class="image-settings-grid">
@@ -2231,6 +2250,12 @@ document.addEventListener("click",async e=>{
 
   b=e.target.closest("[data-pdf-thumb-upload]");
   if(b){await uploadPdfThumbnail(b.dataset.pdfThumbUpload,b.closest(".media-admin-item"));return}
+
+  b=e.target.closest("[data-video-thumb-generate]");
+  if(b){await generateExistingVideoThumbnail(b.dataset.videoThumbGenerate);return}
+
+  b=e.target.closest("[data-video-thumb-upload]");
+  if(b){await uploadVideoThumbnail(b.dataset.videoThumbUpload,b.closest(".media-admin-item"));return}
 
   b=e.target.closest("[data-media-remove]");
   if(b){await removeMedia(b.dataset.mediaRemove);return}
@@ -2458,11 +2483,16 @@ function clearPendingMediaPreview(editor){
     try{URL.revokeObjectURL(box.dataset.objectUrl)}catch{}
     delete box.dataset.objectUrl;
   }
+  if(box.dataset.previewObjectUrl){
+    try{URL.revokeObjectURL(box.dataset.previewObjectUrl)}catch{}
+    delete box.dataset.previewObjectUrl;
+  }
   box.innerHTML="";
   box.classList.add("hidden");
 }
 
 const pendingPdfPreviewBlobs=new WeakMap();
+const pendingVideoPreviewBlobs=new WeakMap();
 
 async function previewSelectedMediaFile(input){
   const editor=input?.closest(".media-editor");
@@ -2493,8 +2523,18 @@ async function previewSelectedMediaFile(input){
     if(type==="video"){
       const objectUrl=URL.createObjectURL(file);
       box.dataset.objectUrl=objectUrl;
-      box.innerHTML=`<div class="media-pending-head"><strong>Selected video</strong><span>${esc(file.name)} · ${formatMediaFileSize(file.size)}</span></div>
-        <video class="media-pending-video" controls preload="metadata" src="${esc(objectUrl)}"></video>`;
+      let posterUrl="";
+      try{
+        const blob=await createVideoPreviewBlob(objectUrl);
+        pendingVideoPreviewBlobs.set(input,blob);
+        posterUrl=URL.createObjectURL(blob);
+        box.dataset.previewObjectUrl=posterUrl;
+      }catch(err){
+        pendingVideoPreviewBlobs.delete(input);
+        console.warn("Selected video thumbnail generation failed:",err);
+      }
+      box.innerHTML=`<div class="media-pending-head"><strong>Selected video${posterUrl?" · automatic preview":""}</strong><span>${esc(file.name)} · ${formatMediaFileSize(file.size)}</span></div>
+        <video class="media-pending-video" controls preload="metadata" ${posterUrl?`poster="${esc(posterUrl)}"`:""} src="${esc(objectUrl)}"></video>`;
       return;
     }
     if(type==="pdf"){
@@ -2507,6 +2547,7 @@ async function previewSelectedMediaFile(input){
     }
   }catch(err){
     if(type==="pdf")pendingPdfPreviewBlobs.delete(input);
+    if(type==="video")pendingVideoPreviewBlobs.delete(input);
     console.warn("Selected media preview failed:",err);
     box.innerHTML=`<div class="media-pending-message">${esc(file.name)} is selected. Preview could not be generated, but you can still upload it.</div>`;
   }
@@ -2558,9 +2599,23 @@ async function uploadMedia(owner,editor){
     }
   }
 
+  if(type==="video"){
+    setStatus("Video uploaded. Generating a fresh preview frame...");
+    try{
+      let blob=pendingVideoPreviewBlobs.get(input);
+      if(!blob){const objectUrl=URL.createObjectURL(file);try{blob=await createVideoPreviewBlob(objectUrl)}finally{URL.revokeObjectURL(objectUrl)}}
+      await saveGeneratedVideoPreview(owner,item,blob);
+    }catch(err){
+      console.warn("Automatic video preview failed:",err);
+      setStatus("Video uploaded. Automatic preview failed; you can regenerate it from the Video preview image controls.");
+    }finally{pendingVideoPreviewBlobs.delete(input)}
+  }
+
   await persistContent(type==="pdf" && item.thumbnail_url
     ? "PDF uploaded with fresh high-resolution preview."
-    : "Media uploaded.");
+    : type==="video" && item.thumbnail_url
+      ? "Video uploaded with fresh automatic preview frame."
+      : "Media uploaded.");
   clearPendingMediaPreview(editor);
   input.value="";
   fillForms();
@@ -2584,6 +2639,108 @@ async function addMediaLink(owner,editor){
 function defaultLinkTitle(type){return{video:"Video",pdf:"PDF",image:"Image",link:"Link"}[type]||"Link"}
 
 
+
+async function createVideoPreviewBlob(sourceUrl){
+  return await new Promise((resolve,reject)=>{
+    const video=document.createElement("video");
+    video.muted=true;
+    video.playsInline=true;
+    video.preload="auto";
+    let settled=false;
+    const cleanup=()=>{video.onloadedmetadata=null;video.onloadeddata=null;video.onseeked=null;video.onerror=null;try{video.removeAttribute("src");video.load()}catch{}};
+    const fail=err=>{if(settled)return;settled=true;cleanup();reject(err instanceof Error?err:new Error("Could not generate video preview."))};
+    const capture=()=>{
+      try{
+        const vw=video.videoWidth||0, vh=video.videoHeight||0;
+        if(!vw||!vh)return fail(new Error("Video dimensions are unavailable."));
+        const targetWidth=Math.min(vw,1440);
+        const scale=targetWidth/vw;
+        const canvas=document.createElement("canvas");
+        canvas.width=Math.max(2,Math.round(vw*scale));
+        canvas.height=Math.max(2,Math.round(vh*scale));
+        const ctx=canvas.getContext("2d",{alpha:false});
+        ctx.fillStyle="#111";ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.drawImage(video,0,0,canvas.width,canvas.height);
+        canvas.toBlob(blob=>{
+          if(!blob)return fail(new Error("Could not create video preview image."));
+          if(settled)return;settled=true;cleanup();resolve(blob);
+        },"image/jpeg",0.92);
+      }catch(err){fail(err)}
+    };
+    video.onerror=()=>fail(new Error("The video could not be decoded for preview generation."));
+    video.onloadedmetadata=()=>{
+      const d=Number.isFinite(video.duration)?video.duration:0;
+      const target=d>0?Math.min(Math.max(d*0.12,0.4),3):0.5;
+      const safeTarget=d>0?Math.min(target,Math.max(d-0.05,0)):target;
+      if(safeTarget<=0){if(video.readyState>=2)capture();else video.onloadeddata=capture;return;}
+      video.onseeked=capture;
+      try{video.currentTime=safeTarget}catch{video.onloadeddata=capture}
+    };
+    video.src=sourceUrl;
+    video.load();
+  });
+}
+
+async function saveGeneratedVideoPreview(owner,item,blob){
+  if(item.thumbnail_path){try{await sb.storage.from("site-media").remove([item.thumbnail_path])}catch{}}
+  const path=`${ownerFolder(owner)}/previews/${uid()}-video-preview.jpg`;
+  const{error}=await sb.storage.from("site-media").upload(path,blob,{upsert:false,contentType:"image/jpeg",cacheControl:"3600"});
+  if(error)throw error;
+  const{data}=sb.storage.from("site-media").getPublicUrl(path);
+  item.thumbnail_url=data.publicUrl+"?v="+Date.now();
+  item.thumbnail_path=path;
+}
+
+function videoMediaSpec(spec){
+  const parts=spec.split(":");
+  if(["profile","research","thesis","contact"].includes(parts[0]))return{owner:parts[0],index:Number(parts[1])};
+  return{owner:`${parts[0]}:${parts[1]}`,index:Number(parts[2])};
+}
+
+async function generateExistingVideoThumbnail(spec){
+  syncAllForms();
+  const{owner,index}=videoMediaSpec(spec);
+  const item=getOwnerMedia(owner)?.[index];
+  if(!item||item.type!=="video")return setStatus("Video attachment not found.");
+  if(adminVideoEmbed(item.url))return setStatus("Embedded YouTube/Vimeo videos use their own player preview.");
+  setStatus("Generating video preview frame...");
+  let objectUrl="";
+  try{
+    const response=await fetch(item.url,{cache:"no-store"});
+    if(!response.ok)throw new Error(`Could not read video (${response.status}).`);
+    objectUrl=URL.createObjectURL(await response.blob());
+    const blob=await createVideoPreviewBlob(objectUrl);
+    await saveGeneratedVideoPreview(owner,item,blob);
+    await persistContent("Video preview generated.");
+    fillForms();
+  }catch(err){
+    console.error(err);
+    setStatus("Automatic video preview failed. Use “Upload manually” with a JPG/PNG/WebP thumbnail.");
+  }finally{if(objectUrl)URL.revokeObjectURL(objectUrl)}
+}
+
+async function uploadVideoThumbnail(spec,row){
+  syncAllForms();
+  const{owner,index}=videoMediaSpec(spec);
+  const item=getOwnerMedia(owner)?.[index];
+  if(!item||item.type!=="video")return setStatus("Video attachment not found.");
+  const input=row?.querySelector("[data-video-thumb-file]");
+  const file=input?.files?.[0];
+  if(!file)return setStatus("Choose a preview image first.");
+  if(file.size>8*1024*1024)return setStatus("Preview image is larger than 8 MB.");
+  if(!["image/jpeg","image/png","image/webp"].includes(file.type))return setStatus("Preview image must be JPG, PNG or WebP.");
+  setStatus("Uploading video preview image...");
+  const ext=(file.name.split(".").pop()||"jpg").toLowerCase();
+  const path=`${ownerFolder(owner)}/previews/${uid()}-video-preview.${ext}`;
+  const{error}=await sb.storage.from("site-media").upload(path,file,{upsert:false,contentType:file.type,cacheControl:"3600"});
+  if(error)return setStatus("Preview upload failed: "+error.message);
+  if(item.thumbnail_path){try{await sb.storage.from("site-media").remove([item.thumbnail_path])}catch{}}
+  const{data}=sb.storage.from("site-media").getPublicUrl(path);
+  item.thumbnail_url=data.publicUrl+"?v="+Date.now();
+  item.thumbnail_path=path;
+  await persistContent("Video preview image uploaded.");
+  fillForms();
+}
 
 function requirePdfJs(){
   if(!window.pdfjsLib)throw new Error("PDF preview engine did not load. Refresh the admin page and try again.");

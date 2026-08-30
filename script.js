@@ -505,7 +505,7 @@ function lightboxFilenameFromImage(img,src){
 function resetSiteLightboxMedia(){
   const img=$("siteLightboxImage"),video=$("siteLightboxVideo"),frame=$("siteLightboxFrame");
   if(img){img.classList.add("hidden");img.removeAttribute("src");img.alt="";}
-  if(video){video.pause();video.classList.add("hidden");video.removeAttribute("src");video.load();}
+  if(video){video.pause();video.classList.add("hidden");video.removeAttribute("src");video.removeAttribute("poster");video.load();}
   if(frame){frame.classList.add("hidden");frame.removeAttribute("src");}
 }
 
@@ -524,7 +524,7 @@ function openSiteMediaLightbox({kind="media",originalUrl="",previewUrl="",embedU
     else if(frame){frame.src=safeOriginal;frame.classList.remove("hidden");}
   }else if(kind==="video"){
     if(safeEmbed&&frame){frame.src=safeEmbed;frame.classList.remove("hidden");canDownload=false;}
-    else if(video){video.src=safeOriginal;video.classList.remove("hidden");}
+    else if(video){video.src=safeOriginal;if(safePreview)video.poster=safePreview;video.classList.remove("hidden");}
   }else if(img){
     img.src=safePreview||safeOriginal;img.alt=title||"Media preview";img.classList.remove("hidden");
   }
@@ -1684,13 +1684,14 @@ function mediaHtml(media){
       </figure>`);
     }else if(type==="video"){
       const embed=videoEmbed(url);
+      const thumb=safeUrl(m.thumbnail_url);
       const displaySize=["very-small","small","standard","medium","large","full","original"].includes(m.displaySize)?m.displaySize:"standard";
       const enlarge=["inherit","on","off"].includes(m.enlarge)?m.enlarge:"on";
       visual.push(`<div class="media-public-item media-video-card media-size-${escAttr(displaySize)}">
         <div class="media-video-stage">
           ${embed?`<div class="media-video-embed"><iframe src="${escAttr(embed)}" title="${escAttr(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`:
-          `<video class="media-public-video" controls preload="metadata" src="${escAttr(url)}"></video>`}
-          <button class="media-expand-button" type="button" data-lightbox-media-kind="video" data-lightbox-mode="${escAttr(enlarge)}" data-media-url="${escAttr(url)}" data-media-embed="${escAttr(embed||"")}" data-media-title="${escAttr(title)}" data-media-caption="${escAttr(caption)}" data-media-download-name="${escAttr(m.filename||title||"video")}">Expand ↗</button>
+          `<video class="media-public-video" controls preload="metadata" ${thumb?`poster="${escAttr(thumb)}"`:""} src="${escAttr(url)}"></video>`}
+          <button class="media-expand-button" type="button" data-lightbox-media-kind="video" data-lightbox-mode="${escAttr(enlarge)}" data-media-url="${escAttr(url)}" data-media-preview="${escAttr(thumb||"")}" data-media-embed="${escAttr(embed||"")}" data-media-title="${escAttr(title)}" data-media-caption="${escAttr(caption)}" data-media-download-name="${escAttr(m.filename||title||"video")}">Expand ↗</button>
         </div>
         ${(title||caption)?`<div class="media-public-info">${title?`<strong>${esc(title)}</strong>`:""}${caption?`<p>${esc(caption)}</p>`:""}</div>`:""}
       </div>`);
