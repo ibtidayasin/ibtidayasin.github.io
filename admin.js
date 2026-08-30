@@ -1991,7 +1991,7 @@ function mediaEditor(owner,media,title){
   return `<div class="media-editor" data-media-owner="${esc(owner)}">
     <div class="media-editor-title">
       <strong>${esc(title)}</strong>
-      <span class="helper">Images · PDFs · videos · links</span>
+      <span class="helper">Images · PDFs · videos · links · use ← → to reorder</span>
     </div>
     <div class="media-existing">
       ${(media||[]).length?(media||[]).map((m,i)=>`
@@ -2000,6 +2000,11 @@ function mediaEditor(owner,media,title){
             <div class="media-admin-summary">
               <span class="media-type-badge">${esc(m.type||"link")}</span>
               <strong>${esc(m.filename||m.title||"Attachment")}</strong>
+              <div class="media-admin-order" aria-label="Media order controls">
+                <span class="media-order-position">${i+1}/${(media||[]).length}</span>
+                <button class="secondary media-order-btn" data-media-move="${esc(owner)}|${i}|-1" type="button" title="Move earlier" ${i===0?"disabled":""}>←</button>
+                <button class="secondary media-order-btn" data-media-move="${esc(owner)}|${i}|1" type="button" title="Move later" ${i===(media||[]).length-1?"disabled":""}>→</button>
+              </div>
             </div>
             ${adminMediaPreview(m)}
             <input data-media-field="title" value="${esc(m.title||"")}" placeholder="Display title (optional)">
@@ -2214,6 +2219,13 @@ document.addEventListener("click",async e=>{
   b=e.target.closest("[data-media-add-link]");
   if(b){await addMediaLink(b.dataset.mediaAddLink,b.closest(".media-editor"));return}
 
+  b=e.target.closest("[data-media-move]");
+  if(b){
+    const [owner,idxs,deltas]=b.dataset.mediaMove.split("|");
+    moveMediaItem(owner,Number(idxs),Number(deltas));
+    return;
+  }
+
   b=e.target.closest("[data-pdf-thumb-generate]");
   if(b){await generateExistingPdfThumbnail(b.dataset.pdfThumbGenerate);return}
 
@@ -2380,6 +2392,40 @@ function getOwnerMedia(owner){
   const arr=currentContent[map[type]];
   return arr?.[i]?.media;
 }
+function renderMediaOwner(owner){
+  if(owner==="profile"){
+    $("profileMediaEditor").innerHTML=mediaEditor("profile",currentContent.sectionMedia?.profile||[],"Profile / About media");
+    return;
+  }
+  if(owner==="thesis"){
+    $("thesisMediaEditor").innerHTML=mediaEditor("thesis",currentContent.thesis?.media||[],"Thesis media & attachments");
+    return;
+  }
+  if(owner==="contact"){
+    $("contactMediaEditor").innerHTML=mediaEditor("contact",currentContent.contact?.media||[],"Contact media");
+    return;
+  }
+  const type=owner.split(":")[0];
+  if(type==="publication")renderPublicationsEditor();
+  else if(type==="project")renderProjectsEditor();
+  else if(type==="activity")renderActivitiesEditor();
+  else if(type==="skill")renderSkillsEditor();
+  else if(type==="education")renderEducationEditor();
+}
+
+function moveMediaItem(owner,index,delta){
+  if(!delta)return;
+  /* Preserve unsaved form + media edits before re-rendering the owner. */
+  syncAllForms();
+  const media=getOwnerMedia(owner);
+  if(!media||!media[index])return;
+  const next=index+delta;
+  if(next<0||next>=media.length)return;
+  const [item]=media.splice(index,1);
+  media.splice(next,0,item);
+  renderMediaOwner(owner);
+}
+
 function ownerFolder(owner){
   if(owner==="profile")return "profile";
   if(owner==="thesis")return "thesis";
