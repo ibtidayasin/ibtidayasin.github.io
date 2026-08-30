@@ -12,9 +12,9 @@ const DEFAULT_CONTENT={
   "featuredResearch":{"title":"Radially graded Cu–Ni nanowires under tensile loading","description":"A classical molecular dynamics study of how radial composition grading, crystallographic orientation, temperature, and surface defects influence tensile behaviour and deformation mechanisms in Cu–Ni nanowires.","tags":["LAMMPS","Python","OVITO","PTM","DXA","RDF"],"media":[]},
   "publications":[],
   "projects":[
-    {"title":"Atomistic Structure Generation","description":"Python-based generation and manipulation of nanoscale structures for molecular dynamics simulations.","meta":"Python · LAMMPS","url":"","media":[]},
-    {"title":"MD Data Analysis","description":"Post-processing of simulation data, stress–strain analysis, comparison across cases, and scientific plotting.","meta":"Python · Matplotlib","url":"","media":[]},
-    {"title":"Atomistic Mechanism Analysis","description":"Structural and defect analysis using PTM, DXA, RDF, atomic strain, and visualization workflows.","meta":"OVITO","url":"","media":[]}
+    {"title":"Atomistic Structure Generation","contribution":"","description":"Python-based generation and manipulation of nanoscale structures for molecular dynamics simulations.","meta":"Python · LAMMPS","url":"","media":[]},
+    {"title":"MD Data Analysis","contribution":"","description":"Post-processing of simulation data, stress–strain analysis, comparison across cases, and scientific plotting.","meta":"Python · Matplotlib","url":"","media":[]},
+    {"title":"Atomistic Mechanism Analysis","contribution":"","description":"Structural and defect analysis using PTM, DXA, RDF, atomic strain, and visualization workflows.","meta":"OVITO","url":"","media":[]}
   ],
   "academicActivities": [],
   "skills":[
@@ -1030,7 +1030,7 @@ function normalizeMediaDisplayList(value){
   return (Array.isArray(value)?value:[]).map(normalizeMediaDisplayItem);
 }
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=19;
+const BUILDER_SETTINGS_SCHEMA_VERSION=20;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1540,6 +1540,7 @@ function normalizeAcademicArchitecture(content){
   content.projects=(content.projects||[]).map(x=>({
     ...x,
     type:String(x?.type||""),
+    contribution:String(x?.contribution||""),
     media:Array.isArray(x?.media)?x.media:[]
   }));
 
@@ -1730,7 +1731,7 @@ function normalizeMedia(content){
   content.sectionMedia=content.sectionMedia||{};
   content.sectionMedia.profile=normalizeMediaDisplayList(content.sectionMedia.profile);
   content.publications=(content.publications||[]).map(normalizePublicationRecord);
-  content.projects=(content.projects||[]).map(x=>({...x,type:String(x.type||""),media:normalizeMediaDisplayList(x.media)}));
+  content.projects=(content.projects||[]).map(x=>({...x,type:String(x.type||""),contribution:String(x.contribution||""),media:normalizeMediaDisplayList(x.media)}));
   content.academicActivities=(content.academicActivities||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
   content.skills=(content.skills||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
   content.education=(content.education||[]).map(x=>({...x,cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:normalizeMediaDisplayList(x.media)}));
@@ -1889,6 +1890,7 @@ function renderProjectsEditor(){
   $("projectsEditor").innerHTML=(currentContent.projects||[]).map((p,i)=>repeatBlock("project",i,`Project / Simulation ${i+1}`,[
     {label:"Project title",key:"title",value:p.title,full:true},
     {label:"Type",key:"type",value:p.type||"",kind:"select",options:["","Research Project","Simulation","Engineering Project","Course Project"]},
+    {label:"Role / My Contribution",key:"contribution",value:p.contribution||"",kind:"textarea",full:true},
     {label:"Tools / metadata",key:"meta",value:p.meta},
     {label:"Description",key:"description",value:p.description,kind:"textarea",full:true},
     {label:"Project URL",key:"url",value:p.url,full:true}
@@ -2167,7 +2169,7 @@ $("addPublicationBtn").addEventListener("click",()=>{
   renderPublicationsEditor();
 });
 $("addProjectBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.projects.push({title:"",type:"",description:"",meta:"",url:"",visible:true,media:[]});renderProjectsEditor();
+  syncAllForms();currentContent.projects.push({title:"",type:"",contribution:"",description:"",meta:"",url:"",visible:true,media:[]});renderProjectsEditor();
 });
 $("addActivityBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.academicActivities.push({category:"Presentation & Poster",title:"",organization:"",date:"",description:"",url:"",visible:true,media:[]});renderActivitiesEditor();
@@ -2316,8 +2318,8 @@ function readRepeaters(){
 
   currentContent.projects=[...document.querySelectorAll("[data-project]")].map((r,i)=>{
     const old=currentContent.projects[i]||{};
-    return {title:get(r,"title"),type:get(r,"type"),description:get(r,"description"),meta:get(r,"meta"),url:get(r,"url"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
-  }).filter(x=>x.title||x.description||x.media.length);
+    return {title:get(r,"title"),type:get(r,"type"),contribution:get(r,"contribution"),description:get(r,"description"),meta:get(r,"meta"),url:get(r,"url"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
+  }).filter(x=>x.title||x.contribution||x.description||x.media.length);
 
   currentContent.academicActivities=[...document.querySelectorAll("[data-activity]")].map((r,i)=>{
     const old=currentContent.academicActivities[i]||{};

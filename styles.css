@@ -2731,6 +2731,16 @@ html[data-navigation-mode="sections"][data-section-page="inner"] body:not(.admin
   text-transform:uppercase;
 }
 .project-type-badge{margin-bottom:10px}
+.project-contribution{
+  margin:0 0 10px;
+  color:var(--text);
+  font-size:.94em;
+  line-height:1.55;
+}
+.project-contribution strong{
+  color:var(--accent);
+  font-weight:750;
+}
 .activity-tabs{
   display:flex;
   gap:8px;
