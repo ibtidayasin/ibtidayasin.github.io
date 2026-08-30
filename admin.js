@@ -1868,6 +1868,71 @@ function renderEducationEditor(){
   ],e.media||[],e.visible!==false)).join("")||`<div class="empty-state">No education entries added.</div>`;
 }
 
+function adminVideoEmbed(url){
+  try{
+    const u=new URL(url);
+    const host=u.hostname.toLowerCase();
+    if(host.includes("youtube.com")){
+      const id=u.searchParams.get("v");
+      if(id)return`https://www.youtube.com/embed/${encodeURIComponent(id)}`;
+      const parts=u.pathname.split("/").filter(Boolean);
+      const shortsIndex=parts.indexOf("shorts");
+      if(shortsIndex>=0&&parts[shortsIndex+1])return`https://www.youtube.com/embed/${encodeURIComponent(parts[shortsIndex+1])}`;
+      const embedIndex=parts.indexOf("embed");
+      if(embedIndex>=0&&parts[embedIndex+1])return`https://www.youtube.com/embed/${encodeURIComponent(parts[embedIndex+1])}`;
+    }
+    if(host==="youtu.be"||host.endsWith(".youtu.be")){
+      const id=u.pathname.split("/").filter(Boolean)[0];
+      if(id)return`https://www.youtube.com/embed/${encodeURIComponent(id)}`;
+    }
+    if(host.includes("vimeo.com")){
+      const id=u.pathname.split("/").filter(Boolean).find(x=>/^\d+$/.test(x));
+      if(id)return`https://player.vimeo.com/video/${encodeURIComponent(id)}`;
+    }
+  }catch{}
+  return"";
+}
+
+function adminMediaPreview(m){
+  const type=m?.type||"link";
+  const url=String(m?.url||"").trim();
+  const title=m?.title||m?.filename||"Media";
+  if(!url)return"";
+
+  if(type==="image"){
+    return `<div class="media-admin-preview media-admin-preview-image">
+      <a href="${esc(url)}" target="_blank" rel="noopener" title="Open full image">
+        <img src="${esc(url)}" alt="Preview of ${esc(title)}" loading="lazy">
+      </a>
+      <div class="media-admin-preview-label">Image preview · click to open full size</div>
+    </div>`;
+  }
+
+  if(type==="video"){
+    const embed=adminVideoEmbed(url);
+    return `<div class="media-admin-preview media-admin-preview-video">
+      ${embed
+        ? `<div class="media-admin-video-frame"><iframe src="${esc(embed)}" title="Preview of ${esc(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`
+        : `<video controls preload="metadata" src="${esc(url)}"></video>`}
+      <div class="media-admin-preview-label">Video preview</div>
+    </div>`;
+  }
+
+  if(type==="pdf"){
+    const thumb=String(m?.thumbnail_url||"").trim();
+    return `<div class="media-admin-preview media-admin-preview-pdf">
+      <a href="${esc(url)}" target="_blank" rel="noopener" title="Open PDF">
+        ${thumb
+          ? `<img src="${esc(thumb)}" alt="First-page preview of ${esc(title)}" loading="lazy">`
+          : `<div class="media-admin-pdf-placeholder"><span>PDF</span><small>Generate a first-page preview below</small></div>`}
+      </a>
+      <div class="media-admin-preview-label">PDF preview · click to open document</div>
+    </div>`;
+  }
+
+  return `<div class="media-admin-link-preview"><a href="${esc(url)}" target="_blank" rel="noopener">Open link ↗</a></div>`;
+}
+
 function mediaEditor(owner,media,title){
   return `<div class="media-editor" data-media-owner="${esc(owner)}">
     <div class="media-editor-title">
@@ -1882,6 +1947,7 @@ function mediaEditor(owner,media,title){
               <span class="media-type-badge">${esc(m.type||"link")}</span>
               <strong>${esc(m.filename||m.title||"Attachment")}</strong>
             </div>
+            ${adminMediaPreview(m)}
             <input data-media-field="title" value="${esc(m.title||"")}" placeholder="Display title (optional)">
             <input data-media-field="caption" value="${esc(m.caption||"")}" placeholder="Caption / note (optional)">
             ${m.type==="image"?`
@@ -1922,7 +1988,6 @@ function mediaEditor(owner,media,title){
             <span class="helper">${esc(m.url||"")}</span>
             ${m.type==="pdf"?`
               <div class="pdf-thumb-admin">
-                ${m.thumbnail_url?`<img src="${esc(m.thumbnail_url)}" alt="PDF preview image">`:""}
                 <label class="media-mini-label">PDF preview image
                   <input type="file" data-pdf-thumb-file accept="image/jpeg,image/png,image/webp">
                 </label>
@@ -1947,6 +2012,7 @@ function mediaEditor(owner,media,title){
       </label>
       <button class="secondary" data-media-upload="${esc(owner)}" type="button">Upload file</button>
     </div>
+    <div class="media-upload-preview hidden" data-media-upload-preview aria-live="polite"></div>
 
     <div class="media-link-grid">
       <label class="media-mini-label">Type
@@ -1999,6 +2065,11 @@ $("addSkillGroupBtn").addEventListener("click",()=>{
 });
 $("addEducationBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.education.push({period:"",degree:"",institution:"",cgpa:"",cgpaSubtitle:"",description:"",courses:[],visible:true,media:[]});renderEducationEditor();
+});
+
+document.addEventListener("change",e=>{
+  const input=e.target.closest?.("[data-media-file]");
+  if(input)previewSelectedMediaFile(input);
 });
 
 document.addEventListener("click",async e=>{
@@ -2205,6 +2276,70 @@ function safeFileName(name){
 }
 function uid(){return`${Date.now()}-${Math.random().toString(36).slice(2,9)}`}
 
+function formatMediaFileSize(bytes){
+  const n=Number(bytes)||0;
+  if(n<1024)return`${n} B`;
+  if(n<1024*1024)return`${(n/1024).toFixed(n<10*1024?1:0)} KB`;
+  return`${(n/(1024*1024)).toFixed(n<10*1024*1024?1:0)} MB`;
+}
+
+function clearPendingMediaPreview(editor){
+  const box=editor?.querySelector("[data-media-upload-preview]");
+  if(!box)return;
+  if(box.dataset.objectUrl){
+    try{URL.revokeObjectURL(box.dataset.objectUrl)}catch{}
+    delete box.dataset.objectUrl;
+  }
+  box.innerHTML="";
+  box.classList.add("hidden");
+}
+
+async function previewSelectedMediaFile(input){
+  const editor=input?.closest(".media-editor");
+  const box=editor?.querySelector("[data-media-upload-preview]");
+  if(!editor||!box)return;
+  clearPendingMediaPreview(editor);
+
+  const file=input.files?.[0];
+  if(!file)return;
+  const type=fileType(file);
+  if(!type){
+    box.classList.remove("hidden");
+    box.innerHTML=`<div class="media-pending-message">This file type cannot be previewed.</div>`;
+    return;
+  }
+
+  box.classList.remove("hidden");
+  box.innerHTML=`<div class="media-pending-message">Preparing preview for <strong>${esc(file.name)}</strong>…</div>`;
+
+  try{
+    if(type==="image"){
+      const objectUrl=URL.createObjectURL(file);
+      box.dataset.objectUrl=objectUrl;
+      box.innerHTML=`<div class="media-pending-head"><strong>Selected image</strong><span>${esc(file.name)} · ${formatMediaFileSize(file.size)}</span></div>
+        <img class="media-pending-image" src="${esc(objectUrl)}" alt="Selected image preview">`;
+      return;
+    }
+    if(type==="video"){
+      const objectUrl=URL.createObjectURL(file);
+      box.dataset.objectUrl=objectUrl;
+      box.innerHTML=`<div class="media-pending-head"><strong>Selected video</strong><span>${esc(file.name)} · ${formatMediaFileSize(file.size)}</span></div>
+        <video class="media-pending-video" controls preload="metadata" src="${esc(objectUrl)}"></video>`;
+      return;
+    }
+    if(type==="pdf"){
+      const blob=await createPdfPreviewBlob(await file.arrayBuffer());
+      const objectUrl=URL.createObjectURL(blob);
+      box.dataset.objectUrl=objectUrl;
+      box.innerHTML=`<div class="media-pending-head"><strong>Selected PDF · page 1</strong><span>${esc(file.name)} · ${formatMediaFileSize(file.size)}</span></div>
+        <img class="media-pending-pdf" src="${esc(objectUrl)}" alt="Selected PDF first-page preview">`;
+    }
+  }catch(err){
+    console.warn("Selected media preview failed:",err);
+    box.innerHTML=`<div class="media-pending-message">${esc(file.name)} is selected. Preview could not be generated, but you can still upload it.</div>`;
+  }
+}
+
 async function uploadMedia(owner,editor){
   syncAllForms();
   const input=editor.querySelector("[data-media-file]");
@@ -2252,6 +2387,7 @@ async function uploadMedia(owner,editor){
   await persistContent(type==="pdf" && item.thumbnail_url
     ? "PDF uploaded with preview."
     : "Media uploaded.");
+  clearPendingMediaPreview(editor);
   input.value="";
   fillForms();
 }

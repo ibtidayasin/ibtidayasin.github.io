@@ -87,6 +87,27 @@ footer{display:flex;justify-content:space-between;gap:20px;font-size:13px;color:
 .media-mini-label{display:grid;gap:5px;font-size:11px;font-weight:700;color:var(--muted)}
 .media-help{font-size:11px;color:var(--muted);margin-top:9px}
 
+
+/* Admin media previews — uploaded + selected files */
+.media-admin-preview{width:min(100%,620px);border:1px solid var(--line);border-radius:9px;overflow:hidden;background:var(--media-bg)}
+.media-admin-preview>a{display:block;color:inherit}
+.media-admin-preview img{display:block;width:100%;max-height:330px;object-fit:contain;object-position:center;background:var(--media-bg)}
+.media-admin-preview video{display:block;width:100%;max-height:330px;background:#111}
+.media-admin-video-frame{position:relative;padding-top:56.25%;background:#111}
+.media-admin-video-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.media-admin-preview-label{padding:7px 9px;border-top:1px solid var(--line);font-size:10px;color:var(--muted);background:var(--surface-soft)}
+.media-admin-pdf-placeholder{min-height:180px;display:grid;place-items:center;align-content:center;gap:7px;color:var(--muted);background:var(--media-bg)}
+.media-admin-pdf-placeholder span{display:grid;place-items:center;width:58px;height:72px;border:2px solid var(--accent);border-radius:6px;color:var(--accent);background:var(--surface);font-weight:800}
+.media-admin-pdf-placeholder small{font-size:10px}
+.media-admin-link-preview a{display:inline-flex;width:max-content;border:1px solid var(--line);border-radius:8px;padding:7px 9px;color:var(--accent);font-size:11px;font-weight:700;background:var(--surface-soft)}
+.media-upload-preview{margin-top:10px;padding:10px;border:1px dashed var(--line);border-radius:9px;background:var(--surface-soft);display:grid;gap:8px;width:min(100%,620px)}
+.media-upload-preview.hidden{display:none!important}
+.media-pending-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center;font-size:11px}
+.media-pending-head span{color:var(--muted);font-size:10px}
+.media-pending-image,.media-pending-pdf{display:block;width:100%;max-height:330px;object-fit:contain;object-position:center;background:var(--media-bg);border-radius:7px}
+.media-pending-video{display:block;width:100%;max-height:330px;background:#111;border-radius:7px}
+.media-pending-message{font-size:11px;color:var(--muted)}
+
 /* Public media */
 .public-media:empty{display:none}
 .public-media{margin-top:20px}
