@@ -1001,7 +1001,28 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=17;
+function normalizeMediaDisplayItem(item){
+  if(!item||typeof item!=="object")return item;
+  const out={...item};
+  const type=String(out.type||"link");
+  if(type==="image"||type==="pdf"){
+    out.fitMode=["exact","center","fill","legacy"].includes(out.fitMode)?out.fitMode:(type==="pdf"?"exact":"legacy");
+    out.width=["auto","full","half","third"].includes(out.width)?out.width:"auto";
+    out.enlarge=["inherit","on","off"].includes(out.enlarge)?out.enlarge:(type==="pdf"?"on":"inherit");
+  }
+  if(type==="image"){
+    out.aspect=["original","square","4x3","16x9"].includes(out.aspect)?out.aspect:"original";
+    out.fit=["cover","contain"].includes(out.fit)?out.fit:"cover";
+    out.position=["center","top","bottom","left","right"].includes(out.position)?out.position:"center";
+    out.alt=String(out.alt||"");
+  }
+  return out;
+}
+function normalizeMediaDisplayList(value){
+  return (Array.isArray(value)?value:[]).map(normalizeMediaDisplayItem);
+}
+
+const BUILDER_SETTINGS_SCHEMA_VERSION=18;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1678,14 +1699,15 @@ function normalizeMedia(content){
   normalizeTypography(content);
   normalizeSectionHeadings(content);
   content.sectionMedia=content.sectionMedia||{};
-  content.sectionMedia.profile=Array.isArray(content.sectionMedia.profile)?content.sectionMedia.profile:[];
-  content.publications=(content.publications||[]).map(x=>({...x,media:Array.isArray(x.media)?x.media:[]}));
-  content.projects=(content.projects||[]).map(x=>({...x,type:String(x.type||""),media:Array.isArray(x.media)?x.media:[]}));
-  content.academicActivities=(content.academicActivities||[]).map(x=>({...x,media:Array.isArray(x.media)?x.media:[]}));
-  content.skills=(content.skills||[]).map(x=>({...x,media:Array.isArray(x.media)?x.media:[]}));
-  content.education=(content.education||[]).map(x=>({...x,cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:Array.isArray(x.media)?x.media:[]}));
+  content.sectionMedia.profile=normalizeMediaDisplayList(content.sectionMedia.profile);
+  content.publications=(content.publications||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
+  content.projects=(content.projects||[]).map(x=>({...x,type:String(x.type||""),media:normalizeMediaDisplayList(x.media)}));
+  content.academicActivities=(content.academicActivities||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
+  content.skills=(content.skills||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
+  content.education=(content.education||[]).map(x=>({...x,cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:normalizeMediaDisplayList(x.media)}));
   content.contact=content.contact||{};
-  content.contact.media=Array.isArray(content.contact.media)?content.contact.media:[];
+  content.contact.media=normalizeMediaDisplayList(content.contact.media);
+  content.thesis.media=normalizeMediaDisplayList(content.thesis.media);
   return content;
 }
 async function loadContent(){
@@ -1961,7 +1983,13 @@ function mediaEditor(owner,media,title){
                     <option value="4x3" ${m.aspect==="4x3"?"selected":""}>4:3</option>
                     <option value="16x9" ${m.aspect==="16x9"?"selected":""}>16:9</option>
                   </select></label>
-                  <label>Fit<select data-media-field="fit">
+                  <label>Media fit mode<select data-media-field="fitMode">
+                    <option value="exact" ${m.fitMode==="exact"?"selected":""}>Exact size</option>
+                    <option value="center" ${m.fitMode==="center"?"selected":""}>Center fit</option>
+                    <option value="fill" ${m.fitMode==="fill"?"selected":""}>Fill / crop</option>
+                    <option value="legacy" ${(m.fitMode||"legacy")==="legacy"?"selected":""}>Current style</option>
+                  </select></label>
+                  <label>Current-style fit<select data-media-field="fit">
                     <option value="cover" ${(m.fit||"cover")==="cover"?"selected":""}>Cover / crop</option>
                     <option value="contain" ${m.fit==="contain"?"selected":""}>Contain</option>
                   </select></label>
@@ -1987,6 +2015,29 @@ function mediaEditor(owner,media,title){
               </div>`:""}
             <span class="helper">${esc(m.url||"")}</span>
             ${m.type==="pdf"?`
+              <div class="image-settings-admin media-display-admin">
+                <h5>Media display</h5>
+                <div class="image-settings-grid">
+                  <label>Media fit mode<select data-media-field="fitMode">
+                    <option value="exact" ${m.fitMode==="exact"?"selected":""}>Exact size</option>
+                    <option value="center" ${m.fitMode==="center"?"selected":""}>Center fit</option>
+                    <option value="fill" ${m.fitMode==="fill"?"selected":""}>Fill / crop</option>
+                    <option value="legacy" ${(m.fitMode||"legacy")==="legacy"?"selected":""}>Current style</option>
+                  </select></label>
+                  <label>Display width<select data-media-field="width">
+                    <option value="auto" ${(m.width||"auto")==="auto"?"selected":""}>Auto</option>
+                    <option value="full" ${m.width==="full"?"selected":""}>Full width</option>
+                    <option value="half" ${m.width==="half"?"selected":""}>Half width</option>
+                    <option value="third" ${m.width==="third"?"selected":""}>Third width</option>
+                  </select></label>
+                  <label>Click to enlarge<select data-media-field="enlarge">
+                    <option value="on" ${(m.enlarge||"on")==="on"?"selected":""}>Always</option>
+                    <option value="inherit" ${m.enlarge==="inherit"?"selected":""}>Use site setting</option>
+                    <option value="off" ${m.enlarge==="off"?"selected":""}>Never</option>
+                  </select></label>
+                </div>
+                <span class="helper">Exact size removes blank framing. Center fit keeps the whole preview visible. Fill / crop fills the frame. Current style preserves the previous display.</span>
+              </div>
               <div class="pdf-thumb-admin">
                 <label class="media-mini-label">PDF preview image
                   <input type="file" data-pdf-thumb-file accept="image/jpeg,image/png,image/webp">
@@ -2236,10 +2287,15 @@ function readMediaMetadata(){
       if(media[i].type==="image"){
         media[i].alt=(row.querySelector('[data-media-field="alt"]')?.value||"").trim();
         media[i].aspect=row.querySelector('[data-media-field="aspect"]')?.value||"original";
+        media[i].fitMode=row.querySelector('[data-media-field="fitMode"]')?.value||"legacy";
         media[i].fit=row.querySelector('[data-media-field="fit"]')?.value||"cover";
         media[i].position=row.querySelector('[data-media-field="position"]')?.value||"center";
         media[i].width=row.querySelector('[data-media-field="width"]')?.value||"auto";
         media[i].enlarge=row.querySelector('[data-media-field="enlarge"]')?.value||"inherit";
+      }else if(media[i].type==="pdf"){
+        media[i].fitMode=row.querySelector('[data-media-field="fitMode"]')?.value||"legacy";
+        media[i].width=row.querySelector('[data-media-field="width"]')?.value||"auto";
+        media[i].enlarge=row.querySelector('[data-media-field="enlarge"]')?.value||"on";
       }
     });
   });
@@ -2368,7 +2424,7 @@ async function uploadMedia(owner,editor){
     path,
     title:file.name.replace(/\.[^.]+$/,""),
     caption:"",
-      ...(type==="image"?{alt:"",aspect:"original",fit:"cover",position:"center",width:"auto",enlarge:"inherit"}:{}),
+      ...(type==="image"?{alt:"",aspect:"original",fitMode:"exact",fit:"cover",position:"center",width:"auto",enlarge:"on"}:type==="pdf"?{fitMode:"exact",width:"auto",enlarge:"on"}:type==="video"?{enlarge:"on"}:{}),
     uploaded_at:new Date().toISOString()
   };
   media.push(item);
@@ -2401,7 +2457,7 @@ async function addMediaLink(owner,editor){
 
   getOwnerMedia(owner).push({
     id:uid(),type,url,title:title||defaultLinkTitle(type),caption:"",filename:"",path:"",
-    ...(type==="image"?{alt:"",aspect:"original",fit:"cover",position:"center",width:"auto",enlarge:"inherit"}:{}),
+    ...(type==="image"?{alt:"",aspect:"original",fitMode:"exact",fit:"cover",position:"center",width:"auto",enlarge:"on"}:type==="pdf"?{fitMode:"exact",width:"auto",enlarge:"on"}:type==="video"?{enlarge:"on"}:{}),
     uploaded_at:new Date().toISOString()
   });
   await persistContent("Link added.");

@@ -396,13 +396,17 @@ function ensureEnhancementUi(){
     box.className="site-lightbox hidden";
     box.setAttribute("role","dialog");
     box.setAttribute("aria-modal","true");
-    box.setAttribute("aria-label","Image preview");
+    box.setAttribute("aria-label","Media preview");
     box.innerHTML=`<button class="site-lightbox-close" type="button" aria-label="Close">×</button>
       <div class="site-lightbox-inner">
-        <img id="siteLightboxImage" alt="">
+        <div id="siteLightboxMedia" class="site-lightbox-media">
+          <img id="siteLightboxImage" class="hidden" alt="">
+          <video id="siteLightboxVideo" class="hidden" controls playsinline preload="metadata"></video>
+          <iframe id="siteLightboxFrame" class="hidden" title="Media preview" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
         <div id="siteLightboxCaption" class="site-lightbox-caption"></div>
         <div class="site-lightbox-actions">
-          <button id="siteLightboxDownload" class="site-lightbox-action" type="button">Download image</button>
+          <button id="siteLightboxDownload" class="site-lightbox-action" type="button">Download media</button>
           <a id="siteLightboxOriginal" class="site-lightbox-action" href="#" target="_blank" rel="noopener">Open original ↗</a>
         </div>
       </div>`;
@@ -416,7 +420,7 @@ function ensureEnhancementUi(){
     window.scrollTo({top:0,behavior:currentSiteExperience.smoothScroll?"smooth":"auto"});
   });
 
-  $("siteLightboxDownload")?.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();downloadLightboxImage();});
+  $("siteLightboxDownload")?.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();downloadLightboxMedia();});
 
   window.addEventListener("scroll",()=>{
     const b=$("backToTopBtn");
@@ -438,6 +442,26 @@ function ensureEnhancementUi(){
       return;
     }
 
+    const mediaTrigger=e.target.closest("[data-lightbox-media-kind]");
+    if(mediaTrigger){
+      const mode=mediaTrigger.dataset.lightboxMode||"on";
+      const allowLightbox=mode==="on"||(mode==="inherit"&&currentSiteExperience.lightbox);
+      if(allowLightbox){
+        e.preventDefault();
+        e.stopPropagation();
+        openSiteMediaLightbox({
+          kind:mediaTrigger.dataset.lightboxMediaKind||"media",
+          originalUrl:mediaTrigger.dataset.mediaUrl||mediaTrigger.getAttribute("href")||"",
+          previewUrl:mediaTrigger.dataset.mediaPreview||"",
+          embedUrl:mediaTrigger.dataset.mediaEmbed||"",
+          title:mediaTrigger.dataset.mediaTitle||"",
+          caption:mediaTrigger.dataset.mediaCaption||"",
+          downloadName:mediaTrigger.dataset.mediaDownloadName||""
+        });
+      }
+      return;
+    }
+
     const img=e.target.closest(".profile-photo, .section-cover-photo-layer-img, .media-public-image");
     if(img){
       const isProfile=img.matches(".profile-photo, .section-cover-photo-layer-img");
@@ -453,12 +477,6 @@ function ensureEnhancementUi(){
       return;
     }
 
-    if(e.target.closest("#siteLightboxDownload")){
-      e.preventDefault();
-      downloadLightboxImage();
-      return;
-    }
-
     if(e.target.id==="siteLightbox"||e.target.closest(".site-lightbox-close")){
       closeSiteLightbox();
     }
@@ -469,40 +487,87 @@ function ensureEnhancementUi(){
   });
 }
 
-function lightboxFilenameFromImage(img,src){
-  const explicit=String(img?.dataset?.downloadName||"").trim();
-  if(explicit)return explicit.replace(/[\/:*?"<>|]+/g,"-");
+function lightboxFilenameFromUrl(explicit,url,fallback="media"){
+  const named=String(explicit||"").trim();
+  if(named)return named.replace(/[\/:*?"<>|]+/g,"-");
   try{
-    const u=new URL(src,location.href);
+    const u=new URL(url,location.href);
     const last=decodeURIComponent(u.pathname.split("/").filter(Boolean).pop()||"");
-    if(last&&last.includes("."))return last;
+    if(last)return last;
   }catch{}
-  const base=String(img?.alt||"image").trim().replace(/[^a-z0-9._-]+/gi,"-").replace(/^-+|-+$/g,"")||"image";
-  return `${base}.jpg`;
+  return String(fallback||"media").trim().replace(/[^a-z0-9._-]+/gi,"-")||"media";
 }
 
-function openSiteLightbox(img,caption=""){
+function lightboxFilenameFromImage(img,src){
+  return lightboxFilenameFromUrl(img?.dataset?.downloadName,src,`${img?.alt||"image"}.jpg`);
+}
+
+function resetSiteLightboxMedia(){
+  const img=$("siteLightboxImage"),video=$("siteLightboxVideo"),frame=$("siteLightboxFrame");
+  if(img){img.classList.add("hidden");img.removeAttribute("src");img.alt="";}
+  if(video){video.pause();video.classList.add("hidden");video.removeAttribute("src");video.load();}
+  if(frame){frame.classList.add("hidden");frame.removeAttribute("src");}
+}
+
+function openSiteMediaLightbox({kind="media",originalUrl="",previewUrl="",embedUrl="",title="",caption="",downloadName=""}={}){
   const box=$("siteLightbox");
-  if(!box||!img?.src)return;
-  const src=img.currentSrc||img.src;
-  $("siteLightboxImage").src=src;
-  $("siteLightboxImage").alt=img.alt||"";
-  $("siteLightboxCaption").textContent=caption||img.dataset.lightboxCaption||img.alt||"";
-  box.dataset.imageSrc=src;
-  box.dataset.downloadName=lightboxFilenameFromImage(img,src);
+  if(!box||!originalUrl)return;
+  resetSiteLightboxMedia();
+  const img=$("siteLightboxImage"),video=$("siteLightboxVideo"),frame=$("siteLightboxFrame");
+  const safeOriginal=safeUrl(originalUrl)||originalUrl;
+  const safePreview=safeUrl(previewUrl)||previewUrl;
+  const safeEmbed=safeUrl(embedUrl)||embedUrl;
+  let canDownload=true;
+
+  if(kind==="pdf"){
+    if(safePreview&&img){img.src=safePreview;img.alt=title||"PDF preview";img.classList.remove("hidden");}
+    else if(frame){frame.src=safeOriginal;frame.classList.remove("hidden");}
+  }else if(kind==="video"){
+    if(safeEmbed&&frame){frame.src=safeEmbed;frame.classList.remove("hidden");canDownload=false;}
+    else if(video){video.src=safeOriginal;video.classList.remove("hidden");}
+  }else if(img){
+    img.src=safePreview||safeOriginal;img.alt=title||"Media preview";img.classList.remove("hidden");
+  }
+
+  const combined=[title,caption].filter(Boolean).join(" · ");
+  $("siteLightboxCaption").textContent=combined;
+  box.dataset.mediaKind=kind;
+  box.dataset.downloadUrl=safeOriginal;
+  box.dataset.downloadName=lightboxFilenameFromUrl(downloadName,safeOriginal,title||kind);
+
+  const download=$("siteLightboxDownload");
+  if(download){
+    download.classList.toggle("hidden",!canDownload);
+    download.textContent=kind==="pdf"?"Download PDF":kind==="video"?"Download video":kind==="image"?"Download image":"Download media";
+  }
   const original=$("siteLightboxOriginal");
-  if(original)original.href=src;
+  if(original){
+    original.href=safeOriginal;
+    original.textContent=kind==="pdf"?"Open PDF ↗":kind==="video"?"Open video ↗":"Open original ↗";
+  }
   box.classList.remove("hidden");
   document.body.classList.add("lightbox-open");
 }
 
-async function downloadLightboxImage(){
+function openSiteLightbox(img,caption=""){
+  if(!img?.src)return;
+  const src=img.currentSrc||img.src;
+  openSiteMediaLightbox({
+    kind:"image",
+    originalUrl:src,
+    previewUrl:src,
+    title:caption||img.dataset.lightboxCaption||img.alt||"",
+    downloadName:lightboxFilenameFromImage(img,src)
+  });
+}
+
+async function downloadLightboxMedia(){
   const box=$("siteLightbox");
-  const src=box?.dataset.imageSrc||$("siteLightboxImage")?.src||"";
+  const src=box?.dataset.downloadUrl||"";
   if(!src)return;
-  const name=box?.dataset.downloadName||"image.jpg";
+  const name=box?.dataset.downloadName||"media";
   const btn=$("siteLightboxDownload");
-  const originalText=btn?.textContent||"Download image";
+  const originalText=btn?.textContent||"Download media";
   if(btn){btn.disabled=true;btn.textContent="Downloading…";}
   try{
     const response=await fetch(src,{mode:"cors",cache:"no-store"});
@@ -513,7 +578,7 @@ async function downloadLightboxImage(){
     a.href=objectUrl;a.download=name;document.body.appendChild(a);a.click();a.remove();
     setTimeout(()=>URL.revokeObjectURL(objectUrl),1500);
   }catch(err){
-    console.warn("Direct image download was blocked; opening the original instead.",err);
+    console.warn("Direct media download was blocked; opening the original instead.",err);
     const a=document.createElement("a");
     a.href=src;a.target="_blank";a.rel="noopener";a.download=name;document.body.appendChild(a);a.click();a.remove();
   }finally{
@@ -521,15 +586,20 @@ async function downloadLightboxImage(){
   }
 }
 
+function downloadLightboxImage(){return downloadLightboxMedia();}
+
 function closeSiteLightbox(){
   const box=$("siteLightbox");
   if(!box)return;
   box.classList.add("hidden");
-  $("siteLightboxImage").removeAttribute("src");
-  delete box.dataset.imageSrc;
+  resetSiteLightboxMedia();
+  delete box.dataset.mediaKind;
+  delete box.dataset.downloadUrl;
   delete box.dataset.downloadName;
   const original=$("siteLightboxOriginal");
-  if(original)original.href="#";
+  if(original){original.href="#";original.textContent="Open original ↗";}
+  const download=$("siteLightboxDownload");
+  if(download){download.classList.remove("hidden");download.textContent="Download media";}
   document.body.classList.remove("lightbox-open");
 }
 
@@ -1083,7 +1153,29 @@ function normalizeThesis(content){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=17;
+function normalizeMediaDisplayItem(item){
+  if(!item||typeof item!=="object")return item;
+  const out={...item};
+  const type=String(out.type||"link");
+  if(type==="image"||type==="pdf"){
+    out.fitMode=["exact","center","fill","legacy"].includes(out.fitMode)?out.fitMode:(type==="pdf"?"exact":"legacy");
+    out.width=["auto","full","half","third"].includes(out.width)?out.width:"auto";
+    out.enlarge=["inherit","on","off"].includes(out.enlarge)?out.enlarge:(type==="pdf"?"on":"inherit");
+  }
+  if(type==="image"){
+    out.aspect=["original","square","4x3","16x9"].includes(out.aspect)?out.aspect:"original";
+    out.fit=["cover","contain"].includes(out.fit)?out.fit:"cover";
+    out.position=["center","top","bottom","left","right"].includes(out.position)?out.position:"center";
+    out.alt=String(out.alt||"");
+  }
+  return out;
+}
+function normalizeMediaDisplayList(value){
+  return (Array.isArray(value)?value:[]).map(normalizeMediaDisplayItem);
+}
+
+
+const BUILDER_SETTINGS_SCHEMA_VERSION=18;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1229,13 +1321,15 @@ function normalize(d){
   normalizeTypography(d);
   normalizeSectionHeadings(d);
   d.sectionMedia=d.sectionMedia||{profile:[]};
-  d.sectionMedia.profile=d.sectionMedia.profile||[];
-  d.featuredResearch=d.featuredResearch||{};d.featuredResearch.media=d.featuredResearch.media||[];
-  d.publications=(d.publications||[]).map(x=>({...x,media:x.media||[]}));
-  d.projects=(d.projects||[]).map(x=>({...x,media:x.media||[]}));
-  d.skills=(d.skills||[]).map(x=>({...x,media:x.media||[]}));
-  d.education=(d.education||[]).map(x=>({...x,cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:x.media||[]}));
-  d.contact=d.contact||{};d.contact.media=d.contact.media||[];
+  d.sectionMedia.profile=normalizeMediaDisplayList(d.sectionMedia.profile);
+  d.featuredResearch=d.featuredResearch||{};d.featuredResearch.media=normalizeMediaDisplayList(d.featuredResearch.media);
+  d.publications=(d.publications||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
+  d.projects=(d.projects||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
+  d.skills=(d.skills||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
+  d.education=(d.education||[]).map(x=>({...x,cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:normalizeMediaDisplayList(x.media)}));
+  d.contact=d.contact||{};d.contact.media=normalizeMediaDisplayList(d.contact.media);
+  d.thesis.media=normalizeMediaDisplayList(d.thesis.media);
+  d.academicActivities=(d.academicActivities||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
   return d;
 }
 
@@ -1536,7 +1630,7 @@ function render(d){
 }
 
 function mediaHtml(media){
-  media=(media||[]).filter(m=>safeUrl(m.url));
+  media=normalizeMediaDisplayList(media).filter(m=>safeUrl(m.url));
   if(!media.length)return"";
   const visual=[],links=[];
   media.forEach(m=>{
@@ -1545,26 +1639,34 @@ function mediaHtml(media){
       const alt=m.alt||title||"Image";
       const aspect=["original","square","4x3","16x9"].includes(m.aspect)?m.aspect:"original";
       const fit=["cover","contain"].includes(m.fit)?m.fit:"cover";
+      const fitMode=["exact","center","fill","legacy"].includes(m.fitMode)?m.fitMode:"legacy";
       const position=["center","top","bottom","left","right"].includes(m.position)?m.position:"center";
       const width=["auto","full","half","third"].includes(m.width)?m.width:"auto";
       const enlarge=["inherit","on","off"].includes(m.enlarge)?m.enlarge:"inherit";
-      visual.push(`<figure class="media-public-item media-width-${escAttr(width)}">
-        <a class="media-image-stage media-aspect-${escAttr(aspect)}" href="${escAttr(url)}" target="_blank" rel="noopener">
+      visual.push(`<figure class="media-public-item media-width-${escAttr(width)} media-fit-${escAttr(fitMode)}">
+        <a class="media-image-stage media-aspect-${escAttr(aspect)} media-fit-${escAttr(fitMode)}" href="${escAttr(url)}" target="_blank" rel="noopener">
           <img class="media-public-image image-fit-${escAttr(fit)} crop-${escAttr(position)}" data-lightbox="${escAttr(enlarge)}" data-download-name="${escAttr(m.filename||title||"image")}" src="${escAttr(url)}" alt="${escAttr(alt)}" loading="lazy">
         </a>
         ${(title||caption)?`<figcaption class="media-public-info">${title?`<strong>${esc(title)}</strong>`:""}${caption?`<p>${esc(caption)}</p>`:""}</figcaption>`:""}
       </figure>`);
     }else if(type==="video"){
       const embed=videoEmbed(url);
-      visual.push(`<div class="media-public-item">
-        ${embed?`<div class="media-video-embed"><iframe src="${escAttr(embed)}" title="${escAttr(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`:
-        `<video class="media-public-video" controls preload="metadata" src="${escAttr(url)}"></video>`}
+      const enlarge=["inherit","on","off"].includes(m.enlarge)?m.enlarge:"on";
+      visual.push(`<div class="media-public-item media-video-card">
+        <div class="media-video-stage">
+          ${embed?`<div class="media-video-embed"><iframe src="${escAttr(embed)}" title="${escAttr(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe></div>`:
+          `<video class="media-public-video" controls preload="metadata" src="${escAttr(url)}"></video>`}
+          <button class="media-expand-button" type="button" data-lightbox-media-kind="video" data-lightbox-mode="${escAttr(enlarge)}" data-media-url="${escAttr(url)}" data-media-embed="${escAttr(embed||"")}" data-media-title="${escAttr(title)}" data-media-caption="${escAttr(caption)}" data-media-download-name="${escAttr(m.filename||title||"video")}">Expand ↗</button>
+        </div>
         ${(title||caption)?`<div class="media-public-info">${title?`<strong>${esc(title)}</strong>`:""}${caption?`<p>${esc(caption)}</p>`:""}</div>`:""}
       </div>`);
     }else if(type==="pdf"){
       const thumb=safeUrl(m.thumbnail_url);
-      visual.push(`<article class="media-public-item pdf-preview-card">
-        <a class="pdf-cover-link" href="${escAttr(url)}" target="_blank" rel="noopener" aria-label="Open ${escAttr(title)}">
+      const fitMode=["exact","center","fill","legacy"].includes(m.fitMode)?m.fitMode:"exact";
+      const width=["auto","full","half","third"].includes(m.width)?m.width:"auto";
+      const enlarge=["inherit","on","off"].includes(m.enlarge)?m.enlarge:"on";
+      visual.push(`<article class="media-public-item pdf-preview-card media-width-${escAttr(width)} media-fit-${escAttr(fitMode)}">
+        <a class="pdf-cover-link" href="${escAttr(url)}" target="_blank" rel="noopener" aria-label="Preview ${escAttr(title)}" data-lightbox-media-kind="pdf" data-lightbox-mode="${escAttr(enlarge)}" data-media-url="${escAttr(url)}" data-media-preview="${escAttr(thumb||"")}" data-media-title="${escAttr(title)}" data-media-caption="${escAttr(caption)}" data-media-download-name="${escAttr(m.filename||title||"document.pdf")}">
           ${thumb
             ? `<img class="pdf-cover-image" src="${escAttr(thumb)}" alt="Preview of ${escAttr(title)}" loading="lazy">`
             : `<div class="pdf-cover-placeholder">
