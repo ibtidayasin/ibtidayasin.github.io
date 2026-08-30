@@ -2022,7 +2022,7 @@ function mediaEditor(owner,media,title){
                     ${m.thumbnail_url?"Regenerate automatically":"Generate preview automatically"}
                   </button>
                 </div>
-                <span class="helper">Automatic first-page preview is the default for uploaded PDFs.</span>
+                <span class="helper">A fresh high-resolution first-page preview is generated automatically whenever you upload a PDF.</span>
                 <label class="media-mini-label">Manual preview image (optional)
                   <input type="file" data-pdf-thumb-file accept="image/jpeg,image/png,image/webp">
                 </label>
@@ -2354,6 +2354,8 @@ function clearPendingMediaPreview(editor){
   box.classList.add("hidden");
 }
 
+const pendingPdfPreviewBlobs=new WeakMap();
+
 async function previewSelectedMediaFile(input){
   const editor=input?.closest(".media-editor");
   const box=editor?.querySelector("[data-media-upload-preview]");
@@ -2389,12 +2391,14 @@ async function previewSelectedMediaFile(input){
     }
     if(type==="pdf"){
       const blob=await createPdfPreviewBlob(await file.arrayBuffer());
+      pendingPdfPreviewBlobs.set(input,blob);
       const objectUrl=URL.createObjectURL(blob);
       box.dataset.objectUrl=objectUrl;
       box.innerHTML=`<div class="media-pending-head"><strong>Selected PDF · page 1</strong><span>${esc(file.name)} · ${formatMediaFileSize(file.size)}</span></div>
         <img class="media-pending-pdf" src="${esc(objectUrl)}" alt="Selected PDF first-page preview">`;
     }
   }catch(err){
+    if(type==="pdf")pendingPdfPreviewBlobs.delete(input);
     console.warn("Selected media preview failed:",err);
     box.innerHTML=`<div class="media-pending-message">${esc(file.name)} is selected. Preview could not be generated, but you can still upload it.</div>`;
   }
@@ -2434,18 +2438,20 @@ async function uploadMedia(owner,editor){
   media.push(item);
 
   if(type==="pdf"){
-    setStatus("PDF uploaded. Creating first-page preview...");
+    setStatus("PDF uploaded. Generating a fresh high-resolution page-1 preview...");
     try{
-      const blob=await createPdfPreviewBlob(await file.arrayBuffer());
+      const blob=pendingPdfPreviewBlobs.get(input)||await createPdfPreviewBlob(await file.arrayBuffer());
       await saveGeneratedPdfPreview(owner,item,blob);
     }catch(err){
       console.warn("Automatic PDF preview failed:",err);
-      setStatus("PDF uploaded. Automatic preview failed; you can generate or upload a preview manually.");
+      setStatus("PDF uploaded. Automatic preview failed; you can regenerate it from the PDF preview controls.");
+    }finally{
+      pendingPdfPreviewBlobs.delete(input);
     }
   }
 
   await persistContent(type==="pdf" && item.thumbnail_url
-    ? "PDF uploaded with preview."
+    ? "PDF uploaded with fresh high-resolution preview."
     : "Media uploaded.");
   clearPendingMediaPreview(editor);
   input.value="";
@@ -2482,12 +2488,13 @@ async function createPdfPreviewBlob(arrayBuffer){
   const page=await pdf.getPage(1);
 
   const base=page.getViewport({scale:1});
-  const targetWidth=720;
+  /* High-resolution raster preview for text, graphs, and graphical abstracts. */
+  const targetWidth=1800;
   const scale=targetWidth/base.width;
   const viewport=page.getViewport({scale});
 
   const canvas=document.createElement("canvas");
-  const ratio=Math.min(window.devicePixelRatio||1,2);
+  const ratio=Math.min(Math.max(window.devicePixelRatio||1,1),1.5);
   canvas.width=Math.floor(viewport.width*ratio);
   canvas.height=Math.floor(viewport.height*ratio);
 
@@ -2499,7 +2506,7 @@ async function createPdfPreviewBlob(arrayBuffer){
   await page.render({canvasContext:ctx,viewport}).promise;
 
   const blob=await new Promise((resolve,reject)=>{
-    canvas.toBlob(b=>b?resolve(b):reject(new Error("Could not create preview image.")),"image/jpeg",0.88);
+    canvas.toBlob(b=>b?resolve(b):reject(new Error("Could not create preview image.")),"image/png");
   });
 
   try{await pdf.destroy()}catch{}
@@ -2511,10 +2518,10 @@ async function saveGeneratedPdfPreview(owner,item,blob){
     try{await sb.storage.from("site-media").remove([item.thumbnail_path])}catch{}
   }
 
-  const path=`${ownerFolder(owner)}/previews/${uid()}-page1.jpg`;
+  const path=`${ownerFolder(owner)}/previews/${uid()}-page1.png`;
   const{error}=await sb.storage.from("site-media").upload(path,blob,{
     upsert:false,
-    contentType:"image/jpeg",
+    contentType:"image/png",
     cacheControl:"3600"
   });
   if(error)throw error;
