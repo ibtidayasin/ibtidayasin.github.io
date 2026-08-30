@@ -1889,7 +1889,7 @@ function renderPublicationsEditor(){
 function renderProjectsEditor(){
   $("projectsEditor").innerHTML=(currentContent.projects||[]).map((p,i)=>repeatBlock("project",i,`Project / Simulation ${i+1}`,[
     {label:"Project title",key:"title",value:p.title,full:true},
-    {label:"Type",key:"type",value:p.type||"",kind:"select",options:["","Research Project","Simulation","Engineering Project","Course Project"]},
+    {label:"Type",key:"type",value:p.type||"",kind:"select",options:["","Research Project","Simulation","Engineering Project","Course Project","Hands-on Practical"]},
     {label:"Role / My Contribution",key:"contribution",value:p.contribution||"",kind:"textarea",full:true},
     {label:"Tools / metadata",key:"meta",value:p.meta},
     {label:"Description",key:"description",value:p.description,kind:"textarea",full:true},
