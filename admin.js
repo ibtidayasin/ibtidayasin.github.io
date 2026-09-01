@@ -1960,13 +1960,13 @@ function renderProjectsEditor(){
 }
 function activityCardStyleOptions(item){
   const category=normalizeActivityCategory(item?.category);
-  const inheritedLabel=category==="Certifications"?"Default — Full-width Certificate":"Default — Appearance setting";
+  const inheritedLabel=category==="Certifications"?"Default — Certificate Card":"Default — Appearance setting";
   return [
     {value:"",label:inheritedLabel},
     {value:"activity-split",label:"Activity Split"},
     {value:"activity-showcase",label:"Activity Showcase"},
     {value:"activity-media-fill",label:"Activity Media Fill"},
-    {value:"activity-certificate-full",label:"Full-width Certificate"}
+    {value:"activity-certificate-full",label:"Certificate Card"}
   ];
 }
 
@@ -1975,7 +1975,7 @@ function refreshActivityCardStyleDefaultLabel(row){
   const category=normalizeActivityCategory(row.querySelector('[data-k="category"]')?.value||"");
   const select=row.querySelector('[data-k="cardDesign"]');
   const option=select?.querySelector('option[value=""]');
-  if(option)option.textContent=category==="Certifications"?"Default — Full-width Certificate":"Default — Appearance setting";
+  if(option)option.textContent=category==="Certifications"?"Default — Certificate Card":"Default — Appearance setting";
 }
 
 function renderActivitiesEditor(){
