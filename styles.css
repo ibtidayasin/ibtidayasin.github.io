@@ -4346,3 +4346,114 @@ html[data-activity-columns="3"] #activities[data-card-design="activity-media-fil
   #activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-size-full{width:100%!important}
   #activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-size-original{width:max-content!important;max-width:100%!important}
 }
+
+
+/* =========================================================
+   MEDIA QUALITY-OF-LIFE — paired Activity Media Fill,
+   caption alignment, replace-file controls, admin back-to-top.
+   ========================================================= */
+
+/* Caption alignment for all visual media cards. */
+body:not(.admin-body) .media-public-info.media-caption-left{text-align:left!important}
+body:not(.admin-body) .media-public-info.media-caption-center{text-align:center!important}
+body:not(.admin-body) .media-public-info.media-caption-right{text-align:right!important}
+
+/* Activity Media Fill: one item stays unchanged. Two or more
+   items pack left-to-right in pairs. If the count is odd, the
+   final item spans the full second/last row. */
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2)){
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:9px!important;
+  padding:0!important;
+  align-items:start!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item:last-child:nth-child(odd){
+  grid-column:1 / -1!important;
+}
+
+/* Widen the media rail when it contains a pair, while still
+   respecting the largest requested Display size. */
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.media-gallery > .media-public-item:nth-child(2)){
+  --activity-media-rail:min(52%,520px);
+  grid-template-columns:minmax(0,1fr) minmax(0,var(--activity-media-rail))!important;
+}
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.media-gallery > .media-public-item:nth-child(2)):has(.media-size-very-small){--activity-media-rail:min(36%,300px)}
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.media-gallery > .media-public-item:nth-child(2)):has(.media-size-small){--activity-media-rail:min(43%,400px)}
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.media-gallery > .media-public-item:nth-child(2)):has(.media-size-standard){--activity-media-rail:min(52%,520px)}
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.media-gallery > .media-public-item:nth-child(2)):has(.media-size-medium){--activity-media-rail:min(55%,580px)}
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.media-gallery > .media-public-item:nth-child(2)):has(.media-size-large){--activity-media-rail:min(58%,640px)}
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.media-gallery > .media-public-item:nth-child(2)):has(.media-size-full),
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.media-gallery > .media-public-item:nth-child(2)):has(.media-size-original){--activity-media-rail:58%}
+
+@media(max-width:680px){
+  #activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2)){
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:8px!important;
+  }
+  #activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item{
+    width:100%!important;
+    max-width:none!important;
+  }
+}
+
+/* Admin replace-file area. */
+.media-replace-admin{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:8px 10px;
+  align-items:end;
+  padding:9px 10px;
+  border:1px dashed var(--line);
+  border-radius:8px;
+  background:var(--surface-soft);
+}
+.media-replace-admin>.helper{grid-column:1 / -1}
+.media-caption-align-control{
+  display:grid;
+  gap:5px;
+  width:min(100%,260px);
+  font-size:11px;
+  font-weight:700;
+  color:var(--muted);
+}
+.media-caption-align-control select{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:8px 9px;
+  background:var(--surface);
+  color:var(--text);
+}
+
+/* Admin-only back-to-top button. */
+.admin-back-to-top{
+  position:fixed;
+  right:22px;
+  bottom:78px;
+  z-index:90;
+  width:44px;
+  height:44px;
+  display:grid;
+  place-items:center;
+  border-radius:50%;
+  border:1px solid var(--line);
+  background:var(--surface);
+  color:var(--accent);
+  box-shadow:0 9px 26px rgba(0,0,0,.12);
+  font-size:22px;
+  line-height:1;
+  font-weight:800;
+  cursor:pointer;
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.admin-back-to-top:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.16)}
+@media(max-width:680px){
+  .media-replace-admin{grid-template-columns:1fr}
+  .admin-back-to-top{right:14px;bottom:82px}
+}

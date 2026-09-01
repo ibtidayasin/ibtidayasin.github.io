@@ -1254,6 +1254,7 @@ function normalizeMediaDisplayItem(item){
   if(!item||typeof item!=="object")return item;
   const out={...item};
   const type=String(out.type||"link");
+  out.captionAlign=["left","center","right"].includes(out.captionAlign)?out.captionAlign:"left";
   if(type==="image"||type==="pdf"||type==="video"){
     const legacySize={third:"standard",half:"medium",full:"large",auto:"standard"};
     out.displaySize=["very-small","small","standard","medium","large","full","original"].includes(out.displaySize)
@@ -1280,7 +1281,7 @@ function normalizeMediaDisplayList(value){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=25;
+const BUILDER_SETTINGS_SCHEMA_VERSION=26;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1785,6 +1786,7 @@ function mediaHtml(media){
   const visual=[],links=[];
   media.forEach(m=>{
     const type=m.type||"link",url=safeUrl(m.url),title=m.title||m.filename||labelFor(type),caption=m.caption||"";
+    const captionAlign=["left","center","right"].includes(m.captionAlign)?m.captionAlign:"left";
     if(type==="image"){
       const alt=m.alt||title||"Image";
       const aspect=["original","square","4x3","16x9"].includes(m.aspect)?m.aspect:"original";
@@ -1798,7 +1800,7 @@ function mediaHtml(media){
         <a class="media-image-stage media-aspect-${escAttr(aspect)} media-fit-${escAttr(fitMode)}" href="${escAttr(url)}" target="_blank" rel="noopener">
           <img class="media-public-image image-fit-${escAttr(fit)} crop-${escAttr(position)}" data-lightbox="${escAttr(enlarge)}" data-download-name="${escAttr(m.filename||title||"image")}" src="${escAttr(url)}" alt="${escAttr(alt)}" loading="lazy">
         </a>
-        ${(title||caption)?`<figcaption class="media-public-info">${title?`<strong>${esc(title)}</strong>`:""}${caption?`<p>${esc(caption)}</p>`:""}</figcaption>`:""}
+        ${(title||caption)?`<figcaption class="media-public-info media-caption-${escAttr(captionAlign)}">${title?`<strong>${esc(title)}</strong>`:""}${caption?`<p>${esc(caption)}</p>`:""}</figcaption>`:""}
       </figure>`);
     }else if(type==="video"){
       const embed=videoEmbed(url);
@@ -1811,7 +1813,7 @@ function mediaHtml(media){
           `<video class="media-public-video" controls preload="metadata" ${thumb?`poster="${escAttr(thumb)}"`:""} src="${escAttr(url)}"></video>`}
           <button class="media-expand-button" type="button" data-lightbox-media-kind="video" data-lightbox-mode="${escAttr(enlarge)}" data-media-url="${escAttr(url)}" data-media-preview="${escAttr(thumb||"")}" data-media-embed="${escAttr(embed||"")}" data-media-title="${escAttr(title)}" data-media-caption="${escAttr(caption)}" data-media-download-name="${escAttr(m.filename||title||"video")}">Expand ↗</button>
         </div>
-        ${(title||caption)?`<div class="media-public-info">${title?`<strong>${esc(title)}</strong>`:""}${caption?`<p>${esc(caption)}</p>`:""}</div>`:""}
+        ${(title||caption)?`<div class="media-public-info media-caption-${escAttr(captionAlign)}">${title?`<strong>${esc(title)}</strong>`:""}${caption?`<p>${esc(caption)}</p>`:""}</div>`:""}
       </div>`);
     }else if(type==="pdf"){
       const thumb=safeUrl(m.thumbnail_url);
@@ -1828,7 +1830,7 @@ function mediaHtml(media){
                  <span class="pdf-placeholder-text">PDF document</span>
                </div>`}
         </a>
-        <div class="media-public-info pdf-preview-info">
+        <div class="media-public-info pdf-preview-info media-caption-${escAttr(captionAlign)}">
           <div>
             <strong>${esc(title)}</strong>
             ${caption?`<p>${esc(caption)}</p>`:""}

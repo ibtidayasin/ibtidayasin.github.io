@@ -1029,6 +1029,7 @@ function normalizeMediaDisplayItem(item){
   if(!item||typeof item!=="object")return item;
   const out={...item};
   const type=String(out.type||"link");
+  out.captionAlign=["left","center","right"].includes(out.captionAlign)?out.captionAlign:"left";
   if(type==="image"||type==="pdf"||type==="video"){
     const legacySize={third:"standard",half:"medium",full:"large",auto:"standard"};
     out.displaySize=["very-small","small","standard","medium","large","full","original"].includes(out.displaySize)
@@ -1054,7 +1055,7 @@ function normalizeMediaDisplayList(value){
   return (Array.isArray(value)?value:[]).map(normalizeMediaDisplayItem);
 }
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=25;
+const BUILDER_SETTINGS_SCHEMA_VERSION=26;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -2049,6 +2050,13 @@ function mediaEditor(owner,media,title){
             ${adminMediaPreview(m)}
             <input data-media-field="title" value="${esc(m.title||"")}" placeholder="Display title (optional)">
             <input data-media-field="caption" value="${esc(m.caption||"")}" placeholder="Caption / note (optional)">
+            ${m.type!=="link"?`<label class="media-caption-align-control">Caption alignment
+              <select data-media-field="captionAlign">
+                <option value="left" ${(m.captionAlign||"left")==="left"?"selected":""}>Left</option>
+                <option value="center" ${m.captionAlign==="center"?"selected":""}>Center</option>
+                <option value="right" ${m.captionAlign==="right"?"selected":""}>Right</option>
+              </select>
+            </label>`:""}
             ${m.type==="image"?`
               <div class="image-settings-admin">
                 <h5>Image settings</h5>
@@ -2094,6 +2102,14 @@ function mediaEditor(owner,media,title){
                 </div>
               </div>`:""}
             <span class="helper">${esc(m.url||"")}</span>
+            ${m.type!=="link"?`
+              <div class="media-replace-admin">
+                <label class="media-mini-label">Replace media file
+                  <input type="file" data-media-replace-file accept="image/jpeg,image/png,image/webp,application/pdf,video/mp4,video/webm">
+                </label>
+                <button class="secondary" data-media-replace="${esc(owner)}:${i}" type="button">Replace file</button>
+                <span class="helper">Replaces only the uploaded file. The title, caption, caption alignment, display size, lightbox setting, and other relevant media settings are preserved.</span>
+              </div>`:""}
             ${m.type==="video"?`
               <div class="pdf-thumb-admin video-thumb-admin">
                 <h5>Video preview image</h5>
@@ -2277,6 +2293,9 @@ document.addEventListener("click",async e=>{
   b=e.target.closest("[data-media-add-link]");
   if(b){await addMediaLink(b.dataset.mediaAddLink,b.closest(".media-editor"));return}
 
+  b=e.target.closest("[data-media-replace]");
+  if(b){await replaceMediaFile(b.dataset.mediaReplace,b.closest(".media-admin-item"));return}
+
   b=e.target.closest("[data-media-move]");
   if(b){
     const [owner,idxs,deltas]=b.dataset.mediaMove.split("|");
@@ -2423,6 +2442,7 @@ function readMediaMetadata(){
       if(!media[i])return;
       media[i].title=(row.querySelector('[data-media-field="title"]')?.value||"").trim();
       media[i].caption=(row.querySelector('[data-media-field="caption"]')?.value||"").trim();
+      media[i].captionAlign=row.querySelector('[data-media-field="captionAlign"]')?.value||"left";
       if(media[i].type==="image"){
         media[i].alt=(row.querySelector('[data-media-field="alt"]')?.value||"").trim();
         media[i].aspect=row.querySelector('[data-media-field="aspect"]')?.value||"original";
@@ -2620,6 +2640,7 @@ async function uploadMedia(owner,editor){
     path,
     title:file.name.replace(/\.[^.]+$/,""),
     caption:"",
+    captionAlign:"left",
       ...(type==="image"?{alt:"",aspect:"original",fitMode:"exact",fit:"cover",position:"center",displaySize:"standard",width:"auto",enlarge:"on"}:type==="pdf"?{fitMode:"exact",displaySize:"standard",width:"auto",enlarge:"on"}:type==="video"?{displaySize:"standard",enlarge:"on"}:{}),
     uploaded_at:new Date().toISOString()
   };
@@ -2660,6 +2681,140 @@ async function uploadMedia(owner,editor){
   fillForms();
 }
 
+
+function parseMediaSpec(spec){
+  const parts=String(spec||"").split(":");
+  if(["profile","research","thesis","contact"].includes(parts[0])){
+    return{owner:parts[0],index:Number(parts[1])};
+  }
+  return{owner:`${parts[0]}:${parts[1]}`,index:Number(parts[2])};
+}
+
+function mediaDefaultsForType(type,oldItem={}){
+  const common={
+    id:oldItem.id||uid(),
+    title:String(oldItem.title||""),
+    caption:String(oldItem.caption||""),
+    captionAlign:["left","center","right"].includes(oldItem.captionAlign)?oldItem.captionAlign:"left",
+    displaySize:["very-small","small","standard","medium","large","full","original"].includes(oldItem.displaySize)?oldItem.displaySize:"standard",
+    enlarge:["inherit","on","off"].includes(oldItem.enlarge)?oldItem.enlarge:"on"
+  };
+  if(type==="image"){
+    return{...common,
+      alt:String(oldItem.alt||""),
+      aspect:["original","square","4x3","16x9"].includes(oldItem.aspect)?oldItem.aspect:"original",
+      fitMode:["exact","center","fill","legacy"].includes(oldItem.fitMode)?oldItem.fitMode:"exact",
+      fit:["cover","contain"].includes(oldItem.fit)?oldItem.fit:"cover",
+      position:["center","top","bottom","left","right"].includes(oldItem.position)?oldItem.position:"center",
+      width:["auto","full","half","third"].includes(oldItem.width)?oldItem.width:"auto"
+    };
+  }
+  if(type==="pdf"){
+    return{...common,
+      fitMode:["exact","center","fill","legacy"].includes(oldItem.fitMode)?oldItem.fitMode:"exact",
+      width:["auto","full","half","third"].includes(oldItem.width)?oldItem.width:"auto",
+      enlarge:["inherit","on","off"].includes(oldItem.enlarge)?oldItem.enlarge:"on"
+    };
+  }
+  if(type==="video"){
+    return{...common,enlarge:["inherit","on","off"].includes(oldItem.enlarge)?oldItem.enlarge:"on"};
+  }
+  return common;
+}
+
+async function replaceMediaFile(spec,row){
+  syncAllForms();
+  const{owner,index}=parseMediaSpec(spec);
+  const media=getOwnerMedia(owner);
+  const oldItem=media?.[index];
+  if(!oldItem)return setStatus("Media attachment not found.");
+
+  const input=row?.querySelector("[data-media-replace-file]");
+  const file=input?.files?.[0];
+  if(!file)return setStatus("Choose a replacement file first.");
+  if(file.size>50*1024*1024)return setStatus("Replacement file is larger than 50 MB.");
+  const type=fileType(file);
+  if(!type)return setStatus("Allowed replacements: JPG, PNG, WebP, PDF, MP4 or WebM.");
+
+  const btn=row?.querySelector("[data-media-replace]");
+  if(btn?.disabled)return;
+  if(btn){
+    btn.disabled=true;
+    btn.dataset.oldText=btn.textContent;
+    btn.textContent="Replacing...";
+  }
+
+  const oldPaths=[oldItem.path,oldItem.thumbnail_path].filter(Boolean);
+  try{
+    setStatus(`Uploading replacement ${file.name}...`);
+    const path=`${ownerFolder(owner)}/${uid()}-${safeFileName(file.name)}`;
+    const{error}=await sb.storage.from("site-media").upload(path,file,{
+      upsert:false,
+      contentType:file.type||undefined,
+      cacheControl:"3600"
+    });
+    if(error)throw new Error(error.message);
+
+    const{data}=sb.storage.from("site-media").getPublicUrl(path);
+    const preserved=mediaDefaultsForType(type,oldItem);
+    const item={
+      ...preserved,
+      type,
+      url:data.publicUrl,
+      filename:file.name,
+      path,
+      thumbnail_url:"",
+      thumbnail_path:"",
+      uploaded_at:new Date().toISOString()
+    };
+    media[index]=item;
+
+    const saved=await persistContent(type==="pdf"
+      ?"Media file replaced. Regenerating PDF preview..."
+      :type==="video"
+        ?"Media file replaced. Regenerating video preview..."
+        :"Media file replaced; existing information and display settings were preserved.");
+    if(!saved)throw new Error("The replacement uploaded, but its website record could not be saved.");
+
+    if(type==="pdf"){
+      try{
+        const blob=await withTimeout(createPdfPreviewBlob(await file.arrayBuffer()),20000,"PDF preview generation timed out.");
+        await withTimeout(saveGeneratedPdfPreview(owner,item,blob),20000,"PDF preview upload timed out.");
+        await persistContent("Media file replaced with a fresh automatic PDF preview.");
+      }catch(err){
+        console.warn("Replacement PDF preview failed:",err);
+        setStatus("PDF replaced successfully. Automatic preview failed; you can regenerate it manually.");
+      }
+    }else if(type==="video"){
+      try{
+        const objectUrl=URL.createObjectURL(file);
+        let blob;
+        try{blob=await withTimeout(createVideoPreviewBlob(objectUrl),20000,"Video preview generation timed out.")}
+        finally{URL.revokeObjectURL(objectUrl)}
+        await withTimeout(saveGeneratedVideoPreview(owner,item,blob),20000,"Video preview upload timed out.");
+        await persistContent("Media file replaced with a fresh automatic video preview.");
+      }catch(err){
+        console.warn("Replacement video preview failed:",err);
+        setStatus("Video replaced successfully. Automatic preview failed; you can regenerate it manually.");
+      }
+    }
+
+    if(oldPaths.length){
+      try{await sb.storage.from("site-media").remove(oldPaths)}catch(err){console.warn("Old media cleanup failed:",err)}
+    }
+    fillForms();
+  }catch(err){
+    console.error(err);
+    setStatus("Media replacement failed: "+(err?.message||err));
+  }finally{
+    if(btn){
+      btn.disabled=false;
+      btn.textContent=btn.dataset.oldText||"Replace file";
+      delete btn.dataset.oldText;
+    }
+  }
+}
+
 async function addMediaLink(owner,editor){
   syncAllForms();
   const type=editor.querySelector("[data-media-link-type]").value;
@@ -2668,7 +2823,7 @@ async function addMediaLink(owner,editor){
   if(!/^https?:\/\//i.test(url))return setStatus("Media URL must start with http:// or https://");
 
   getOwnerMedia(owner).push({
-    id:uid(),type,url,title:title||defaultLinkTitle(type),caption:"",filename:"",path:"",
+    id:uid(),type,url,title:title||defaultLinkTitle(type),caption:"",captionAlign:"left",filename:"",path:"",
     ...(type==="image"?{alt:"",aspect:"original",fitMode:"exact",fit:"cover",position:"center",displaySize:"standard",width:"auto",enlarge:"on"}:type==="pdf"?{fitMode:"exact",displaySize:"standard",width:"auto",enlarge:"on"}:type==="video"?{displaySize:"standard",enlarge:"on"}:{}),
     uploaded_at:new Date().toISOString()
   });
@@ -3100,7 +3255,26 @@ document.addEventListener("change",e=>{
   if(vis)setSectionVisibility(vis.dataset.sectionVisible,vis.checked);
 });
 
+
+function initAdminBackToTop(){
+  if(document.getElementById("adminBackToTopBtn"))return;
+  const btn=document.createElement("button");
+  btn.id="adminBackToTopBtn";
+  btn.className="admin-back-to-top hidden";
+  btn.type="button";
+  btn.textContent="↑";
+  btn.setAttribute("aria-label","Back to top");
+  btn.title="Back to top";
+  document.body.appendChild(btn);
+
+  const update=()=>btn.classList.toggle("hidden",window.scrollY<420);
+  btn.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}));
+  window.addEventListener("scroll",update,{passive:true});
+  update();
+}
+
 bindAdvancedAdminSuite();
+initAdminBackToTop();
 
 ["fNavigationModeSingle","fNavigationModeSections"].forEach(id=>{
   $(id)?.addEventListener("change",()=>{
