@@ -1281,7 +1281,7 @@ function normalizeMediaDisplayList(value){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=26;
+const BUILDER_SETTINGS_SCHEMA_VERSION=27;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1341,11 +1341,29 @@ function builderSettingsNeedMigration(content){
 }
 
 
+function normalizeActivityCategory(value){
+  const category=String(value||"Presentations & Posters").trim();
+  const aliases={
+    "Presentation & Poster":"Presentations & Posters",
+    "Presentations & Posters":"Presentations & Posters",
+    "Certification & Training":"Training & Practical Experience",
+    "Certifications & Training":"Training & Practical Experience",
+    "Training":"Training & Practical Experience",
+    "Training & Practical Experience":"Training & Practical Experience",
+    "Certification":"Certifications",
+    "Certifications":"Certifications",
+    "Mentoring & Teaching":"Mentoring & Teaching",
+    "Award & Honor":"Awards & Honors",
+    "Awards & Honors":"Awards & Honors"
+  };
+  return aliases[category]||category||"Presentations & Posters";
+}
+
 function normalizeAcademicArchitecture(content){
   const marker=content?.builderState?.academicArchitectureV1===true;
   const existingActivities=Array.isArray(content.academicActivities)?content.academicActivities:[];
   content.academicActivities=existingActivities.map(x=>({
-    category:String(x?.category||"Presentation & Poster"),
+    category:normalizeActivityCategory(x?.category),
     activityType:String(x?.activityType||""),
     topics:(Array.isArray(x?.topics)?x.topics:(typeof x?.topics==="string"?x.topics.split(","):[])).map(v=>String(v??"").trim()).filter(Boolean),
     title:String(x?.title||""),
@@ -1512,16 +1530,13 @@ function iconLinkHtml(type,label,url,isExternal=true,style="labels"){
 
 
 function activityCategoryLabel(value){
-  return {
-    "Presentation & Poster":"Presentations & Posters",
-    "Certification & Training":"Certifications & Training",
-    "Award & Honor":"Awards & Honors"
-  }[value]||value||"Academic Activities";
+  return normalizeActivityCategory(value)||"Academic Activities";
 }
 
 function activityLinkLabel(category){
-  if(category==="Certification & Training")return"View credential ↗";
-  if(category==="Presentation & Poster")return"View presentation ↗";
+  if(category==="Certifications")return"View credential ↗";
+  if(category==="Presentations & Posters")return"View presentation ↗";
+  if(category==="Training & Practical Experience")return"View training details ↗";
   return"View details ↗";
 }
 
@@ -1548,12 +1563,12 @@ function activateActivityCategory(category,persist=true){
 
 function renderAcademicActivities(d){
   const items=(d.academicActivities||[]).filter(academicActivityHasContent);
-  const categories=["Presentation & Poster","Certification & Training","Award & Honor"]
+  const categories=["Presentations & Posters","Training & Practical Experience","Certifications","Mentoring & Teaching","Awards & Honors"]
     .filter(category=>items.some(item=>item.category===category));
 
   const tabs=$("activityTabs"),list=$("activitiesList");
   if(!tabs||!list)return;
-  const remembered=savedActivityCategory();
+  const remembered=normalizeActivityCategory(savedActivityCategory());
   const activeCategory=categories.includes(remembered)?remembered:(categories[0]||"");
   tabs.innerHTML=categories.map(category=>{
     const active=category===activeCategory;
