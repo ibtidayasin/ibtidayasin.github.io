@@ -2047,16 +2047,18 @@ function mediaEditor(owner,media,title){
                 <button class="secondary media-order-btn" data-media-move="${esc(owner)}|${i}|1" type="button" title="Move later" ${i===(media||[]).length-1?"disabled":""}>→</button>
               </div>
             </div>
-            ${adminMediaPreview(m)}
+            <div class="media-preview-replace-row">
+              ${adminMediaPreview(m)}
+              ${m.type!=="link"?`<div class="media-replace-admin media-replace-admin-inline">
+                <label class="media-mini-label">Replace media file
+                  <input type="file" data-media-replace-file accept="image/jpeg,image/png,image/webp,application/pdf,video/mp4,video/webm">
+                </label>
+                <button class="secondary" data-media-replace="${esc(owner)}:${i}" type="button">Replace file</button>
+                <span class="helper">Keeps the title, caption and display settings.</span>
+              </div>`:""}
+            </div>
             <input data-media-field="title" value="${esc(m.title||"")}" placeholder="Display title (optional)">
             <input data-media-field="caption" value="${esc(m.caption||"")}" placeholder="Caption / note (optional)">
-            ${m.type!=="link"?`<label class="media-caption-align-control">Caption alignment
-              <select data-media-field="captionAlign">
-                <option value="left" ${(m.captionAlign||"left")==="left"?"selected":""}>Left</option>
-                <option value="center" ${m.captionAlign==="center"?"selected":""}>Center</option>
-                <option value="right" ${m.captionAlign==="right"?"selected":""}>Right</option>
-              </select>
-            </label>`:""}
             ${m.type==="image"?`
               <div class="image-settings-admin">
                 <h5>Image settings</h5>
@@ -2099,17 +2101,14 @@ function mediaEditor(owner,media,title){
                     <option value="on" ${m.enlarge==="on"?"selected":""}>Always</option>
                     <option value="off" ${m.enlarge==="off"?"selected":""}>Never</option>
                   </select></label>
+                  <label>Caption alignment<select data-media-field="captionAlign">
+                    <option value="left" ${(m.captionAlign||"left")==="left"?"selected":""}>Left</option>
+                    <option value="center" ${m.captionAlign==="center"?"selected":""}>Center</option>
+                    <option value="right" ${m.captionAlign==="right"?"selected":""}>Right</option>
+                  </select></label>
                 </div>
               </div>`:""}
             <span class="helper">${esc(m.url||"")}</span>
-            ${m.type!=="link"?`
-              <div class="media-replace-admin">
-                <label class="media-mini-label">Replace media file
-                  <input type="file" data-media-replace-file accept="image/jpeg,image/png,image/webp,application/pdf,video/mp4,video/webm">
-                </label>
-                <button class="secondary" data-media-replace="${esc(owner)}:${i}" type="button">Replace file</button>
-                <span class="helper">Replaces only the uploaded file. The title, caption, caption alignment, display size, lightbox setting, and other relevant media settings are preserved.</span>
-              </div>`:""}
             ${m.type==="video"?`
               <div class="pdf-thumb-admin video-thumb-admin">
                 <h5>Video preview image</h5>
@@ -2145,6 +2144,11 @@ function mediaEditor(owner,media,title){
                     <option value="on" ${(m.enlarge||"on")==="on"?"selected":""}>Always</option>
                     <option value="inherit" ${m.enlarge==="inherit"?"selected":""}>Use site setting</option>
                     <option value="off" ${m.enlarge==="off"?"selected":""}>Never</option>
+                  </select></label>
+                  <label>Caption alignment<select data-media-field="captionAlign">
+                    <option value="left" ${(m.captionAlign||"left")==="left"?"selected":""}>Left</option>
+                    <option value="center" ${m.captionAlign==="center"?"selected":""}>Center</option>
+                    <option value="right" ${m.captionAlign==="right"?"selected":""}>Right</option>
                   </select></label>
                 </div>
                 <span class="helper">Standard matches the normal attachment card size. Medium and Large make the media more prominent; Original keeps its native size where space allows.</span>
@@ -2190,6 +2194,11 @@ function mediaEditor(owner,media,title){
                     <option value="on" ${(m.enlarge||"on")==="on"?"selected":""}>Always</option>
                     <option value="inherit" ${m.enlarge==="inherit"?"selected":""}>Use site setting</option>
                     <option value="off" ${m.enlarge==="off"?"selected":""}>Never</option>
+                  </select></label>
+                  <label>Caption alignment<select data-media-field="captionAlign">
+                    <option value="left" ${(m.captionAlign||"left")==="left"?"selected":""}>Left</option>
+                    <option value="center" ${m.captionAlign==="center"?"selected":""}>Center</option>
+                    <option value="right" ${m.captionAlign==="right"?"selected":""}>Right</option>
                   </select></label>
                 </div>
                 <span class="helper">Display size controls how large the media appears. Standard matches normal attachment cards; Medium and Large make it more prominent. Exact size removes blank framing; Center fit keeps the whole preview visible.</span>

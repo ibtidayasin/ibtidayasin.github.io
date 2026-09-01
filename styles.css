@@ -4402,6 +4402,21 @@ body:not(.admin-body) .media-public-info.media-caption-right{text-align:right!im
   }
 }
 
+/* Admin media preview + replace control on one compact row. */
+.media-preview-replace-row{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  flex-wrap:wrap;
+}
+.media-preview-replace-row .media-admin-preview{flex:0 0 auto}
+.media-replace-admin.media-replace-admin-inline{
+  width:min(100%,360px);
+  align-self:center;
+  margin:0;
+}
+.media-replace-admin.media-replace-admin-inline>.helper{font-size:10px}
+
 /* Admin replace-file area. */
 .media-replace-admin{
   display:grid;
@@ -4454,7 +4469,9 @@ body:not(.admin-body) .media-public-info.media-caption-right{text-align:right!im
 }
 .admin-back-to-top:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.16)}
 @media(max-width:680px){
+  .media-preview-replace-row{align-items:flex-start;gap:10px}
   .media-replace-admin{grid-template-columns:1fr}
+  .media-replace-admin.media-replace-admin-inline{width:100%}
   .admin-back-to-top{right:14px;bottom:82px}
 }
 
