@@ -1280,7 +1280,7 @@ function normalizeMediaDisplayList(value){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=23;
+const BUILDER_SETTINGS_SCHEMA_VERSION=24;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1345,6 +1345,7 @@ function normalizeAcademicArchitecture(content){
   const existingActivities=Array.isArray(content.academicActivities)?content.academicActivities:[];
   content.academicActivities=existingActivities.map(x=>({
     category:String(x?.category||"Presentation & Poster"),
+    activityType:String(x?.activityType||""),
     title:String(x?.title||""),
     organization:String(x?.organization||""),
     date:String(x?.date||""),
@@ -1394,7 +1395,7 @@ function normalizeResearchInterests(content){
 function academicActivityHasContent(item){
   return !!(item&&item.visible!==false&&(
     String(item.title||"").trim()||String(item.description||"").trim()||
-    String(item.organization||"").trim()||String(item.date||"").trim()||
+    String(item.activityType||"").trim()||String(item.organization||"").trim()||String(item.date||"").trim()||
     (Array.isArray(item.media)&&item.media.length)
   ));
 }
@@ -1549,10 +1550,10 @@ function renderAcademicActivities(d){
     return `<div class="activity-panel ${index===0?"active":"hidden"}" data-activity-panel="${escAttr(category)}" role="tabpanel">
       <div class="activity-grid">${group.map(item=>`
         <article class="activity-card">
-          <div class="activity-card-top">
-            <span class="activity-type-badge">${esc(activityCategoryLabel(category))}</span>
+          ${(item.activityType||item.date)?`<div class="activity-card-top">
+            ${item.activityType?`<span class="activity-type-badge">${esc(item.activityType)}</span>`:""}
             ${item.date?`<span class="activity-date">${esc(item.date)}</span>`:""}
-          </div>
+          </div>`:""}
           <h3>${esc(item.title||"")}</h3>
           ${item.organization?`<div class="activity-organization">${esc(item.organization)}</div>`:""}
           ${item.description?`<p class="muted">${esc(item.description)}</p>`:""}

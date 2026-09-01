@@ -4031,3 +4031,69 @@ html[data-activity-columns="3"] #activities[data-card-design="activity-showcase"
   margin-left:14px!important;margin-right:14px!important;
 }
 html[data-activity-columns="3"] #activities :is(.activity-type-badge,.activity-date){font-size:10px}
+
+
+/* =========================================================
+   ACTIVITY CARD POLISH
+   - On mobile, Activity Showcase media uses its natural aspect ratio
+     so portrait/landscape photos are fully visible rather than cropped.
+   - The tab above the cards is the GENERAL category; the badge inside
+     a card is the optional SPECIFIC activity type.
+   ========================================================= */
+@media(max-width:680px){
+  #activities[data-card-design="activity-showcase"] .activity-card>.item-media{
+    display:block!important;
+    width:100%!important;
+    padding:0!important;
+    background:var(--accent-soft)!important;
+  }
+  #activities[data-card-design="activity-showcase"] .item-media .media-gallery{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    width:100%!important;
+    padding:12px!important;
+    gap:10px!important;
+  }
+  #activities[data-card-design="activity-showcase"] .item-media .media-public-item{
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+  }
+  #activities[data-card-design="activity-showcase"] .item-media .media-public-item .media-image-stage,
+  #activities[data-card-design="activity-showcase"] .item-media .media-public-item.media-fit-center .media-image-stage,
+  #activities[data-card-design="activity-showcase"] .item-media .media-public-item.media-fit-fill .media-image-stage,
+  #activities[data-card-design="activity-showcase"] .item-media .media-public-item.media-fit-legacy .media-image-stage{
+    width:100%!important;
+    height:auto!important;
+    min-height:0!important;
+    aspect-ratio:auto!important;
+    display:block!important;
+  }
+  #activities[data-card-design="activity-showcase"] .item-media .media-public-image{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    max-height:none!important;
+    aspect-ratio:auto!important;
+    object-fit:contain!important;
+    object-position:center!important;
+  }
+  #activities[data-card-design="activity-showcase"] .item-media .pdf-cover-link{
+    display:block!important;
+    width:100%!important;
+    max-width:100%!important;
+  }
+  #activities[data-card-design="activity-showcase"] .item-media .pdf-cover-image{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    max-height:none!important;
+    object-fit:contain!important;
+  }
+  #activities[data-card-design="activity-showcase"] .item-media video{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    max-height:none!important;
+  }
+}

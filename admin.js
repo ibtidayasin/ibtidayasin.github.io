@@ -1054,7 +1054,7 @@ function normalizeMediaDisplayList(value){
   return (Array.isArray(value)?value:[]).map(normalizeMediaDisplayItem);
 }
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=23;
+const BUILDER_SETTINGS_SCHEMA_VERSION=24;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1553,6 +1553,7 @@ function normalizeAcademicArchitecture(content){
   const existingActivities=Array.isArray(content.academicActivities)?content.academicActivities:[];
   content.academicActivities=existingActivities.map(x=>({
     category:String(x?.category||"Presentation & Poster"),
+    activityType:String(x?.activityType||""),
     title:String(x?.title||""),
     organization:String(x?.organization||""),
     date:String(x?.date||""),
@@ -1602,7 +1603,7 @@ function normalizeResearchInterests(content){
 function academicActivityHasContent(item){
   return !!(item&&item.visible!==false&&(
     String(item.title||"").trim()||String(item.description||"").trim()||
-    String(item.organization||"").trim()||String(item.date||"").trim()||
+    String(item.activityType||"").trim()||String(item.organization||"").trim()||String(item.date||"").trim()||
     (Array.isArray(item.media)&&item.media.length)
   ));
 }
@@ -1706,13 +1707,23 @@ $("loginBtn").addEventListener("click",async()=>{
 });
 $("logoutBtn").addEventListener("click",async()=>{await sb.auth.signOut();location.reload()});
 
-document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{
+function activateAdminTab(tabName,{persist=true}={}){
+  const btn=[...document.querySelectorAll("[data-tab]")].find(b=>b.dataset.tab===tabName);
+  if(!btn)return false;
   document.querySelectorAll("[data-tab]").forEach(b=>b.classList.toggle("active",b===btn));
-  document.querySelectorAll("[data-panel]").forEach(p=>p.classList.toggle("active",p.dataset.panel===btn.dataset.tab));
-  if(btn.dataset.tab==="preview")scheduleAdminPreview(true);
-  if(btn.dataset.tab==="history")renderRevisionList();
-  if(btn.dataset.tab==="presets")renderDesignPresets();
-}));
+  document.querySelectorAll("[data-panel]").forEach(p=>p.classList.toggle("active",p.dataset.panel===tabName));
+  if(persist)localStorage.setItem("academicAdminActiveTab",tabName);
+  if(tabName==="preview")scheduleAdminPreview(true);
+  if(tabName==="history")renderRevisionList();
+  if(tabName==="presets")renderDesignPresets();
+  return true;
+}
+
+document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>activateAdminTab(btn.dataset.tab)));
+
+/* Keep the same Admin page after a browser refresh/reload. */
+const savedAdminActiveTab=localStorage.getItem("academicAdminActiveTab");
+if(savedAdminActiveTab)activateAdminTab(savedAdminActiveTab,{persist:false});
 
 function merge(base,extra){
   if(Array.isArray(base))return Array.isArray(extra)?extra:base;
@@ -1922,7 +1933,8 @@ function renderProjectsEditor(){
 }
 function renderActivitiesEditor(){
   $("activitiesEditor").innerHTML=(currentContent.academicActivities||[]).map((item,i)=>repeatBlock("activity",i,`Academic activity ${i+1}`,[
-    {label:"Category",key:"category",value:item.category||"Presentation & Poster",kind:"select",options:["Presentation & Poster","Certification & Training","Award & Honor"]},
+    {label:"General category",key:"category",value:item.category||"Presentation & Poster",kind:"select",options:["Presentation & Poster","Certification & Training","Award & Honor"]},
+    {label:"Specific activity type",key:"activityType",value:item.activityType||""},
     {label:"Date / year",key:"date",value:item.date||""},
     {label:"Title",key:"title",value:item.title,full:true},
     {label:"Venue / issuer / organization",key:"organization",value:item.organization,full:true},
@@ -2220,7 +2232,7 @@ $("addProjectBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.projects.push({title:"",type:"",contribution:"",description:"",meta:"",url:"",visible:true,media:[]});renderProjectsEditor();
 });
 $("addActivityBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.academicActivities.push({category:"Presentation & Poster",title:"",organization:"",date:"",description:"",url:"",visible:true,media:[]});renderActivitiesEditor();
+  syncAllForms();currentContent.academicActivities.push({category:"Presentation & Poster",activityType:"",title:"",organization:"",date:"",description:"",url:"",visible:true,media:[]});renderActivitiesEditor();
 });
 $("addSkillGroupBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.skills.push({category:"",items:[],visible:true,media:[]});renderSkillsEditor();
@@ -2384,7 +2396,7 @@ function readRepeaters(){
 
   currentContent.academicActivities=[...document.querySelectorAll("[data-activity]")].map((r,i)=>{
     const old=currentContent.academicActivities[i]||{};
-    return {category:get(r,"category")||"Presentation & Poster",title:get(r,"title"),organization:get(r,"organization"),date:get(r,"date"),description:get(r,"description"),url:get(r,"url"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
+    return {category:get(r,"category")||"Presentation & Poster",activityType:get(r,"activityType"),title:get(r,"title"),organization:get(r,"organization"),date:get(r,"date"),description:get(r,"description"),url:get(r,"url"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
   }).filter(x=>x.title||x.description||x.organization||x.date||x.media.length);
 
   currentContent.skills=[...document.querySelectorAll("[data-skill]")].map((r,i)=>{
