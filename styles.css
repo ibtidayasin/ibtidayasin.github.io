@@ -4635,3 +4635,66 @@ body:not(.admin-body) .media-public-info.media-caption-right{text-align:right!im
   }
 }
 
+
+/* =========================================================
+   CERTIFICATE CARD — SHRINK WRAP TO CHOSEN MEDIA SIZE
+   The certificate card itself now ends just after the chosen
+   certificate image width instead of stretching across its
+   whole activity-grid track. Full remains the explicit
+   full-track choice; Original follows the media's natural size.
+   ========================================================= */
+#activities .activity-card[data-activity-card-design="activity-certificate-full"]{
+  --certificate-card-media-width:280px;
+  justify-self:start!important;
+  align-self:start!important;
+  width:min(calc(var(--certificate-card-media-width) + 44px),100%)!important;
+  max-width:100%!important;
+  box-sizing:border-box!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-full"]:has(.media-size-very-small){
+  --certificate-card-media-width:140px;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-full"]:has(.media-size-small){
+  --certificate-card-media-width:200px;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-full"]:has(.media-size-standard){
+  --certificate-card-media-width:280px;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-full"]:has(.media-size-medium){
+  --certificate-card-media-width:420px;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-full"]:has(.media-size-large){
+  --certificate-card-media-width:620px;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-full"]:has(.media-size-full){
+  width:100%!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-full"]:has(.media-size-original){
+  width:fit-content!important;
+  max-width:100%!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-full"]>.item-media{
+  width:fit-content!important;
+  max-width:100%!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-full"] .item-media .media-gallery{
+  width:fit-content!important;
+  max-width:100%!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-full"]:has(.media-size-full)>.item-media,
+#activities .activity-card[data-activity-card-design="activity-certificate-full"]:has(.media-size-full) .item-media .media-gallery{
+  width:100%!important;
+}
+
+@media(max-width:720px){
+  #activities .activity-card[data-activity-card-design="activity-certificate-full"]{
+    width:min(calc(var(--certificate-card-media-width) + 32px),100%)!important;
+  }
+  #activities .activity-card[data-activity-card-design="activity-certificate-full"]:has(.media-size-full){
+    width:100%!important;
+  }
+  #activities .activity-card[data-activity-card-design="activity-certificate-full"]:has(.media-size-original){
+    width:fit-content!important;
+    max-width:100%!important;
+  }
+}
