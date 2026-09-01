@@ -4144,3 +4144,156 @@ html[data-activity-columns="3"] #activities :is(.activity-type-badge,.activity-d
     max-height:none!important;
   }
 }
+
+
+/* =========================================================
+   ACTIVITY MEDIA FILL
+   Edge-to-edge media rail: the right side is defined by the
+   uploaded media itself rather than a padded decorative panel.
+   Images keep their natural aspect ratio, so portrait and
+   landscape photos set an appropriate media height automatically.
+   ========================================================= */
+#activities[data-card-design="activity-media-fill"] .activity-card{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1.18fr) minmax(260px,.82fr)!important;
+  column-gap:0!important;
+  row-gap:0!important;
+  padding:0!important;
+  align-items:start!important;
+  align-content:start!important;
+  overflow:hidden!important;
+  background:var(--surface)!important;
+}
+#activities[data-card-design="activity-media-fill"] .activity-card>:not(.item-media){
+  grid-column:1!important;
+  min-width:0;
+  margin-left:26px!important;
+  margin-right:26px!important;
+}
+#activities[data-card-design="activity-media-fill"] .activity-card>.activity-card-top{
+  margin-top:22px!important;
+  margin-bottom:10px!important;
+}
+#activities[data-card-design="activity-media-fill"] .activity-card>h3{margin-top:0!important}
+#activities[data-card-design="activity-media-fill"] .activity-card>.activity-topic-chips{
+  margin-bottom:24px!important;
+}
+#activities[data-card-design="activity-media-fill"] .activity-card>p:last-of-type:not(:has(+ .activity-topic-chips)){
+  margin-bottom:24px!important;
+}
+#activities[data-card-design="activity-media-fill"] .activity-card>.text-link{
+  margin-bottom:24px!important;
+  align-self:start;
+}
+#activities[data-card-design="activity-media-fill"] .activity-card>.item-media{
+  grid-column:2!important;
+  grid-row:1 / span 7!important;
+  margin:0!important;
+  padding:0!important;
+  min-width:0;
+  width:100%!important;
+  align-self:start!important;
+  background:transparent!important;
+  border-left:1px solid var(--line)!important;
+}
+#activities[data-card-design="activity-media-fill"] .activity-card.no-media,
+#activities[data-card-design="activity-media-fill"] .activity-card:not(:has(.item-media .media-public-item,.item-media .attachment-link)){
+  grid-template-columns:1fr!important;
+  padding-bottom:22px!important;
+}
+#activities[data-card-design="activity-media-fill"] .activity-card.no-media>:not(.item-media),
+#activities[data-card-design="activity-media-fill"] .activity-card:not(:has(.item-media .media-public-item,.item-media .attachment-link))>:not(.item-media){
+  grid-column:1!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  width:100%!important;
+  gap:0!important;
+  padding:0!important;
+  margin:0!important;
+  align-items:start!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-public-item{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin:0!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-image-stage,
+#activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-fit-exact .media-image-stage,
+#activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-fit-center .media-image-stage,
+#activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-fit-fill .media-image-stage,
+#activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-fit-legacy .media-image-stage{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  aspect-ratio:auto!important;
+  background:transparent!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-public-image{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  max-height:none!important;
+  aspect-ratio:auto!important;
+  object-fit:contain!important;
+  object-position:center!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-public-info{
+  padding:10px 13px!important;
+  background:var(--surface)!important;
+  border-top:1px solid var(--line)!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .pdf-cover-link,
+#activities[data-card-design="activity-media-fill"] .item-media .pdf-cover-image,
+#activities[data-card-design="activity-media-fill"] .item-media video{
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:auto!important;
+  max-height:none!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .pdf-cover-image{
+  object-fit:contain!important;
+  padding:0!important;
+}
+
+/* Keep the edge-to-edge design useful if Activities use multiple columns. */
+html[data-activity-columns="2"] #activities[data-card-design="activity-media-fill"] .activity-card{
+  grid-template-columns:minmax(0,1.22fr) minmax(170px,.78fr)!important;
+}
+html[data-activity-columns="3"] #activities[data-card-design="activity-media-fill"] .activity-card{
+  grid-template-columns:minmax(0,1.3fr) minmax(110px,.7fr)!important;
+}
+html[data-activity-columns="3"] #activities[data-card-design="activity-media-fill"] .activity-card>:not(.item-media){
+  margin-left:14px!important;
+  margin-right:14px!important;
+}
+@media(max-width:900px){
+  #activities[data-card-design="activity-media-fill"] .activity-card{
+    grid-template-columns:minmax(0,1fr) minmax(190px,.72fr)!important;
+  }
+}
+@media(max-width:680px){
+  #activities[data-card-design="activity-media-fill"] .activity-card{
+    display:block!important;
+    min-height:0!important;
+  }
+  #activities[data-card-design="activity-media-fill"] .activity-card>:not(.item-media){
+    margin-left:18px!important;
+    margin-right:18px!important;
+  }
+  #activities[data-card-design="activity-media-fill"] .activity-card>.item-media{
+    width:100%!important;
+    margin:14px 0 0!important;
+    border-left:0!important;
+    border-top:1px solid var(--line)!important;
+  }
+}
