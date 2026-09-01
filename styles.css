@@ -4457,3 +4457,47 @@ body:not(.admin-body) .media-public-info.media-caption-right{text-align:right!im
   .media-replace-admin{grid-template-columns:1fr}
   .admin-back-to-top{right:14px;bottom:82px}
 }
+
+
+/* =========================================================
+   ACTIVITY MEDIA FILL — DISPLAY SIZE FIX
+   In paired galleries, each tile now respects its own Display size
+   instead of being forced to fill 50% of the media rail.
+   ========================================================= */
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item{
+  justify-self:center!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item.media-size-very-small{
+  width:min(140px,100%)!important;
+  max-width:140px!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item.media-size-small{
+  width:min(200px,100%)!important;
+  max-width:200px!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item.media-size-standard{
+  width:min(280px,100%)!important;
+  max-width:280px!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item.media-size-medium{
+  width:min(420px,100%)!important;
+  max-width:420px!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item.media-size-large,
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item.media-size-full{
+  width:100%!important;
+  max-width:none!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item.media-size-original{
+  width:max-content!important;
+  max-width:100%!important;
+}
+/* Preserve the requested odd-item behavior: with the normal Standard
+   (or larger) size, the last unpaired item fills its row. */
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item:last-child:nth-child(odd).media-size-standard,
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item:last-child:nth-child(odd).media-size-medium,
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item:last-child:nth-child(odd).media-size-large,
+#activities[data-card-design="activity-media-fill"] .item-media .media-gallery:has(> .media-public-item:nth-child(2))>.media-public-item:last-child:nth-child(odd).media-size-full{
+  width:100%!important;
+  max-width:none!important;
+}
