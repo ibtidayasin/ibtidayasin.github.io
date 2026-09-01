@@ -1524,7 +1524,14 @@ function activityLinkLabel(category){
   return"View details ↗";
 }
 
-function activateActivityCategory(category){
+const ACTIVITY_CATEGORY_STORAGE_KEY="academic-profile-active-activity-category";
+function savedActivityCategory(){
+  try{return sessionStorage.getItem(ACTIVITY_CATEGORY_STORAGE_KEY)||""}catch{return""}
+}
+function rememberActivityCategory(category){
+  try{sessionStorage.setItem(ACTIVITY_CATEGORY_STORAGE_KEY,String(category||""))}catch{}
+}
+function activateActivityCategory(category,persist=true){
   document.querySelectorAll("[data-activity-tab]").forEach(btn=>{
     const active=btn.dataset.activityTab===category;
     btn.classList.toggle("active",active);
@@ -1535,6 +1542,7 @@ function activateActivityCategory(category){
     panel.classList.toggle("active",active);
     panel.classList.toggle("hidden",!active);
   });
+  if(persist)rememberActivityCategory(category);
 }
 
 function renderAcademicActivities(d){
@@ -1544,12 +1552,18 @@ function renderAcademicActivities(d){
 
   const tabs=$("activityTabs"),list=$("activitiesList");
   if(!tabs||!list)return;
-  tabs.innerHTML=categories.map((category,i)=>`<button type="button" class="activity-tab ${i===0?"active":""}" data-activity-tab="${escAttr(category)}" role="tab" aria-selected="${i===0?"true":"false"}">${esc(activityCategoryLabel(category))}</button>`).join("");
+  const remembered=savedActivityCategory();
+  const activeCategory=categories.includes(remembered)?remembered:(categories[0]||"");
+  tabs.innerHTML=categories.map(category=>{
+    const active=category===activeCategory;
+    return `<button type="button" class="activity-tab ${active?"active":""}" data-activity-tab="${escAttr(category)}" role="tab" aria-selected="${active?"true":"false"}">${esc(activityCategoryLabel(category))}</button>`;
+  }).join("");
   tabs.classList.toggle("single-activity-tab",categories.length<=1);
 
-  list.innerHTML=categories.map((category,index)=>{
+  list.innerHTML=categories.map(category=>{
     const group=items.filter(item=>item.category===category);
-    return `<div class="activity-panel ${index===0?"active":"hidden"}" data-activity-panel="${escAttr(category)}" role="tabpanel">
+    const active=category===activeCategory;
+    return `<div class="activity-panel ${active?"active":"hidden"}" data-activity-panel="${escAttr(category)}" role="tabpanel">
       <div class="activity-grid">${group.map(item=>{
         const activityMedia=mediaHtml(item.media||[]);
         return `

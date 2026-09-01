@@ -4156,7 +4156,11 @@ html[data-activity-columns="3"] #activities :is(.activity-type-badge,.activity-d
 #activities[data-card-design="activity-media-fill"] .activity-card{
   position:relative!important;
   display:grid!important;
-  grid-template-columns:minmax(0,1.18fr) minmax(260px,.82fr)!important;
+  /* The selected media Display size controls the width of the right rail.
+     Because the image itself fills that rail, shrinking the media also
+     shrinks the card's media side instead of leaving an empty panel. */
+  --activity-media-rail:300px;
+  grid-template-columns:minmax(0,1fr) minmax(0,var(--activity-media-rail))!important;
   column-gap:0!important;
   row-gap:0!important;
   padding:0!important;
@@ -4165,6 +4169,12 @@ html[data-activity-columns="3"] #activities :is(.activity-type-badge,.activity-d
   overflow:hidden!important;
   background:var(--surface)!important;
 }
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-very-small){--activity-media-rail:150px}
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-small){--activity-media-rail:210px}
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-standard){--activity-media-rail:300px}
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-medium){--activity-media-rail:420px}
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-large){--activity-media-rail:560px}
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-full){--activity-media-rail:50%}
 #activities[data-card-design="activity-media-fill"] .activity-card>:not(.item-media){
   grid-column:1!important;
   min-width:0;
@@ -4265,22 +4275,49 @@ html[data-activity-columns="3"] #activities :is(.activity-type-badge,.activity-d
   padding:0!important;
 }
 
-/* Keep the edge-to-edge design useful if Activities use multiple columns. */
+/* Keep the edge-to-edge design useful if Activities use multiple columns.
+   The media-size selection remains authoritative; only cap very large rails
+   when an activity card itself becomes narrow. */
 html[data-activity-columns="2"] #activities[data-card-design="activity-media-fill"] .activity-card{
-  grid-template-columns:minmax(0,1.22fr) minmax(170px,.78fr)!important;
+  --activity-media-rail:min(42%,300px);
 }
+html[data-activity-columns="2"] #activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-very-small){--activity-media-rail:min(34%,150px)}
+html[data-activity-columns="2"] #activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-small){--activity-media-rail:min(38%,210px)}
+html[data-activity-columns="2"] #activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-medium),
+html[data-activity-columns="2"] #activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-large),
+html[data-activity-columns="2"] #activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-full){--activity-media-rail:44%}
 html[data-activity-columns="3"] #activities[data-card-design="activity-media-fill"] .activity-card{
-  grid-template-columns:minmax(0,1.3fr) minmax(110px,.7fr)!important;
+  --activity-media-rail:38%;
 }
+html[data-activity-columns="3"] #activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-very-small){--activity-media-rail:30%}
+html[data-activity-columns="3"] #activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-small){--activity-media-rail:34%}
 html[data-activity-columns="3"] #activities[data-card-design="activity-media-fill"] .activity-card>:not(.item-media){
   margin-left:14px!important;
   margin-right:14px!important;
 }
 @media(max-width:900px){
   #activities[data-card-design="activity-media-fill"] .activity-card{
-    grid-template-columns:minmax(0,1fr) minmax(190px,.72fr)!important;
+    --activity-media-rail:min(38vw,300px);
   }
+  #activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-very-small){--activity-media-rail:min(26vw,150px)}
+  #activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-small){--activity-media-rail:min(31vw,210px)}
 }
+#activities[data-card-design="activity-media-fill"] .activity-card:has(.item-media .media-size-original){
+  grid-template-columns:minmax(0,1fr) max-content!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-size-original{
+  width:max-content!important;
+  max-width:min(560px,48vw)!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-size-original .media-image-stage{
+  width:max-content!important;
+  max-width:100%!important;
+}
+#activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-size-original .media-public-image{
+  width:auto!important;
+  max-width:100%!important;
+}
+
 @media(max-width:680px){
   #activities[data-card-design="activity-media-fill"] .activity-card{
     display:block!important;
@@ -4295,5 +4332,17 @@ html[data-activity-columns="3"] #activities[data-card-design="activity-media-fil
     margin:14px 0 0!important;
     border-left:0!important;
     border-top:1px solid var(--line)!important;
+    display:flex!important;
+    justify-content:center!important;
   }
+  #activities[data-card-design="activity-media-fill"] .item-media .media-gallery{
+    width:100%!important;
+  }
+  #activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-size-very-small{width:min(150px,100%)!important}
+  #activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-size-small{width:min(210px,100%)!important}
+  #activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-size-standard{width:min(300px,100%)!important}
+  #activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-size-medium{width:min(420px,100%)!important}
+  #activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-size-large,
+  #activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-size-full{width:100%!important}
+  #activities[data-card-design="activity-media-fill"] .item-media .media-public-item.media-size-original{width:max-content!important;max-width:100%!important}
 }
