@@ -180,7 +180,7 @@ const COVER_SECTION_KEYS=["research","thesis","publications","projects","activit
 const SIDEBAR_SECTION_KEYS=[...COVER_SECTION_KEYS];
 const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","skills","education","contact"];
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
-const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed"];
+const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase"];
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -200,6 +200,7 @@ const DEFAULT_SITE_SETTINGS={
     portraitPosition:"center",
     projectColumns:3,
     projectFlow:"grid",
+    activityColumns:2,
     skillsColumns:3,
     fontPair:"classic",
     shadow:"theme",
@@ -317,6 +318,7 @@ function normalizeSiteSettings(content){
       portraitPosition:["center","top","bottom","left","right"].includes(l.portraitPosition)?l.portraitPosition:DEFAULT_SITE_SETTINGS.layout.portraitPosition,
       projectColumns:[1,2,3].includes(Number(l.projectColumns))?Number(l.projectColumns):DEFAULT_SITE_SETTINGS.layout.projectColumns,
       projectFlow:["grid","masonry"].includes(l.projectFlow)?l.projectFlow:DEFAULT_SITE_SETTINGS.layout.projectFlow,
+      activityColumns:[1,2,3].includes(Number(l.activityColumns))?Number(l.activityColumns):DEFAULT_SITE_SETTINGS.layout.activityColumns,
       skillsColumns:[1,2,3].includes(Number(l.skillsColumns))?Number(l.skillsColumns):DEFAULT_SITE_SETTINGS.layout.skillsColumns,
       fontPair:Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,l.fontPair)?l.fontPair:DEFAULT_SITE_SETTINGS.layout.fontPair,
       shadow:["theme","none","subtle","medium"].includes(l.shadow)?l.shadow:DEFAULT_SITE_SETTINGS.layout.shadow,
@@ -962,6 +964,8 @@ function applyLayoutSettings(d){
   root.style.setProperty("--site-portrait-position",l.portraitPosition||"center");
   root.style.setProperty("--site-project-columns",String(l.projectColumns));
   root.dataset.projectFlow=l.projectFlow||"grid";
+  root.style.setProperty("--site-activity-columns",String(l.activityColumns));
+  root.dataset.activityColumns=String(l.activityColumns);
   root.style.setProperty("--site-skills-columns",String(l.skillsColumns));
   root.style.setProperty("--site-shadow",siteShadowValue(l.shadow));
   root.style.setProperty("--site-font-body",pair.body);
@@ -1276,7 +1280,7 @@ function normalizeMediaDisplayList(value){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=22;
+const BUILDER_SETTINGS_SCHEMA_VERSION=23;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){

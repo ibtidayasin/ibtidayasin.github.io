@@ -2772,7 +2772,7 @@ html[data-navigation-mode="sections"][data-section-page="inner"] body:not(.admin
 .activity-tabs.single-activity-tab{border-bottom:0;padding-bottom:0}
 .activity-grid{
   display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-columns:repeat(var(--site-activity-columns,2),minmax(0,1fr));
   gap:14px;
 }
 .activity-card{
@@ -3885,3 +3885,149 @@ body:not(.admin-body) #projectsList.project-flow-masonry>.card{
     top:auto!important;
   }
 }
+
+
+/* =========================================================
+   ACTIVITY SIDE-BY-SIDE CARD DESIGNS
+   Both designs keep the activity text/information on the left
+   and the uploaded media on the right. They are intended for
+   Academic Activities and work with the Activity columns setting.
+   ========================================================= */
+
+/* 1) Activity Split — balanced academic card with framed media rail. */
+#activities[data-card-design="activity-split"] .activity-card{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.35fr) minmax(220px,.85fr)!important;
+  grid-auto-rows:auto;
+  column-gap:22px!important;
+  row-gap:0!important;
+  padding:20px 20px 20px 22px!important;
+  align-items:start!important;
+  overflow:hidden!important;
+  min-height:210px;
+}
+#activities[data-card-design="activity-split"] .activity-card>:not(.item-media){grid-column:1!important;min-width:0}
+#activities[data-card-design="activity-split"] .activity-card>.item-media{
+  grid-column:2!important;
+  grid-row:1 / span 6!important;
+  margin:0!important;
+  min-width:0;
+  align-self:stretch;
+  display:flex;
+  align-items:center;
+}
+#activities[data-card-design="activity-split"] .activity-card>.item-media:empty{display:none!important}
+#activities[data-card-design="activity-split"] .activity-card:not(:has(.item-media .media-public-item,.item-media .attachment-link)){
+  grid-template-columns:1fr!important;
+}
+#activities[data-card-design="activity-split"] .item-media .media-gallery{
+  width:100%;
+  justify-content:center!important;
+  align-items:flex-start!important;
+  gap:9px!important;
+}
+#activities[data-card-design="activity-split"] .item-media .media-public-item{
+  border-radius:10px!important;
+  background:var(--surface-alt)!important;
+}
+#activities[data-card-design="activity-split"] .activity-card-top{margin-bottom:10px!important}
+#activities[data-card-design="activity-split"] .activity-organization{margin-bottom:8px!important}
+
+/* 2) Activity Showcase — stronger visual panel with media flush to the right edge. */
+#activities[data-card-design="activity-showcase"] .activity-card{
+  position:relative!important;
+  display:grid!important;
+  grid-template-columns:minmax(0,1.2fr) minmax(240px,.8fr)!important;
+  column-gap:0!important;
+  row-gap:0!important;
+  padding:0!important;
+  align-items:stretch!important;
+  overflow:hidden!important;
+  min-height:230px;
+  background:var(--surface)!important;
+}
+#activities[data-card-design="activity-showcase"] .activity-card>:not(.item-media){
+  grid-column:1!important;
+  min-width:0;
+  margin-left:24px!important;
+  margin-right:24px!important;
+}
+#activities[data-card-design="activity-showcase"] .activity-card>.activity-card-top{margin-top:22px!important;margin-bottom:10px!important}
+#activities[data-card-design="activity-showcase"] .activity-card>h3{margin-top:0!important}
+#activities[data-card-design="activity-showcase"] .activity-card>.text-link{margin-bottom:22px!important;align-self:start}
+#activities[data-card-design="activity-showcase"] .activity-card>.item-media{
+  grid-column:2!important;
+  grid-row:1 / span 6!important;
+  margin:0!important;
+  min-width:0;
+  min-height:100%;
+  background:var(--accent-soft)!important;
+  border-left:1px solid var(--line)!important;
+  display:flex;
+  align-items:center;
+}
+#activities[data-card-design="activity-showcase"] .activity-card>.item-media:empty{display:none!important}
+#activities[data-card-design="activity-showcase"] .activity-card:not(:has(.item-media .media-public-item,.item-media .attachment-link)){
+  grid-template-columns:1fr!important;
+  padding-bottom:22px!important;
+}
+#activities[data-card-design="activity-showcase"] .activity-card:not(:has(.item-media .media-public-item,.item-media .attachment-link))>:not(.item-media){
+  grid-column:1!important;
+}
+#activities[data-card-design="activity-showcase"] .item-media .media-gallery{
+  width:100%;
+  justify-content:center!important;
+  align-items:center!important;
+  gap:10px!important;
+  padding:16px!important;
+}
+#activities[data-card-design="activity-showcase"] .item-media .media-public-item{
+  border-color:color-mix(in srgb,var(--accent) 24%,var(--line))!important;
+  box-shadow:0 8px 24px rgba(0,0,0,.08)!important;
+}
+#activities[data-card-design="activity-showcase"] .item-media .media-public-info{
+  background:color-mix(in srgb,var(--surface) 96%,transparent)!important;
+}
+
+/* Keep side-by-side designs readable on narrower screens. */
+@media(max-width:900px){
+  #activities[data-card-design="activity-split"] .activity-card,
+  #activities[data-card-design="activity-showcase"] .activity-card{
+    grid-template-columns:minmax(0,1fr) minmax(180px,.72fr)!important;
+  }
+}
+@media(max-width:680px){
+  #activities[data-card-design="activity-split"] .activity-card,
+  #activities[data-card-design="activity-showcase"] .activity-card{
+    display:block!important;
+    min-height:0!important;
+  }
+  #activities[data-card-design="activity-split"] .activity-card>.item-media,
+  #activities[data-card-design="activity-showcase"] .activity-card>.item-media{
+    margin:14px 0 0!important;
+    border-left:0!important;
+    border-top:1px solid var(--line)!important;
+  }
+  #activities[data-card-design="activity-showcase"] .activity-card>:not(.item-media){
+    margin-left:18px!important;
+    margin-right:18px!important;
+  }
+}
+
+/* Compact side-by-side proportions when Activities use multiple columns. */
+html[data-activity-columns="2"] #activities[data-card-design="activity-split"] .activity-card{
+  grid-template-columns:minmax(0,1.28fr) minmax(140px,.72fr)!important;column-gap:14px!important;padding:16px!important;
+}
+html[data-activity-columns="2"] #activities[data-card-design="activity-showcase"] .activity-card{
+  grid-template-columns:minmax(0,1.22fr) minmax(150px,.78fr)!important;
+}
+html[data-activity-columns="3"] #activities[data-card-design="activity-split"] .activity-card{
+  grid-template-columns:minmax(0,1.32fr) minmax(95px,.68fr)!important;column-gap:10px!important;padding:14px!important;
+}
+html[data-activity-columns="3"] #activities[data-card-design="activity-showcase"] .activity-card{
+  grid-template-columns:minmax(0,1.3fr) minmax(100px,.7fr)!important;
+}
+html[data-activity-columns="3"] #activities[data-card-design="activity-showcase"] .activity-card>:not(.item-media){
+  margin-left:14px!important;margin-right:14px!important;
+}
+html[data-activity-columns="3"] #activities :is(.activity-type-badge,.activity-date){font-size:10px}
