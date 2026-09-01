@@ -1280,7 +1280,7 @@ function normalizeMediaDisplayList(value){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=24;
+const BUILDER_SETTINGS_SCHEMA_VERSION=25;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1346,6 +1346,7 @@ function normalizeAcademicArchitecture(content){
   content.academicActivities=existingActivities.map(x=>({
     category:String(x?.category||"Presentation & Poster"),
     activityType:String(x?.activityType||""),
+    topics:(Array.isArray(x?.topics)?x.topics:(typeof x?.topics==="string"?x.topics.split(","):[])).map(v=>String(v??"").trim()).filter(Boolean),
     title:String(x?.title||""),
     organization:String(x?.organization||""),
     date:String(x?.date||""),
@@ -1396,6 +1397,7 @@ function academicActivityHasContent(item){
   return !!(item&&item.visible!==false&&(
     String(item.title||"").trim()||String(item.description||"").trim()||
     String(item.activityType||"").trim()||String(item.organization||"").trim()||String(item.date||"").trim()||
+    (Array.isArray(item.topics)&&item.topics.length)||
     (Array.isArray(item.media)&&item.media.length)
   ));
 }
@@ -1557,6 +1559,7 @@ function renderAcademicActivities(d){
           <h3>${esc(item.title||"")}</h3>
           ${item.organization?`<div class="activity-organization">${esc(item.organization)}</div>`:""}
           ${item.description?`<p class="muted">${esc(item.description)}</p>`:""}
+          ${(item.topics||[]).length?`<div class="activity-topic-chips" aria-label="Topics and exposure">${item.topics.map(topic=>`<span class="activity-topic-chip">${esc(topic)}</span>`).join("")}</div>`:""}
           ${safeUrl(item.url)?`<a class="text-link" href="${escAttr(safeUrl(item.url))}" target="_blank" rel="noopener">${activityLinkLabel(category)}</a>`:""}
           <div class="item-media">${mediaHtml(item.media||[])}</div>
         </article>`).join("")}</div>

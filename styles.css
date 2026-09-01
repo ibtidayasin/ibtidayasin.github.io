@@ -2775,6 +2775,28 @@ html[data-navigation-mode="sections"][data-section-page="inner"] body:not(.admin
   grid-template-columns:repeat(var(--site-activity-columns,2),minmax(0,1fr));
   gap:14px;
 }
+
+.activity-topic-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:12px;
+  align-items:center;
+}
+.activity-topic-chip{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  max-width:100%;
+  padding:6px 10px;
+  border-radius:999px;
+  background:var(--accent-soft);
+  color:var(--accent);
+  font-size:11px;
+  line-height:1.2;
+  font-weight:700;
+}
+
 .activity-card{
   border:1px solid var(--line);
   border-radius:var(--site-card-radius);
@@ -3564,7 +3586,7 @@ body:not(.admin-body) .thesis-card h3{font-size:var(--public-card-title-size)}
 .section[data-card-design="ledger"] .skill-card h3::after,
 .section[data-card-design="ledger"] .skill-card::before,
 .section[data-card-design="ledger"] .skill-card::after{display:none!important;content:none!important}
-.section[data-card-design="ledger"] :is(.pub-status,.edu-period-badge,.activity-type-badge,.project-type-badge,.tag){
+.section[data-card-design="ledger"] :is(.pub-status,.edu-period-badge,.activity-type-badge,.project-type-badge,.tag,.activity-topic-chip){
   background:transparent!important;border:0!important;border-radius:0!important;padding-left:0!important;padding-right:0!important;color:var(--accent)!important;
 }
 .section[data-card-design="ledger"] .edu-cgpa{background:transparent!important;border-left:0!important;border-radius:0!important;padding-left:0!important}
@@ -3595,7 +3617,7 @@ html[data-hover-interactions="glow"] .section[data-card-design="ledger"] :is(.th
   border-radius:999px!important;background:var(--surface)!important;color:var(--text)!important;font-weight:650!important;
 }
 .section[data-card-design="spotlight"] .skill-card li::before{display:none!important;content:none!important}
-.section[data-card-design="spotlight"] :is(.pub-status,.edu-period-badge,.activity-type-badge,.project-type-badge,.tag,.edu-course-chip){
+.section[data-card-design="spotlight"] :is(.pub-status,.edu-period-badge,.activity-type-badge,.project-type-badge,.tag,.edu-course-chip,.activity-topic-chip){
   background:var(--surface)!important;border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line))!important;border-radius:999px!important;
 }
 .section[data-card-design="spotlight"] .edu-cgpa{background:var(--surface)!important;border-left:0!important;border-radius:14px!important;padding:15px 17px!important}

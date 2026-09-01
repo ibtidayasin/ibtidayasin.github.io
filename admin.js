@@ -1054,7 +1054,7 @@ function normalizeMediaDisplayList(value){
   return (Array.isArray(value)?value:[]).map(normalizeMediaDisplayItem);
 }
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=24;
+const BUILDER_SETTINGS_SCHEMA_VERSION=25;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1554,6 +1554,7 @@ function normalizeAcademicArchitecture(content){
   content.academicActivities=existingActivities.map(x=>({
     category:String(x?.category||"Presentation & Poster"),
     activityType:String(x?.activityType||""),
+    topics:(Array.isArray(x?.topics)?x.topics:(typeof x?.topics==="string"?x.topics.split(","):[])).map(v=>String(v??"").trim()).filter(Boolean),
     title:String(x?.title||""),
     organization:String(x?.organization||""),
     date:String(x?.date||""),
@@ -1604,6 +1605,7 @@ function academicActivityHasContent(item){
   return !!(item&&item.visible!==false&&(
     String(item.title||"").trim()||String(item.description||"").trim()||
     String(item.activityType||"").trim()||String(item.organization||"").trim()||String(item.date||"").trim()||
+    (Array.isArray(item.topics)&&item.topics.length)||
     (Array.isArray(item.media)&&item.media.length)
   ));
 }
@@ -1935,6 +1937,7 @@ function renderActivitiesEditor(){
   $("activitiesEditor").innerHTML=(currentContent.academicActivities||[]).map((item,i)=>repeatBlock("activity",i,`Academic activity ${i+1}`,[
     {label:"General category",key:"category",value:item.category||"Presentation & Poster",kind:"select",options:["Presentation & Poster","Certification & Training","Award & Honor"]},
     {label:"Specific activity type",key:"activityType",value:item.activityType||""},
+    {label:"Topics / exposure — comma separated",key:"topics",value:(item.topics||[]).join(", "),full:true},
     {label:"Date / year",key:"date",value:item.date||""},
     {label:"Title",key:"title",value:item.title,full:true},
     {label:"Venue / issuer / organization",key:"organization",value:item.organization,full:true},
@@ -2232,7 +2235,7 @@ $("addProjectBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.projects.push({title:"",type:"",contribution:"",description:"",meta:"",url:"",visible:true,media:[]});renderProjectsEditor();
 });
 $("addActivityBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.academicActivities.push({category:"Presentation & Poster",activityType:"",title:"",organization:"",date:"",description:"",url:"",visible:true,media:[]});renderActivitiesEditor();
+  syncAllForms();currentContent.academicActivities.push({category:"Presentation & Poster",activityType:"",topics:[],title:"",organization:"",date:"",description:"",url:"",visible:true,media:[]});renderActivitiesEditor();
 });
 $("addSkillGroupBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.skills.push({category:"",items:[],visible:true,media:[]});renderSkillsEditor();
@@ -2396,8 +2399,8 @@ function readRepeaters(){
 
   currentContent.academicActivities=[...document.querySelectorAll("[data-activity]")].map((r,i)=>{
     const old=currentContent.academicActivities[i]||{};
-    return {category:get(r,"category")||"Presentation & Poster",activityType:get(r,"activityType"),title:get(r,"title"),organization:get(r,"organization"),date:get(r,"date"),description:get(r,"description"),url:get(r,"url"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
-  }).filter(x=>x.title||x.description||x.organization||x.date||x.media.length);
+    return {category:get(r,"category")||"Presentation & Poster",activityType:get(r,"activityType"),topics:get(r,"topics").split(",").map(x=>x.trim()).filter(Boolean),title:get(r,"title"),organization:get(r,"organization"),date:get(r,"date"),description:get(r,"description"),url:get(r,"url"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
+  }).filter(x=>x.title||x.description||x.organization||x.date||x.topics.length||x.media.length);
 
   currentContent.skills=[...document.querySelectorAll("[data-skill]")].map((r,i)=>{
     const old=currentContent.skills[i]||{};
