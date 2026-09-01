@@ -180,7 +180,7 @@ const COVER_SECTION_KEYS=["research","thesis","publications","projects","activit
 const SIDEBAR_SECTION_KEYS=[...COVER_SECTION_KEYS];
 const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","skills","education","contact"];
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
-const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill"];
+const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full"];
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -1281,7 +1281,7 @@ function normalizeMediaDisplayList(value){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=27;
+const BUILDER_SETTINGS_SCHEMA_VERSION=28;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1359,12 +1359,26 @@ function normalizeActivityCategory(value){
   return aliases[category]||category||"Presentations & Posters";
 }
 
+function normalizeActivityCardDesign(value){
+  const design=String(value||"").trim();
+  return ["activity-split","activity-showcase","activity-media-fill","activity-certificate-full"].includes(design)?design:"";
+}
+
+function effectiveActivityCardDesign(item,d){
+  const override=normalizeActivityCardDesign(item?.cardDesign);
+  if(override)return override;
+  if(normalizeActivityCategory(item?.category)==="Certifications")return "activity-certificate-full";
+  const sectionDefault=d?.siteSettings?.layout?.cardDesigns?.activities||DEFAULT_SITE_SETTINGS.layout.cardDesigns.activities;
+  return CARD_DESIGN_VALUES.includes(sectionDefault)?sectionDefault:DEFAULT_SITE_SETTINGS.layout.cardDesigns.activities;
+}
+
 function normalizeAcademicArchitecture(content){
   const marker=content?.builderState?.academicArchitectureV1===true;
   const existingActivities=Array.isArray(content.academicActivities)?content.academicActivities:[];
   content.academicActivities=existingActivities.map(x=>({
     category:normalizeActivityCategory(x?.category),
     activityType:String(x?.activityType||""),
+    cardDesign:normalizeActivityCardDesign(x?.cardDesign),
     topics:(Array.isArray(x?.topics)?x.topics:(typeof x?.topics==="string"?x.topics.split(","):[])).map(v=>String(v??"").trim()).filter(Boolean),
     title:String(x?.title||""),
     organization:String(x?.organization||""),
@@ -1583,7 +1597,7 @@ function renderAcademicActivities(d){
       <div class="activity-grid">${group.map(item=>{
         const activityMedia=mediaHtml(item.media||[]);
         return `
-        <article class="activity-card ${activityMedia?"has-media":"no-media"}">
+        <article class="activity-card ${activityMedia?"has-media":"no-media"}" data-activity-card-design="${escAttr(effectiveActivityCardDesign(item,d))}">
           ${(item.activityType||item.date)?`<div class="activity-card-top">
             ${item.activityType?`<span class="activity-type-badge">${esc(item.activityType)}</span>`:""}
             ${item.date?`<span class="activity-date">${esc(item.date)}</span>`:""}

@@ -421,7 +421,7 @@ const COVER_SECTION_KEYS=["research","thesis","publications","projects","activit
 const SIDEBAR_SECTION_KEYS=[...COVER_SECTION_KEYS];
 const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","skills","education","contact"];
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
-const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill"];
+const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full"];
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -1055,7 +1055,7 @@ function normalizeMediaDisplayList(value){
   return (Array.isArray(value)?value:[]).map(normalizeMediaDisplayItem);
 }
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=27;
+const BUILDER_SETTINGS_SCHEMA_VERSION=28;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1567,12 +1567,18 @@ function normalizeActivityCategory(value){
   return aliases[category]||category||"Presentations & Posters";
 }
 
+function normalizeActivityCardDesign(value){
+  const design=String(value||"").trim();
+  return ["activity-split","activity-showcase","activity-media-fill","activity-certificate-full"].includes(design)?design:"";
+}
+
 function normalizeAcademicArchitecture(content){
   const marker=content?.builderState?.academicArchitectureV1===true;
   const existingActivities=Array.isArray(content.academicActivities)?content.academicActivities:[];
   content.academicActivities=existingActivities.map(x=>({
     category:normalizeActivityCategory(x?.category),
     activityType:String(x?.activityType||""),
+    cardDesign:normalizeActivityCardDesign(x?.cardDesign),
     topics:(Array.isArray(x?.topics)?x.topics:(typeof x?.topics==="string"?x.topics.split(","):[])).map(v=>String(v??"").trim()).filter(Boolean),
     title:String(x?.title||""),
     organization:String(x?.organization||""),
@@ -1925,7 +1931,7 @@ function repeatBlock(type,i,title,fields,media=[],visible=true){
     <div class="form-grid">
       ${fields.map(f=>`<div class="field ${f.full?"full":""}"><label>${esc(f.label)}</label>${
         f.kind==="textarea"?`<textarea data-k="${f.key}">${esc(f.value||"")}</textarea>`:
-        f.kind==="select"?`<select data-k="${f.key}">${(f.options||["","Published","Accepted","In press","Submitted","Under review","Manuscript in Preparation","Preprint","Conference"]).map(o=>`<option ${o===f.value?"selected":""}>${esc(o)}</option>`).join("")}</select>`:
+        f.kind==="select"?`<select data-k="${f.key}">${(f.options||["","Published","Accepted","In press","Submitted","Under review","Manuscript in Preparation","Preprint","Conference"]).map(o=>{const opt=(o&&typeof o==="object")?o:{value:o,label:o};return`<option value="${esc(opt.value??"")}" ${(opt.value??"")===f.value?"selected":""}>${esc(opt.label??opt.value??"")}</option>`}).join("")}</select>`:
         `<input data-k="${f.key}" value="${esc(f.value||"")}">`
       }</div>`).join("")}
     </div>
@@ -1952,17 +1958,38 @@ function renderProjectsEditor(){
     {label:"Project URL",key:"url",value:p.url,full:true}
   ],p.media||[],p.visible!==false)).join("")||`<div class="empty-state">No projects or simulations added.</div>`;
 }
+function activityCardStyleOptions(item){
+  const category=normalizeActivityCategory(item?.category);
+  const inheritedLabel=category==="Certifications"?"Default — Full-width Certificate":"Default — Appearance setting";
+  return [
+    {value:"",label:inheritedLabel},
+    {value:"activity-split",label:"Activity Split"},
+    {value:"activity-showcase",label:"Activity Showcase"},
+    {value:"activity-media-fill",label:"Activity Media Fill"},
+    {value:"activity-certificate-full",label:"Full-width Certificate"}
+  ];
+}
+
+function refreshActivityCardStyleDefaultLabel(row){
+  if(!row)return;
+  const category=normalizeActivityCategory(row.querySelector('[data-k="category"]')?.value||"");
+  const select=row.querySelector('[data-k="cardDesign"]');
+  const option=select?.querySelector('option[value=""]');
+  if(option)option.textContent=category==="Certifications"?"Default — Full-width Certificate":"Default — Appearance setting";
+}
+
 function renderActivitiesEditor(){
   $("activitiesEditor").innerHTML=(currentContent.academicActivities||[]).map((item,i)=>repeatBlock("activity",i,`Academic activity ${i+1}`,[
     {label:"General category",key:"category",value:normalizeActivityCategory(item.category),kind:"select",options:["Presentations & Posters","Training & Practical Experience","Certifications","Mentoring & Teaching","Awards & Honors"]},
     {label:"Specific activity type",key:"activityType",value:item.activityType||""},
     {label:"Topics / exposure — comma separated",key:"topics",value:(item.topics||[]).join(", "),full:true},
     {label:"Date / year",key:"date",value:item.date||""},
+    {label:"Card style",key:"cardDesign",value:normalizeActivityCardDesign(item.cardDesign),kind:"select",options:activityCardStyleOptions(item)},
     {label:"Title",key:"title",value:item.title,full:true},
     {label:"Venue / issuer / organization",key:"organization",value:item.organization,full:true},
     {label:"Description",key:"description",value:item.description,kind:"textarea",full:true},
     {label:"Relevant URL / credential link",key:"url",value:item.url,full:true}
-  ],item.media||[],item.visible!==false)).join("")||`<div class="empty-state">No academic activities added yet. Add presentations, certifications/training, or awards here.</div>`;
+  ],item.media||[],item.visible!==false)).join("")||`<div class="empty-state">No academic activities added yet. Add presentations, training, certifications, mentoring/teaching, or awards here.</div>`;
 }
 function renderSkillsEditor(){
   $("skillsEditor").innerHTML=(currentContent.skills||[]).map((g,i)=>repeatBlock("skill",i,`Skill group ${i+1}`,[
@@ -2278,13 +2305,18 @@ $("addProjectBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.projects.push({title:"",type:"",contribution:"",description:"",meta:"",url:"",visible:true,media:[]});renderProjectsEditor();
 });
 $("addActivityBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.academicActivities.push({category:"Presentations & Posters",activityType:"",topics:[],title:"",organization:"",date:"",description:"",url:"",visible:true,media:[]});renderActivitiesEditor();
+  syncAllForms();currentContent.academicActivities.push({category:"Presentations & Posters",activityType:"",cardDesign:"",topics:[],title:"",organization:"",date:"",description:"",url:"",visible:true,media:[]});renderActivitiesEditor();
 });
 $("addSkillGroupBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.skills.push({category:"",items:[],visible:true,media:[]});renderSkillsEditor();
 });
 $("addEducationBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.education.push({period:"",degree:"",institution:"",cgpa:"",cgpaSubtitle:"",description:"",courses:[],visible:true,media:[]});renderEducationEditor();
+});
+
+document.addEventListener("change",e=>{
+  const categorySelect=e.target.closest?.('[data-activity] [data-k="category"]');
+  if(categorySelect)refreshActivityCardStyleDefaultLabel(categorySelect.closest('[data-activity]'));
 });
 
 document.addEventListener("change",e=>{
@@ -2445,7 +2477,7 @@ function readRepeaters(){
 
   currentContent.academicActivities=[...document.querySelectorAll("[data-activity]")].map((r,i)=>{
     const old=currentContent.academicActivities[i]||{};
-    return {category:normalizeActivityCategory(get(r,"category")),activityType:get(r,"activityType"),topics:get(r,"topics").split(",").map(x=>x.trim()).filter(Boolean),title:get(r,"title"),organization:get(r,"organization"),date:get(r,"date"),description:get(r,"description"),url:get(r,"url"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
+    return {category:normalizeActivityCategory(get(r,"category")),activityType:get(r,"activityType"),cardDesign:normalizeActivityCardDesign(get(r,"cardDesign")),topics:get(r,"topics").split(",").map(x=>x.trim()).filter(Boolean),title:get(r,"title"),organization:get(r,"organization"),date:get(r,"date"),description:get(r,"description"),url:get(r,"url"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
   }).filter(x=>x.title||x.description||x.organization||x.date||x.topics.length||x.media.length);
 
   currentContent.skills=[...document.querySelectorAll("[data-skill]")].map((r,i)=>{
