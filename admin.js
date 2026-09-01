@@ -935,6 +935,20 @@ function moveRepeaterItem(type,index,delta){
   const map={publication:"publications",project:"projects",activity:"academicActivities",skill:"skills",education:"education"};
   const arr=currentContent[map[type]];
   if(!Array.isArray(arr))return;
+
+  if(type==="activity"){
+    const category=normalizeActivityCategory(arr[index]?.category);
+    const slots=arr.map((item,i)=>normalizeActivityCategory(item?.category)===category?i:-1).filter(i=>i>=0);
+    const pos=slots.indexOf(index);
+    const targetPos=pos+delta;
+    if(pos<0||targetPos<0||targetPos>=slots.length)return;
+    const j=slots[targetPos];
+    [arr[index],arr[j]]=[arr[j],arr[index]];
+    renderActivitiesEditor();
+    setStatus("Activity reordered within this category. Save all changes to publish.");
+    return;
+  }
+
   const j=index+delta;
   if(index<0||j<0||j>=arr.length)return;
   [arr[index],arr[j]]=[arr[j],arr[index]];
@@ -1978,9 +1992,44 @@ function refreshActivityCardStyleDefaultLabel(row){
   if(option)option.textContent=category==="Certifications"?"Default — Certificate Card":"Default — Appearance setting";
 }
 
-function renderActivitiesEditor(){
-  $("activitiesEditor").innerHTML=(currentContent.academicActivities||[]).map((item,i)=>repeatBlock("activity",i,`Academic activity ${i+1}`,[
-    {label:"General category",key:"category",value:normalizeActivityCategory(item.category),kind:"select",options:["Presentations & Posters","Training & Practical Experience","Certifications","Mentoring & Teaching","Awards & Honors"]},
+const ACTIVITY_ADMIN_CATEGORIES=["Presentations & Posters","Training & Practical Experience","Certifications","Mentoring & Teaching","Awards & Honors"];
+const ACTIVITY_ADMIN_CATEGORY_STORAGE_KEY="academicAdminActivityCategory";
+let activityAdminExpandIndexAfterRender=null;
+let activityDragState=null;
+
+function savedActivityAdminCategory(){
+  try{
+    const saved=normalizeActivityCategory(localStorage.getItem(ACTIVITY_ADMIN_CATEGORY_STORAGE_KEY)||"");
+    return ACTIVITY_ADMIN_CATEGORIES.includes(saved)?saved:"";
+  }catch{return ""}
+}
+
+let activityAdminActiveCategory=savedActivityAdminCategory()||ACTIVITY_ADMIN_CATEGORIES[0];
+
+function activityCardStyleSummary(item){
+  const explicit=normalizeActivityCardDesign(item?.cardDesign);
+  const labels={
+    "activity-split":"Activity Split",
+    "activity-showcase":"Activity Showcase",
+    "activity-media-fill":"Activity Media Fill",
+    "activity-certificate-full":"Certificate Card"
+  };
+  if(explicit)return labels[explicit]||"Custom card";
+  return normalizeActivityCategory(item?.category)==="Certifications"?"Certificate Card (default)":"Appearance default";
+}
+
+function activitySearchText(item){
+  return [item?.title,item?.activityType,item?.organization,item?.date,(item?.topics||[]).join(" ")]
+    .map(v=>String(v||"").trim()).filter(Boolean).join(" ").toLowerCase();
+}
+
+function activityRepeatBlock(item,i){
+  const category=normalizeActivityCategory(item?.category);
+  const title=String(item?.title||item?.activityType||"Untitled activity").trim()||"Untitled activity";
+  const mediaCount=Array.isArray(item?.media)?item.media.length:0;
+  const meta=[String(item?.date||"").trim(),activityCardStyleSummary(item),`${mediaCount} ${mediaCount===1?"media":"media"}`].filter(Boolean);
+  const fields=[
+    {label:"General category",key:"category",value:category,kind:"select",options:ACTIVITY_ADMIN_CATEGORIES},
     {label:"Specific activity type",key:"activityType",value:item.activityType||""},
     {label:"Topics / exposure — comma separated",key:"topics",value:(item.topics||[]).join(", "),full:true},
     {label:"Date / year",key:"date",value:item.date||""},
@@ -1989,7 +2038,163 @@ function renderActivitiesEditor(){
     {label:"Venue / issuer / organization",key:"organization",value:item.organization,full:true},
     {label:"Description",key:"description",value:item.description,kind:"textarea",full:true},
     {label:"Relevant URL / credential link",key:"url",value:item.url,full:true}
-  ],item.media||[],item.visible!==false)).join("")||`<div class="empty-state">No academic activities added yet. Add presentations, training, certifications, mentoring/teaching, or awards here.</div>`;
+  ];
+
+  return `<div class="repeat-item activity-admin-item activity-collapsed" data-activity="${i}" data-activity-category="${esc(category)}" data-activity-search="${esc(activitySearchText(item))}">
+    <div class="repeat-head activity-repeat-head">
+      <div class="activity-repeat-summary">
+        <button class="activity-collapse-toggle" data-activity-toggle="${i}" type="button" aria-expanded="false" title="Expand activity"><span class="activity-collapse-chevron" aria-hidden="true">›</span></button>
+        <span class="activity-drag-handle" data-activity-drag-handle="${i}" draggable="true" role="button" tabindex="0" title="Drag to reorder within this category" aria-label="Drag to reorder within this category">⠿</span>
+        <div class="activity-repeat-summary-copy">
+          <strong data-activity-summary-title>${esc(title)}</strong>
+          <div class="activity-repeat-meta" data-activity-summary-meta>${meta.map(v=>`<span>${esc(v)}</span>`).join("")}</div>
+        </div>
+      </div>
+      <div class="repeat-actions">
+        <label class="repeat-public-toggle"><input type="checkbox" data-item-visible ${item.visible!==false?"checked":""}> Show publicly</label>
+        <button class="secondary repeat-move" data-move-item="activity:${i}:-1" type="button" title="Move up within this category">↑</button>
+        <button class="secondary repeat-move" data-move-item="activity:${i}:1" type="button" title="Move down within this category">↓</button>
+        <button class="danger" data-remove="activity:${i}" type="button">Remove</button>
+      </div>
+    </div>
+    <div class="activity-repeat-body">
+      <div class="form-grid">
+        ${fields.map(f=>`<div class="field ${f.full?"full":""}"><label>${esc(f.label)}</label>${
+          f.kind==="textarea"?`<textarea data-k="${f.key}">${esc(f.value||"")}</textarea>`:
+          f.kind==="select"?`<select data-k="${f.key}">${(f.options||[]).map(o=>{const opt=(o&&typeof o==="object")?o:{value:o,label:o};return`<option value="${esc(opt.value??"")}" ${(opt.value??"")===f.value?"selected":""}>${esc(opt.label??opt.value??"")}</option>`}).join("")}</select>`:
+          `<input data-k="${f.key}" value="${esc(f.value||"")}">`
+        }</div>`).join("")}
+      </div>
+      ${mediaEditor(`activity:${i}`,item.media||[],"Media & attachments")}
+    </div>
+  </div>`;
+}
+
+function setActivityRowCollapsed(row,collapsed){
+  if(!row)return;
+  row.classList.toggle("activity-collapsed",!!collapsed);
+  const toggle=row.querySelector("[data-activity-toggle]");
+  if(toggle){
+    toggle.setAttribute("aria-expanded",collapsed?"false":"true");
+    toggle.title=collapsed?"Expand activity":"Collapse activity";
+  }
+}
+
+function captureExpandedActivityIndexes(){
+  return new Set([...document.querySelectorAll('#activitiesEditor [data-activity]')]
+    .filter(row=>!row.classList.contains("activity-collapsed"))
+    .map(row=>Number(row.dataset.activity))
+    .filter(Number.isFinite));
+}
+
+function renderActivityCategoryTabs(){
+  const tabs=$("activityCategoryTabs");
+  if(!tabs)return;
+  const rows=[...document.querySelectorAll('#activitiesEditor [data-activity]')];
+  tabs.innerHTML=ACTIVITY_ADMIN_CATEGORIES.map(category=>{
+    const count=rows.filter(row=>normalizeActivityCategory(row.dataset.activityCategory)===category).length;
+    const active=category===activityAdminActiveCategory;
+    return `<button class="activity-category-tab ${active?"active":""}" type="button" role="tab" aria-selected="${active?"true":"false"}" data-activity-admin-category="${esc(category)}"><span>${esc(category)}</span><small>${count}</small></button>`;
+  }).join("");
+}
+
+function applyActivityAdminFilters(){
+  if(!ACTIVITY_ADMIN_CATEGORIES.includes(activityAdminActiveCategory))activityAdminActiveCategory=ACTIVITY_ADMIN_CATEGORIES[0];
+  const search=String($("activitySearchInput")?.value||"").trim().toLowerCase();
+  let shown=0;
+  const rows=[...document.querySelectorAll('#activitiesEditor [data-activity]')];
+  rows.forEach(row=>{
+    const category=normalizeActivityCategory(row.dataset.activityCategory);
+    const matchesCategory=category===activityAdminActiveCategory;
+    const matchesSearch=!search||String(row.dataset.activitySearch||"").includes(search);
+    const visible=matchesCategory&&matchesSearch;
+    row.classList.toggle("activity-admin-filtered-out",!visible);
+    if(visible)shown++;
+  });
+
+  document.querySelectorAll("#activityCategoryTabs [data-activity-admin-category]").forEach(btn=>{
+    const active=btn.dataset.activityAdminCategory===activityAdminActiveCategory;
+    btn.classList.toggle("active",active);
+    btn.setAttribute("aria-selected",active?"true":"false");
+  });
+
+  const addBtn=$("addActivityBtn");
+  if(addBtn)addBtn.textContent=`+ Add to ${activityAdminActiveCategory}`;
+  const status=$("activityCategoryStatus");
+  if(status)status.textContent=search?`${shown} matching ${shown===1?"activity":"activities"} in ${activityAdminActiveCategory}`:`${shown} ${shown===1?"activity":"activities"} in ${activityAdminActiveCategory}`;
+  const empty=$("activityCategoryEmptyState");
+  if(empty){
+    empty.classList.toggle("hidden",shown>0);
+    empty.textContent=search?`No activities in ${activityAdminActiveCategory} match “${$("activitySearchInput")?.value||""}”.`:`No activities in ${activityAdminActiveCategory} yet.`;
+  }
+}
+
+function setActivityAdminCategory(category,persist=true){
+  const normalized=normalizeActivityCategory(category);
+  activityAdminActiveCategory=ACTIVITY_ADMIN_CATEGORIES.includes(normalized)?normalized:ACTIVITY_ADMIN_CATEGORIES[0];
+  if(persist){try{localStorage.setItem(ACTIVITY_ADMIN_CATEGORY_STORAGE_KEY,activityAdminActiveCategory)}catch{}}
+  if($("activitySearchInput"))$("activitySearchInput").value="";
+  applyActivityAdminFilters();
+}
+
+function updateActivityAdminRowSummary(row){
+  if(!row)return;
+  const category=normalizeActivityCategory(row.querySelector('[data-k="category"]')?.value||row.dataset.activityCategory);
+  row.dataset.activityCategory=category;
+  const values={
+    title:(row.querySelector('[data-k="title"]')?.value||"").trim(),
+    activityType:(row.querySelector('[data-k="activityType"]')?.value||"").trim(),
+    organization:(row.querySelector('[data-k="organization"]')?.value||"").trim(),
+    date:(row.querySelector('[data-k="date"]')?.value||"").trim(),
+    topics:(row.querySelector('[data-k="topics"]')?.value||"").split(",").map(x=>x.trim()).filter(Boolean),
+    cardDesign:(row.querySelector('[data-k="cardDesign"]')?.value||"").trim(),
+    category
+  };
+  row.dataset.activitySearch=activitySearchText(values);
+  const titleNode=row.querySelector("[data-activity-summary-title]");
+  if(titleNode)titleNode.textContent=values.title||values.activityType||"Untitled activity";
+  const metaNode=row.querySelector("[data-activity-summary-meta]");
+  if(metaNode){
+    const fake={category,cardDesign:values.cardDesign};
+    const mediaCount=row.querySelectorAll(".media-admin-item").length;
+    const parts=[values.date,activityCardStyleSummary(fake),`${mediaCount} ${mediaCount===1?"media":"media"}`].filter(Boolean);
+    metaNode.innerHTML=parts.map(v=>`<span>${esc(v)}</span>`).join("");
+  }
+}
+
+function renderActivitiesEditor(){
+  const expanded=captureExpandedActivityIndexes();
+  const items=currentContent.academicActivities||[];
+  $("activitiesEditor").innerHTML=items.map((item,i)=>activityRepeatBlock(item,i)).join("");
+  expanded.forEach(i=>setActivityRowCollapsed(document.querySelector(`#activitiesEditor [data-activity="${i}"]`),false));
+  if(Number.isFinite(activityAdminExpandIndexAfterRender)){
+    const row=document.querySelector(`#activitiesEditor [data-activity="${activityAdminExpandIndexAfterRender}"]`);
+    if(row){setActivityRowCollapsed(row,false);setTimeout(()=>row.scrollIntoView({behavior:"smooth",block:"nearest"}),0)}
+    activityAdminExpandIndexAfterRender=null;
+  }
+  renderActivityCategoryTabs();
+  applyActivityAdminFilters();
+}
+
+function reorderActivityWithinCategory(sourceIndex,targetIndex,placeAfter=false){
+  syncAllForms();
+  const arr=currentContent.academicActivities||[];
+  if(sourceIndex===targetIndex||!arr[sourceIndex]||!arr[targetIndex])return;
+  const category=normalizeActivityCategory(arr[sourceIndex].category);
+  if(normalizeActivityCategory(arr[targetIndex].category)!==category)return;
+  const slots=arr.map((item,i)=>normalizeActivityCategory(item?.category)===category?i:-1).filter(i=>i>=0);
+  const items=slots.map(i=>arr[i]);
+  const sourcePos=slots.indexOf(sourceIndex);
+  const targetPos=slots.indexOf(targetIndex);
+  if(sourcePos<0||targetPos<0)return;
+  const [moving]=items.splice(sourcePos,1);
+  const adjustedTarget=targetPos-(sourcePos<targetPos?1:0);
+  let insertPos=adjustedTarget+(placeAfter?1:0);
+  insertPos=Math.max(0,Math.min(items.length,insertPos));
+  items.splice(insertPos,0,moving);
+  slots.forEach((slot,i)=>{arr[slot]=items[i]});
+  renderActivitiesEditor();
+  setStatus("Activity reordered within this category. Save all changes to publish.");
 }
 function renderSkillsEditor(){
   $("skillsEditor").innerHTML=(currentContent.skills||[]).map((g,i)=>repeatBlock("skill",i,`Skill group ${i+1}`,[
@@ -2305,7 +2510,12 @@ $("addProjectBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.projects.push({title:"",type:"",contribution:"",description:"",meta:"",url:"",visible:true,media:[]});renderProjectsEditor();
 });
 $("addActivityBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.academicActivities.push({category:"Presentations & Posters",activityType:"",cardDesign:"",topics:[],title:"",organization:"",date:"",description:"",url:"",visible:true,media:[]});renderActivitiesEditor();
+  syncAllForms();
+  const category=ACTIVITY_ADMIN_CATEGORIES.includes(activityAdminActiveCategory)?activityAdminActiveCategory:ACTIVITY_ADMIN_CATEGORIES[0];
+  currentContent.academicActivities.push({category,activityType:"",cardDesign:"",topics:[],title:"",organization:"",date:"",description:"",url:"",visible:true,media:[]});
+  activityAdminExpandIndexAfterRender=currentContent.academicActivities.length-1;
+  renderActivitiesEditor();
+  setActivityAdminCategory(category);
 });
 $("addSkillGroupBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.skills.push({category:"",items:[],visible:true,media:[]});renderSkillsEditor();
@@ -2316,7 +2526,80 @@ $("addEducationBtn").addEventListener("click",()=>{
 
 document.addEventListener("change",e=>{
   const categorySelect=e.target.closest?.('[data-activity] [data-k="category"]');
-  if(categorySelect)refreshActivityCardStyleDefaultLabel(categorySelect.closest('[data-activity]'));
+  if(categorySelect){
+    const row=categorySelect.closest('[data-activity]');
+    refreshActivityCardStyleDefaultLabel(row);
+    updateActivityAdminRowSummary(row);
+    renderActivityCategoryTabs();
+    setActivityAdminCategory(categorySelect.value);
+  }
+});
+
+$("activitySearchInput")?.addEventListener("input",applyActivityAdminFilters);
+$("expandActivitiesBtn")?.addEventListener("click",()=>{
+  document.querySelectorAll('#activitiesEditor [data-activity]:not(.activity-admin-filtered-out)').forEach(row=>setActivityRowCollapsed(row,false));
+});
+$("collapseActivitiesBtn")?.addEventListener("click",()=>{
+  document.querySelectorAll('#activitiesEditor [data-activity]:not(.activity-admin-filtered-out)').forEach(row=>setActivityRowCollapsed(row,true));
+});
+
+document.addEventListener("input",e=>{
+  const row=e.target.closest?.('#activitiesEditor [data-activity]');
+  if(!row)return;
+  if(e.target.matches?.('[data-k="title"],[data-k="activityType"],[data-k="organization"],[data-k="date"],[data-k="topics"],[data-k="cardDesign"]')){
+    updateActivityAdminRowSummary(row);
+    if($("activitySearchInput")?.value)applyActivityAdminFilters();
+  }
+});
+
+document.addEventListener("click",e=>{
+  const tab=e.target.closest?.("[data-activity-admin-category]");
+  if(tab){setActivityAdminCategory(tab.dataset.activityAdminCategory);return}
+  const toggle=e.target.closest?.("[data-activity-toggle]");
+  if(toggle){
+    const row=toggle.closest('[data-activity]');
+    setActivityRowCollapsed(row,!row.classList.contains("activity-collapsed"));
+    return;
+  }
+});
+
+document.addEventListener("dragstart",e=>{
+  const handle=e.target.closest?.("[data-activity-drag-handle]");
+  if(!handle)return;
+  const row=handle.closest('[data-activity]');
+  if(!row)return;
+  activityDragState={sourceIndex:Number(row.dataset.activity),category:normalizeActivityCategory(row.dataset.activityCategory)};
+  row.classList.add("activity-dragging");
+  if(e.dataTransfer){e.dataTransfer.effectAllowed="move";e.dataTransfer.setData("text/plain",String(row.dataset.activity))}
+});
+
+document.addEventListener("dragover",e=>{
+  if(!activityDragState)return;
+  const row=e.target.closest?.('#activitiesEditor [data-activity]');
+  if(!row||normalizeActivityCategory(row.dataset.activityCategory)!==activityDragState.category)return;
+  e.preventDefault();
+  document.querySelectorAll('#activitiesEditor .activity-drag-over-before,#activitiesEditor .activity-drag-over-after').forEach(el=>el.classList.remove("activity-drag-over-before","activity-drag-over-after"));
+  const rect=row.getBoundingClientRect();
+  row.classList.add(e.clientY>rect.top+rect.height/2?"activity-drag-over-after":"activity-drag-over-before");
+});
+
+document.addEventListener("drop",e=>{
+  if(!activityDragState)return;
+  const row=e.target.closest?.('#activitiesEditor [data-activity]');
+  if(!row||normalizeActivityCategory(row.dataset.activityCategory)!==activityDragState.category)return;
+  e.preventDefault();
+  const after=row.classList.contains("activity-drag-over-after");
+  const sourceIndex=activityDragState.sourceIndex;
+  const targetIndex=Number(row.dataset.activity);
+  capturePreMutation();
+  document.querySelectorAll('#activitiesEditor .activity-dragging,#activitiesEditor .activity-drag-over-before,#activitiesEditor .activity-drag-over-after').forEach(el=>el.classList.remove("activity-dragging","activity-drag-over-before","activity-drag-over-after"));
+  activityDragState=null;
+  reorderActivityWithinCategory(sourceIndex,targetIndex,after);
+});
+
+document.addEventListener("dragend",()=>{
+  document.querySelectorAll('#activitiesEditor .activity-dragging,#activitiesEditor .activity-drag-over-before,#activitiesEditor .activity-drag-over-after').forEach(el=>el.classList.remove("activity-dragging","activity-drag-over-before","activity-drag-over-after"));
+  activityDragState=null;
 });
 
 document.addEventListener("change",e=>{

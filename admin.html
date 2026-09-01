@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260902-certificate-compact1" rel="stylesheet"/>
+<link href="styles.css?v=20260902-activity-admin-organizer1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -160,12 +160,30 @@
 </div>
 <div class="admin-panel" data-panel="activities">
 <div class="form-grid section-heading-editor">
-<p class="heading-editor-note">One compact section for presentations, certifications/training, and awards/honors.</p>
+<p class="heading-editor-note">Organize presentations, training, certifications, mentoring/teaching, and awards without opening every activity at once.</p>
 <div class="field"><label>Section name</label><input id="fSectionActivitiesTitle"/></div>
 <div class="field"><label>Section subtitle</label><input id="fSectionActivitiesSubtitle"/></div>
 </div>
+<div class="activity-admin-organizer" id="activityAdminOrganizer">
+<div class="activity-admin-toolbar">
+<div class="activity-admin-toolbar-copy">
+<strong>Activity organizer</strong>
+<span class="helper">Choose a category, then expand only the activity you want to edit.</span>
+</div>
+<div class="activity-admin-toolbar-actions">
+<label class="activity-search-wrap" for="activitySearchInput"><span>Search</span><input id="activitySearchInput" type="search" placeholder="Search current category" autocomplete="off"/></label>
+<button class="secondary" id="expandActivitiesBtn" type="button">Expand all</button>
+<button class="secondary" id="collapseActivitiesBtn" type="button">Collapse all</button>
+</div>
+</div>
+<div class="activity-admin-category-tabs" id="activityCategoryTabs" role="tablist" aria-label="Academic activity categories"></div>
+<div class="activity-admin-category-action">
+<span class="helper" id="activityCategoryStatus"></span>
+<button class="secondary" id="addActivityBtn" type="button">+ Add activity</button>
+</div>
+</div>
 <div id="activitiesEditor"></div>
-<button class="secondary" id="addActivityBtn" type="button">+ Add academic activity</button>
+<div class="empty-state hidden" id="activityCategoryEmptyState"></div>
 </div>
 <div class="admin-panel" data-panel="skills">
 <div class="form-grid section-heading-editor">
@@ -1084,6 +1102,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-<script src="admin.js?v=20260902-certificate-compact1"></script>
+<script src="admin.js?v=20260902-activity-admin-organizer1"></script>
 </body>
 </html>
