@@ -1550,8 +1550,10 @@ function renderAcademicActivities(d){
   list.innerHTML=categories.map((category,index)=>{
     const group=items.filter(item=>item.category===category);
     return `<div class="activity-panel ${index===0?"active":"hidden"}" data-activity-panel="${escAttr(category)}" role="tabpanel">
-      <div class="activity-grid">${group.map(item=>`
-        <article class="activity-card">
+      <div class="activity-grid">${group.map(item=>{
+        const activityMedia=mediaHtml(item.media||[]);
+        return `
+        <article class="activity-card ${activityMedia?"has-media":"no-media"}">
           ${(item.activityType||item.date)?`<div class="activity-card-top">
             ${item.activityType?`<span class="activity-type-badge">${esc(item.activityType)}</span>`:""}
             ${item.date?`<span class="activity-date">${esc(item.date)}</span>`:""}
@@ -1561,8 +1563,9 @@ function renderAcademicActivities(d){
           ${item.description?`<p class="muted">${esc(item.description)}</p>`:""}
           ${(item.topics||[]).length?`<div class="activity-topic-chips" aria-label="Topics and exposure">${item.topics.map(topic=>`<span class="activity-topic-chip">${esc(topic)}</span>`).join("")}</div>`:""}
           ${safeUrl(item.url)?`<a class="text-link" href="${escAttr(safeUrl(item.url))}" target="_blank" rel="noopener">${activityLinkLabel(category)}</a>`:""}
-          <div class="item-media">${mediaHtml(item.media||[])}</div>
-        </article>`).join("")}</div>
+          ${activityMedia?`<div class="item-media">${activityMedia}</div>`:""}
+        </article>`;
+      }).join("")}</div>
     </div>`;
   }).join("");
 }

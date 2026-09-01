@@ -3939,6 +3939,10 @@ body:not(.admin-body) #projectsList.project-flow-masonry>.card{
   align-items:center;
 }
 #activities[data-card-design="activity-split"] .activity-card>.item-media:empty{display:none!important}
+#activities[data-card-design="activity-split"] .activity-card.no-media{
+  grid-template-columns:1fr!important;
+  min-height:0!important;
+}
 #activities[data-card-design="activity-split"] .activity-card:not(:has(.item-media .media-public-item,.item-media .attachment-link)){
   grid-template-columns:1fr!important;
 }
@@ -3989,6 +3993,14 @@ body:not(.admin-body) #projectsList.project-flow-masonry>.card{
   align-items:center;
 }
 #activities[data-card-design="activity-showcase"] .activity-card>.item-media:empty{display:none!important}
+#activities[data-card-design="activity-showcase"] .activity-card.no-media{
+  grid-template-columns:1fr!important;
+  min-height:0!important;
+  padding-bottom:22px!important;
+}
+#activities[data-card-design="activity-showcase"] .activity-card.no-media>:not(.item-media){
+  grid-column:1!important;
+}
 #activities[data-card-design="activity-showcase"] .activity-card:not(:has(.item-media .media-public-item,.item-media .attachment-link)){
   grid-template-columns:1fr!important;
   padding-bottom:22px!important;
