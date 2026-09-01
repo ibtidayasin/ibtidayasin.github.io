@@ -3968,6 +3968,7 @@ body:not(.admin-body) #projectsList.project-flow-masonry>.card{
   row-gap:0!important;
   padding:0!important;
   align-items:stretch!important;
+  align-content:start!important;
   overflow:hidden!important;
   min-height:230px;
   background:var(--surface)!important;
@@ -4021,6 +4022,18 @@ body:not(.admin-body) #projectsList.project-flow-masonry>.card{
 }
 #activities[data-card-design="activity-showcase"] .item-media .media-public-info{
   background:color-mix(in srgb,var(--surface) 96%,transparent)!important;
+}
+
+
+/* Keep activity text/chips comfortably inset from the card edge.
+   This is especially important when the media panel is taller than the text. */
+#activities[data-card-design="activity-split"] .activity-card>.activity-topic-chips,
+#activities[data-card-design="activity-showcase"] .activity-card>.activity-topic-chips{
+  margin-bottom:22px!important;
+}
+#activities[data-card-design="activity-split"] .activity-card>p:last-of-type:not(:has(+ .activity-topic-chips)),
+#activities[data-card-design="activity-showcase"] .activity-card>p:last-of-type:not(:has(+ .activity-topic-chips)){
+  margin-bottom:22px!important;
 }
 
 /* Keep side-by-side designs readable on narrower screens. */
