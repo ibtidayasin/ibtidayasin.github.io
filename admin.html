@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260902-certification-grid-card1" rel="stylesheet"/>
+<link href="styles.css?v=20260902-skills-subgroups-collapse1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -146,6 +146,13 @@
 <div class="field"><label>Section name</label><input id="fSectionPublicationsTitle"/></div>
 <div class="field"><label>Section subtitle</label><input id="fSectionPublicationsSubtitle"/></div>
 </div>
+<div class="collection-admin-toolbar">
+  <span class="helper">Keep publication entries collapsed and open only the one you are editing.</span>
+  <div class="collection-admin-toolbar-actions">
+    <button class="secondary" data-expand-collection="publication" type="button">Expand all</button>
+    <button class="secondary" data-collapse-collection="publication" type="button">Collapse all</button>
+  </div>
+</div>
 <div id="publicationsEditor"></div>
 <button class="secondary" id="addPublicationBtn" type="button">+ Add publication</button>
 </div>
@@ -154,6 +161,13 @@
 <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
 <div class="field"><label>Section name</label><input id="fSectionProjectsTitle"/></div>
 <div class="field"><label>Section subtitle</label><input id="fSectionProjectsSubtitle"/></div>
+</div>
+<div class="collection-admin-toolbar">
+  <span class="helper">Keep project entries compact and expand only the record you need.</span>
+  <div class="collection-admin-toolbar-actions">
+    <button class="secondary" data-expand-collection="project" type="button">Expand all</button>
+    <button class="secondary" data-collapse-collection="project" type="button">Collapse all</button>
+  </div>
 </div>
 <div id="projectsEditor"></div>
 <button class="secondary" id="addProjectBtn" type="button">+ Add project</button>
@@ -187,9 +201,16 @@
 </div>
 <div class="admin-panel" data-panel="skills">
 <div class="form-grid section-heading-editor">
-<p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
+<p class="heading-editor-note">Create skill groups, then optionally divide each group into compact subgroups such as Programming &amp; Libraries, Scientific Computing, and Development Environments.</p>
 <div class="field"><label>Section name</label><input id="fSectionSkillsTitle"/></div>
 <div class="field"><label>Section subtitle</label><input id="fSectionSkillsSubtitle"/></div>
+</div>
+<div class="collection-admin-toolbar">
+  <span class="helper">Skill groups stay collapsed by default. Subgroups are managed inside each skill group.</span>
+  <div class="collection-admin-toolbar-actions">
+    <button class="secondary" data-expand-collection="skill" type="button">Expand all</button>
+    <button class="secondary" data-collapse-collection="skill" type="button">Collapse all</button>
+  </div>
 </div>
 <div id="skillsEditor"></div>
 <button class="secondary" id="addSkillGroupBtn" type="button">+ Add skill group</button>
@@ -199,6 +220,13 @@
 <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it. Each education entry can also include CGPA, an academic-standing note, and a compact Important Courses list.</p>
 <div class="field"><label>Section name</label><input id="fSectionEducationTitle"/></div>
 <div class="field"><label>Section subtitle</label><input id="fSectionEducationSubtitle"/></div>
+</div>
+<div class="collection-admin-toolbar">
+  <span class="helper">Education records stay compact until you expand the one you want to edit.</span>
+  <div class="collection-admin-toolbar-actions">
+    <button class="secondary" data-expand-collection="education" type="button">Expand all</button>
+    <button class="secondary" data-collapse-collection="education" type="button">Collapse all</button>
+  </div>
 </div>
 <div id="educationEditor"></div>
 <button class="secondary" id="addEducationBtn" type="button">+ Add education</button>
@@ -1102,6 +1130,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-<script src="admin.js?v=20260902-certification-grid-card1"></script>
+<script src="admin.js?v=20260902-skills-subgroups-collapse1"></script>
 </body>
 </html>

@@ -1069,7 +1069,7 @@ function normalizeMediaDisplayList(value){
   return (Array.isArray(value)?value:[]).map(normalizeMediaDisplayItem);
 }
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=29;
+const BUILDER_SETTINGS_SCHEMA_VERSION=30;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1528,7 +1528,7 @@ function bindAdvancedAdminSuite(){
   });
 
   const mutationSelectors=[
-    "[data-remove]","[data-move-item]","[data-section-move]","[data-media-remove]","[data-media-add-link]",
+    "[data-remove]","[data-move-item]","[data-section-move]","[data-media-remove]","[data-media-add-link]","[data-add-skill-subgroup]","[data-move-skill-subgroup]","[data-remove-skill-subgroup]",
     "#addPublicationBtn","#addProjectBtn","#addActivityBtn","#addSkillGroupBtn","#addEducationBtn","#removeCvBtn",
     "#resetLayoutStyleBtn","#resetSectionStructureBtn","#resetExperienceBtn",
     "#resetTypographyBtn","#resetCustomThemeBtn"
@@ -1796,6 +1796,18 @@ function normalizePublicationRecord(item){
   return out;
 }
 
+function normalizeSkillGroupRecord(item){
+  const out={...(item||{})};
+  out.category=String(out.category||"").trim();
+  out.items=Array.isArray(out.items)?out.items.map(v=>String(v).trim()).filter(Boolean):String(out.items||"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean);
+  out.subgroups=(Array.isArray(out.subgroups)?out.subgroups:[]).map(group=>({
+    name:String(group?.name??group?.title??"").trim(),
+    items:Array.isArray(group?.items)?group.items.map(v=>String(v).trim()).filter(Boolean):String(group?.items||"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean)
+  })).filter(group=>group.name||group.items.length);
+  out.media=normalizeMediaDisplayList(out.media);
+  return out;
+}
+
 function normalizeMedia(content){
   normalizeAcademicArchitecture(content);
   normalizeResearchInterests(content);
@@ -1809,7 +1821,7 @@ function normalizeMedia(content){
   content.publications=(content.publications||[]).map(normalizePublicationRecord);
   content.projects=(content.projects||[]).map(x=>({...x,type:String(x.type||""),contribution:String(x.contribution||""),media:normalizeMediaDisplayList(x.media)}));
   content.academicActivities=(content.academicActivities||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
-  content.skills=(content.skills||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
+  content.skills=(content.skills||[]).map(normalizeSkillGroupRecord);
   content.education=(content.education||[]).map(x=>({...x,cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:normalizeMediaDisplayList(x.media)}));
   content.contact=content.contact||{};
   content.contact.media=normalizeMediaDisplayList(content.contact.media);
@@ -1931,10 +1943,14 @@ function renderAllEditors(){
   $("contactMediaEditor").innerHTML=mediaEditor("contact",currentContent.contact?.media||[],"Contact media");
 }
 
-function repeatBlock(type,i,title,fields,media=[],visible=true){
-  return `<div class="repeat-item" data-${type}="${i}">
-    <div class="repeat-head">
-      <strong>${esc(title)}</strong>
+function repeatBlock(type,i,title,fields,media=[],visible=true,extraBody=""){
+  const safeTitle=String(title||"").trim()||`${type} ${i+1}`;
+  return `<div class="repeat-item repeat-collapsible repeat-collapsed" data-${type}="${i}" data-repeat-type="${type}">
+    <div class="repeat-head repeat-collapsible-head">
+      <div class="repeat-collapsible-summary">
+        <button class="repeat-collapse-toggle" data-repeat-toggle="${type}:${i}" type="button" aria-expanded="false" title="Expand item"><span class="repeat-collapse-chevron" aria-hidden="true">›</span></button>
+        <strong>${esc(safeTitle)}</strong>
+      </div>
       <div class="repeat-actions">
         <label class="repeat-public-toggle"><input type="checkbox" data-item-visible ${visible!==false?"checked":""}> Show publicly</label>
         <button class="secondary repeat-move" data-move-item="${type}:${i}:-1" type="button" title="Move up">↑</button>
@@ -1942,19 +1958,37 @@ function repeatBlock(type,i,title,fields,media=[],visible=true){
         <button class="danger" data-remove="${type}:${i}" type="button">Remove</button>
       </div>
     </div>
-    <div class="form-grid">
-      ${fields.map(f=>`<div class="field ${f.full?"full":""}"><label>${esc(f.label)}</label>${
-        f.kind==="textarea"?`<textarea data-k="${f.key}">${esc(f.value||"")}</textarea>`:
-        f.kind==="select"?`<select data-k="${f.key}">${(f.options||["","Published","Accepted","In press","Submitted","Under review","Manuscript in Preparation","Preprint","Conference"]).map(o=>{const opt=(o&&typeof o==="object")?o:{value:o,label:o};return`<option value="${esc(opt.value??"")}" ${(opt.value??"")===f.value?"selected":""}>${esc(opt.label??opt.value??"")}</option>`}).join("")}</select>`:
-        `<input data-k="${f.key}" value="${esc(f.value||"")}">`
-      }</div>`).join("")}
+    <div class="repeat-collapsible-body">
+      <div class="form-grid">
+        ${fields.map(f=>`<div class="field ${f.full?"full":""}"><label>${esc(f.label)}</label>${
+          f.kind==="textarea"?`<textarea data-k="${f.key}">${esc(f.value||"")}</textarea>`:
+          f.kind==="select"?`<select data-k="${f.key}">${(f.options||["","Published","Accepted","In press","Submitted","Under review","Manuscript in Preparation","Preprint","Conference"]).map(o=>{const opt=(o&&typeof o==="object")?o:{value:o,label:o};return`<option value="${esc(opt.value??"")}" ${(opt.value??"")===f.value?"selected":""}>${esc(opt.label??opt.value??"")}</option>`}).join("")}</select>`:
+          `<input data-k="${f.key}" value="${esc(f.value||"")}">`
+        }</div>`).join("")}
+      </div>
+      ${extraBody||""}
+      ${mediaEditor(`${type}:${i}`,media,"Media & attachments")}
     </div>
-    ${mediaEditor(`${type}:${i}`,media,"Media & attachments")}
   </div>`;
 }
 
+function setRepeatRowCollapsed(row,collapsed){
+  if(!row)return;
+  row.classList.toggle("repeat-collapsed",!!collapsed);
+  const toggle=row.querySelector("[data-repeat-toggle]");
+  if(toggle){
+    toggle.setAttribute("aria-expanded",collapsed?"false":"true");
+    toggle.title=collapsed?"Expand item":"Collapse item";
+  }
+}
+
+function collectionRows(type){
+  const selector={publication:"#publicationsEditor [data-publication]",project:"#projectsEditor [data-project]",skill:"#skillsEditor [data-skill]",education:"#educationEditor [data-education]"}[type];
+  return selector?[...document.querySelectorAll(selector)]:[];
+}
+
 function renderPublicationsEditor(){
-  $("publicationsEditor").innerHTML=(currentContent.publications||[]).map((p,i)=>repeatBlock("publication",i,`Publication ${i+1}`,[
+  $("publicationsEditor").innerHTML=(currentContent.publications||[]).map((p,i)=>repeatBlock("publication",i,p.title||`Publication ${i+1}`,[
     {label:"Title",key:"title",value:p.title,full:true},{label:"Authors",key:"authors",value:p.authors,full:true},
     {label:"Author symbol / contribution note",key:"authorNote",value:p.authorNote||"",full:true},
     {label:"Journal / Conference",key:"venue",value:p.venue},{label:"Year",key:"year",value:p.year},
@@ -1963,7 +1997,7 @@ function renderPublicationsEditor(){
   ],p.media||[],p.visible!==false)).join("")||`<div class="empty-state">No publications added yet.</div>`;
 }
 function renderProjectsEditor(){
-  $("projectsEditor").innerHTML=(currentContent.projects||[]).map((p,i)=>repeatBlock("project",i,`Project / Simulation ${i+1}`,[
+  $("projectsEditor").innerHTML=(currentContent.projects||[]).map((p,i)=>repeatBlock("project",i,p.title||`Project / Simulation ${i+1}`,[
     {label:"Project title",key:"title",value:p.title,full:true},
     {label:"Type",key:"type",value:p.type||"",kind:"select",options:["","Research Project","Simulation","Engineering Project","Course Project","Hands-on Practical"]},
     {label:"Role / My Contribution",key:"contribution",value:p.contribution||"",kind:"textarea",full:true},
@@ -2198,13 +2232,48 @@ function reorderActivityWithinCategory(sourceIndex,targetIndex,placeAfter=false)
   renderActivitiesEditor();
   setStatus("Activity reordered within this category. Save all changes to publish.");
 }
-function renderSkillsEditor(){
-  $("skillsEditor").innerHTML=(currentContent.skills||[]).map((g,i)=>repeatBlock("skill",i,`Skill group ${i+1}`,[
-    {label:"Category",key:"category",value:g.category,full:true},{label:"Skills — one per line",key:"items",value:(g.items||[]).join("\n"),kind:"textarea",full:true}
-  ],g.media||[],g.visible!==false)).join("")||`<div class="empty-state">No skill groups added.</div>`;
+function skillSubgroupBlock(groupIndex,subgroup,subIndex){
+  return `<div class="skill-subgroup-admin" data-skill-subgroup="${subIndex}">
+    <div class="skill-subgroup-head">
+      <strong>${esc(subgroup.name||`Subgroup ${subIndex+1}`)}</strong>
+      <div class="skill-subgroup-actions">
+        <button class="secondary" data-move-skill-subgroup="${groupIndex}:${subIndex}:-1" type="button" title="Move subgroup up">↑</button>
+        <button class="secondary" data-move-skill-subgroup="${groupIndex}:${subIndex}:1" type="button" title="Move subgroup down">↓</button>
+        <button class="danger" data-remove-skill-subgroup="${groupIndex}:${subIndex}" type="button">Remove</button>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="field full"><label>Subgroup name</label><input data-skill-subgroup-name value="${esc(subgroup.name||"")}" placeholder="e.g., Programming & Libraries"></div>
+      <div class="field full"><label>Skills — one per line</label><textarea data-skill-subgroup-items placeholder="Python\nNumPy\npandas">${esc((subgroup.items||[]).join("\n"))}</textarea></div>
+    </div>
+  </div>`;
 }
+
+function skillSubgroupsEditor(group,i){
+  const subgroups=Array.isArray(group.subgroups)?group.subgroups:[];
+  return `<div class="skill-subgroups-admin">
+    <div class="skill-subgroups-toolbar">
+      <div>
+        <strong>Subgroups</strong>
+        <span class="helper">Optional. Use these to structure one skill group without creating several separate cards.</span>
+      </div>
+      <button class="secondary" data-add-skill-subgroup="${i}" type="button">+ Add subgroup</button>
+    </div>
+    <div class="skill-subgroups-list">
+      ${subgroups.length?subgroups.map((sg,j)=>skillSubgroupBlock(i,sg,j)).join(""):`<div class="skill-subgroup-empty">No subgroups yet. General skills above will still display normally.</div>`}
+    </div>
+  </div>`;
+}
+
+function renderSkillsEditor(){
+  $("skillsEditor").innerHTML=(currentContent.skills||[]).map((g,i)=>repeatBlock("skill",i,g.category||`Skill group ${i+1}`,[
+    {label:"Category",key:"category",value:g.category,full:true},
+    {label:"General / ungrouped skills — one per line (optional)",key:"items",value:(g.items||[]).join("\n"),kind:"textarea",full:true}
+  ],g.media||[],g.visible!==false,skillSubgroupsEditor(g,i))).join("")||`<div class="empty-state">No skill groups added.</div>`;
+}
+
 function renderEducationEditor(){
-  $("educationEditor").innerHTML=(currentContent.education||[]).map((e,i)=>repeatBlock("education",i,`Education ${i+1}`,[
+  $("educationEditor").innerHTML=(currentContent.education||[]).map((e,i)=>repeatBlock("education",i,e.degree||e.institution||`Education ${i+1}`,[
     {label:"Period",key:"period",value:e.period},{label:"Degree",key:"degree",value:e.degree},
     {label:"Institution",key:"institution",value:e.institution,full:true},
     {label:"CGPA / GPA",key:"cgpa",value:e.cgpa||""},
@@ -2507,9 +2576,10 @@ $("addPublicationBtn").addEventListener("click",()=>{
   syncAllForms();
   currentContent.publications.push({title:"",authors:"",authorNote:"",venue:"",year:"",status:"",doi:"",url:"",description:"",visible:true,media:[]});
   renderPublicationsEditor();
+  const row=document.querySelector(`#publicationsEditor [data-publication="${currentContent.publications.length-1}"]`);if(row)setRepeatRowCollapsed(row,false);
 });
 $("addProjectBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.projects.push({title:"",type:"",contribution:"",description:"",meta:"",url:"",visible:true,media:[]});renderProjectsEditor();
+  syncAllForms();currentContent.projects.push({title:"",type:"",contribution:"",description:"",meta:"",url:"",visible:true,media:[]});renderProjectsEditor();const row=document.querySelector(`#projectsEditor [data-project="${currentContent.projects.length-1}"]`);if(row)setRepeatRowCollapsed(row,false);
 });
 $("addActivityBtn").addEventListener("click",()=>{
   syncAllForms();
@@ -2520,10 +2590,10 @@ $("addActivityBtn").addEventListener("click",()=>{
   setActivityAdminCategory(category);
 });
 $("addSkillGroupBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.skills.push({category:"",items:[],visible:true,media:[]});renderSkillsEditor();
+  syncAllForms();currentContent.skills.push({category:"",items:[],subgroups:[],visible:true,media:[]});renderSkillsEditor();const row=document.querySelector(`#skillsEditor [data-skill="${currentContent.skills.length-1}"]`);if(row)setRepeatRowCollapsed(row,false);
 });
 $("addEducationBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.education.push({period:"",degree:"",institution:"",cgpa:"",cgpaSubtitle:"",description:"",courses:[],visible:true,media:[]});renderEducationEditor();
+  syncAllForms();currentContent.education.push({period:"",degree:"",institution:"",cgpa:"",cgpaSubtitle:"",description:"",courses:[],visible:true,media:[]});renderEducationEditor();const row=document.querySelector(`#educationEditor [data-education="${currentContent.education.length-1}"]`);if(row)setRepeatRowCollapsed(row,false);
 });
 
 document.addEventListener("change",e=>{
@@ -2610,7 +2680,59 @@ document.addEventListener("change",e=>{
 });
 
 document.addEventListener("click",async e=>{
-  let b=e.target.closest("[data-move-item]");
+  let b=e.target.closest("[data-repeat-toggle]");
+  if(b){
+    const row=b.closest(".repeat-collapsible");
+    if(row)setRepeatRowCollapsed(row,!row.classList.contains("repeat-collapsed"));
+    return;
+  }
+
+  b=e.target.closest("[data-expand-collection]");
+  if(b){collectionRows(b.dataset.expandCollection).forEach(row=>setRepeatRowCollapsed(row,false));return}
+
+  b=e.target.closest("[data-collapse-collection]");
+  if(b){collectionRows(b.dataset.collapseCollection).forEach(row=>setRepeatRowCollapsed(row,true));return}
+
+  b=e.target.closest("[data-add-skill-subgroup]");
+  if(b){
+    syncAllForms();
+    const i=Number(b.dataset.addSkillSubgroup);
+    currentContent.skills[i]=normalizeSkillGroupRecord(currentContent.skills[i]||{});
+    currentContent.skills[i].subgroups.push({name:"",items:[]});
+    renderSkillsEditor();
+    const row=document.querySelector(`#skillsEditor [data-skill="${i}"]`);
+    if(row)setRepeatRowCollapsed(row,false);
+    return;
+  }
+
+  b=e.target.closest("[data-move-skill-subgroup]");
+  if(b){
+    syncAllForms();
+    const [gi,si,delta]=b.dataset.moveSkillSubgroup.split(":").map(Number);
+    const group=currentContent.skills[gi];
+    if(group&&Array.isArray(group.subgroups)){
+      const j=si+delta;
+      if(j>=0&&j<group.subgroups.length){[group.subgroups[si],group.subgroups[j]]=[group.subgroups[j],group.subgroups[si]]}
+    }
+    renderSkillsEditor();
+    const row=document.querySelector(`#skillsEditor [data-skill="${gi}"]`);
+    if(row)setRepeatRowCollapsed(row,false);
+    return;
+  }
+
+  b=e.target.closest("[data-remove-skill-subgroup]");
+  if(b){
+    syncAllForms();
+    const [gi,si]=b.dataset.removeSkillSubgroup.split(":").map(Number);
+    const group=currentContent.skills[gi];
+    if(group&&Array.isArray(group.subgroups))group.subgroups.splice(si,1);
+    renderSkillsEditor();
+    const row=document.querySelector(`#skillsEditor [data-skill="${gi}"]`);
+    if(row)setRepeatRowCollapsed(row,false);
+    return;
+  }
+
+  b=e.target.closest("[data-move-item]");
   if(b){
     const[type,idxs,deltas]=b.dataset.moveItem.split(":");
     moveRepeaterItem(type,Number(idxs),Number(deltas));
@@ -2767,8 +2889,12 @@ function readRepeaters(){
 
   currentContent.skills=[...document.querySelectorAll("[data-skill]")].map((r,i)=>{
     const old=currentContent.skills[i]||{};
-    return {category:get(r,"category"),items:get(r,"items").split("\n").map(x=>x.trim()).filter(Boolean),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
-  }).filter(x=>x.category||x.items.length||x.media.length);
+    const subgroups=[...r.querySelectorAll("[data-skill-subgroup]")].map(sr=>({
+      name:(sr.querySelector("[data-skill-subgroup-name]")?.value||"").trim(),
+      items:(sr.querySelector("[data-skill-subgroup-items]")?.value||"").split("\n").map(x=>x.trim()).filter(Boolean)
+    })).filter(sg=>sg.name||sg.items.length);
+    return {category:get(r,"category"),items:get(r,"items").split("\n").map(x=>x.trim()).filter(Boolean),subgroups,visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
+  }).filter(x=>x.category||x.items.length||x.subgroups.length||x.media.length);
 
   currentContent.education=[...document.querySelectorAll("[data-education]")].map((r,i)=>{
     const old=currentContent.education[i]||{};

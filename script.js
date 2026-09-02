@@ -1281,7 +1281,7 @@ function normalizeMediaDisplayList(value){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=29;
+const BUILDER_SETTINGS_SCHEMA_VERSION=30;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1488,7 +1488,15 @@ function normalize(d){
   d.featuredResearch=d.featuredResearch||{};d.featuredResearch.media=normalizeMediaDisplayList(d.featuredResearch.media);
   d.publications=(d.publications||[]).map(normalizePublicationRecord);
   d.projects=(d.projects||[]).map(x=>({...x,contribution:String(x.contribution||""),media:normalizeMediaDisplayList(x.media)}));
-  d.skills=(d.skills||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
+  const normalizeSkillGroupRecord=(item)=>{
+    const out={...(item||{})};
+    out.category=String(out.category||"").trim();
+    out.items=Array.isArray(out.items)?out.items.map(v=>String(v).trim()).filter(Boolean):String(out.items||"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean);
+    out.subgroups=(Array.isArray(out.subgroups)?out.subgroups:[]).map(group=>({name:String(group?.name??group?.title??"").trim(),items:Array.isArray(group?.items)?group.items.map(v=>String(v).trim()).filter(Boolean):String(group?.items||"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean)})).filter(group=>group.name||group.items.length);
+    out.media=normalizeMediaDisplayList(out.media);
+    return out;
+  };
+  d.skills=(d.skills||[]).map(normalizeSkillGroupRecord);
   d.education=(d.education||[]).map(x=>({...x,cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:normalizeMediaDisplayList(x.media)}));
   d.contact=d.contact||{};d.contact.media=normalizeMediaDisplayList(d.contact.media);
   d.thesis.media=normalizeMediaDisplayList(d.thesis.media);
@@ -1732,12 +1740,16 @@ function render(d){
 
   renderAcademicActivities(d);
 
-  $("skillsList").innerHTML=(d.skills||[]).filter(g=>g.visible!==false).map(g=>`
-    <article class="skill-card">
+  $("skillsList").innerHTML=(d.skills||[]).filter(g=>g.visible!==false).map(g=>{
+    const subgroups=(g.subgroups||[]).filter(sg=>sg.name||(sg.items||[]).length);
+    const general=(g.items||[]);
+    return `<article class="skill-card ${subgroups.length?"has-skill-subgroups":""}">
       <h3>${esc(g.category||"")}</h3>
-      <ul>${(g.items||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>
+      ${general.length?`<ul class="skill-general-list">${general.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
+      ${subgroups.length?`<div class="skill-subgroups">${subgroups.map(sg=>`<section class="skill-subgroup"><h4>${esc(sg.name||"Skills")}</h4><ul>${(sg.items||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></section>`).join("")}</div>`:""}
       <div class="item-media">${mediaHtml(g.media||[])}</div>
-    </article>`).join("");
+    </article>`;
+  }).join("");
 
   $("educationList").innerHTML=(d.education||[]).filter(e=>e.visible!==false).map(e=>`
     <article class="edu">
