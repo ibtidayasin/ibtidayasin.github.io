@@ -5127,3 +5127,31 @@ body:not(.admin-body) .skill-card.has-skill-subgroups>.item-media{margin-top:16p
     box-sizing:border-box!important;
   }
 }
+
+/* =========================================================
+   MOBILE SKILLS — EXPLICIT GAP BELOW BANDED HEADER
+   Robust fix: use real block margins (not only UL padding), so the
+   first visible skill cannot sit against the header divider.
+   ========================================================= */
+@media(max-width:760px){
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-general-list{
+    margin-top:20px!important;
+    padding-top:0!important;
+    padding-bottom:20px!important;
+    padding-left:38px!important;
+    padding-right:20px!important;
+  }
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-subgroups{
+    margin-top:20px!important;
+    padding-top:0!important;
+    padding-bottom:20px!important;
+    padding-left:20px!important;
+    padding-right:20px!important;
+  }
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-general-list>li:first-child{
+    padding-top:10px!important;
+  }
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-subgroups>.skill-subgroup:first-child{
+    padding-top:10px!important;
+  }
+}
