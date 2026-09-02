@@ -5020,3 +5020,95 @@ body:not(.admin-body) .skill-card.has-skill-subgroups>.item-media{margin-top:16p
 #skills[data-card-design="ledger"] .skill-subgroup ul{columns:2;column-gap:34px}
 #skills[data-card-design="spotlight"] .skill-subgroup h4{color:var(--muted)!important;margin-bottom:8px!important}
 #skills[data-card-design="spotlight"] .skill-subgroups{gap:16px!important}
+
+/* =========================================================
+   MOBILE SKILLS — BREATHING ROOM AROUND FIRST/LAST ITEM
+   Keeps the first skill from visually touching the header divider.
+   Applies to both flat skill lists and subgroup-based skill cards.
+   ========================================================= */
+@media(max-width:760px){
+  body:not(.admin-body) #skills .skill-card>.skill-general-list{
+    padding-top:18px!important;
+    padding-bottom:16px!important;
+  }
+  body:not(.admin-body) #skills .skill-card>.skill-subgroups{
+    padding-top:18px!important;
+    padding-bottom:16px!important;
+  }
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-general-list{
+    padding-top:28px!important;
+    padding-bottom:20px!important;
+    padding-left:38px!important;
+    padding-right:20px!important;
+  }
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-subgroups{
+    padding-top:28px!important;
+    padding-bottom:20px!important;
+    padding-left:20px!important;
+    padding-right:20px!important;
+  }
+}
+
+/* =========================================================
+   MOBILE POLISH — Activity Media Fill centering + Thesis split
+   2026-09-03
+   ========================================================= */
+@media(max-width:760px){
+  /* Activity Media Fill: center a single, size-controlled media card
+     inside the full-width mobile media rail. Full-width media remains
+     naturally full-width. */
+  body:not(.admin-body) #activities .activity-card[data-activity-card-design="activity-media-fill"]
+  .item-media .media-gallery:not(:has(> .media-public-item:nth-child(2))) > .media-public-item{
+    justify-self:center!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+  }
+
+  body:not(.admin-body) #activities .activity-card[data-activity-card-design="activity-media-fill"]
+  .item-media .media-gallery:not(:has(> .media-public-item:nth-child(2))){
+    justify-items:center!important;
+  }
+
+  /* Thesis split/banded cards must collapse to one readable column on
+     phones. This overrides the desktop split's !important two-column rule. */
+  body:not(.admin-body) #thesis .thesis-card{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr)!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  body:not(.admin-body) #thesis .thesis-main,
+  body:not(.admin-body) #thesis .thesis-meta{
+    grid-column:1!important;
+    width:100%!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+  }
+  body:not(.admin-body) #thesis .thesis-main{
+    padding:20px!important;
+  }
+  body:not(.admin-body) #thesis .thesis-main h3{
+    max-width:100%!important;
+    overflow-wrap:break-word!important;
+    word-break:normal!important;
+  }
+  body:not(.admin-body) #thesis .thesis-meta{
+    padding:20px!important;
+    border-left:0!important;
+    border-top:1px solid var(--line)!important;
+  }
+
+  /* Explicit banded override because its desktop rule uses !important. */
+  body:not(.admin-body) #thesis[data-card-design="banded"] .thesis-card{
+    grid-template-columns:minmax(0,1fr)!important;
+  }
+  body:not(.admin-body) #thesis[data-card-design="banded"] .thesis-main,
+  body:not(.admin-body) #thesis[data-card-design="banded"] .thesis-meta{
+    background:var(--surface)!important;
+  }
+  body:not(.admin-body) #thesis[data-card-design="banded"] .thesis-meta{
+    background:var(--accent-soft)!important;
+    border-left:0!important;
+    border-top:1px solid var(--line)!important;
+  }
+}
