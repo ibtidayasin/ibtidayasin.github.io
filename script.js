@@ -1745,8 +1745,10 @@ function render(d){
     const general=(g.items||[]);
     return `<article class="skill-card ${subgroups.length?"has-skill-subgroups":""}">
       <h3>${esc(g.category||"")}</h3>
-      ${!subgroups.length&&general.length?`<ul class="skill-general-list">${general.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
-      ${subgroups.length?`<div class="skill-subgroups">${subgroups.map(sg=>`<section class="skill-subgroup"><h4>${esc(sg.name||"Skills")}</h4><ul>${(sg.items||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></section>`).join("")}</div>`:""}
+      <div class="skill-list-wrap ${subgroups.length?"has-subgroups":"has-general"}">
+        ${!subgroups.length&&general.length?`<ul class="skill-general-list">${general.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
+        ${subgroups.length?`<div class="skill-subgroups">${subgroups.map(sg=>`<section class="skill-subgroup"><h4>${esc(sg.name||"Skills")}</h4><ul>${(sg.items||[]).map(x=>`<li>${esc(x)}</li>`).join("")}</ul></section>`).join("")}</div>`:""}
+      </div>
       <div class="item-media">${mediaHtml(g.media||[])}</div>
     </article>`;
   }).join("");

@@ -5155,3 +5155,70 @@ body:not(.admin-body) .skill-card.has-skill-subgroups>.item-media{margin-top:16p
     padding-top:10px!important;
   }
 }
+
+
+/* =========================================================
+   MOBILE SKILLS — STRUCTURAL CONTENT WRAPPER FIX
+   The visual banded header and the skill content are separate boxes.
+   Spacing now lives on a dedicated wrapper, so it cannot collapse or
+   be cancelled by UL margins/padding from alternate card designs.
+   ========================================================= */
+body:not(.admin-body) #skills .skill-card>.skill-list-wrap{
+  min-width:0;
+  box-sizing:border-box;
+}
+
+/* Preserve the two-panel Banded layout on desktop after introducing
+   the dedicated skill-content wrapper. */
+body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-list-wrap{
+  grid-column:2!important;
+  padding:22px 26px 18px 46px!important;
+  margin:0!important;
+  align-self:center!important;
+}
+body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-list-wrap>.skill-general-list,
+body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-list-wrap>.skill-subgroups{
+  margin:0!important;
+  padding:0!important;
+}
+body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-list-wrap.has-subgroups{
+  padding-left:26px!important;
+}
+
+/* Minimal Index keeps the skill content in the right column. */
+body:not(.admin-body) #skills[data-card-design="ledger"] .skill-card>.skill-list-wrap{
+  min-width:0!important;
+}
+body:not(.admin-body) #skills[data-card-design="ledger"] .skill-card>.item-media{
+  grid-column:2!important;
+}
+
+@media(max-width:760px){
+  /* Mobile Banded is now explicitly: header block -> content block.
+     The 26px top padding is inside the content block itself, so the
+     first bullet can no longer sit against the divider. */
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-list-wrap{
+    display:block!important;
+    width:100%!important;
+    margin:0!important;
+    padding:26px 20px 20px 38px!important;
+    box-sizing:border-box!important;
+  }
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-list-wrap.has-subgroups{
+    padding-left:20px!important;
+  }
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-list-wrap>.skill-general-list,
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-list-wrap>.skill-subgroups{
+    display:grid!important;
+    width:100%!important;
+    margin:0!important;
+    padding:0!important;
+  }
+  /* Neutralize the older direct-child gap rules; the wrapper now owns
+     all vertical spacing. */
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-general-list,
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-subgroups{
+    margin:0!important;
+    padding-top:0!important;
+  }
+}
