@@ -5112,3 +5112,18 @@ body:not(.admin-body) .skill-card.has-skill-subgroups>.item-media{margin-top:16p
     border-top:1px solid var(--line)!important;
   }
 }
+
+/* =========================================================
+   MOBILE THESIS META — CENTER NARROW DETAILS CARD
+   Keeps spotlight Thesis metadata visually centered on phones.
+   ========================================================= */
+@media(max-width:760px){
+  body:not(.admin-body) #thesis[data-card-design="spotlight"] .thesis-meta{
+    width:calc(100% - 28px)!important;
+    max-width:100%!important;
+    margin:14px auto!important;
+    justify-self:center!important;
+    align-self:stretch!important;
+    box-sizing:border-box!important;
+  }
+}
