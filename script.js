@@ -180,7 +180,7 @@ const COVER_SECTION_KEYS=["research","thesis","publications","projects","activit
 const SIDEBAR_SECTION_KEYS=[...COVER_SECTION_KEYS];
 const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","skills","education","contact"];
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
-const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full"];
+const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -1281,7 +1281,7 @@ function normalizeMediaDisplayList(value){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=28;
+const BUILDER_SETTINGS_SCHEMA_VERSION=29;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1361,13 +1361,13 @@ function normalizeActivityCategory(value){
 
 function normalizeActivityCardDesign(value){
   const design=String(value||"").trim();
-  return ["activity-split","activity-showcase","activity-media-fill","activity-certificate-full"].includes(design)?design:"";
+  return ["activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"].includes(design)?design:"";
 }
 
 function effectiveActivityCardDesign(item,d){
   const override=normalizeActivityCardDesign(item?.cardDesign);
   if(override)return override;
-  if(normalizeActivityCategory(item?.category)==="Certifications")return "activity-certificate-full";
+  if(normalizeActivityCategory(item?.category)==="Certifications")return "activity-certificate-grid";
   const sectionDefault=d?.siteSettings?.layout?.cardDesigns?.activities||DEFAULT_SITE_SETTINGS.layout.cardDesigns.activities;
   return CARD_DESIGN_VALUES.includes(sectionDefault)?sectionDefault:DEFAULT_SITE_SETTINGS.layout.cardDesigns.activities;
 }

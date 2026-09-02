@@ -4853,21 +4853,97 @@ body:not(.admin-body) .media-public-info.media-caption-right{text-align:right!im
 }
 
 /* =========================================================
-   CERTIFICATIONS — TWO-COLUMN PUBLIC LAYOUT
-   Keep the global Academic Activities column setting for every
-   other category, but always show Certifications two per row
-   on desktop. Certificate cards keep their own compact width.
+   CERTIFICATIONS — DEDICATED TWO-COLUMN GRID CARD
+   Certifications get a separate default card composition that
+   fills each half-row cleanly. The older Certificate Card stays
+   available for individual activities and still shrink-wraps to
+   the chosen media size.
    ========================================================= */
 #activities .activity-panel[data-activity-panel="Certifications"] .activity-grid{
   grid-template-columns:repeat(2,minmax(0,1fr))!important;
-  align-items:start!important;
-  justify-items:start!important;
+  align-items:stretch!important;
+  justify-items:stretch!important;
+  gap:18px!important;
 }
-#activities .activity-panel[data-activity-panel="Certifications"] .activity-card{
+
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"]{
+  display:flex!important;
+  flex-direction:column!important;
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  min-height:100%!important;
+  box-sizing:border-box!important;
+  justify-self:stretch!important;
+  align-self:stretch!important;
+  padding:20px!important;
+  overflow:hidden!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"]>.activity-card-top{
+  margin-bottom:10px!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"]>h3{
+  margin:0 0 7px!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"]>.activity-organization{
+  margin-bottom:9px!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"]>p{
+  margin-bottom:0!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"]>.activity-topic-chips{
+  margin-top:12px!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"]>.text-link{
+  margin-top:10px!important;
+  align-self:flex-start!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"]>.item-media{
+  display:block!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:16px 0 0!important;
+  padding:0!important;
+  border:0!important;
+  background:transparent!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"]>.item-media:empty{display:none!important}
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"] .item-media .media-gallery{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:10px!important;
+  width:100%!important;
+  max-width:none!important;
+  margin:0!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"] .item-media .media-public-item{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin:0!important;
+  justify-self:stretch!important;
   align-self:start!important;
 }
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"] .item-media :is(.media-image-stage,.pdf-cover-link,.media-public-video){
+  width:100%!important;
+  max-width:none!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"] .item-media :is(.media-public-image,.pdf-cover-image){
+  display:block!important;
+  width:100%!important;
+  max-width:100%!important;
+  height:auto!important;
+}
+#activities .activity-card[data-activity-card-design="activity-certificate-grid"] .item-media .media-public-info{
+  width:100%!important;
+}
+
 @media(max-width:760px){
   #activities .activity-panel[data-activity-panel="Certifications"] .activity-grid{
     grid-template-columns:1fr!important;
+    gap:14px!important;
+  }
+  #activities .activity-card[data-activity-card-design="activity-certificate-grid"]{
+    padding:16px!important;
   }
 }
