@@ -5222,3 +5222,36 @@ body:not(.admin-body) #skills[data-card-design="ledger"] .skill-card>.item-media
     padding-top:0!important;
   }
 }
+
+/* =========================================================
+   MOBILE BANDED SKILLS — FLOW-BASED HEADER FIX
+   The previous Banded mobile header used an absolutely-positioned
+   112px ::before band. For short/one-line titles, the following skill
+   content started before that 112px band had actually ended, so its
+   top padding was hidden underneath the band. Make the header itself
+   own the band height so content always starts after the divider.
+   ========================================================= */
+@media(max-width:760px){
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card::before{
+    display:none!important;
+    content:none!important;
+  }
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>h3{
+    display:flex!important;
+    align-items:flex-start!important;
+    width:100%!important;
+    min-height:112px!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+    padding:24px 20px 32px!important;
+    background:var(--accent-soft)!important;
+    border-bottom:1px solid var(--line)!important;
+  }
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-list-wrap{
+    margin:0!important;
+    padding:22px 20px 20px 38px!important;
+  }
+  body:not(.admin-body) #skills[data-card-design="banded"] .skill-card>.skill-list-wrap.has-subgroups{
+    padding-left:20px!important;
+  }
+}
