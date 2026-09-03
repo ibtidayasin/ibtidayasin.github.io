@@ -846,10 +846,13 @@ function syncSiteCustomizationFromControls(){
   l.portraitShape=$("fPortraitShape").value;
   l.portraitFit=$("fPortraitFit").value;
   l.portraitPosition=$("fPortraitPosition").value;
-  l.projectColumns=Number($("fProjectColumns").value);
+  const nextProjectColumns=Number($("fProjectColumns")?.value);
+  if([1,2,3].includes(nextProjectColumns))l.projectColumns=nextProjectColumns;
   l.projectFlow=$("fProjectFlow")?.value==="masonry"?"masonry":"grid";
-  l.activityColumns=Number($("fActivityColumns")?.value||2);
-  l.skillsColumns=Number($("fSkillsColumns").value);
+  const nextActivityColumns=Number($("fActivityColumns")?.value);
+  if([1,2,3].includes(nextActivityColumns))l.activityColumns=nextActivityColumns;
+  const nextSkillsColumns=Number($("fSkillsColumns")?.value);
+  if([1,2,3].includes(nextSkillsColumns))l.skillsColumns=nextSkillsColumns;
   l.fontPair=$("fFontPair").value;
   l.shadow=$("fShadow").value;
   l.stickySidebar=$("fStickySidebar").checked;
@@ -883,6 +886,26 @@ function syncSiteCustomizationFromControls(){
   e.navHighlightStyle=$("fNavHighlightStyle").value;
   e.socialStyle=$("fSocialStyle").value;
 }
+
+/* Keep Layout selections in currentContent immediately.
+   Earlier, Layout controls depended on a delayed history checkpoint. If an
+   unrelated action re-rendered Admin first, the UI could be refilled from the
+   older layout values and the selected column count appeared to change. */
+function commitLayoutControlsImmediately(){
+  try{
+    syncSiteCustomizationFromControls();
+    currentContent.appearance=currentContent.appearance||{};
+    currentContent.appearance.designPreset="custom";
+  }catch(err){
+    console.warn("Could not commit layout controls:",err);
+  }
+}
+document.addEventListener("input",e=>{
+  if(e.target?.closest?.('[data-panel="layout"]'))commitLayoutControlsImmediately();
+});
+document.addEventListener("change",e=>{
+  if(e.target?.closest?.('[data-panel="layout"]'))commitLayoutControlsImmediately();
+});
 
 function resetLayoutStyleControls(){
   normalizeSiteSettings(currentContent);
@@ -1655,10 +1678,13 @@ function sectionHasPublicContent(d,key){
 }
 
 const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
-const ADMIN_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream","custom-theme"];
+const ADMIN_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream","powder-blue","sky-blue","ice-blue","cobalt-blue","cornflower-blue","steel-blue","denim-blue","arctic-blue","glacier-blue","mist-blue","ocean-blue","harbor-blue","cerulean-blue","periwinkle-blue","sapphire-blue","aegean-blue","frost-blue","azure-bloom","lapis-blue","cloud-blue","custom-theme"];
 function validAdminTheme(t){return ADMIN_THEMES.includes(t)?t:"classic-brown"}
 function selectedAdminTheme(){
-  return document.querySelector('input[name="siteTheme"]:checked')?.value||"classic-brown";
+  const checked=document.querySelector('input[name="siteTheme"]:checked')?.value;
+  if(ADMIN_THEMES.includes(checked))return checked;
+  const current=String(currentContent?.defaultTheme||"");
+  return ADMIN_THEMES.includes(current)?current:"classic-brown";
 }
 function applyAdminThemePreview(theme){
   const valid=validAdminTheme(theme);
@@ -1683,6 +1709,9 @@ document.addEventListener("change",e=>{
   document.querySelectorAll("[data-theme-card]").forEach(card=>{
     card.classList.toggle("selected",card.dataset.themeCard===input.value);
   });
+  // Store the chosen theme immediately in the editor state. This prevents a
+  // later fillForms()/media refresh from restoring the previously saved theme.
+  currentContent.defaultTheme=input.value;
   applyAdminThemePreview(input.value);
   if($("fSectionTitleColor")&&$("fSectionSubtitleColor")){
     showCurrentThemeColorsInBoxes();
