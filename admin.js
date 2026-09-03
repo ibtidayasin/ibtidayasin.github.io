@@ -1718,9 +1718,48 @@ async function boot(){
     revealAdminUi();
   }
 }
+function prepareFreshLoginFields(){
+  const email=$("loginEmail"),password=$("loginPassword");
+  if(!email||!password)return;
+
+  // Do not change Supabase session persistence. This guard is only for
+  // browsers that do NOT already have a valid signed-in Admin session.
+  [email,password].forEach(field=>{
+    field.value="";
+    field.readOnly=true;
+    field.setAttribute("data-lpignore","true");
+    field.setAttribute("data-1p-ignore","true");
+    field.setAttribute("data-bwignore","true");
+  });
+  email.setAttribute("autocomplete","off");
+  password.setAttribute("autocomplete","new-password");
+
+  const unlockField=field=>{
+    field.readOnly=false;
+    field.value="";
+  };
+  [email,password].forEach(field=>{
+    field.addEventListener("pointerdown",()=>unlockField(field),{once:true});
+    field.addEventListener("focus",()=>unlockField(field),{once:true});
+    field.addEventListener("keydown",()=>{field.readOnly=false},{once:true});
+  });
+
+  // Some browsers/password managers try to inject saved values just after
+  // page load. Clear those values while the fields are still locked.
+  requestAnimationFrame(()=>{
+    if(email.readOnly)email.value="";
+    if(password.readOnly)password.value="";
+  });
+  setTimeout(()=>{
+    if(email.readOnly)email.value="";
+    if(password.readOnly)password.value="";
+  },250);
+}
+
 function showLogin(){
   $("loginView").classList.remove("hidden");
   $("adminView").classList.add("hidden");
+  prepareFreshLoginFields();
 }
 async function verifyAdminAndOpen(){
   const{data,error}=await sb.rpc("is_site_admin");

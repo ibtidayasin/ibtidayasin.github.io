@@ -23,10 +23,10 @@
 <section class="admin-card login-wrap" id="loginView">
 <p class="eyebrow">Private Admin</p>
 <h1>Website login</h1>
-<p class="muted">Use your Supabase admin email and password.</p>
+<p class="muted">Existing signed-in browser sessions stay active. New browser sessions require your admin email and password.</p>
 <div class="form-grid">
-<div class="field full"><label>Email</label><input autocomplete="username" id="loginEmail" type="email"/></div>
-<div class="field full"><label>Password</label><input autocomplete="current-password" id="loginPassword" type="password"/></div>
+<div class="field full"><label>Email</label><input autocomplete="off" autocapitalize="none" autocorrect="off" data-1p-ignore="true" data-bwignore="true" data-lpignore="true" id="loginEmail" inputmode="email" spellcheck="false" type="email"/></div>
+<div class="field full"><label>Password</label><input autocomplete="new-password" autocapitalize="none" autocorrect="off" data-1p-ignore="true" data-bwignore="true" data-lpignore="true" id="loginPassword" spellcheck="false" type="password"/></div>
 </div>
 <div class="action-row"><button class="primary" id="loginBtn" type="button">Log in</button><a class="secondary" href="index.html">Back to website</a></div>
 <div class="status" id="loginStatus"></div>
@@ -1130,6 +1130,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-<script src="admin.js?v=20260903-mobile-skill-header-flow1"></script>
+<script src="admin.js?v=20260903-login-autofill-guard1"></script>
 </body>
 </html>
