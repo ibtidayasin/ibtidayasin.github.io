@@ -423,18 +423,18 @@ const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
-const MAIN_NAV_STYLE_VALUES=["current","academic-underline","floating-rail","editorial-rule","topline-indicator","dot-marker","gradient-wash","split-brand","bracket-focus","accent-edge","glass-underline"];
+const MAIN_NAV_STYLE_VALUES=["current","framed-links","accent-pills","floating-capsule","segmented-strip","top-rail","mini-cards","soft-chips","editorial-dividers","glass-rail","ribbon-blocks"];
 const LEGACY_MAIN_NAV_STYLE_MAP={
-  "framed-links":"editorial-rule",
-  "accent-pills":"academic-underline",
-  "floating-capsule":"floating-rail",
-  "segmented-strip":"editorial-rule",
-  "top-rail":"topline-indicator",
-  "mini-cards":"bracket-focus",
-  "soft-chips":"gradient-wash",
-  "editorial-dividers":"editorial-rule",
-  "glass-rail":"glass-underline",
-  "ribbon-blocks":"accent-edge"
+  "academic-underline":"accent-pills",
+  "floating-rail":"floating-capsule",
+  "editorial-rule":"editorial-dividers",
+  "topline-indicator":"top-rail",
+  "dot-marker":"framed-links",
+  "gradient-wash":"soft-chips",
+  "split-brand":"framed-links",
+  "bracket-focus":"mini-cards",
+  "accent-edge":"top-rail",
+  "glass-underline":"glass-rail"
 };
 function normalizeMainNavStyle(value){
   if(MAIN_NAV_STYLE_VALUES.includes(value))return value;
