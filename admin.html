@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260906-activity-nav-styles1" rel="stylesheet"/>
+<link href="styles.css?v=20260906-navigation-styles1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -49,6 +49,7 @@
 <button data-tab="contact" type="button">Contact</button>
 <button data-tab="cv" type="button">CV</button>
 <button data-tab="appearance" type="button">Appearance</button>
+<button data-tab="navigation" type="button">Navigation</button>
 <button data-tab="typography" type="button">Typography</button>
 <button data-tab="layout" type="button">Layout</button>
 <button data-tab="structure" type="button">Structure</button>
@@ -944,7 +945,106 @@
 <span>Choosing a theme previews it immediately in this private admin page. Click <b>Save all changes</b> to publish it.</span>
 </div>
 
-<div class="admin-card activity-tab-style-admin">
+
+<div class="admin-card">
+<div class="settings-head">
+<div>
+<h2>Design presets</h2>
+<p class="muted">Apply a complete visual starting point, then customize every setting afterward.</p>
+</div>
+<span class="preset-current" id="currentPresetLabel">Custom</span>
+</div>
+<div class="preset-grid" id="designPresetGrid"></div>
+<p class="helper">Presets change design settings only. Your text, publications, projects, thesis, media and CV are not replaced.</p>
+</div><div class="admin-card compact-settings-card">
+<div class="settings-head"><div><h3>Cards</h3><p class="muted">Use Card Finish for subtle changes, or Card Design for a clearly different visual structure.</p></div></div>
+<div class="compact-control-grid">
+<div class="range-setting"><label>Card corner radius</label><div><input id="fCardRadius" max="28" min="0" step="1" type="range"/><input id="fCardRadiusNumber" max="28" min="0" step="1" type="number"/></div></div>
+<div class="field card-style-compact-control"><label>Card options</label><div class="card-style-select-row card-options-three"><select id="fCardStyleSection" aria-label="Card section"><option value="thesis">Thesis</option><option value="publications">Publications</option><option value="projects">Projects &amp; Simulations</option><option value="activities">Academic Activities</option><option value="skills">Skills</option><option value="education">Education</option><option value="contact">Contact</option></select><select id="fCardStyleValue" aria-label="Card finish"><option value="classic">Balanced finish</option><option value="clean">Flat finish</option><option value="outline">Outline finish</option><option value="soft">Soft tint</option><option value="accent">Accent edge</option><option value="elevated">Raised finish</option></select><select id="fCardDesignValue" aria-label="Card design"><option value="standard">Native section</option><option value="editorial">Publication record</option><option value="banded">Thesis split</option><option value="ledger">Minimal index</option><option value="spotlight">Toolkit chips</option><option value="framed">Academic timeline</option><option value="activity-split" data-activity-only="true">Activity Split</option><option value="activity-showcase" data-activity-only="true">Activity Showcase</option><option value="activity-media-fill" data-activity-only="true">Activity Media Fill</option><option value="activity-certificate-full" data-activity-only="true">Certificate Card</option><option value="activity-certificate-grid" data-activity-only="true">Certification Grid</option></select></div><span class="helper">Card Finish makes subtle surface changes. Card Design switches to a genuinely different composition. For Academic Activities, this design is the default; any individual activity can override it from its own editor.</span></div>
+<div class="field"><label>Shadow</label><select id="fShadow"><option value="theme">Theme default</option><option value="none">None</option><option value="subtle">Subtle</option><option value="medium">Medium</option></select></div>
+</div>
+</div></div>
+
+
+<div class="admin-panel" data-panel="navigation">
+<div class="navigation-admin-intro admin-card">
+<p class="eyebrow">Navigation</p>
+<h2>Navigation styles</h2>
+<p class="muted">Control the public top navigation and the Academic Activities category navigation from one place.</p>
+</div>
+<details class="admin-card navigation-fold" open>
+<summary><span><strong>Main website navigation</strong><small>Choose the style of the navigation bar shown at the top of the public website.</small></span><span class="navigation-fold-chevron" aria-hidden="true"></span></summary>
+<div class="navigation-fold-body">
+<div class="main-nav-style-choice-grid" role="radiogroup" aria-label="Main website navigation style">
+<label class="main-nav-style-choice" data-main-nav-style-card="current">
+<input name="mainNavStyle" type="radio" value="current"/>
+<span class="main-nav-style-preview" data-main-nav-preview="current"><span>Home</span><span class="active">Research</span><span>Projects</span></span>
+<span class="main-nav-style-name">Current / Classic Line</span>
+</label>
+<label class="main-nav-style-choice" data-main-nav-style-card="framed-links">
+<input name="mainNavStyle" type="radio" value="framed-links"/>
+<span class="main-nav-style-preview" data-main-nav-preview="framed-links"><span>Home</span><span class="active">Research</span><span>Projects</span></span>
+<span class="main-nav-style-name">1. Framed Links</span>
+</label>
+<label class="main-nav-style-choice" data-main-nav-style-card="accent-pills">
+<input name="mainNavStyle" type="radio" value="accent-pills"/>
+<span class="main-nav-style-preview" data-main-nav-preview="accent-pills"><span>Home</span><span class="active">Research</span><span>Projects</span></span>
+<span class="main-nav-style-name">2. Accent Pills</span>
+</label>
+<label class="main-nav-style-choice" data-main-nav-style-card="floating-capsule">
+<input name="mainNavStyle" type="radio" value="floating-capsule"/>
+<span class="main-nav-style-preview" data-main-nav-preview="floating-capsule"><span>Home</span><span class="active">Research</span><span>Projects</span></span>
+<span class="main-nav-style-name">3. Floating Capsule</span>
+</label>
+<label class="main-nav-style-choice" data-main-nav-style-card="segmented-strip">
+<input name="mainNavStyle" type="radio" value="segmented-strip"/>
+<span class="main-nav-style-preview" data-main-nav-preview="segmented-strip"><span>Home</span><span class="active">Research</span><span>Projects</span></span>
+<span class="main-nav-style-name">4. Segmented Strip</span>
+</label>
+<label class="main-nav-style-choice" data-main-nav-style-card="top-rail">
+<input name="mainNavStyle" type="radio" value="top-rail"/>
+<span class="main-nav-style-preview" data-main-nav-preview="top-rail"><span>Home</span><span class="active">Research</span><span>Projects</span></span>
+<span class="main-nav-style-name">5. Top-Rail Tabs</span>
+</label>
+<label class="main-nav-style-choice" data-main-nav-style-card="mini-cards">
+<input name="mainNavStyle" type="radio" value="mini-cards"/>
+<span class="main-nav-style-preview" data-main-nav-preview="mini-cards"><span>Home</span><span class="active">Research</span><span>Projects</span></span>
+<span class="main-nav-style-name">6. Mini Cards</span>
+</label>
+<label class="main-nav-style-choice" data-main-nav-style-card="soft-chips">
+<input name="mainNavStyle" type="radio" value="soft-chips"/>
+<span class="main-nav-style-preview" data-main-nav-preview="soft-chips"><span>Home</span><span class="active">Research</span><span>Projects</span></span>
+<span class="main-nav-style-name">7. Soft Chips</span>
+</label>
+<label class="main-nav-style-choice" data-main-nav-style-card="editorial-dividers">
+<input name="mainNavStyle" type="radio" value="editorial-dividers"/>
+<span class="main-nav-style-preview" data-main-nav-preview="editorial-dividers"><span>Home</span><span class="active">Research</span><span>Projects</span></span>
+<span class="main-nav-style-name">8. Editorial Dividers</span>
+</label>
+<label class="main-nav-style-choice" data-main-nav-style-card="glass-rail">
+<input name="mainNavStyle" type="radio" value="glass-rail"/>
+<span class="main-nav-style-preview" data-main-nav-preview="glass-rail"><span>Home</span><span class="active">Research</span><span>Projects</span></span>
+<span class="main-nav-style-name">9. Glass Rail</span>
+</label>
+<label class="main-nav-style-choice" data-main-nav-style-card="ribbon-blocks">
+<input name="mainNavStyle" type="radio" value="ribbon-blocks"/>
+<span class="main-nav-style-preview" data-main-nav-preview="ribbon-blocks"><span>Home</span><span class="active">Research</span><span>Projects</span></span>
+<span class="main-nav-style-name">10. Ribbon Blocks</span>
+</label>
+</div>
+<div class="navigation-behavior-grid">
+<label class="experience-card"><input id="fActiveNav" type="checkbox"/><span><strong>Active navigation highlight</strong><small>Highlights the section currently being viewed.</small></span></label>
+<div class="experience-card experience-select-card">
+<span><strong>Current-style active marker</strong><small>Applies only when <b>Current / Classic Line</b> is selected above.</small></span>
+<select id="fNavHighlightStyle"><option value="underline">Underline</option><option value="pill">Pill</option><option value="text">Text only</option></select>
+</div>
+</div>
+<p class="helper">The 10 new styles include their own active-state treatment. Click <b>Save all changes</b> to publish the selected style.</p>
+</div>
+</details>
+<details class="admin-card navigation-fold">
+<summary><span><strong>Academic Activities navigation</strong><small>Choose how the category buttons appear inside Academic Activities.</small></span><span class="navigation-fold-chevron" aria-hidden="true"></span></summary>
+<div class="navigation-fold-body">
 <div class="settings-head">
 <div>
 <h3>Academic Activities navigation</h3>
@@ -1005,24 +1105,8 @@
 </div>
 <p class="helper">The selected style follows the active website theme automatically. Click <b>Save all changes</b> to publish it.</p>
 </div>
-<div class="admin-card">
-<div class="settings-head">
-<div>
-<h2>Design presets</h2>
-<p class="muted">Apply a complete visual starting point, then customize every setting afterward.</p>
+</details>
 </div>
-<span class="preset-current" id="currentPresetLabel">Custom</span>
-</div>
-<div class="preset-grid" id="designPresetGrid"></div>
-<p class="helper">Presets change design settings only. Your text, publications, projects, thesis, media and CV are not replaced.</p>
-</div><div class="admin-card compact-settings-card">
-<div class="settings-head"><div><h3>Cards</h3><p class="muted">Use Card Finish for subtle changes, or Card Design for a clearly different visual structure.</p></div></div>
-<div class="compact-control-grid">
-<div class="range-setting"><label>Card corner radius</label><div><input id="fCardRadius" max="28" min="0" step="1" type="range"/><input id="fCardRadiusNumber" max="28" min="0" step="1" type="number"/></div></div>
-<div class="field card-style-compact-control"><label>Card options</label><div class="card-style-select-row card-options-three"><select id="fCardStyleSection" aria-label="Card section"><option value="thesis">Thesis</option><option value="publications">Publications</option><option value="projects">Projects &amp; Simulations</option><option value="activities">Academic Activities</option><option value="skills">Skills</option><option value="education">Education</option><option value="contact">Contact</option></select><select id="fCardStyleValue" aria-label="Card finish"><option value="classic">Balanced finish</option><option value="clean">Flat finish</option><option value="outline">Outline finish</option><option value="soft">Soft tint</option><option value="accent">Accent edge</option><option value="elevated">Raised finish</option></select><select id="fCardDesignValue" aria-label="Card design"><option value="standard">Native section</option><option value="editorial">Publication record</option><option value="banded">Thesis split</option><option value="ledger">Minimal index</option><option value="spotlight">Toolkit chips</option><option value="framed">Academic timeline</option><option value="activity-split" data-activity-only="true">Activity Split</option><option value="activity-showcase" data-activity-only="true">Activity Showcase</option><option value="activity-media-fill" data-activity-only="true">Activity Media Fill</option><option value="activity-certificate-full" data-activity-only="true">Certificate Card</option><option value="activity-certificate-grid" data-activity-only="true">Certification Grid</option></select></div><span class="helper">Card Finish makes subtle surface changes. Card Design switches to a genuinely different composition. For Academic Activities, this design is the default; any individual activity can override it from its own editor.</span></div>
-<div class="field"><label>Shadow</label><select id="fShadow"><option value="theme">Theme default</option><option value="none">None</option><option value="subtle">Subtle</option><option value="medium">Medium</option></select></div>
-</div>
-</div></div>
 
 <div class="admin-panel" data-panel="typography">
 <div class="admin-card">
@@ -1274,7 +1358,6 @@
 <button class="secondary" id="resetExperienceBtn" type="button">Reset experience</button>
 </div>
 <div class="experience-grid">
-<label class="experience-card"><input id="fActiveNav" type="checkbox"/><span><strong>Active navigation highlight</strong><small>Highlights the section currently being viewed.</small></span></label>
 <label class="experience-card"><input id="fBackToTop" type="checkbox"/><span><strong>Back-to-top button</strong><small>Shows a small ↑ button after scrolling down.</small></span></label>
 <label class="experience-card"><input id="fLightbox" type="checkbox"/><span><strong>Full-image viewer + download</strong><small>Click the profile photo or enabled site images to view the original at full size and download it.</small></span></label>
 <label class="experience-card"><input id="fSmoothScroll" type="checkbox"/><span><strong>Smooth scrolling</strong><small>Smoothly moves between navigation sections.</small></span></label>
@@ -1286,10 +1369,6 @@
 <div class="experience-card experience-select-card">
 <span><strong>Hover interactions</strong><small>Add restrained feedback when visitors hover over cards, images, links, and buttons.</small></span>
 <select id="fHoverInteractions"><option value="off">Off</option><option value="subtle">Subtle</option><option value="lift">Lift</option><option value="glow">Glow</option></select>
-</div>
-<div class="experience-card experience-select-card">
-<span><strong>Active-nav style</strong><small>Choose how the current section is highlighted.</small></span>
-<select id="fNavHighlightStyle"><option value="underline">Underline</option><option value="pill">Pill</option><option value="text">Text only</option></select>
 </div>
 <div class="experience-card experience-select-card">
 <span><strong>Social links style</strong><small>Show academic links with labels or as compact icons.</small></span>
@@ -1392,6 +1471,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-<script src="admin.js?v=20260906-activity-nav-styles1"></script>
+<script src="admin.js?v=20260906-navigation-styles1"></script>
 </body>
 </html>

@@ -423,6 +423,7 @@ const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
+const MAIN_NAV_STYLE_VALUES=["current", "framed-links", "accent-pills", "floating-capsule", "segmented-strip", "top-rail", "mini-cards", "soft-chips", "editorial-dividers", "glass-rail", "ribbon-blocks"];
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -476,7 +477,8 @@ const DEFAULT_SITE_SETTINGS={
     copyButtons:true,
     navHighlightStyle:"underline",
     socialStyle:"labels",
-    activityTabStyle:"strong-pills"
+    activityTabStyle:"strong-pills",
+    mainNavStyle:"current"
   }
 };
 
@@ -596,7 +598,8 @@ function normalizeSiteSettings(content){
       copyButtons:experienceBool("copyButtons"),
       navHighlightStyle:["underline","pill","text"].includes(e.navHighlightStyle)?e.navHighlightStyle:DEFAULT_SITE_SETTINGS.experience.navHighlightStyle,
       socialStyle:["labels","icons"].includes(e.socialStyle)?e.socialStyle:DEFAULT_SITE_SETTINGS.experience.socialStyle,
-      activityTabStyle:ACTIVITY_TAB_STYLE_VALUES.includes(e.activityTabStyle)?e.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.activityTabStyle
+      activityTabStyle:ACTIVITY_TAB_STYLE_VALUES.includes(e.activityTabStyle)?e.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.activityTabStyle,
+      mainNavStyle:MAIN_NAV_STYLE_VALUES.includes(e.mainNavStyle)?e.mainNavStyle:DEFAULT_SITE_SETTINGS.experience.mainNavStyle
     }
   };
 
@@ -767,6 +770,10 @@ function fillSiteCustomizationControls(){
   const activityTabInput=document.querySelector(`input[name="activityTabStyle"][value="${activityTabStyle}"]`);
   if(activityTabInput)activityTabInput.checked=true;
   document.querySelectorAll("[data-activity-tab-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.activityTabStyleCard===activityTabStyle));
+  const mainNavStyle=MAIN_NAV_STYLE_VALUES.includes(e.mainNavStyle)?e.mainNavStyle:DEFAULT_SITE_SETTINGS.experience.mainNavStyle;
+  const mainNavInput=document.querySelector(`input[name="mainNavStyle"][value="${mainNavStyle}"]`);
+  if(mainNavInput)mainNavInput.checked=true;
+  document.querySelectorAll("[data-main-nav-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.mainNavStyleCard===mainNavStyle));
 
   renderSectionManager();
 }
@@ -894,6 +901,8 @@ function syncSiteCustomizationFromControls(){
   e.socialStyle=$("fSocialStyle").value;
   const activityTabStyle=document.querySelector('input[name="activityTabStyle"]:checked')?.value;
   if(ACTIVITY_TAB_STYLE_VALUES.includes(activityTabStyle))e.activityTabStyle=activityTabStyle;
+  const mainNavStyle=document.querySelector('input[name="mainNavStyle"]:checked')?.value;
+  if(MAIN_NAV_STYLE_VALUES.includes(mainNavStyle))e.mainNavStyle=mainNavStyle;
 }
 
 /* Keep Layout selections in currentContent immediately.
@@ -1736,6 +1745,23 @@ document.addEventListener("change",e=>{
   }
 });
 
+
+/* Main website navigation style — commit immediately so the selected
+   style cannot be overwritten by another Admin refresh. */
+document.addEventListener("change",e=>{
+  const input=e.target.closest('input[name="mainNavStyle"]');
+  if(!input)return;
+  const value=input.value;
+  if(!MAIN_NAV_STYLE_VALUES.includes(value))return;
+  normalizeSiteSettings(currentContent);
+  currentContent.siteSettings.experience.mainNavStyle=value;
+  currentContent.appearance=currentContent.appearance||{};
+  currentContent.appearance.designPreset="custom";
+  document.querySelectorAll("[data-main-nav-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.mainNavStyleCard===value));
+  renderDesignPresets();
+  scheduleAdminPreview(true);
+  setStatus("Main navigation style updated. Save all changes to publish it.");
+});
 
 /* Academic Activities category-navigation style — commit immediately so an
    unrelated Admin refresh cannot restore the previous choice. */

@@ -182,6 +182,7 @@ const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
+const MAIN_NAV_STYLE_VALUES=["current", "framed-links", "accent-pills", "floating-capsule", "segmented-strip", "top-rail", "mini-cards", "soft-chips", "editorial-dividers", "glass-rail", "ribbon-blocks"];
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -235,7 +236,8 @@ const DEFAULT_SITE_SETTINGS={
     copyButtons:true,
     navHighlightStyle:"underline",
     socialStyle:"labels",
-    activityTabStyle:"strong-pills"
+    activityTabStyle:"strong-pills",
+    mainNavStyle:"current"
   }
 };
 
@@ -355,7 +357,8 @@ function normalizeSiteSettings(content){
       copyButtons:experienceBool("copyButtons"),
       navHighlightStyle:["underline","pill","text"].includes(e.navHighlightStyle)?e.navHighlightStyle:DEFAULT_SITE_SETTINGS.experience.navHighlightStyle,
       socialStyle:["labels","icons"].includes(e.socialStyle)?e.socialStyle:DEFAULT_SITE_SETTINGS.experience.socialStyle,
-      activityTabStyle:ACTIVITY_TAB_STYLE_VALUES.includes(e.activityTabStyle)?e.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.activityTabStyle
+      activityTabStyle:ACTIVITY_TAB_STYLE_VALUES.includes(e.activityTabStyle)?e.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.activityTabStyle,
+      mainNavStyle:MAIN_NAV_STYLE_VALUES.includes(e.mainNavStyle)?e.mainNavStyle:DEFAULT_SITE_SETTINGS.experience.mainNavStyle
     }
   };
 
@@ -1200,6 +1203,7 @@ function applyExperienceSettings(d){
 
   document.documentElement.classList.toggle("no-smooth-scroll",!currentSiteExperience.smoothScroll);
   document.documentElement.dataset.navHighlight=currentSiteExperience.navHighlightStyle||"underline";
+  document.documentElement.dataset.mainNavStyle=MAIN_NAV_STYLE_VALUES.includes(currentSiteExperience.mainNavStyle)?currentSiteExperience.mainNavStyle:"current";
   document.documentElement.dataset.hoverInteractions=currentSiteExperience.hoverInteractions||"subtle";
   $("backToTopBtn")?.classList.toggle("feature-disabled",!currentSiteExperience.backToTop);
   if(!currentSiteExperience.lightbox)closeSiteLightbox();
