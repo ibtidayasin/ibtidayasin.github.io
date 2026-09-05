@@ -1435,6 +1435,14 @@ function academicActivityHasContent(item){
   ));
 }
 
+
+function educationGradeLabel(item){
+  const explicit=String(item?.gradeLabel||"").trim().toUpperCase();
+  if(explicit==="CGPA"||explicit==="GPA")return explicit;
+  const degree=String(item?.degree||"").toLowerCase();
+  return /\b(hsc|ssc)\b|higher secondary|secondary school/.test(degree)?"GPA":"CGPA";
+}
+
 function sectionHasPublicContent(d,key){
   if(key==="activities")return (d.academicActivities||[]).some(academicActivityHasContent);
   return true;
@@ -1497,7 +1505,7 @@ function normalize(d){
     return out;
   };
   d.skills=(d.skills||[]).map(normalizeSkillGroupRecord);
-  d.education=(d.education||[]).map(x=>({...x,cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:normalizeMediaDisplayList(x.media)}));
+  d.education=(d.education||[]).map(x=>({...x,gradeLabel:["CGPA","GPA"].includes(String(x?.gradeLabel||"").toUpperCase())?String(x.gradeLabel).toUpperCase():"",cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:normalizeMediaDisplayList(x.media)}));
   d.contact=d.contact||{};d.contact.media=normalizeMediaDisplayList(d.contact.media);
   d.thesis.media=normalizeMediaDisplayList(d.thesis.media);
   d.academicActivities=(d.academicActivities||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
@@ -1764,7 +1772,7 @@ function render(d){
       </div>
       <div class="edu-main">
         ${(e.cgpa||e.cgpaSubtitle)?`<div class="edu-cgpa">
-          <span class="edu-cgpa-label">CGPA</span>
+          <span class="edu-cgpa-label">${esc(educationGradeLabel(e))}</span>
           ${e.cgpa?`<strong class="edu-cgpa-value">${esc(e.cgpa)}</strong>`:""}
           ${e.cgpaSubtitle?`<span class="edu-cgpa-subtitle">${esc(e.cgpaSubtitle)}</span>`:""}
         </div>`:""}

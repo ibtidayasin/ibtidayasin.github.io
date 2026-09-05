@@ -1672,6 +1672,14 @@ function academicActivityHasContent(item){
   ));
 }
 
+
+function educationGradeLabel(item){
+  const explicit=String(item?.gradeLabel||"").trim().toUpperCase();
+  if(explicit==="CGPA"||explicit==="GPA")return explicit;
+  const degree=String(item?.degree||"").toLowerCase();
+  return /\b(hsc|ssc)\b|higher secondary|secondary school/.test(degree)?"GPA":"CGPA";
+}
+
 function sectionHasPublicContent(d,key){
   if(key==="activities")return (d.academicActivities||[]).some(academicActivityHasContent);
   return true;
@@ -1890,7 +1898,7 @@ function normalizeMedia(content){
   content.projects=(content.projects||[]).map(x=>({...x,type:String(x.type||""),contribution:String(x.contribution||""),media:normalizeMediaDisplayList(x.media)}));
   content.academicActivities=(content.academicActivities||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
   content.skills=(content.skills||[]).map(normalizeSkillGroupRecord);
-  content.education=(content.education||[]).map(x=>({...x,cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:normalizeMediaDisplayList(x.media)}));
+  content.education=(content.education||[]).map(x=>({...x,gradeLabel:["CGPA","GPA"].includes(String(x?.gradeLabel||"").toUpperCase())?String(x.gradeLabel).toUpperCase():"",cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:normalizeMediaDisplayList(x.media)}));
   content.contact=content.contact||{};
   content.contact.media=normalizeMediaDisplayList(content.contact.media);
   content.thesis.media=normalizeMediaDisplayList(content.thesis.media);
@@ -2344,8 +2352,9 @@ function renderEducationEditor(){
   $("educationEditor").innerHTML=(currentContent.education||[]).map((e,i)=>repeatBlock("education",i,e.degree||e.institution||`Education ${i+1}`,[
     {label:"Period",key:"period",value:e.period},{label:"Degree",key:"degree",value:e.degree},
     {label:"Institution",key:"institution",value:e.institution,full:true},
+    {label:"Grade label",key:"gradeLabel",value:e.gradeLabel||"",kind:"select",options:[{value:"",label:`Auto — ${educationGradeLabel(e)}`},{value:"CGPA",label:"CGPA"},{value:"GPA",label:"GPA"}]},
     {label:"CGPA / GPA",key:"cgpa",value:e.cgpa||""},
-    {label:"CGPA subtitle / academic distinction",key:"cgpaSubtitle",value:e.cgpaSubtitle||"",full:true},
+    {label:"Grade subtitle / academic distinction",key:"cgpaSubtitle",value:e.cgpaSubtitle||"",full:true},
     {label:"Description",key:"description",value:e.description,kind:"textarea",full:true},
     {label:"Important Courses — one per line",key:"courses",value:(e.courses||[]).join("\n"),kind:"textarea",full:true}
   ],e.media||[],e.visible!==false)).join("")||`<div class="empty-state">No education entries added.</div>`;
@@ -2661,7 +2670,7 @@ $("addSkillGroupBtn").addEventListener("click",()=>{
   syncAllForms();currentContent.skills.push({category:"",items:[],subgroups:[],visible:true,media:[]});renderSkillsEditor();const row=document.querySelector(`#skillsEditor [data-skill="${currentContent.skills.length-1}"]`);if(row)setRepeatRowCollapsed(row,false);
 });
 $("addEducationBtn").addEventListener("click",()=>{
-  syncAllForms();currentContent.education.push({period:"",degree:"",institution:"",cgpa:"",cgpaSubtitle:"",description:"",courses:[],visible:true,media:[]});renderEducationEditor();const row=document.querySelector(`#educationEditor [data-education="${currentContent.education.length-1}"]`);if(row)setRepeatRowCollapsed(row,false);
+  syncAllForms();currentContent.education.push({period:"",degree:"",institution:"",gradeLabel:"",cgpa:"",cgpaSubtitle:"",description:"",courses:[],visible:true,media:[]});renderEducationEditor();const row=document.querySelector(`#educationEditor [data-education="${currentContent.education.length-1}"]`);if(row)setRepeatRowCollapsed(row,false);
 });
 
 document.addEventListener("change",e=>{
@@ -2966,7 +2975,7 @@ function readRepeaters(){
 
   currentContent.education=[...document.querySelectorAll("[data-education]")].map((r,i)=>{
     const old=currentContent.education[i]||{};
-    return {period:get(r,"period"),degree:get(r,"degree"),institution:get(r,"institution"),cgpa:get(r,"cgpa"),cgpaSubtitle:get(r,"cgpaSubtitle"),description:get(r,"description"),courses:get(r,"courses").split("\n").map(x=>x.trim()).filter(Boolean),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
+    return {period:get(r,"period"),degree:get(r,"degree"),institution:get(r,"institution"),gradeLabel:["CGPA","GPA"].includes(get(r,"gradeLabel").toUpperCase())?get(r,"gradeLabel").toUpperCase():"",cgpa:get(r,"cgpa"),cgpaSubtitle:get(r,"cgpaSubtitle"),description:get(r,"description"),courses:get(r,"courses").split("\n").map(x=>x.trim()).filter(Boolean),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
   }).filter(x=>x.period||x.degree||x.institution||x.cgpa||x.cgpaSubtitle||x.description||x.courses.length||x.media.length);
 }
 function get(r,k){return(r.querySelector(`[data-k="${k}"]`)?.value||"").trim()}
