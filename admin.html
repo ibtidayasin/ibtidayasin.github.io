@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260905-gpa-label1" rel="stylesheet"/>
+<link href="styles.css?v=20260906-activity-nav-styles1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -943,6 +943,68 @@
 <strong>Live preview</strong>
 <span>Choosing a theme previews it immediately in this private admin page. Click <b>Save all changes</b> to publish it.</span>
 </div>
+
+<div class="admin-card activity-tab-style-admin">
+<div class="settings-head">
+<div>
+<h3>Academic Activities navigation</h3>
+<p class="muted">Choose how the category navigation appears. Every option keeps inactive categories clearly visible so visitors notice that more content is available.</p>
+</div>
+</div>
+<div class="activity-tab-style-choice-grid" role="radiogroup" aria-label="Academic Activities navigation style">
+<label class="activity-tab-style-choice" data-activity-tab-style-card="strong-pills">
+<input name="activityTabStyle" type="radio" value="strong-pills"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="strong-pills"><span class="activity-tab">Presentations</span><span class="activity-tab active">Training</span><span class="activity-tab">Awards</span></span>
+<span class="activity-tab-style-name">1. Strong Filled Pills</span>
+</label>
+<label class="activity-tab-style-choice" data-activity-tab-style-card="segmented">
+<input name="activityTabStyle" type="radio" value="segmented"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="segmented"><span class="activity-tab">Presentations</span><span class="activity-tab active">Training</span><span class="activity-tab">Awards</span></span>
+<span class="activity-tab-style-name">2. Segmented Control</span>
+</label>
+<label class="activity-tab-style-choice" data-activity-tab-style-card="elevated">
+<input name="activityTabStyle" type="radio" value="elevated"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="elevated"><span class="activity-tab">Presentations</span><span class="activity-tab active">Training</span><span class="activity-tab">Awards</span></span>
+<span class="activity-tab-style-name">3. Elevated Buttons</span>
+</label>
+<label class="activity-tab-style-choice" data-activity-tab-style-card="outline-fill">
+<input name="activityTabStyle" type="radio" value="outline-fill"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="outline-fill"><span class="activity-tab">Presentations</span><span class="activity-tab active">Training</span><span class="activity-tab">Awards</span></span>
+<span class="activity-tab-style-name">4. Outline + Soft Fill</span>
+</label>
+<label class="activity-tab-style-choice" data-activity-tab-style-card="underline-fill">
+<input name="activityTabStyle" type="radio" value="underline-fill"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="underline-fill"><span class="activity-tab">Presentations</span><span class="activity-tab active">Training</span><span class="activity-tab">Awards</span></span>
+<span class="activity-tab-style-name">5. Underline + Fill</span>
+</label>
+<label class="activity-tab-style-choice" data-activity-tab-style-card="soft-cards">
+<input name="activityTabStyle" type="radio" value="soft-cards"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="soft-cards"><span class="activity-tab">Presentations</span><span class="activity-tab active">Training</span><span class="activity-tab">Awards</span></span>
+<span class="activity-tab-style-name">6. Soft Card Tabs</span>
+</label>
+<label class="activity-tab-style-choice" data-activity-tab-style-card="icon-label">
+<input name="activityTabStyle" type="radio" value="icon-label"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="icon-label"><span class="activity-tab"><span class="activity-tab-icon activity-tab-icon-demo">◇</span>Presentations</span><span class="activity-tab active"><span class="activity-tab-icon activity-tab-icon-demo">▣</span>Training</span><span class="activity-tab"><span class="activity-tab-icon activity-tab-icon-demo">★</span>Awards</span></span>
+<span class="activity-tab-style-name">7. Icon + Label</span>
+</label>
+<label class="activity-tab-style-choice" data-activity-tab-style-card="two-tone">
+<input name="activityTabStyle" type="radio" value="two-tone"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="two-tone"><span class="activity-tab">Presentations</span><span class="activity-tab active">Training</span><span class="activity-tab">Awards</span></span>
+<span class="activity-tab-style-name">8. Two-Tone Accent</span>
+</label>
+<label class="activity-tab-style-choice" data-activity-tab-style-card="glass">
+<input name="activityTabStyle" type="radio" value="glass"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="glass"><span class="activity-tab">Presentations</span><span class="activity-tab active">Training</span><span class="activity-tab">Awards</span></span>
+<span class="activity-tab-style-name">9. Glass Highlight</span>
+</label>
+<label class="activity-tab-style-choice" data-activity-tab-style-card="ribbon">
+<input name="activityTabStyle" type="radio" value="ribbon"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="ribbon"><span class="activity-tab">Presentations</span><span class="activity-tab active">Training</span><span class="activity-tab">Awards</span></span>
+<span class="activity-tab-style-name">10. Ribbon Tags</span>
+</label>
+</div>
+<p class="helper">The selected style follows the active website theme automatically. Click <b>Save all changes</b> to publish it.</p>
+</div>
 <div class="admin-card">
 <div class="settings-head">
 <div>
@@ -1330,6 +1392,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-<script src="admin.js?v=20260905-gpa-label1"></script>
+<script src="admin.js?v=20260906-activity-nav-styles1"></script>
 </body>
 </html>

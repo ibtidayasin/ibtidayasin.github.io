@@ -422,6 +422,7 @@ const SIDEBAR_SECTION_KEYS=[...COVER_SECTION_KEYS];
 const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","skills","education","contact"];
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
+const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -474,7 +475,8 @@ const DEFAULT_SITE_SETTINGS={
     smoothScroll:true,
     copyButtons:true,
     navHighlightStyle:"underline",
-    socialStyle:"labels"
+    socialStyle:"labels",
+    activityTabStyle:"strong-pills"
   }
 };
 
@@ -593,7 +595,8 @@ function normalizeSiteSettings(content){
       smoothScroll:experienceBool("smoothScroll"),
       copyButtons:experienceBool("copyButtons"),
       navHighlightStyle:["underline","pill","text"].includes(e.navHighlightStyle)?e.navHighlightStyle:DEFAULT_SITE_SETTINGS.experience.navHighlightStyle,
-      socialStyle:["labels","icons"].includes(e.socialStyle)?e.socialStyle:DEFAULT_SITE_SETTINGS.experience.socialStyle
+      socialStyle:["labels","icons"].includes(e.socialStyle)?e.socialStyle:DEFAULT_SITE_SETTINGS.experience.socialStyle,
+      activityTabStyle:ACTIVITY_TAB_STYLE_VALUES.includes(e.activityTabStyle)?e.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.activityTabStyle
     }
   };
 
@@ -760,6 +763,10 @@ function fillSiteCustomizationControls(){
   $("fCopyButtons").checked=e.copyButtons;
   $("fNavHighlightStyle").value=e.navHighlightStyle||"underline";
   $("fSocialStyle").value=e.socialStyle||"labels";
+  const activityTabStyle=ACTIVITY_TAB_STYLE_VALUES.includes(e.activityTabStyle)?e.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.activityTabStyle;
+  const activityTabInput=document.querySelector(`input[name="activityTabStyle"][value="${activityTabStyle}"]`);
+  if(activityTabInput)activityTabInput.checked=true;
+  document.querySelectorAll("[data-activity-tab-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.activityTabStyleCard===activityTabStyle));
 
   renderSectionManager();
 }
@@ -885,6 +892,8 @@ function syncSiteCustomizationFromControls(){
   e.copyButtons=$("fCopyButtons").checked;
   e.navHighlightStyle=$("fNavHighlightStyle").value;
   e.socialStyle=$("fSocialStyle").value;
+  const activityTabStyle=document.querySelector('input[name="activityTabStyle"]:checked')?.value;
+  if(ACTIVITY_TAB_STYLE_VALUES.includes(activityTabStyle))e.activityTabStyle=activityTabStyle;
 }
 
 /* Keep Layout selections in currentContent immediately.
@@ -1725,6 +1734,24 @@ document.addEventListener("change",e=>{
     showCurrentThemeColorsInBoxes();
     setStatus("Theme preview updated. Typography colors now start from this theme's colors.");
   }
+});
+
+
+/* Academic Activities category-navigation style — commit immediately so an
+   unrelated Admin refresh cannot restore the previous choice. */
+document.addEventListener("change",e=>{
+  const input=e.target.closest('input[name="activityTabStyle"]');
+  if(!input)return;
+  const value=input.value;
+  if(!ACTIVITY_TAB_STYLE_VALUES.includes(value))return;
+  normalizeSiteSettings(currentContent);
+  currentContent.siteSettings.experience.activityTabStyle=value;
+  currentContent.appearance=currentContent.appearance||{};
+  currentContent.appearance.designPreset="custom";
+  document.querySelectorAll("[data-activity-tab-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.activityTabStyleCard===value));
+  renderDesignPresets();
+  scheduleAdminPreview(true);
+  setStatus("Academic Activities navigation style updated. Save all changes to publish it.");
 });
 
 const $=id=>document.getElementById(id);

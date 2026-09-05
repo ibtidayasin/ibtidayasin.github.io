@@ -181,6 +181,7 @@ const SIDEBAR_SECTION_KEYS=[...COVER_SECTION_KEYS];
 const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","skills","education","contact"];
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
+const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -233,7 +234,8 @@ const DEFAULT_SITE_SETTINGS={
     smoothScroll:true,
     copyButtons:true,
     navHighlightStyle:"underline",
-    socialStyle:"labels"
+    socialStyle:"labels",
+    activityTabStyle:"strong-pills"
   }
 };
 
@@ -352,7 +354,8 @@ function normalizeSiteSettings(content){
       smoothScroll:experienceBool("smoothScroll"),
       copyButtons:experienceBool("copyButtons"),
       navHighlightStyle:["underline","pill","text"].includes(e.navHighlightStyle)?e.navHighlightStyle:DEFAULT_SITE_SETTINGS.experience.navHighlightStyle,
-      socialStyle:["labels","icons"].includes(e.socialStyle)?e.socialStyle:DEFAULT_SITE_SETTINGS.experience.socialStyle
+      socialStyle:["labels","icons"].includes(e.socialStyle)?e.socialStyle:DEFAULT_SITE_SETTINGS.experience.socialStyle,
+      activityTabStyle:ACTIVITY_TAB_STYLE_VALUES.includes(e.activityTabStyle)?e.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.activityTabStyle
     }
   };
 
@@ -1563,6 +1566,18 @@ function activityCategoryLabel(value){
   return normalizeActivityCategory(value)||"Academic Activities";
 }
 
+function activityCategoryIcon(category){
+  const common='viewBox="0 0 24 24" aria-hidden="true" focusable="false"';
+  const icons={
+    "Presentations & Posters":`<svg ${common}><rect x="4" y="5" width="16" height="11" rx="1.5"></rect><path d="M8 20h8M12 16v4M7 9h10M7 12h6"></path></svg>`,
+    "Training & Practical Experience":`<svg ${common}><path d="M4 8h16v11H4z"></path><path d="M9 8V5h6v3M4 12h16M10 12v2h4v-2"></path></svg>`,
+    "Certifications":`<svg ${common}><circle cx="12" cy="10" r="5"></circle><path d="M9 14l-1 6 4-2 4 2-1-6"></path><path d="M10 10l1.4 1.4L14.5 8.5"></path></svg>`,
+    "Mentoring & Teaching":`<svg ${common}><circle cx="9" cy="8" r="3"></circle><path d="M3.5 19c.7-3.2 2.5-5 5.5-5s4.8 1.8 5.5 5"></path><path d="M16 6h5v7h-5M17.5 9h2"></path></svg>`,
+    "Awards & Honors":`<svg ${common}><path d="M8 4h8v4a4 4 0 0 1-8 0V4z"></path><path d="M8 6H5v1c0 2 1.2 3 3.2 3M16 6h3v1c0 2-1.2 3-3.2 3M12 12v4M8 20h8M10 16h4"></path></svg>`
+  };
+  return icons[normalizeActivityCategory(category)]||icons["Awards & Honors"];
+}
+
 function activityLinkLabel(category){
   if(category==="Certifications")return"View credential ↗";
   if(category==="Presentations & Posters")return"View presentation ↗";
@@ -1600,9 +1615,11 @@ function renderAcademicActivities(d){
   if(!tabs||!list)return;
   const remembered=normalizeActivityCategory(savedActivityCategory());
   const activeCategory=categories.includes(remembered)?remembered:(categories[0]||"");
+  const tabStyle=ACTIVITY_TAB_STYLE_VALUES.includes(d.siteSettings?.experience?.activityTabStyle)?d.siteSettings.experience.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.activityTabStyle;
+  tabs.dataset.activityTabStyle=tabStyle;
   tabs.innerHTML=categories.map(category=>{
     const active=category===activeCategory;
-    return `<button type="button" class="activity-tab ${active?"active":""}" data-activity-tab="${escAttr(category)}" role="tab" aria-selected="${active?"true":"false"}">${esc(activityCategoryLabel(category))}</button>`;
+    return `<button type="button" class="activity-tab ${active?"active":""}" data-activity-tab="${escAttr(category)}" role="tab" aria-selected="${active?"true":"false"}"><span class="activity-tab-icon">${activityCategoryIcon(category)}</span><span class="activity-tab-label">${esc(activityCategoryLabel(category))}</span></button>`;
   }).join("");
   tabs.classList.toggle("single-activity-tab",categories.length<=1);
 
