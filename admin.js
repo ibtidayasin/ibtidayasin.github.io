@@ -423,7 +423,23 @@ const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
-const MAIN_NAV_STYLE_VALUES=["current", "framed-links", "accent-pills", "floating-capsule", "segmented-strip", "top-rail", "mini-cards", "soft-chips", "editorial-dividers", "glass-rail", "ribbon-blocks"];
+const MAIN_NAV_STYLE_VALUES=["current","academic-underline","floating-rail","editorial-rule","topline-indicator","dot-marker","gradient-wash","split-brand","bracket-focus","accent-edge","glass-underline"];
+const LEGACY_MAIN_NAV_STYLE_MAP={
+  "framed-links":"editorial-rule",
+  "accent-pills":"academic-underline",
+  "floating-capsule":"floating-rail",
+  "segmented-strip":"editorial-rule",
+  "top-rail":"topline-indicator",
+  "mini-cards":"bracket-focus",
+  "soft-chips":"gradient-wash",
+  "editorial-dividers":"editorial-rule",
+  "glass-rail":"glass-underline",
+  "ribbon-blocks":"accent-edge"
+};
+function normalizeMainNavStyle(value){
+  if(MAIN_NAV_STYLE_VALUES.includes(value))return value;
+  return LEGACY_MAIN_NAV_STYLE_MAP[value]||"current";
+}
 const DEFAULT_SITE_SETTINGS={
   sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
@@ -599,7 +615,7 @@ function normalizeSiteSettings(content){
       navHighlightStyle:["underline","pill","text"].includes(e.navHighlightStyle)?e.navHighlightStyle:DEFAULT_SITE_SETTINGS.experience.navHighlightStyle,
       socialStyle:["labels","icons"].includes(e.socialStyle)?e.socialStyle:DEFAULT_SITE_SETTINGS.experience.socialStyle,
       activityTabStyle:ACTIVITY_TAB_STYLE_VALUES.includes(e.activityTabStyle)?e.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.activityTabStyle,
-      mainNavStyle:MAIN_NAV_STYLE_VALUES.includes(e.mainNavStyle)?e.mainNavStyle:DEFAULT_SITE_SETTINGS.experience.mainNavStyle
+      mainNavStyle:normalizeMainNavStyle(e.mainNavStyle)
     }
   };
 
@@ -770,7 +786,7 @@ function fillSiteCustomizationControls(){
   const activityTabInput=document.querySelector(`input[name="activityTabStyle"][value="${activityTabStyle}"]`);
   if(activityTabInput)activityTabInput.checked=true;
   document.querySelectorAll("[data-activity-tab-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.activityTabStyleCard===activityTabStyle));
-  const mainNavStyle=MAIN_NAV_STYLE_VALUES.includes(e.mainNavStyle)?e.mainNavStyle:DEFAULT_SITE_SETTINGS.experience.mainNavStyle;
+  const mainNavStyle=normalizeMainNavStyle(e.mainNavStyle);
   const mainNavInput=document.querySelector(`input[name="mainNavStyle"][value="${mainNavStyle}"]`);
   if(mainNavInput)mainNavInput.checked=true;
   document.querySelectorAll("[data-main-nav-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.mainNavStyleCard===mainNavStyle));

@@ -5553,111 +5553,202 @@ body:not(.admin-body) #skills[data-card-design="ledger"] .skill-card>.item-media
 }
 
 
+
 /* =========================================================
-   MAIN WEBSITE NAVIGATION — CURRENT + 10 DISTINCT STYLES
+   MAIN WEBSITE NAVIGATION — CURRENT + 10 TOP-BAR-SPECIFIC STYLES
+   These styles treat the header/navigation as a single composition,
+   rather than reusing Academic Activities button/tab patterns.
    ========================================================= */
+html[data-main-nav-style] body:not(.admin-body) .topbar,
+html[data-main-nav-style] body:not(.admin-body) .topbar-inner,
 html[data-main-nav-style] body:not(.admin-body) .topbar nav,
-html[data-main-nav-style] body:not(.admin-body) .topbar nav a{
-  box-sizing:border-box;
+html[data-main-nav-style] body:not(.admin-body) .topbar nav a,
+html[data-main-nav-style] body:not(.admin-body) .brand{box-sizing:border-box}
+
+html:not([data-main-nav-style="current"]) body:not(.admin-body) .topbar nav a{
+  margin:0!important;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+  transform:none;
+  color:var(--muted);
+}
+html:not([data-main-nav-style="current"]) body:not(.admin-body) .topbar nav a.active-section{
+  background:transparent;
+  color:var(--accent);
 }
 html:not([data-main-nav-style="current"]) body:not(.admin-body) .topbar nav a.active-section::after{
   display:none!important;
   content:none!important;
 }
-html:not([data-main-nav-style="current"]) body:not(.admin-body) .topbar nav a{
-  margin:0!important;
-}
 
-/* 1 — Framed Links */
-html[data-main-nav-style="framed-links"] body:not(.admin-body) .topbar nav{gap:7px}
-html[data-main-nav-style="framed-links"] body:not(.admin-body) .topbar nav a{
-  padding:6px 9px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--muted);
+/* 1 — Academic Underline
+   Traditional academic header with one continuous baseline and a crisp
+   active underline. Links remain text, not buttons. */
+html[data-main-nav-style="academic-underline"] body:not(.admin-body) .topbar nav{
+  gap:18px;align-items:stretch;border-bottom:1px solid var(--line);padding:0 0 1px;
 }
-html[data-main-nav-style="framed-links"] body:not(.admin-body) .topbar nav a:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-html[data-main-nav-style="framed-links"] body:not(.admin-body) .topbar nav a.active-section{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);box-shadow:0 4px 12px color-mix(in srgb,var(--accent) 14%,transparent)}
+html[data-main-nav-style="academic-underline"] body:not(.admin-body) .topbar nav a{
+  position:relative;padding:10px 0 9px!important;color:var(--muted);font-weight:650;
+}
+html[data-main-nav-style="academic-underline"] body:not(.admin-body) .topbar nav a::after{
+  display:block!important;content:""!important;position:absolute;left:0;right:0;bottom:-2px;height:3px;border-radius:99px;background:var(--accent);transform:scaleX(0);transform-origin:center;transition:transform .18s ease;
+}
+html[data-main-nav-style="academic-underline"] body:not(.admin-body) .topbar nav a:hover{color:var(--text)}
+html[data-main-nav-style="academic-underline"] body:not(.admin-body) .topbar nav a:hover::after,
+html[data-main-nav-style="academic-underline"] body:not(.admin-body) .topbar nav a.active-section::after{transform:scaleX(1)}
+html[data-main-nav-style="academic-underline"] body:not(.admin-body) .topbar nav a.active-section{color:var(--accent);font-weight:800}
 
-/* 2 — Accent Pills */
-html[data-main-nav-style="accent-pills"] body:not(.admin-body) .topbar nav{gap:7px}
-html[data-main-nav-style="accent-pills"] body:not(.admin-body) .topbar nav a{
-  padding:6px 10px;border-radius:999px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 22%,var(--line));color:color-mix(in srgb,var(--accent) 72%,var(--text));
+/* 2 — Floating Rail
+   A restrained floating navigation rail; the rail is the object, while
+   individual links stay typographic and lightweight. */
+html[data-main-nav-style="floating-rail"] body:not(.admin-body) .topbar{border-bottom-color:transparent}
+html[data-main-nav-style="floating-rail"] body:not(.admin-body) .topbar nav{
+  gap:14px;align-items:center;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);box-shadow:0 8px 24px rgba(25,35,45,.07);
 }
-html[data-main-nav-style="accent-pills"] body:not(.admin-body) .topbar nav a:hover{transform:translateY(-1px);border-color:var(--accent)}
-html[data-main-nav-style="accent-pills"] body:not(.admin-body) .topbar nav a.active-section{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 6px 14px color-mix(in srgb,var(--accent) 24%,transparent)}
+html[data-main-nav-style="floating-rail"] body:not(.admin-body) .topbar nav a{position:relative;padding:3px 0!important;color:var(--muted)}
+html[data-main-nav-style="floating-rail"] body:not(.admin-body) .topbar nav a::after{
+  display:block!important;content:""!important;position:absolute;left:50%;bottom:-5px;width:0;height:2px;border-radius:99px;background:var(--accent);transform:translateX(-50%);transition:width .18s ease;
+}
+html[data-main-nav-style="floating-rail"] body:not(.admin-body) .topbar nav a:hover{color:var(--text)}
+html[data-main-nav-style="floating-rail"] body:not(.admin-body) .topbar nav a:hover::after{width:14px}
+html[data-main-nav-style="floating-rail"] body:not(.admin-body) .topbar nav a.active-section{color:var(--accent);font-weight:800}
+html[data-main-nav-style="floating-rail"] body:not(.admin-body) .topbar nav a.active-section::after{width:22px}
 
-/* 3 — Floating Capsule */
-html[data-main-nav-style="floating-capsule"] body:not(.admin-body) .topbar{border-bottom-color:transparent}
-html[data-main-nav-style="floating-capsule"] body:not(.admin-body) .topbar nav{
-  gap:3px;padding:5px;border:1px solid var(--line);border-radius:18px;background:var(--surface);box-shadow:0 8px 22px rgba(25,35,45,.08);
+/* 3 — Editorial Rule
+   Double-rule editorial treatment with fine separators between links. */
+html[data-main-nav-style="editorial-rule"] body:not(.admin-body) .topbar{
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--line) 42%,transparent);
 }
-html[data-main-nav-style="floating-capsule"] body:not(.admin-body) .topbar nav a{padding:6px 9px;border-radius:13px;color:var(--muted)}
-html[data-main-nav-style="floating-capsule"] body:not(.admin-body) .topbar nav a:hover{background:var(--surface-alt);color:var(--text)}
-html[data-main-nav-style="floating-capsule"] body:not(.admin-body) .topbar nav a.active-section{background:var(--accent);color:#fff}
+html[data-main-nav-style="editorial-rule"] body:not(.admin-body) .topbar nav{gap:0;align-items:center}
+html[data-main-nav-style="editorial-rule"] body:not(.admin-body) .topbar nav a{position:relative;padding:7px 12px!important;color:var(--muted);letter-spacing:.01em}
+html[data-main-nav-style="editorial-rule"] body:not(.admin-body) .topbar nav a+a::before{
+  content:"";position:absolute;left:0;top:25%;bottom:25%;width:1px;background:var(--line);
+}
+html[data-main-nav-style="editorial-rule"] body:not(.admin-body) .topbar nav a::after{
+  display:block!important;content:""!important;position:absolute;left:50%;bottom:1px;width:0;height:2px;background:var(--accent);transform:translateX(-50%);transition:width .18s ease;
+}
+html[data-main-nav-style="editorial-rule"] body:not(.admin-body) .topbar nav a:hover{color:var(--text)}
+html[data-main-nav-style="editorial-rule"] body:not(.admin-body) .topbar nav a:hover::after{width:18px}
+html[data-main-nav-style="editorial-rule"] body:not(.admin-body) .topbar nav a.active-section{color:var(--accent);font-weight:800}
+html[data-main-nav-style="editorial-rule"] body:not(.admin-body) .topbar nav a.active-section::after{width:28px}
 
-/* 4 — Segmented Strip */
-html[data-main-nav-style="segmented-strip"] body:not(.admin-body) .topbar nav{
-  gap:0;padding:4px;border:1px solid var(--line);border-radius:10px;background:var(--surface-alt);overflow:hidden;
+/* 4 — Topline Indicator
+   A thin rail above the text marks the current section. */
+html[data-main-nav-style="topline-indicator"] body:not(.admin-body) .topbar nav{gap:18px;align-items:stretch;border-top:1px solid var(--line)}
+html[data-main-nav-style="topline-indicator"] body:not(.admin-body) .topbar nav a{position:relative;padding:11px 0 6px!important;color:var(--muted)}
+html[data-main-nav-style="topline-indicator"] body:not(.admin-body) .topbar nav a::before{
+  content:"";position:absolute;left:50%;top:-2px;width:0;height:3px;border-radius:0 0 3px 3px;background:var(--accent);transform:translateX(-50%);transition:width .18s ease;
 }
-html[data-main-nav-style="segmented-strip"] body:not(.admin-body) .topbar nav a{padding:6px 9px;border-radius:7px;color:var(--muted)}
-html[data-main-nav-style="segmented-strip"] body:not(.admin-body) .topbar nav a+a{border-left:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
-html[data-main-nav-style="segmented-strip"] body:not(.admin-body) .topbar nav a:hover{background:color-mix(in srgb,var(--surface) 70%,transparent);color:var(--text)}
-html[data-main-nav-style="segmented-strip"] body:not(.admin-body) .topbar nav a.active-section{background:var(--surface);color:var(--accent);box-shadow:0 2px 8px rgba(25,35,45,.09);border-left-color:transparent}
+html[data-main-nav-style="topline-indicator"] body:not(.admin-body) .topbar nav a:hover{color:var(--text)}
+html[data-main-nav-style="topline-indicator"] body:not(.admin-body) .topbar nav a:hover::before{width:40%}
+html[data-main-nav-style="topline-indicator"] body:not(.admin-body) .topbar nav a.active-section{color:var(--accent);font-weight:800}
+html[data-main-nav-style="topline-indicator"] body:not(.admin-body) .topbar nav a.active-section::before{width:100%}
 
-/* 5 — Top-Rail Tabs */
-html[data-main-nav-style="top-rail"] body:not(.admin-body) .topbar nav{gap:7px}
-html[data-main-nav-style="top-rail"] body:not(.admin-body) .topbar nav a{
-  padding:8px 9px 6px;border:1px solid var(--line);border-top:3px solid color-mix(in srgb,var(--accent) 32%,var(--line));border-radius:7px;background:var(--surface);color:var(--muted);
+/* 5 — Active Dot
+   A compact dot marker makes the current section obvious while keeping
+   the header airy and text-led. */
+html[data-main-nav-style="dot-marker"] body:not(.admin-body) .topbar nav{gap:17px;align-items:center}
+html[data-main-nav-style="dot-marker"] body:not(.admin-body) .topbar nav a{position:relative;padding:7px 0 7px 12px!important;color:var(--muted)}
+html[data-main-nav-style="dot-marker"] body:not(.admin-body) .topbar nav a::before{
+  content:"";position:absolute;left:0;top:50%;width:6px;height:6px;border-radius:50%;background:color-mix(in srgb,var(--line) 72%,transparent);transform:translateY(-50%) scale(.72);transition:background .16s ease,transform .16s ease;
 }
-html[data-main-nav-style="top-rail"] body:not(.admin-body) .topbar nav a:hover{border-top-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-html[data-main-nav-style="top-rail"] body:not(.admin-body) .topbar nav a.active-section{border-top-color:var(--accent);background:var(--accent-soft);color:var(--accent);box-shadow:0 4px 12px rgba(25,35,45,.07)}
+html[data-main-nav-style="dot-marker"] body:not(.admin-body) .topbar nav a:hover{color:var(--text)}
+html[data-main-nav-style="dot-marker"] body:not(.admin-body) .topbar nav a:hover::before{background:color-mix(in srgb,var(--accent) 50%,var(--line));transform:translateY(-50%) scale(1)}
+html[data-main-nav-style="dot-marker"] body:not(.admin-body) .topbar nav a.active-section{color:var(--accent);font-weight:800}
+html[data-main-nav-style="dot-marker"] body:not(.admin-body) .topbar nav a.active-section::before{background:var(--accent);transform:translateY(-50%) scale(1.15);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent-soft) 72%,transparent)}
 
-/* 6 — Mini Cards */
-html[data-main-nav-style="mini-cards"] body:not(.admin-body) .topbar nav{gap:8px}
-html[data-main-nav-style="mini-cards"] body:not(.admin-body) .topbar nav a{
-  padding:7px 10px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(180deg,var(--surface),var(--surface-soft));color:var(--muted);box-shadow:0 3px 8px rgba(25,35,45,.05);
+/* 6 — Gradient Wash
+   A subtle theme-colored wash belongs to the header itself; the links
+   remain simple typography with a clean active line. */
+html[data-main-nav-style="gradient-wash"] body:not(.admin-body) .topbar{
+  background:linear-gradient(90deg,color-mix(in srgb,var(--accent-soft) 56%,var(--header-bg)) 0%,var(--header-bg) 38%,var(--header-bg) 100%);border-bottom:1px solid color-mix(in srgb,var(--accent) 20%,var(--line));
 }
-html[data-main-nav-style="mini-cards"] body:not(.admin-body) .topbar nav a:hover{transform:translateY(-2px);border-color:var(--accent);color:var(--accent);box-shadow:0 7px 16px rgba(25,35,45,.08)}
-html[data-main-nav-style="mini-cards"] body:not(.admin-body) .topbar nav a.active-section{background:var(--accent-soft);border-color:var(--accent);color:var(--accent);box-shadow:0 7px 18px color-mix(in srgb,var(--accent) 18%,transparent)}
+html[data-main-nav-style="gradient-wash"] body:not(.admin-body) .topbar nav{gap:18px;align-items:center}
+html[data-main-nav-style="gradient-wash"] body:not(.admin-body) .topbar nav a{position:relative;padding:8px 0!important;color:color-mix(in srgb,var(--muted) 88%,var(--text))}
+html[data-main-nav-style="gradient-wash"] body:not(.admin-body) .topbar nav a::after{
+  display:block!important;content:""!important;position:absolute;left:50%;bottom:1px;width:0;height:2px;border-radius:99px;background:var(--accent);transform:translateX(-50%);transition:width .18s ease;
+}
+html[data-main-nav-style="gradient-wash"] body:not(.admin-body) .topbar nav a:hover{color:var(--text)}
+html[data-main-nav-style="gradient-wash"] body:not(.admin-body) .topbar nav a:hover::after{width:45%}
+html[data-main-nav-style="gradient-wash"] body:not(.admin-body) .topbar nav a.active-section{color:var(--accent);font-weight:800}
+html[data-main-nav-style="gradient-wash"] body:not(.admin-body) .topbar nav a.active-section::after{width:100%}
 
-/* 7 — Soft Chips */
-html[data-main-nav-style="soft-chips"] body:not(.admin-body) .topbar nav{gap:6px}
-html[data-main-nav-style="soft-chips"] body:not(.admin-body) .topbar nav a{
-  padding:6px 9px;border-radius:7px;background:color-mix(in srgb,var(--accent-soft) 66%,var(--surface));border:1px solid color-mix(in srgb,var(--accent) 16%,var(--line));color:color-mix(in srgb,var(--accent) 54%,var(--text));
+/* 7 — Split Brand
+   The identity/brand and the navigation are visually separated like a
+   professional portfolio or lab website header. */
+html[data-main-nav-style="split-brand"] body:not(.admin-body) .topbar-inner{justify-content:flex-start;gap:20px}
+html[data-main-nav-style="split-brand"] body:not(.admin-body) .brand{
+  padding:4px 22px 4px 0;border-right:2px solid var(--accent);color:var(--text);
 }
-html[data-main-nav-style="soft-chips"] body:not(.admin-body) .topbar nav a:hover{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 55%,var(--line));color:var(--accent)}
-html[data-main-nav-style="soft-chips"] body:not(.admin-body) .topbar nav a.active-section{background:var(--accent);border-color:var(--accent);color:#fff}
+html[data-main-nav-style="split-brand"] body:not(.admin-body) .topbar nav{gap:15px;align-items:center;flex:1}
+html[data-main-nav-style="split-brand"] body:not(.admin-body) .topbar nav a{position:relative;padding:7px 0!important;color:var(--muted)}
+html[data-main-nav-style="split-brand"] body:not(.admin-body) .topbar nav a::after{
+  display:block!important;content:""!important;position:absolute;left:0;bottom:0;width:0;height:2px;background:var(--accent);transition:width .18s ease;
+}
+html[data-main-nav-style="split-brand"] body:not(.admin-body) .topbar nav a:hover{color:var(--text)}
+html[data-main-nav-style="split-brand"] body:not(.admin-body) .topbar nav a:hover::after{width:45%}
+html[data-main-nav-style="split-brand"] body:not(.admin-body) .topbar nav a.active-section{color:var(--accent);font-weight:800}
+html[data-main-nav-style="split-brand"] body:not(.admin-body) .topbar nav a.active-section::after{width:100%}
 
-/* 8 — Editorial Dividers */
-html[data-main-nav-style="editorial-dividers"] body:not(.admin-body) .topbar nav{
-  gap:0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:3px 0;
+/* 8 — Bracket Focus
+   Slim side brackets frame only the active/hovered link; no button fill. */
+html[data-main-nav-style="bracket-focus"] body:not(.admin-body) .topbar nav{gap:10px;align-items:center}
+html[data-main-nav-style="bracket-focus"] body:not(.admin-body) .topbar nav a{position:relative;padding:7px 9px!important;color:var(--muted)}
+html[data-main-nav-style="bracket-focus"] body:not(.admin-body) .topbar nav a::before,
+html[data-main-nav-style="bracket-focus"] body:not(.admin-body) .topbar nav a::after{
+  content:""!important;display:block!important;position:absolute;top:20%;bottom:20%;width:1px;background:transparent;transition:background .16s ease,top .16s ease,bottom .16s ease;
 }
-html[data-main-nav-style="editorial-dividers"] body:not(.admin-body) .topbar nav a{padding:5px 10px;color:var(--muted);background:transparent}
-html[data-main-nav-style="editorial-dividers"] body:not(.admin-body) .topbar nav a+a{border-left:1px solid var(--line)}
-html[data-main-nav-style="editorial-dividers"] body:not(.admin-body) .topbar nav a:hover{background:var(--surface-alt);color:var(--text)}
-html[data-main-nav-style="editorial-dividers"] body:not(.admin-body) .topbar nav a.active-section{background:var(--accent-soft);color:var(--accent);box-shadow:inset 0 -2px 0 var(--accent)}
+html[data-main-nav-style="bracket-focus"] body:not(.admin-body) .topbar nav a::before{left:1px}
+html[data-main-nav-style="bracket-focus"] body:not(.admin-body) .topbar nav a::after{right:1px}
+html[data-main-nav-style="bracket-focus"] body:not(.admin-body) .topbar nav a:hover{color:var(--text)}
+html[data-main-nav-style="bracket-focus"] body:not(.admin-body) .topbar nav a:hover::before,
+html[data-main-nav-style="bracket-focus"] body:not(.admin-body) .topbar nav a:hover::after{background:color-mix(in srgb,var(--accent) 50%,var(--line));top:12%;bottom:12%}
+html[data-main-nav-style="bracket-focus"] body:not(.admin-body) .topbar nav a.active-section{color:var(--accent);font-weight:800}
+html[data-main-nav-style="bracket-focus"] body:not(.admin-body) .topbar nav a.active-section::before,
+html[data-main-nav-style="bracket-focus"] body:not(.admin-body) .topbar nav a.active-section::after{background:var(--accent);top:8%;bottom:8%}
 
-/* 9 — Glass Rail */
-html[data-main-nav-style="glass-rail"] body:not(.admin-body) .topbar nav{
-  gap:5px;padding:5px 6px;border:1px solid color-mix(in srgb,var(--line) 70%,transparent);border-radius:14px;background:color-mix(in srgb,var(--surface) 76%,transparent);backdrop-filter:blur(14px);box-shadow:0 8px 24px rgba(25,35,45,.07);
+/* 9 — Accent Edge
+   The whole header gets a confident accent edge; the current section is
+   marked with a small square and stronger typography. */
+html[data-main-nav-style="accent-edge"] body:not(.admin-body) .topbar{
+  border-bottom:3px solid var(--accent);box-shadow:0 5px 16px color-mix(in srgb,var(--accent) 8%,transparent);
 }
-html[data-main-nav-style="glass-rail"] body:not(.admin-body) .topbar nav a{padding:6px 9px;border-radius:10px;color:var(--muted);background:color-mix(in srgb,var(--surface) 46%,transparent);border:1px solid transparent}
-html[data-main-nav-style="glass-rail"] body:not(.admin-body) .topbar nav a:hover{border-color:var(--line);background:var(--surface);color:var(--text)}
-html[data-main-nav-style="glass-rail"] body:not(.admin-body) .topbar nav a.active-section{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 42%,var(--line));color:var(--accent)}
+html[data-main-nav-style="accent-edge"] body:not(.admin-body) .topbar nav{gap:17px;align-items:center}
+html[data-main-nav-style="accent-edge"] body:not(.admin-body) .topbar nav a{position:relative;padding:7px 0!important;color:var(--muted)}
+html[data-main-nav-style="accent-edge"] body:not(.admin-body) .topbar nav a::before{
+  content:"";position:absolute;left:50%;top:-4px;width:4px;height:4px;background:transparent;transform:translateX(-50%) rotate(45deg);transition:background .16s ease,top .16s ease;
+}
+html[data-main-nav-style="accent-edge"] body:not(.admin-body) .topbar nav a:hover{color:var(--text)}
+html[data-main-nav-style="accent-edge"] body:not(.admin-body) .topbar nav a:hover::before{background:color-mix(in srgb,var(--accent) 55%,transparent);top:-6px}
+html[data-main-nav-style="accent-edge"] body:not(.admin-body) .topbar nav a.active-section{color:var(--accent);font-weight:800}
+html[data-main-nav-style="accent-edge"] body:not(.admin-body) .topbar nav a.active-section::before{background:var(--accent);top:-6px}
 
-/* 10 — Ribbon Blocks */
-html[data-main-nav-style="ribbon-blocks"] body:not(.admin-body) .topbar nav{gap:5px}
-html[data-main-nav-style="ribbon-blocks"] body:not(.admin-body) .topbar nav a{
-  padding:7px 12px 7px 10px;background:var(--surface-alt);border:1px solid var(--line);color:var(--muted);clip-path:polygon(0 0,calc(100% - 7px) 0,100% 50%,calc(100% - 7px) 100%,0 100%,5px 50%);
+/* 10 — Glass Underline
+   A refined translucent header treatment with text-only links and a
+   polished active underline. */
+html[data-main-nav-style="glass-underline"] body:not(.admin-body) .topbar{
+  background:color-mix(in srgb,var(--header-bg) 78%,transparent);backdrop-filter:blur(18px) saturate(125%);border-bottom:1px solid color-mix(in srgb,var(--line) 72%,transparent);box-shadow:0 7px 24px rgba(25,35,45,.045);
 }
-html[data-main-nav-style="ribbon-blocks"] body:not(.admin-body) .topbar nav a:first-child{clip-path:polygon(0 0,calc(100% - 7px) 0,100% 50%,calc(100% - 7px) 100%,0 100%)}
-html[data-main-nav-style="ribbon-blocks"] body:not(.admin-body) .topbar nav a:hover{background:var(--accent-soft);color:var(--accent)}
-html[data-main-nav-style="ribbon-blocks"] body:not(.admin-body) .topbar nav a.active-section{background:var(--accent);border-color:var(--accent);color:#fff}
+html[data-main-nav-style="glass-underline"] body:not(.admin-body) .topbar nav{gap:18px;align-items:center}
+html[data-main-nav-style="glass-underline"] body:not(.admin-body) .topbar nav a{position:relative;padding:8px 0!important;color:var(--muted)}
+html[data-main-nav-style="glass-underline"] body:not(.admin-body) .topbar nav a::after{
+  display:block!important;content:""!important;position:absolute;left:50%;bottom:0;width:0;height:2px;border-radius:99px;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 55%,transparent),var(--accent),color-mix(in srgb,var(--accent) 55%,transparent));transform:translateX(-50%);transition:width .18s ease;
+}
+html[data-main-nav-style="glass-underline"] body:not(.admin-body) .topbar nav a:hover{color:var(--text)}
+html[data-main-nav-style="glass-underline"] body:not(.admin-body) .topbar nav a:hover::after{width:54%}
+html[data-main-nav-style="glass-underline"] body:not(.admin-body) .topbar nav a.active-section{color:var(--accent);font-weight:800}
+html[data-main-nav-style="glass-underline"] body:not(.admin-body) .topbar nav a.active-section::after{width:100%}
 
 @media(max-width:760px){
   html[data-main-nav-style] body:not(.admin-body) .topbar nav{width:100%;justify-content:flex-start}
   html[data-main-nav-style] body:not(.admin-body) .topbar nav a{font-size:12px!important}
-  html[data-main-nav-style="floating-capsule"] body:not(.admin-body) .topbar nav,
-  html[data-main-nav-style="segmented-strip"] body:not(.admin-body) .topbar nav,
-  html[data-main-nav-style="glass-rail"] body:not(.admin-body) .topbar nav{border-radius:12px}
+  html[data-main-nav-style="floating-rail"] body:not(.admin-body) .topbar nav{border-radius:14px;padding:8px 10px;gap:12px}
+  html[data-main-nav-style="editorial-rule"] body:not(.admin-body) .topbar nav a{padding-left:9px!important;padding-right:9px!important}
+  html[data-main-nav-style="split-brand"] body:not(.admin-body) .topbar-inner{gap:10px}
+  html[data-main-nav-style="split-brand"] body:not(.admin-body) .brand{padding:0 0 7px;border-right:0;border-bottom:2px solid var(--accent)}
+  html[data-main-nav-style="split-brand"] body:not(.admin-body) .topbar nav{gap:13px}
 }
 
 /* =========================================================
@@ -5680,34 +5771,41 @@ html[data-main-nav-style="ribbon-blocks"] body:not(.admin-body) .topbar nav a.ac
 .main-nav-style-choice.selected{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .main-nav-style-choice>input{position:absolute;opacity:0;pointer-events:none}
 .main-nav-style-name{font-size:12px;font-weight:800;color:var(--text)}
-.main-nav-style-preview{min-height:52px;display:flex;align-items:center;justify-content:center;gap:5px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft);overflow:hidden}
-.main-nav-style-preview>span{font-size:9px;font-weight:800;white-space:nowrap;color:var(--muted)}
-.main-nav-style-preview[data-main-nav-preview="current"]>span.active{color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:2px}
-.main-nav-style-preview[data-main-nav-preview="framed-links"]>span{padding:4px 6px;border:1px solid var(--line);border-radius:5px;background:var(--surface)}
-.main-nav-style-preview[data-main-nav-preview="framed-links"]>span.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
-.main-nav-style-preview[data-main-nav-preview="accent-pills"]>span{padding:4px 6px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
-.main-nav-style-preview[data-main-nav-preview="accent-pills"]>span.active{background:var(--accent);color:#fff}
-.main-nav-style-preview[data-main-nav-preview="floating-capsule"]{border-radius:999px;background:var(--surface);box-shadow:0 5px 14px rgba(25,35,45,.08)}
-.main-nav-style-preview[data-main-nav-preview="floating-capsule"]>span{padding:4px 6px;border-radius:999px}
-.main-nav-style-preview[data-main-nav-preview="floating-capsule"]>span.active{background:var(--accent);color:#fff}
-.main-nav-style-preview[data-main-nav-preview="segmented-strip"]{gap:0;background:var(--surface-alt)}
-.main-nav-style-preview[data-main-nav-preview="segmented-strip"]>span{padding:4px 6px;border-left:1px solid var(--line)}
-.main-nav-style-preview[data-main-nav-preview="segmented-strip"]>span:first-child{border-left:0}
-.main-nav-style-preview[data-main-nav-preview="segmented-strip"]>span.active{background:var(--surface);color:var(--accent);box-shadow:0 2px 6px rgba(25,35,45,.08)}
-.main-nav-style-preview[data-main-nav-preview="top-rail"]>span{padding:5px 6px;border:1px solid var(--line);border-top:3px solid color-mix(in srgb,var(--accent) 35%,var(--line));border-radius:5px;background:var(--surface)}
-.main-nav-style-preview[data-main-nav-preview="top-rail"]>span.active{border-top-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
-.main-nav-style-preview[data-main-nav-preview="mini-cards"]>span{padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--surface);box-shadow:0 3px 7px rgba(25,35,45,.07)}
-.main-nav-style-preview[data-main-nav-preview="mini-cards"]>span.active{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
-.main-nav-style-preview[data-main-nav-preview="soft-chips"]>span{padding:4px 6px;border-radius:5px;background:var(--accent-soft);color:color-mix(in srgb,var(--accent) 70%,var(--text))}
-.main-nav-style-preview[data-main-nav-preview="soft-chips"]>span.active{background:var(--accent);color:#fff}
-.main-nav-style-preview[data-main-nav-preview="editorial-dividers"]{border-radius:0;border-left:0;border-right:0;background:var(--surface)}
-.main-nav-style-preview[data-main-nav-preview="editorial-dividers"]>span{padding:4px 7px;border-left:1px solid var(--line)}
-.main-nav-style-preview[data-main-nav-preview="editorial-dividers"]>span:first-child{border-left:0}
-.main-nav-style-preview[data-main-nav-preview="editorial-dividers"]>span.active{background:var(--accent-soft);color:var(--accent);box-shadow:inset 0 -2px 0 var(--accent)}
-.main-nav-style-preview[data-main-nav-preview="glass-rail"]{background:color-mix(in srgb,var(--surface) 76%,transparent);box-shadow:0 5px 14px rgba(25,35,45,.07)}
-.main-nav-style-preview[data-main-nav-preview="glass-rail"]>span{padding:4px 6px;border-radius:6px;background:color-mix(in srgb,var(--surface) 60%,transparent)}
-.main-nav-style-preview[data-main-nav-preview="glass-rail"]>span.active{background:var(--accent-soft);color:var(--accent)}
-.main-nav-style-preview[data-main-nav-preview="ribbon-blocks"]>span{padding:5px 8px;background:var(--surface-alt);clip-path:polygon(0 0,calc(100% - 5px) 0,100% 50%,calc(100% - 5px) 100%,0 100%,4px 50%)}
-.main-nav-style-preview[data-main-nav-preview="ribbon-blocks"]>span:first-child{clip-path:polygon(0 0,calc(100% - 5px) 0,100% 50%,calc(100% - 5px) 100%,0 100%)}
-.main-nav-style-preview[data-main-nav-preview="ribbon-blocks"]>span.active{background:var(--accent);color:#fff}
+
+.main-nav-style-preview{min-height:62px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--surface-soft);overflow:hidden}
+.main-nav-style-preview-brand{font-size:9px;font-weight:900;color:var(--text);white-space:nowrap}
+.main-nav-style-preview-links{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0;flex:1}
+.main-nav-style-preview-links>span{position:relative;font-size:8px;font-weight:750;white-space:nowrap;color:var(--muted);line-height:1.2}
+.main-nav-style-preview[data-main-nav-preview="current"] .main-nav-preview-links>span.active{color:var(--accent);border-bottom:2px solid var(--accent);padding-bottom:2px}
+.main-nav-style-preview[data-main-nav-preview="academic-underline"]{align-items:flex-end}
+.main-nav-style-preview[data-main-nav-preview="academic-underline"] .main-nav-preview-links{border-bottom:1px solid var(--line);padding-bottom:4px}
+.main-nav-style-preview[data-main-nav-preview="academic-underline"] .main-nav-preview-links>span.active{color:var(--accent);font-weight:900;border-bottom:3px solid var(--accent);padding-bottom:4px;margin-bottom:-5px}
+.main-nav-style-preview[data-main-nav-preview="floating-rail"] .main-nav-preview-links{padding:6px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface);box-shadow:0 4px 10px rgba(25,35,45,.07)}
+.main-nav-style-preview[data-main-nav-preview="floating-rail"] .main-nav-preview-links>span.active{color:var(--accent);font-weight:900}
+.main-nav-style-preview[data-main-nav-preview="floating-rail"] .main-nav-preview-links>span.active::after{content:"";position:absolute;left:50%;bottom:-4px;width:14px;height:2px;background:var(--accent);transform:translateX(-50%)}
+.main-nav-style-preview[data-main-nav-preview="editorial-rule"]{border-top:2px double var(--line);border-bottom:2px double var(--line);border-radius:2px;background:var(--surface)}
+.main-nav-style-preview[data-main-nav-preview="editorial-rule"] .main-nav-preview-links{gap:0}
+.main-nav-style-preview[data-main-nav-preview="editorial-rule"] .main-nav-preview-links>span{padding:0 7px;border-left:1px solid var(--line)}
+.main-nav-style-preview[data-main-nav-preview="editorial-rule"] .main-nav-preview-links>span:first-child{border-left:0}
+.main-nav-style-preview[data-main-nav-preview="editorial-rule"] .main-nav-preview-links>span.active{color:var(--accent);font-weight:900}
+.main-nav-style-preview[data-main-nav-preview="topline-indicator"] .main-nav-preview-links{border-top:1px solid var(--line);padding-top:6px}
+.main-nav-style-preview[data-main-nav-preview="topline-indicator"] .main-nav-preview-links>span.active{color:var(--accent);font-weight:900}
+.main-nav-style-preview[data-main-nav-preview="topline-indicator"] .main-nav-preview-links>span.active::before{content:"";position:absolute;left:0;right:0;top:-7px;height:3px;background:var(--accent)}
+.main-nav-style-preview[data-main-nav-preview="dot-marker"] .main-nav-preview-links>span{padding-left:8px}
+.main-nav-style-preview[data-main-nav-preview="dot-marker"] .main-nav-preview-links>span::before{content:"";position:absolute;left:0;top:50%;width:4px;height:4px;border-radius:50%;background:var(--line);transform:translateY(-50%)}
+.main-nav-style-preview[data-main-nav-preview="dot-marker"] .main-nav-preview-links>span.active{color:var(--accent);font-weight:900}
+.main-nav-style-preview[data-main-nav-preview="dot-marker"] .main-nav-preview-links>span.active::before{background:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.main-nav-style-preview[data-main-nav-preview="gradient-wash"]{background:linear-gradient(90deg,var(--accent-soft),var(--surface) 42%,var(--surface));border-color:color-mix(in srgb,var(--accent) 20%,var(--line))}
+.main-nav-style-preview[data-main-nav-preview="gradient-wash"] .main-nav-preview-links>span.active{color:var(--accent);font-weight:900;border-bottom:2px solid var(--accent);padding-bottom:2px}
+.main-nav-style-preview[data-main-nav-preview="split-brand"] .main-nav-style-preview-brand{padding-right:9px;border-right:2px solid var(--accent)}
+.main-nav-style-preview[data-main-nav-preview="split-brand"] .main-nav-preview-links>span.active{color:var(--accent);font-weight:900;border-bottom:2px solid var(--accent);padding-bottom:2px}
+.main-nav-style-preview[data-main-nav-preview="bracket-focus"] .main-nav-preview-links>span{padding:2px 5px}
+.main-nav-style-preview[data-main-nav-preview="bracket-focus"] .main-nav-preview-links>span.active{color:var(--accent);font-weight:900;border-left:1px solid var(--accent);border-right:1px solid var(--accent)}
+.main-nav-style-preview[data-main-nav-preview="accent-edge"]{border-bottom:3px solid var(--accent);border-radius:8px 8px 3px 3px}
+.main-nav-style-preview[data-main-nav-preview="accent-edge"] .main-nav-preview-links>span.active{color:var(--accent);font-weight:900}
+.main-nav-style-preview[data-main-nav-preview="accent-edge"] .main-nav-preview-links>span.active::before{content:"";position:absolute;left:50%;top:-6px;width:4px;height:4px;background:var(--accent);transform:translateX(-50%) rotate(45deg)}
+.main-nav-style-preview[data-main-nav-preview="glass-underline"]{background:color-mix(in srgb,var(--surface) 70%,transparent);box-shadow:0 4px 12px rgba(25,35,45,.05)}
+.main-nav-style-preview[data-main-nav-preview="glass-underline"] .main-nav-preview-links>span.active{color:var(--accent);font-weight:900}
+.main-nav-style-preview[data-main-nav-preview="glass-underline"] .main-nav-preview-links>span.active::after{content:"";position:absolute;left:0;right:0;bottom:-4px;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent)}
+
 @media(max-width:760px){.main-nav-style-choice-grid,.navigation-behavior-grid{grid-template-columns:1fr}.navigation-fold>summary{padding:16px 17px}.navigation-fold-body{padding:17px}}
