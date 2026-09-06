@@ -424,7 +424,21 @@ const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"]
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
 const MAIN_NAV_STYLE_VALUES=["current","framed-links","accent-pills","floating-capsule","segmented-strip","top-rail","mini-cards","soft-chips","editorial-dividers","glass-rail","ribbon-blocks"];
-const SIDEBAR_STYLE_VALUES=["current","profile-card","editorial-sidebar","accent-rail","soft-tint-panel","floating-profile","portrait-header","centered-academic","split-portrait","framed-portrait","minimal-identity","academic-id","researcher-badge","top-accent-banner","overlap-portrait","asymmetric-editorial","compact-sticky","sectioned-sidebar","glass-academic","faculty-premium","identity-row","name-first","research-first","contact-first","dual-column-details","portrait-nameplate","social-dock","timeline-profile","modular-tiles","executive-header","research-card-stack","directory-compact","scholar-split","banner-overlay","profile-matrix"];
+const SIDEBAR_DESIGN_VALUES=["current","profile-card","editorial-sidebar","accent-rail","soft-tint-panel","floating-profile","portrait-header","centered-academic","split-portrait","framed-portrait","minimal-identity","academic-id","researcher-badge","top-accent-banner","overlap-portrait","asymmetric-editorial","compact-sticky","sectioned-sidebar","glass-academic","faculty-premium"];
+const SIDEBAR_LAYOUT_VALUES=["classic","identity-row","name-first","research-first","contact-first","dual-column-details","portrait-nameplate","social-dock","timeline-profile","modular-tiles","executive-header","research-card-stack","directory-compact","scholar-split","banner-overlay","profile-matrix"];
+const SIDEBAR_POSITION_VALUES=["left","right","top"];
+const SIDEBAR_STYLE_VALUES=[...SIDEBAR_DESIGN_VALUES,...SIDEBAR_LAYOUT_VALUES.filter(v=>v!=="classic")];
+function normalizeSidebarDesign(layout={}){
+  if(SIDEBAR_DESIGN_VALUES.includes(layout.sidebarDesign))return layout.sidebarDesign;
+  if(SIDEBAR_DESIGN_VALUES.includes(layout.sidebarStyle))return layout.sidebarStyle;
+  return "current";
+}
+function normalizeSidebarLayout(layout={}){
+  if(SIDEBAR_LAYOUT_VALUES.includes(layout.sidebarLayout))return layout.sidebarLayout;
+  if(SIDEBAR_LAYOUT_VALUES.includes(layout.sidebarStyle))return layout.sidebarStyle;
+  return "classic";
+}
+function normalizeSidebarPosition(value){return SIDEBAR_POSITION_VALUES.includes(value)?value:"left";}
 const LEGACY_MAIN_NAV_STYLE_MAP={
   "academic-underline":"accent-pills",
   "floating-rail":"floating-capsule",
@@ -466,6 +480,9 @@ const DEFAULT_SITE_SETTINGS={
     shadow:"theme",
     stickySidebar:true,
     sidebarStyle:"current",
+    sidebarDesign:"current",
+    sidebarLayout:"classic",
+    sidebarPosition:"left",
     navigationMode:"single",
     pageTransition:"fade",
     pagePager:true,
@@ -586,7 +603,10 @@ function normalizeSiteSettings(content){
       fontPair:Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,l.fontPair)?l.fontPair:DEFAULT_SITE_SETTINGS.layout.fontPair,
       shadow:["theme","none","subtle","medium"].includes(l.shadow)?l.shadow:DEFAULT_SITE_SETTINGS.layout.shadow,
       stickySidebar:Object.prototype.hasOwnProperty.call(l,"stickySidebar")?l.stickySidebar!==false:DEFAULT_SITE_SETTINGS.layout.stickySidebar,
-      sidebarStyle:SIDEBAR_STYLE_VALUES.includes(l.sidebarStyle)?l.sidebarStyle:DEFAULT_SITE_SETTINGS.layout.sidebarStyle,
+      sidebarStyle:normalizeSidebarDesign(l),
+      sidebarDesign:normalizeSidebarDesign(l),
+      sidebarLayout:normalizeSidebarLayout(l),
+      sidebarPosition:normalizeSidebarPosition(l.sidebarPosition),
       navigationMode:["single","sections"].includes(l.navigationMode)?l.navigationMode:DEFAULT_SITE_SETTINGS.layout.navigationMode,
       pageTransition:["none","fade","slide"].includes(l.pageTransition)?l.pageTransition:DEFAULT_SITE_SETTINGS.layout.pageTransition,
       pagePager:Object.prototype.hasOwnProperty.call(l,"pagePager")?l.pagePager!==false:DEFAULT_SITE_SETTINGS.layout.pagePager,
@@ -753,10 +773,18 @@ function fillSiteCustomizationControls(){
   if($("fCardStyleValue"))$("fCardStyleValue").value=l.cardStyles?.[cardSection]||DEFAULT_SITE_SETTINGS.layout.cardStyles[cardSection];
   if($("fCardDesignValue"))$("fCardDesignValue").value=l.cardDesigns?.[cardSection]||DEFAULT_SITE_SETTINGS.layout.cardDesigns[cardSection];
   $("fStickySidebar").checked=l.stickySidebar;
-  const sidebarStyle=SIDEBAR_STYLE_VALUES.includes(l.sidebarStyle)?l.sidebarStyle:DEFAULT_SITE_SETTINGS.layout.sidebarStyle;
-  const sidebarStyleInput=document.querySelector(`input[name="sidebarStyle"][value="${sidebarStyle}"]`);
-  if(sidebarStyleInput)sidebarStyleInput.checked=true;
-  document.querySelectorAll("[data-sidebar-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.sidebarStyleCard===sidebarStyle));
+  const sidebarDesign=normalizeSidebarDesign(l);
+  const sidebarDesignInput=document.querySelector(`input[name="sidebarDesign"][value="${sidebarDesign}"]`);
+  if(sidebarDesignInput)sidebarDesignInput.checked=true;
+  document.querySelectorAll("[data-sidebar-design-card]").forEach(card=>card.classList.toggle("selected",card.dataset.sidebarDesignCard===sidebarDesign));
+  const sidebarLayout=normalizeSidebarLayout(l);
+  const sidebarLayoutInput=document.querySelector(`input[name="sidebarLayout"][value="${sidebarLayout}"]`);
+  if(sidebarLayoutInput)sidebarLayoutInput.checked=true;
+  document.querySelectorAll("[data-sidebar-layout-card]").forEach(card=>card.classList.toggle("selected",card.dataset.sidebarLayoutCard===sidebarLayout));
+  const sidebarPosition=normalizeSidebarPosition(l.sidebarPosition);
+  const sidebarPositionInput=document.querySelector(`input[name="sidebarPosition"][value="${sidebarPosition}"]`);
+  if(sidebarPositionInput)sidebarPositionInput.checked=true;
+  document.querySelectorAll("[data-sidebar-position-card]").forEach(card=>card.classList.toggle("selected",card.dataset.sidebarPositionCard===sidebarPosition));
   $("fNavigationModeSingle").checked=l.navigationMode!=="sections";
   $("fNavigationModeSections").checked=l.navigationMode==="sections";
   $("fPageTransition").value=l.pageTransition||"fade";
@@ -893,8 +921,12 @@ function syncSiteCustomizationFromControls(){
   l.fontPair=$("fFontPair").value;
   l.shadow=$("fShadow").value;
   l.stickySidebar=$("fStickySidebar").checked;
-  const sidebarStyle=document.querySelector('input[name="sidebarStyle"]:checked')?.value;
-  if(SIDEBAR_STYLE_VALUES.includes(sidebarStyle))l.sidebarStyle=sidebarStyle;
+  const sidebarDesign=document.querySelector('input[name="sidebarDesign"]:checked')?.value;
+  if(SIDEBAR_DESIGN_VALUES.includes(sidebarDesign)){l.sidebarDesign=sidebarDesign;l.sidebarStyle=sidebarDesign;}
+  const sidebarLayout=document.querySelector('input[name="sidebarLayout"]:checked')?.value;
+  if(SIDEBAR_LAYOUT_VALUES.includes(sidebarLayout))l.sidebarLayout=sidebarLayout;
+  const sidebarPosition=document.querySelector('input[name="sidebarPosition"]:checked')?.value;
+  if(SIDEBAR_POSITION_VALUES.includes(sidebarPosition))l.sidebarPosition=sidebarPosition;
   l.navigationMode=$("fNavigationModeSections").checked?"sections":"single";
   l.pageTransition=$("fPageTransition").value;
   l.pagePager=$("fPagePager").checked;
@@ -1771,19 +1803,31 @@ document.addEventListener("change",e=>{
 });
 
 
-/* Main website navigation style — commit immediately so the selected
-   style cannot be overwritten by another Admin refresh. */
+/* Sidebar design, layout, and placement — commit immediately so later Admin
+   refreshes cannot restore stale values. */
 document.addEventListener("change",e=>{
-  const input=e.target.closest('input[name="sidebarStyle"]');
-  if(!input)return;
-  const value=input.value;
-  if(!SIDEBAR_STYLE_VALUES.includes(value))return;
+  const design=e.target.closest('input[name="sidebarDesign"]');
+  const layout=e.target.closest('input[name="sidebarLayout"]');
+  const position=e.target.closest('input[name="sidebarPosition"]');
+  if(!design&&!layout&&!position)return;
   normalizeSiteSettings(currentContent);
-  currentContent.siteSettings.layout.sidebarStyle=value;
+  const l=currentContent.siteSettings.layout;
+  if(design&&SIDEBAR_DESIGN_VALUES.includes(design.value)){
+    l.sidebarDesign=design.value;l.sidebarStyle=design.value;
+    document.querySelectorAll("[data-sidebar-design-card]").forEach(card=>card.classList.toggle("selected",card.dataset.sidebarDesignCard===design.value));
+  }
+  if(layout&&SIDEBAR_LAYOUT_VALUES.includes(layout.value)){
+    l.sidebarLayout=layout.value;
+    document.querySelectorAll("[data-sidebar-layout-card]").forEach(card=>card.classList.toggle("selected",card.dataset.sidebarLayoutCard===layout.value));
+  }
+  if(position&&SIDEBAR_POSITION_VALUES.includes(position.value)){
+    l.sidebarPosition=position.value;
+    document.querySelectorAll("[data-sidebar-position-card]").forEach(card=>card.classList.toggle("selected",card.dataset.sidebarPositionCard===position.value));
+  }
   currentContent.appearance=currentContent.appearance||{};
   currentContent.appearance.designPreset="custom";
-  document.querySelectorAll("[data-sidebar-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.sidebarStyleCard===value));
   scheduleAdminPreview(true);
+  setStatus("Sidebar settings updated. Save all changes to publish them.");
 });
 
 document.addEventListener("change",e=>{
@@ -4042,3 +4086,12 @@ function setupAppearanceAccordions(){
 
 setupAppearanceAccordions();
 boot();
+
+
+/* Preserve collapsed/open state of the three Sidebar groups. */
+document.querySelectorAll('[data-sidebar-fold]').forEach(fold=>{
+  const key='academicSidebarFold:'+fold.dataset.sidebarFold;
+  const saved=localStorage.getItem(key);
+  if(saved!==null)fold.open=saved==='1';
+  fold.addEventListener('toggle',()=>localStorage.setItem(key,fold.open?'1':'0'));
+});

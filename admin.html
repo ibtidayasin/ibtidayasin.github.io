@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260906-sidebar35-structure2" rel="stylesheet"/>
+<link href="styles.css?v=20260906-sidebar-system3" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -1113,262 +1113,214 @@
 <div class="admin-panel" data-panel="sidebar">
 <div class="sidebar-admin-intro admin-card">
 <p class="eyebrow">Sidebar</p>
-<h2>Profile sidebar styles</h2>
-<p class="muted">Choose from 20 visual sidebar designs plus 15 structural layouts that change the information order and formation. Portrait, crop, sidebar width, sticky behavior and section visibility settings still work.</p>
+<h2>Profile sidebar</h2>
+<p class="muted">Choose the visual design, information layout, and placement independently. Portrait size and crop settings remain consistent across the system.</p>
 </div>
-<details class="admin-card sidebar-fold" open>
-<summary><span><strong>Sidebar design</strong><small>35 professional sidebar styles: 20 visual treatments plus 15 structural arrangements. The current sidebar is preserved as the first option.</small></span><span class="sidebar-fold-chevron" aria-hidden="true"></span></summary>
+<details class="admin-card sidebar-fold" data-sidebar-fold="design" open>
+<summary><span><strong>Sidebar designs</strong><small>20 visual treatments. These control the surface, framing, accents, spacing, and overall visual character.</small></span><span class="sidebar-fold-chevron" aria-hidden="true"></span></summary>
 <div class="sidebar-fold-body">
-<div class="sidebar-style-choice-grid" role="radiogroup" aria-label="Profile sidebar style">
-<label class="sidebar-style-choice" data-sidebar-style-card="current">
-<input name="sidebarStyle" type="radio" value="current"/>
-<span class="sidebar-style-preview" data-sidebar-preview="current">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<div class="sidebar-style-choice-grid" role="radiogroup" aria-label="Sidebar design">
+<label class="sidebar-style-choice" data-sidebar-design-card="current">
+<input name="sidebarDesign" type="radio" value="current"/>
+<span class="sidebar-style-preview" data-sidebar-preview="current"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">Current Classic Academic</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="profile-card">
-<input name="sidebarStyle" type="radio" value="profile-card"/>
-<span class="sidebar-style-preview" data-sidebar-preview="profile-card">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="profile-card">
+<input name="sidebarDesign" type="radio" value="profile-card"/>
+<span class="sidebar-style-preview" data-sidebar-preview="profile-card"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">1. Profile Card</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="editorial-sidebar">
-<input name="sidebarStyle" type="radio" value="editorial-sidebar"/>
-<span class="sidebar-style-preview" data-sidebar-preview="editorial-sidebar">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="editorial-sidebar">
+<input name="sidebarDesign" type="radio" value="editorial-sidebar"/>
+<span class="sidebar-style-preview" data-sidebar-preview="editorial-sidebar"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">2. Editorial Sidebar</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="accent-rail">
-<input name="sidebarStyle" type="radio" value="accent-rail"/>
-<span class="sidebar-style-preview" data-sidebar-preview="accent-rail">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="accent-rail">
+<input name="sidebarDesign" type="radio" value="accent-rail"/>
+<span class="sidebar-style-preview" data-sidebar-preview="accent-rail"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">3. Accent Rail</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="soft-tint-panel">
-<input name="sidebarStyle" type="radio" value="soft-tint-panel"/>
-<span class="sidebar-style-preview" data-sidebar-preview="soft-tint-panel">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="soft-tint-panel">
+<input name="sidebarDesign" type="radio" value="soft-tint-panel"/>
+<span class="sidebar-style-preview" data-sidebar-preview="soft-tint-panel"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">4. Soft Tint Panel</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="floating-profile">
-<input name="sidebarStyle" type="radio" value="floating-profile"/>
-<span class="sidebar-style-preview" data-sidebar-preview="floating-profile">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="floating-profile">
+<input name="sidebarDesign" type="radio" value="floating-profile"/>
+<span class="sidebar-style-preview" data-sidebar-preview="floating-profile"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">5. Floating Profile Panel</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="portrait-header">
-<input name="sidebarStyle" type="radio" value="portrait-header"/>
-<span class="sidebar-style-preview" data-sidebar-preview="portrait-header">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="portrait-header">
+<input name="sidebarDesign" type="radio" value="portrait-header"/>
+<span class="sidebar-style-preview" data-sidebar-preview="portrait-header"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">6. Portrait Header Card</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="centered-academic">
-<input name="sidebarStyle" type="radio" value="centered-academic"/>
-<span class="sidebar-style-preview" data-sidebar-preview="centered-academic">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="centered-academic">
+<input name="sidebarDesign" type="radio" value="centered-academic"/>
+<span class="sidebar-style-preview" data-sidebar-preview="centered-academic"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">7. Centered Academic Profile</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="split-portrait">
-<input name="sidebarStyle" type="radio" value="split-portrait"/>
-<span class="sidebar-style-preview" data-sidebar-preview="split-portrait">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="split-portrait">
+<input name="sidebarDesign" type="radio" value="split-portrait"/>
+<span class="sidebar-style-preview" data-sidebar-preview="split-portrait"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">8. Split Portrait Sidebar</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="framed-portrait">
-<input name="sidebarStyle" type="radio" value="framed-portrait"/>
-<span class="sidebar-style-preview" data-sidebar-preview="framed-portrait">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="framed-portrait">
+<input name="sidebarDesign" type="radio" value="framed-portrait"/>
+<span class="sidebar-style-preview" data-sidebar-preview="framed-portrait"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">9. Framed Portrait Style</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="minimal-identity">
-<input name="sidebarStyle" type="radio" value="minimal-identity"/>
-<span class="sidebar-style-preview" data-sidebar-preview="minimal-identity">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="minimal-identity">
+<input name="sidebarDesign" type="radio" value="minimal-identity"/>
+<span class="sidebar-style-preview" data-sidebar-preview="minimal-identity"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">10. Minimal Identity Sidebar</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="academic-id">
-<input name="sidebarStyle" type="radio" value="academic-id"/>
-<span class="sidebar-style-preview" data-sidebar-preview="academic-id">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="academic-id">
+<input name="sidebarDesign" type="radio" value="academic-id"/>
+<span class="sidebar-style-preview" data-sidebar-preview="academic-id"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">11. Academic ID Card</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="researcher-badge">
-<input name="sidebarStyle" type="radio" value="researcher-badge"/>
-<span class="sidebar-style-preview" data-sidebar-preview="researcher-badge">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">12. Researcher Badge Layout</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="researcher-badge">
+<input name="sidebarDesign" type="radio" value="researcher-badge"/>
+<span class="sidebar-style-preview" data-sidebar-preview="researcher-badge"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">12. Researcher Badge</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="top-accent-banner">
-<input name="sidebarStyle" type="radio" value="top-accent-banner"/>
-<span class="sidebar-style-preview" data-sidebar-preview="top-accent-banner">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="top-accent-banner">
+<input name="sidebarDesign" type="radio" value="top-accent-banner"/>
+<span class="sidebar-style-preview" data-sidebar-preview="top-accent-banner"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">13. Top Accent Banner</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="overlap-portrait">
-<input name="sidebarStyle" type="radio" value="overlap-portrait"/>
-<span class="sidebar-style-preview" data-sidebar-preview="overlap-portrait">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="overlap-portrait">
+<input name="sidebarDesign" type="radio" value="overlap-portrait"/>
+<span class="sidebar-style-preview" data-sidebar-preview="overlap-portrait"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">14. Overlapping Portrait Card</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="asymmetric-editorial">
-<input name="sidebarStyle" type="radio" value="asymmetric-editorial"/>
-<span class="sidebar-style-preview" data-sidebar-preview="asymmetric-editorial">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="asymmetric-editorial">
+<input name="sidebarDesign" type="radio" value="asymmetric-editorial"/>
+<span class="sidebar-style-preview" data-sidebar-preview="asymmetric-editorial"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">15. Asymmetric Editorial</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="compact-sticky">
-<input name="sidebarStyle" type="radio" value="compact-sticky"/>
-<span class="sidebar-style-preview" data-sidebar-preview="compact-sticky">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="compact-sticky">
+<input name="sidebarDesign" type="radio" value="compact-sticky"/>
+<span class="sidebar-style-preview" data-sidebar-preview="compact-sticky"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">16. Compact Sticky Research Card</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="sectioned-sidebar">
-<input name="sidebarStyle" type="radio" value="sectioned-sidebar"/>
-<span class="sidebar-style-preview" data-sidebar-preview="sectioned-sidebar">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="sectioned-sidebar">
+<input name="sidebarDesign" type="radio" value="sectioned-sidebar"/>
+<span class="sidebar-style-preview" data-sidebar-preview="sectioned-sidebar"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">17. Sectioned Sidebar</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="glass-academic">
-<input name="sidebarStyle" type="radio" value="glass-academic"/>
-<span class="sidebar-style-preview" data-sidebar-preview="glass-academic">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="glass-academic">
+<input name="sidebarDesign" type="radio" value="glass-academic"/>
+<span class="sidebar-style-preview" data-sidebar-preview="glass-academic"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">18. Glass Academic Panel</span>
 </label>
-<label class="sidebar-style-choice" data-sidebar-style-card="faculty-premium">
-<input name="sidebarStyle" type="radio" value="faculty-premium"/>
-<span class="sidebar-style-preview" data-sidebar-preview="faculty-premium">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
+<label class="sidebar-style-choice" data-sidebar-design-card="faculty-premium">
+<input name="sidebarDesign" type="radio" value="faculty-premium"/>
+<span class="sidebar-style-preview" data-sidebar-preview="faculty-premium"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
 <span class="sidebar-style-name">19. Premium Faculty Profile</span>
 </label>
-<div class="sidebar-style-group-title"><strong>Structural layouts</strong><span>15 options that change information order and profile formation, not just surface styling.</span></div>
-<label class="sidebar-style-choice" data-sidebar-style-card="identity-row">
-<input name="sidebarStyle" type="radio" value="identity-row"/>
-<span class="sidebar-style-preview" data-sidebar-preview="identity-row">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">20. Identity Row</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="name-first">
-<input name="sidebarStyle" type="radio" value="name-first"/>
-<span class="sidebar-style-preview" data-sidebar-preview="name-first">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">21. Name-First Profile</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="research-first">
-<input name="sidebarStyle" type="radio" value="research-first"/>
-<span class="sidebar-style-preview" data-sidebar-preview="research-first">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">22. Research-First Profile</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="contact-first">
-<input name="sidebarStyle" type="radio" value="contact-first"/>
-<span class="sidebar-style-preview" data-sidebar-preview="contact-first">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">23. Contact-First Profile</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="dual-column-details">
-<input name="sidebarStyle" type="radio" value="dual-column-details"/>
-<span class="sidebar-style-preview" data-sidebar-preview="dual-column-details">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">24. Dual-Column Details</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="portrait-nameplate">
-<input name="sidebarStyle" type="radio" value="portrait-nameplate"/>
-<span class="sidebar-style-preview" data-sidebar-preview="portrait-nameplate">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">25. Portrait Nameplate</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="social-dock">
-<input name="sidebarStyle" type="radio" value="social-dock"/>
-<span class="sidebar-style-preview" data-sidebar-preview="social-dock">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">26. Social Dock Profile</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="timeline-profile">
-<input name="sidebarStyle" type="radio" value="timeline-profile"/>
-<span class="sidebar-style-preview" data-sidebar-preview="timeline-profile">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">27. Timeline Profile</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="modular-tiles">
-<input name="sidebarStyle" type="radio" value="modular-tiles"/>
-<span class="sidebar-style-preview" data-sidebar-preview="modular-tiles">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">28. Modular Tiles</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="executive-header">
-<input name="sidebarStyle" type="radio" value="executive-header"/>
-<span class="sidebar-style-preview" data-sidebar-preview="executive-header">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">29. Executive Header</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="research-card-stack">
-<input name="sidebarStyle" type="radio" value="research-card-stack"/>
-<span class="sidebar-style-preview" data-sidebar-preview="research-card-stack">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">30. Research Card Stack</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="directory-compact">
-<input name="sidebarStyle" type="radio" value="directory-compact"/>
-<span class="sidebar-style-preview" data-sidebar-preview="directory-compact">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">31. Directory Compact</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="scholar-split">
-<input name="sidebarStyle" type="radio" value="scholar-split"/>
-<span class="sidebar-style-preview" data-sidebar-preview="scholar-split">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">32. Scholar Split</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="banner-overlay">
-<input name="sidebarStyle" type="radio" value="banner-overlay"/>
-<span class="sidebar-style-preview" data-sidebar-preview="banner-overlay">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">33. Banner Overlay</span>
-</label>
-<label class="sidebar-style-choice" data-sidebar-style-card="profile-matrix">
-<input name="sidebarStyle" type="radio" value="profile-matrix"/>
-<span class="sidebar-style-preview" data-sidebar-preview="profile-matrix">
-  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
-</span>
-<span class="sidebar-style-name">34. Profile Matrix</span>
-</label>
-
 </div>
-<p class="helper">These styles affect the normal profile sidebar only. Inner-page cover designs remain controlled independently from the Cover section. Click <b>Save all changes</b> to publish the selected style.</p>
+<p class="helper">Designs and layouts are independent. You can combine any design with any layout.</p>
+</div>
+</details>
+<details class="admin-card sidebar-fold" data-sidebar-fold="layout">
+<summary><span><strong>Sidebar layouts</strong><small>Classic arrangement plus 15 structural compositions that change information order and formation.</small></span><span class="sidebar-fold-chevron" aria-hidden="true"></span></summary>
+<div class="sidebar-fold-body">
+<div class="sidebar-style-choice-grid" role="radiogroup" aria-label="Sidebar layout">
+<label class="sidebar-style-choice" data-sidebar-layout-card="classic">
+<input name="sidebarLayout" type="radio" value="classic"/>
+<span class="sidebar-style-preview" data-sidebar-preview="current"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">Classic Stack</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="identity-row">
+<input name="sidebarLayout" type="radio" value="identity-row"/>
+<span class="sidebar-style-preview" data-sidebar-preview="identity-row"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">1. Identity Row</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="name-first">
+<input name="sidebarLayout" type="radio" value="name-first"/>
+<span class="sidebar-style-preview" data-sidebar-preview="name-first"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">2. Name-First Profile</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="research-first">
+<input name="sidebarLayout" type="radio" value="research-first"/>
+<span class="sidebar-style-preview" data-sidebar-preview="research-first"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">3. Research-First Profile</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="contact-first">
+<input name="sidebarLayout" type="radio" value="contact-first"/>
+<span class="sidebar-style-preview" data-sidebar-preview="contact-first"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">4. Contact-First Profile</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="dual-column-details">
+<input name="sidebarLayout" type="radio" value="dual-column-details"/>
+<span class="sidebar-style-preview" data-sidebar-preview="dual-column-details"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">5. Dual-Column Details</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="portrait-nameplate">
+<input name="sidebarLayout" type="radio" value="portrait-nameplate"/>
+<span class="sidebar-style-preview" data-sidebar-preview="portrait-nameplate"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">6. Portrait Nameplate</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="social-dock">
+<input name="sidebarLayout" type="radio" value="social-dock"/>
+<span class="sidebar-style-preview" data-sidebar-preview="social-dock"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">7. Social Dock Profile</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="timeline-profile">
+<input name="sidebarLayout" type="radio" value="timeline-profile"/>
+<span class="sidebar-style-preview" data-sidebar-preview="timeline-profile"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">8. Timeline Profile</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="modular-tiles">
+<input name="sidebarLayout" type="radio" value="modular-tiles"/>
+<span class="sidebar-style-preview" data-sidebar-preview="modular-tiles"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">9. Modular Tiles</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="executive-header">
+<input name="sidebarLayout" type="radio" value="executive-header"/>
+<span class="sidebar-style-preview" data-sidebar-preview="executive-header"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">10. Executive Header</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="research-card-stack">
+<input name="sidebarLayout" type="radio" value="research-card-stack"/>
+<span class="sidebar-style-preview" data-sidebar-preview="research-card-stack"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">11. Research Card Stack</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="directory-compact">
+<input name="sidebarLayout" type="radio" value="directory-compact"/>
+<span class="sidebar-style-preview" data-sidebar-preview="directory-compact"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">12. Directory Compact</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="scholar-split">
+<input name="sidebarLayout" type="radio" value="scholar-split"/>
+<span class="sidebar-style-preview" data-sidebar-preview="scholar-split"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">13. Scholar Split</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="banner-overlay">
+<input name="sidebarLayout" type="radio" value="banner-overlay"/>
+<span class="sidebar-style-preview" data-sidebar-preview="banner-overlay"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">14. Banner Overlay</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-layout-card="profile-matrix">
+<input name="sidebarLayout" type="radio" value="profile-matrix"/>
+<span class="sidebar-style-preview" data-sidebar-preview="profile-matrix"><i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i></span>
+<span class="sidebar-style-name">15. Profile Matrix</span>
+</label>
+</div>
+<p class="helper">Layout controls arrangement only. Your selected sidebar design remains active.</p>
+</div>
+</details>
+<details class="admin-card sidebar-fold" data-sidebar-fold="position" open>
+<summary><span><strong>Sidebar position</strong><small>Place the profile on the left, right, or across the top. All designs and layouts adapt automatically.</small></span><span class="sidebar-fold-chevron" aria-hidden="true"></span></summary>
+<div class="sidebar-fold-body">
+<div class="sidebar-position-grid" role="radiogroup" aria-label="Sidebar position">
+<label class="sidebar-position-choice" data-sidebar-position-card="left"><input name="sidebarPosition" type="radio" value="left"/><span class="sidebar-position-preview position-left"><i></i><b></b></span><strong>Left</strong><small>Current default</small></label>
+<label class="sidebar-position-choice" data-sidebar-position-card="right"><input name="sidebarPosition" type="radio" value="right"/><span class="sidebar-position-preview position-right"><i></i><b></b></span><strong>Right</strong><small>Profile on the right</small></label>
+<label class="sidebar-position-choice" data-sidebar-position-card="top"><input name="sidebarPosition" type="radio" value="top"/><span class="sidebar-position-preview position-top"><i></i><b></b></span><strong>Top</strong><small>Horizontal profile header</small></label>
+</div>
+<p class="helper">On phones and narrow tablets, the profile automatically stacks above the page content for readability.</p>
 </div>
 </details>
 </div>
@@ -1736,6 +1688,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-<script src="admin.js?v=20260906-sidebar35-structure2"></script>
+<script src="admin.js?v=20260906-sidebar-system3"></script>
 </body>
 </html>
