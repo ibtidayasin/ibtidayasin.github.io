@@ -183,6 +183,7 @@ const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"]
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
 const MAIN_NAV_STYLE_VALUES=["current","framed-links","accent-pills","floating-capsule","segmented-strip","top-rail","mini-cards","soft-chips","editorial-dividers","glass-rail","ribbon-blocks"];
+const SIDEBAR_STYLE_VALUES=["current","profile-card","editorial-sidebar","accent-rail","soft-tint-panel","floating-profile","portrait-header","centered-academic","split-portrait","framed-portrait","minimal-identity","academic-id","researcher-badge","top-accent-banner","overlap-portrait","asymmetric-editorial","compact-sticky","sectioned-sidebar","glass-academic","faculty-premium"];
 const LEGACY_MAIN_NAV_STYLE_MAP={
   "academic-underline":"accent-pills",
   "floating-rail":"floating-capsule",
@@ -223,6 +224,7 @@ const DEFAULT_SITE_SETTINGS={
     fontPair:"classic",
     shadow:"theme",
     stickySidebar:true,
+    sidebarStyle:"current",
     navigationMode:"single",
     pageTransition:"fade",
     pagePager:true,
@@ -343,6 +345,7 @@ function normalizeSiteSettings(content){
       fontPair:Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,l.fontPair)?l.fontPair:DEFAULT_SITE_SETTINGS.layout.fontPair,
       shadow:["theme","none","subtle","medium"].includes(l.shadow)?l.shadow:DEFAULT_SITE_SETTINGS.layout.shadow,
       stickySidebar:Object.prototype.hasOwnProperty.call(l,"stickySidebar")?l.stickySidebar!==false:DEFAULT_SITE_SETTINGS.layout.stickySidebar,
+      sidebarStyle:SIDEBAR_STYLE_VALUES.includes(l.sidebarStyle)?l.sidebarStyle:DEFAULT_SITE_SETTINGS.layout.sidebarStyle,
       navigationMode:["single","sections"].includes(l.navigationMode)?l.navigationMode:DEFAULT_SITE_SETTINGS.layout.navigationMode,
       pageTransition:["none","fade","slide"].includes(l.pageTransition)?l.pageTransition:DEFAULT_SITE_SETTINGS.layout.pageTransition,
       pagePager:Object.prototype.hasOwnProperty.call(l,"pagePager")?l.pagePager!==false:DEFAULT_SITE_SETTINGS.layout.pagePager,
@@ -993,6 +996,7 @@ function applyLayoutSettings(d){
   root.style.setProperty("--site-font-body",pair.body);
   root.style.setProperty("--site-font-heading",pair.heading);
   root.dataset.stickySidebar=l.stickySidebar?"true":"false";
+  root.dataset.sidebarStyle=SIDEBAR_STYLE_VALUES.includes(l.sidebarStyle)?l.sidebarStyle:"current";
   CARD_STYLE_SECTION_KEYS.forEach(key=>{
     const sec=document.querySelector(`[data-section-key="${key}"]`);
     if(sec){

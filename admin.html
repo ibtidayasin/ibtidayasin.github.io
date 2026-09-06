@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260906-main-nav-restored1" rel="stylesheet"/>
+<link href="styles.css?v=20260906-sidebar20-v1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -50,6 +50,7 @@
 <button data-tab="cv" type="button">CV</button>
 <button data-tab="appearance" type="button">Appearance</button>
 <button data-tab="navigation" type="button">Navigation</button>
+<button data-tab="sidebar" type="button">Sidebar</button>
 <button data-tab="typography" type="button">Typography</button>
 <button data-tab="layout" type="button">Layout</button>
 <button data-tab="structure" type="button">Structure</button>
@@ -1108,6 +1109,163 @@
 </details>
 </div>
 
+
+<div class="admin-panel" data-panel="sidebar">
+<div class="sidebar-admin-intro admin-card">
+<p class="eyebrow">Sidebar</p>
+<h2>Profile sidebar styles</h2>
+<p class="muted">Choose a professional profile composition for the normal left sidebar. Your existing portrait size, crop, sidebar width, sticky behavior and section visibility settings still work.</p>
+</div>
+<details class="admin-card sidebar-fold" open>
+<summary><span><strong>Sidebar design</strong><small>20 distinct academic and professional profile styles. The current sidebar is preserved as the first option.</small></span><span class="sidebar-fold-chevron" aria-hidden="true"></span></summary>
+<div class="sidebar-fold-body">
+<div class="sidebar-style-choice-grid" role="radiogroup" aria-label="Profile sidebar style">
+<label class="sidebar-style-choice" data-sidebar-style-card="current">
+<input name="sidebarStyle" type="radio" value="current"/>
+<span class="sidebar-style-preview" data-sidebar-preview="current">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">Current Classic Academic</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="profile-card">
+<input name="sidebarStyle" type="radio" value="profile-card"/>
+<span class="sidebar-style-preview" data-sidebar-preview="profile-card">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">1. Profile Card</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="editorial-sidebar">
+<input name="sidebarStyle" type="radio" value="editorial-sidebar"/>
+<span class="sidebar-style-preview" data-sidebar-preview="editorial-sidebar">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">2. Editorial Sidebar</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="accent-rail">
+<input name="sidebarStyle" type="radio" value="accent-rail"/>
+<span class="sidebar-style-preview" data-sidebar-preview="accent-rail">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">3. Accent Rail</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="soft-tint-panel">
+<input name="sidebarStyle" type="radio" value="soft-tint-panel"/>
+<span class="sidebar-style-preview" data-sidebar-preview="soft-tint-panel">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">4. Soft Tint Panel</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="floating-profile">
+<input name="sidebarStyle" type="radio" value="floating-profile"/>
+<span class="sidebar-style-preview" data-sidebar-preview="floating-profile">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">5. Floating Profile Panel</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="portrait-header">
+<input name="sidebarStyle" type="radio" value="portrait-header"/>
+<span class="sidebar-style-preview" data-sidebar-preview="portrait-header">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">6. Portrait Header Card</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="centered-academic">
+<input name="sidebarStyle" type="radio" value="centered-academic"/>
+<span class="sidebar-style-preview" data-sidebar-preview="centered-academic">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">7. Centered Academic Profile</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="split-portrait">
+<input name="sidebarStyle" type="radio" value="split-portrait"/>
+<span class="sidebar-style-preview" data-sidebar-preview="split-portrait">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">8. Split Portrait Sidebar</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="framed-portrait">
+<input name="sidebarStyle" type="radio" value="framed-portrait"/>
+<span class="sidebar-style-preview" data-sidebar-preview="framed-portrait">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">9. Framed Portrait Style</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="minimal-identity">
+<input name="sidebarStyle" type="radio" value="minimal-identity"/>
+<span class="sidebar-style-preview" data-sidebar-preview="minimal-identity">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">10. Minimal Identity Sidebar</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="academic-id">
+<input name="sidebarStyle" type="radio" value="academic-id"/>
+<span class="sidebar-style-preview" data-sidebar-preview="academic-id">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">11. Academic ID Card</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="researcher-badge">
+<input name="sidebarStyle" type="radio" value="researcher-badge"/>
+<span class="sidebar-style-preview" data-sidebar-preview="researcher-badge">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">12. Researcher Badge Layout</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="top-accent-banner">
+<input name="sidebarStyle" type="radio" value="top-accent-banner"/>
+<span class="sidebar-style-preview" data-sidebar-preview="top-accent-banner">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">13. Top Accent Banner</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="overlap-portrait">
+<input name="sidebarStyle" type="radio" value="overlap-portrait"/>
+<span class="sidebar-style-preview" data-sidebar-preview="overlap-portrait">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">14. Overlapping Portrait Card</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="asymmetric-editorial">
+<input name="sidebarStyle" type="radio" value="asymmetric-editorial"/>
+<span class="sidebar-style-preview" data-sidebar-preview="asymmetric-editorial">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">15. Asymmetric Editorial</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="compact-sticky">
+<input name="sidebarStyle" type="radio" value="compact-sticky"/>
+<span class="sidebar-style-preview" data-sidebar-preview="compact-sticky">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">16. Compact Sticky Research Card</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="sectioned-sidebar">
+<input name="sidebarStyle" type="radio" value="sectioned-sidebar"/>
+<span class="sidebar-style-preview" data-sidebar-preview="sectioned-sidebar">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">17. Sectioned Sidebar</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="glass-academic">
+<input name="sidebarStyle" type="radio" value="glass-academic"/>
+<span class="sidebar-style-preview" data-sidebar-preview="glass-academic">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">18. Glass Academic Panel</span>
+</label>
+<label class="sidebar-style-choice" data-sidebar-style-card="faculty-premium">
+<input name="sidebarStyle" type="radio" value="faculty-premium"/>
+<span class="sidebar-style-preview" data-sidebar-preview="faculty-premium">
+  <i class="ss-photo"></i><i class="ss-name"></i><i class="ss-role"></i><i class="ss-rule"></i><i class="ss-meta ss-meta-a"></i><i class="ss-meta ss-meta-b"></i><i class="ss-icons"></i><i class="ss-button"></i>
+</span>
+<span class="sidebar-style-name">19. Premium Faculty Profile</span>
+</label>
+</div>
+<p class="helper">These styles affect the normal profile sidebar only. Inner-page cover designs remain controlled independently from the Cover section. Click <b>Save all changes</b> to publish the selected style.</p>
+</div>
+</details>
+</div>
+
 <div class="admin-panel" data-panel="typography">
 <div class="admin-card">
 <h2>Typography</h2>
@@ -1471,6 +1629,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-<script src="admin.js?v=20260906-main-nav-restored1"></script>
+<script src="admin.js?v=20260906-sidebar20-v1"></script>
 </body>
 </html>
