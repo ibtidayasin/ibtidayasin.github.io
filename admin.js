@@ -424,6 +424,7 @@ const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"]
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
 const MAIN_NAV_STYLE_VALUES=["current","framed-links","accent-pills","floating-capsule","segmented-strip","top-rail","mini-cards","soft-chips","editorial-dividers","glass-rail","ribbon-blocks"];
+const BRAND_NAME_STYLE_VALUES=["current","accent-rail","signature-underline","soft-badge","outline-label","capsule","editorial-serif","small-caps","split-rule","accent-corner","glass-label"];
 const SIDEBAR_DESIGN_VALUES=["current","profile-card","editorial-sidebar","accent-rail","soft-tint-panel","floating-profile","portrait-header","centered-academic","split-portrait","framed-portrait","minimal-identity","academic-id","researcher-badge","top-accent-banner","overlap-portrait","asymmetric-editorial","compact-sticky","sectioned-sidebar","glass-academic","faculty-premium"];
 const SIDEBAR_LAYOUT_VALUES=["classic","identity-row","name-first","research-first","contact-first","dual-column-details","portrait-nameplate","social-dock","timeline-profile","modular-tiles","executive-header","research-card-stack","directory-compact","scholar-split","banner-overlay","profile-matrix"];
 const SIDEBAR_POSITION_VALUES=["left","right","top"];
@@ -513,7 +514,10 @@ const DEFAULT_SITE_SETTINGS={
     navHighlightStyle:"underline",
     socialStyle:"labels",
     activityTabStyle:"strong-pills",
-    mainNavStyle:"current"
+    mainNavStyle:"current",
+    brandNameSize:18,
+    brandNameColor:"",
+    brandNameStyle:"current"
   }
 };
 
@@ -592,7 +596,7 @@ function normalizeSiteSettings(content){
       cardRadius:clampNumber(l.cardRadius,0,28,DEFAULT_SITE_SETTINGS.layout.cardRadius),
       cardStyles:Object.fromEntries(CARD_STYLE_SECTION_KEYS.map(k=>[k,CARD_STYLE_VALUES.includes(l.cardStyles?.[k])?l.cardStyles[k]:DEFAULT_SITE_SETTINGS.layout.cardStyles[k]])),
       cardDesigns:Object.fromEntries(CARD_STYLE_SECTION_KEYS.map(k=>[k,CARD_DESIGN_VALUES.includes(l.cardDesigns?.[k])?l.cardDesigns[k]:DEFAULT_SITE_SETTINGS.layout.cardDesigns[k]])),
-      portraitSize:clampNumber(l.portraitSize,140,250,DEFAULT_SITE_SETTINGS.layout.portraitSize),
+      portraitSize:clampNumber(l.portraitSize,140,320,DEFAULT_SITE_SETTINGS.layout.portraitSize),
       portraitShape:["square","slight","rounded","circle"].includes(l.portraitShape)?l.portraitShape:DEFAULT_SITE_SETTINGS.layout.portraitShape,
       portraitFit:["cover","contain"].includes(l.portraitFit)?l.portraitFit:DEFAULT_SITE_SETTINGS.layout.portraitFit,
       portraitPosition:["center","top","bottom","left","right"].includes(l.portraitPosition)?l.portraitPosition:DEFAULT_SITE_SETTINGS.layout.portraitPosition,
@@ -638,7 +642,10 @@ function normalizeSiteSettings(content){
       navHighlightStyle:["underline","pill","text"].includes(e.navHighlightStyle)?e.navHighlightStyle:DEFAULT_SITE_SETTINGS.experience.navHighlightStyle,
       socialStyle:["labels","icons"].includes(e.socialStyle)?e.socialStyle:DEFAULT_SITE_SETTINGS.experience.socialStyle,
       activityTabStyle:ACTIVITY_TAB_STYLE_VALUES.includes(e.activityTabStyle)?e.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.activityTabStyle,
-      mainNavStyle:normalizeMainNavStyle(e.mainNavStyle)
+      mainNavStyle:normalizeMainNavStyle(e.mainNavStyle),
+      brandNameSize:clampNumber(e.brandNameSize,14,32,DEFAULT_SITE_SETTINGS.experience.brandNameSize),
+      brandNameColor:validHex(e.brandNameColor)?e.brandNameColor.toUpperCase():"",
+      brandNameStyle:BRAND_NAME_STYLE_VALUES.includes(e.brandNameStyle)?e.brandNameStyle:DEFAULT_SITE_SETTINGS.experience.brandNameStyle
     }
   };
 
@@ -826,6 +833,22 @@ function fillSiteCustomizationControls(){
   if(mainNavInput)mainNavInput.checked=true;
   document.querySelectorAll("[data-main-nav-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.mainNavStyleCard===mainNavStyle));
 
+  if($("fBrandNameSize"))$("fBrandNameSize").value=e.brandNameSize||18;
+  if($("fBrandNameSizeNumber"))$("fBrandNameSizeNumber").value=e.brandNameSize||18;
+  const brandStyle=BRAND_NAME_STYLE_VALUES.includes(e.brandNameStyle)?e.brandNameStyle:"current";
+  const brandStyleInput=document.querySelector(`input[name="brandNameStyle"][value="${brandStyle}"]`);
+  if(brandStyleInput)brandStyleInput.checked=true;
+  document.querySelectorAll("[data-brand-name-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.brandNameStyleCard===brandStyle));
+  const brandThemeColor=!e.brandNameColor;
+  if($("fBrandUseThemeColor"))$("fBrandUseThemeColor").checked=brandThemeColor;
+  const brandFallback=currentThemeTypographyColors().body;
+  const brandColor=e.brandNameColor||brandFallback;
+  if($("fBrandNameColor"))$("fBrandNameColor").value=brandColor;
+  if($("fBrandNameColorText"))$("fBrandNameColorText").value=brandColor;
+  syncBrandNameColorState();
+  updateBrandNameAdminPreview();
+  updatePortraitPresetControl(l.portraitSize);
+
   renderSectionManager();
 }
 
@@ -907,7 +930,7 @@ function syncSiteCustomizationFromControls(){
   const cardDesignValue=$("fCardDesignValue")?.value;
   if(CARD_STYLE_SECTION_KEYS.includes(cardStyleSection)&&CARD_STYLE_VALUES.includes(cardStyleValue))l.cardStyles[cardStyleSection]=cardStyleValue;
   if(CARD_STYLE_SECTION_KEYS.includes(cardStyleSection)&&CARD_DESIGN_VALUES.includes(cardDesignValue))l.cardDesigns[cardStyleSection]=cardDesignValue;
-  l.portraitSize=clampNumber($("fPortraitSizeNumber").value||$("fPortraitSize").value,140,250,190);
+  l.portraitSize=clampNumber($("fPortraitSizeNumber").value||$("fPortraitSize").value,140,320,190);
   l.portraitShape=$("fPortraitShape").value;
   l.portraitFit=$("fPortraitFit").value;
   l.portraitPosition=$("fPortraitPosition").value;
@@ -960,6 +983,10 @@ function syncSiteCustomizationFromControls(){
   if(ACTIVITY_TAB_STYLE_VALUES.includes(activityTabStyle))e.activityTabStyle=activityTabStyle;
   const mainNavStyle=document.querySelector('input[name="mainNavStyle"]:checked')?.value;
   if(MAIN_NAV_STYLE_VALUES.includes(mainNavStyle))e.mainNavStyle=mainNavStyle;
+  e.brandNameSize=clampNumber($("fBrandNameSizeNumber")?.value||$("fBrandNameSize")?.value,14,32,18);
+  e.brandNameColor=$("fBrandUseThemeColor")?.checked?"":(validHex($("fBrandNameColorText")?.value)?$("fBrandNameColorText").value.toUpperCase():(validHex($("fBrandNameColor")?.value)?$("fBrandNameColor").value.toUpperCase():""));
+  const brandNameStyle=document.querySelector('input[name="brandNameStyle"]:checked')?.value;
+  if(BRAND_NAME_STYLE_VALUES.includes(brandNameStyle))e.brandNameStyle=brandNameStyle;
 }
 
 /* Keep Layout selections in currentContent immediately.
@@ -1828,6 +1855,83 @@ document.addEventListener("change",e=>{
   currentContent.appearance.designPreset="custom";
   scheduleAdminPreview(true);
   setStatus("Sidebar settings updated. Save all changes to publish them.");
+});
+
+const PORTRAIT_SIZE_PRESETS={small:150,standard:190,medium:215,large:240,"very-large":270,massive:300};
+function updatePortraitPresetControl(value){
+  const select=$("fPortraitSizePreset"); if(!select)return;
+  const n=Number(value);
+  const exact=Object.entries(PORTRAIT_SIZE_PRESETS).find(([,px])=>px===n);
+  select.value=exact?String(exact[1]):"custom";
+}
+function applyPortraitPreset(value){
+  const n=Number(value); if(!Number.isFinite(n))return;
+  if($("fPortraitSize"))$("fPortraitSize").value=n;
+  if($("fPortraitSizeNumber"))$("fPortraitSizeNumber").value=n;
+  normalizeSiteSettings(currentContent);
+  currentContent.siteSettings.layout.portraitSize=clampNumber(n,140,320,190);
+  currentContent.appearance=currentContent.appearance||{};currentContent.appearance.designPreset="custom";
+  scheduleAdminPreview(true);
+  setStatus(`Portrait size set to ${n}px. Save all changes to publish it.`);
+}
+function syncBrandNameColorState(){
+  const useTheme=$("fBrandUseThemeColor")?.checked!==false;
+  if($("fBrandNameColor"))$("fBrandNameColor").disabled=useTheme;
+  if($("fBrandNameColorText"))$("fBrandNameColorText").disabled=useTheme;
+}
+function updateBrandNameAdminPreview(){
+  const panel=document.querySelector('[data-panel="navigation"]'); if(!panel)return;
+  const useTheme=$("fBrandUseThemeColor")?.checked!==false;
+  const c=useTheme?currentThemeTypographyColors().body:(validHex($("fBrandNameColorText")?.value)?$("fBrandNameColorText").value:$("fBrandNameColor")?.value);
+  panel.style.setProperty("--brand-preview-color",c||"var(--text)");
+}
+function commitBrandNameControls(){
+  normalizeSiteSettings(currentContent);
+  const e=currentContent.siteSettings.experience;
+  e.brandNameSize=clampNumber($("fBrandNameSizeNumber")?.value||$("fBrandNameSize")?.value,14,32,18);
+  e.brandNameColor=$("fBrandUseThemeColor")?.checked?"":(validHex($("fBrandNameColorText")?.value)?$("fBrandNameColorText").value.toUpperCase():(validHex($("fBrandNameColor")?.value)?$("fBrandNameColor").value.toUpperCase():""));
+  const style=document.querySelector('input[name="brandNameStyle"]:checked')?.value;
+  if(BRAND_NAME_STYLE_VALUES.includes(style))e.brandNameStyle=style;
+  updateBrandNameAdminPreview();
+  scheduleAdminPreview(true);
+}
+function commitPortraitSizeValue(value){
+  const n=clampNumber(value,140,320,190);
+  normalizeSiteSettings(currentContent);
+  currentContent.siteSettings.layout.portraitSize=n;
+  currentContent.appearance=currentContent.appearance||{};currentContent.appearance.designPreset="custom";
+  updatePortraitPresetControl(n);
+  scheduleAdminPreview(true);
+}
+$("fPortraitSizePreset")?.addEventListener("change",e=>{
+  if(e.target.value!=="custom")applyPortraitPreset(e.target.value);
+});
+$("fPortraitSize")?.addEventListener("input",e=>commitPortraitSizeValue(e.target.value));
+$("fPortraitSizeNumber")?.addEventListener("input",e=>commitPortraitSizeValue(e.target.value));
+$("fBrandUseThemeColor")?.addEventListener("change",()=>{syncBrandNameColorState();commitBrandNameControls()});
+$("fBrandNameSize")?.addEventListener("input",()=>commitBrandNameControls());
+$("fBrandNameSizeNumber")?.addEventListener("input",()=>commitBrandNameControls());
+$("fBrandNameColor")?.addEventListener("input",()=>{
+  if($("fBrandUseThemeColor"))$("fBrandUseThemeColor").checked=false;
+  if($("fBrandNameColorText"))$("fBrandNameColorText").value=$("fBrandNameColor").value.toUpperCase();
+  syncBrandNameColorState();commitBrandNameControls();
+});
+$("fBrandNameColorText")?.addEventListener("input",()=>{
+  const v=$("fBrandNameColorText").value.trim();
+  if(validHex(v)){
+    if($("fBrandUseThemeColor"))$("fBrandUseThemeColor").checked=false;
+    if($("fBrandNameColor"))$("fBrandNameColor").value=v;
+    syncBrandNameColorState();commitBrandNameControls();
+  }
+});
+document.addEventListener("change",e=>{
+  const input=e.target.closest('input[name="brandNameStyle"]');
+  if(!input)return;
+  normalizeSiteSettings(currentContent);
+  currentContent.siteSettings.experience.brandNameStyle=input.value;
+  document.querySelectorAll("[data-brand-name-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.brandNameStyleCard===input.value));
+  scheduleAdminPreview(true);
+  setStatus("Header name style updated. Save all changes to publish it.");
 });
 
 document.addEventListener("change",e=>{
@@ -3911,7 +4015,8 @@ syncRangeNumber("fSidebarWidth","fSidebarWidthNumber",210,340,255);
 syncRangeNumber("fLayoutGap","fLayoutGapNumber",20,100,58);
 syncRangeNumber("fSectionSpacing","fSectionSpacingNumber",20,90,40);
 syncRangeNumber("fCardRadius","fCardRadiusNumber",0,28,11);
-syncRangeNumber("fPortraitSize","fPortraitSizeNumber",140,250,190);
+syncRangeNumber("fPortraitSize","fPortraitSizeNumber",140,320,190);
+syncRangeNumber("fBrandNameSize","fBrandNameSizeNumber",14,32,18);
 syncRangeNumber("fBodyTextSize","fBodyTextSizeNumber",14,20,16);
 syncRangeNumber("fBodyLineHeight","fBodyLineHeightNumber",1.4,2,1.7);
 syncRangeNumber("fCardTitleSize","fCardTitleSizeNumber",16,28,20);

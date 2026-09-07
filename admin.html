@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260906-sidebar-top-v4" rel="stylesheet"/>
+<link href="styles.css?v=20260907-profile-brand-v1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -84,7 +84,8 @@
 <div><h3>Profile display</h3><p class="muted">Control how your main portrait appears on the public site.</p></div>
 </div>
 <div class="compact-control-grid">
-<div class="range-setting"><label>Portrait size</label><div><input id="fPortraitSize" max="250" min="140" step="5" type="range"/><input id="fPortraitSizeNumber" max="250" min="140" step="5" type="number"/></div></div>
+<div class="field"><label>Portrait size preset</label><select id="fPortraitSizePreset"><option value="150">Small — 150 px</option><option value="190">Standard — 190 px</option><option value="215">Medium — 215 px</option><option value="240">Large — 240 px</option><option value="270">Very Large — 270 px</option><option value="300">Massive — 300 px</option><option value="custom">Custom</option></select><span class="helper">Larger presets can widen a left/right sidebar automatically so the portrait does not get squeezed. Compact structural layouts may cap the portrait slightly to preserve a professional composition.</span></div>
+<div class="range-setting"><label>Fine-tune portrait size</label><div><input id="fPortraitSize" max="320" min="140" step="5" type="range"/><input id="fPortraitSizeNumber" max="320" min="140" step="5" type="number"/></div></div>
 <div class="field"><label>Portrait shape</label><select id="fPortraitShape"><option value="square">Square</option><option value="slight">Slightly rounded</option><option value="rounded">Rounded</option><option value="circle">Circle</option></select></div>
 <div class="field"><label>Portrait image fit</label><select id="fPortraitFit"><option value="cover">Cover / crop</option><option value="contain">Contain</option></select></div>
 <div class="field"><label>Portrait crop position</label><select id="fPortraitPosition"><option value="center">Center</option><option value="top">Top</option><option value="bottom">Bottom</option><option value="left">Left</option><option value="right">Right</option></select></div>
@@ -973,6 +974,63 @@
 <h2>Navigation styles</h2>
 <p class="muted">Control the public top navigation and the Academic Activities category navigation from one place.</p>
 </div>
+<details class="admin-card navigation-fold" data-navigation-fold="brand" open>
+<summary><span><strong>Header name / site identity</strong><small>Edit the name shown at the upper-left of the public navigation bar.</small></span><span class="navigation-fold-chevron" aria-hidden="true"></span></summary>
+<div class="navigation-fold-body">
+<div class="brand-control-grid">
+<div class="range-setting"><label>Name size</label><div><input id="fBrandNameSize" max="32" min="14" step="1" type="range"/><input id="fBrandNameSizeNumber" max="32" min="14" step="1" type="number"/></div><span class="helper">18 px is the current default. 20–24 px gives a stronger identity without overpowering the navigation.</span></div>
+<div class="field"><label>Name color</label><label class="check-row" style="margin-bottom:8px"><input id="fBrandUseThemeColor" type="checkbox"/> Use theme text color</label><div class="brand-color-row"><input id="fBrandNameColor" type="color"/><input id="fBrandNameColorText" maxlength="7" placeholder="#202328"/></div></div>
+</div>
+<div class="settings-head"><div><h3>Header name style</h3><p class="muted">These styles affect only your name at the left of the top bar and work independently from the main navigation style.</p></div></div>
+<div class="brand-style-choice-grid" role="radiogroup" aria-label="Header name style">
+<label class="brand-style-choice" data-brand-name-style-card="current">
+<input name="brandNameStyle" type="radio" value="current"/>
+<span class="brand-style-preview" data-brand-preview="current"><b>Ibtida Yasin</b></span>
+<span class="brand-style-name">Current</span>
+</label><label class="brand-style-choice" data-brand-name-style-card="accent-rail">
+<input name="brandNameStyle" type="radio" value="accent-rail"/>
+<span class="brand-style-preview" data-brand-preview="accent-rail"><b>Ibtida Yasin</b></span>
+<span class="brand-style-name">1. Accent Rail</span>
+</label><label class="brand-style-choice" data-brand-name-style-card="signature-underline">
+<input name="brandNameStyle" type="radio" value="signature-underline"/>
+<span class="brand-style-preview" data-brand-preview="signature-underline"><b>Ibtida Yasin</b></span>
+<span class="brand-style-name">2. Signature Underline</span>
+</label><label class="brand-style-choice" data-brand-name-style-card="soft-badge">
+<input name="brandNameStyle" type="radio" value="soft-badge"/>
+<span class="brand-style-preview" data-brand-preview="soft-badge"><b>Ibtida Yasin</b></span>
+<span class="brand-style-name">3. Soft Badge</span>
+</label><label class="brand-style-choice" data-brand-name-style-card="outline-label">
+<input name="brandNameStyle" type="radio" value="outline-label"/>
+<span class="brand-style-preview" data-brand-preview="outline-label"><b>Ibtida Yasin</b></span>
+<span class="brand-style-name">4. Outline Label</span>
+</label><label class="brand-style-choice" data-brand-name-style-card="capsule">
+<input name="brandNameStyle" type="radio" value="capsule"/>
+<span class="brand-style-preview" data-brand-preview="capsule"><b>Ibtida Yasin</b></span>
+<span class="brand-style-name">5. Capsule</span>
+</label><label class="brand-style-choice" data-brand-name-style-card="editorial-serif">
+<input name="brandNameStyle" type="radio" value="editorial-serif"/>
+<span class="brand-style-preview" data-brand-preview="editorial-serif"><b>Ibtida Yasin</b></span>
+<span class="brand-style-name">6. Editorial Serif</span>
+</label><label class="brand-style-choice" data-brand-name-style-card="small-caps">
+<input name="brandNameStyle" type="radio" value="small-caps"/>
+<span class="brand-style-preview" data-brand-preview="small-caps"><b>Ibtida Yasin</b></span>
+<span class="brand-style-name">7. Small Caps</span>
+</label><label class="brand-style-choice" data-brand-name-style-card="split-rule">
+<input name="brandNameStyle" type="radio" value="split-rule"/>
+<span class="brand-style-preview" data-brand-preview="split-rule"><b>Ibtida Yasin</b></span>
+<span class="brand-style-name">8. Split Rule</span>
+</label><label class="brand-style-choice" data-brand-name-style-card="accent-corner">
+<input name="brandNameStyle" type="radio" value="accent-corner"/>
+<span class="brand-style-preview" data-brand-preview="accent-corner"><b>Ibtida Yasin</b></span>
+<span class="brand-style-name">9. Accent Corner</span>
+</label><label class="brand-style-choice" data-brand-name-style-card="glass-label">
+<input name="brandNameStyle" type="radio" value="glass-label"/>
+<span class="brand-style-preview" data-brand-preview="glass-label"><b>Ibtida Yasin</b></span>
+<span class="brand-style-name">10. Glass Label</span>
+</label>
+</div>
+</div>
+</details>
 <details class="admin-card navigation-fold" open>
 <summary><span><strong>Main website navigation</strong><small>Choose the style of the navigation bar shown at the top of the public website.</small></span><span class="navigation-fold-chevron" aria-hidden="true"></span></summary>
 <div class="navigation-fold-body">
@@ -1688,6 +1746,6 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-<script src="admin.js?v=20260906-sidebar-top-v4"></script>
+<script src="admin.js?v=20260907-profile-brand-v1"></script>
 </body>
 </html>

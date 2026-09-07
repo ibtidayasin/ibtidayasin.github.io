@@ -183,6 +183,7 @@ const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"]
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
 const MAIN_NAV_STYLE_VALUES=["current","framed-links","accent-pills","floating-capsule","segmented-strip","top-rail","mini-cards","soft-chips","editorial-dividers","glass-rail","ribbon-blocks"];
+const BRAND_NAME_STYLE_VALUES=["current","accent-rail","signature-underline","soft-badge","outline-label","capsule","editorial-serif","small-caps","split-rule","accent-corner","glass-label"];
 const SIDEBAR_DESIGN_VALUES=["current","profile-card","editorial-sidebar","accent-rail","soft-tint-panel","floating-profile","portrait-header","centered-academic","split-portrait","framed-portrait","minimal-identity","academic-id","researcher-badge","top-accent-banner","overlap-portrait","asymmetric-editorial","compact-sticky","sectioned-sidebar","glass-academic","faculty-premium"];
 const SIDEBAR_LAYOUT_VALUES=["classic","identity-row","name-first","research-first","contact-first","dual-column-details","portrait-nameplate","social-dock","timeline-profile","modular-tiles","executive-header","research-card-stack","directory-compact","scholar-split","banner-overlay","profile-matrix"];
 const SIDEBAR_POSITION_VALUES=["left","right","top"];
@@ -272,7 +273,10 @@ const DEFAULT_SITE_SETTINGS={
     navHighlightStyle:"underline",
     socialStyle:"labels",
     activityTabStyle:"strong-pills",
-    mainNavStyle:"current"
+    mainNavStyle:"current",
+    brandNameSize:18,
+    brandNameColor:"",
+    brandNameStyle:"current"
   }
 };
 
@@ -351,7 +355,7 @@ function normalizeSiteSettings(content){
       cardRadius:clampNumber(l.cardRadius,0,28,DEFAULT_SITE_SETTINGS.layout.cardRadius),
       cardStyles:Object.fromEntries(CARD_STYLE_SECTION_KEYS.map(k=>[k,CARD_STYLE_VALUES.includes(l.cardStyles?.[k])?l.cardStyles[k]:DEFAULT_SITE_SETTINGS.layout.cardStyles[k]])),
       cardDesigns:Object.fromEntries(CARD_STYLE_SECTION_KEYS.map(k=>[k,CARD_DESIGN_VALUES.includes(l.cardDesigns?.[k])?l.cardDesigns[k]:DEFAULT_SITE_SETTINGS.layout.cardDesigns[k]])),
-      portraitSize:clampNumber(l.portraitSize,140,250,DEFAULT_SITE_SETTINGS.layout.portraitSize),
+      portraitSize:clampNumber(l.portraitSize,140,320,DEFAULT_SITE_SETTINGS.layout.portraitSize),
       portraitShape:["square","slight","rounded","circle"].includes(l.portraitShape)?l.portraitShape:DEFAULT_SITE_SETTINGS.layout.portraitShape,
       portraitFit:["cover","contain"].includes(l.portraitFit)?l.portraitFit:DEFAULT_SITE_SETTINGS.layout.portraitFit,
       portraitPosition:["center","top","bottom","left","right"].includes(l.portraitPosition)?l.portraitPosition:DEFAULT_SITE_SETTINGS.layout.portraitPosition,
@@ -397,7 +401,10 @@ function normalizeSiteSettings(content){
       navHighlightStyle:["underline","pill","text"].includes(e.navHighlightStyle)?e.navHighlightStyle:DEFAULT_SITE_SETTINGS.experience.navHighlightStyle,
       socialStyle:["labels","icons"].includes(e.socialStyle)?e.socialStyle:DEFAULT_SITE_SETTINGS.experience.socialStyle,
       activityTabStyle:ACTIVITY_TAB_STYLE_VALUES.includes(e.activityTabStyle)?e.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.activityTabStyle,
-      mainNavStyle:normalizeMainNavStyle(e.mainNavStyle)
+      mainNavStyle:normalizeMainNavStyle(e.mainNavStyle),
+      brandNameSize:clampNumber(e.brandNameSize,14,32,DEFAULT_SITE_SETTINGS.experience.brandNameSize),
+      brandNameColor:validHex(e.brandNameColor)?e.brandNameColor.toUpperCase():"",
+      brandNameStyle:BRAND_NAME_STYLE_VALUES.includes(e.brandNameStyle)?e.brandNameStyle:DEFAULT_SITE_SETTINGS.experience.brandNameStyle
     }
   };
 
@@ -1247,6 +1254,9 @@ function applyExperienceSettings(d){
   document.documentElement.classList.toggle("no-smooth-scroll",!currentSiteExperience.smoothScroll);
   document.documentElement.dataset.navHighlight=currentSiteExperience.navHighlightStyle||"underline";
   document.documentElement.dataset.mainNavStyle=normalizeMainNavStyle(currentSiteExperience.mainNavStyle);
+  document.documentElement.dataset.brandNameStyle=BRAND_NAME_STYLE_VALUES.includes(currentSiteExperience.brandNameStyle)?currentSiteExperience.brandNameStyle:"current";
+  document.documentElement.style.setProperty("--brand-name-size",`${clampNumber(currentSiteExperience.brandNameSize,14,32,18)}px`);
+  document.documentElement.style.setProperty("--brand-name-color",currentSiteExperience.brandNameColor||"var(--text)");
   document.documentElement.dataset.hoverInteractions=currentSiteExperience.hoverInteractions||"subtle";
   $("backToTopBtn")?.classList.toggle("feature-disabled",!currentSiteExperience.backToTop);
   if(!currentSiteExperience.lightbox)closeSiteLightbox();
