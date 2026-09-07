@@ -1998,11 +1998,12 @@ function prepareFreshLoginFields(){
   const email=$("loginEmail"),password=$("loginPassword");
   if(!email||!password)return;
 
-  // Do not change Supabase session persistence. This guard is only for
-  // browsers that do NOT already have a valid signed-in Admin session.
+  // Existing Supabase sessions remain persistent. This guard applies only
+  // when the browser has no valid Admin session and the login form is shown.
   [email,password].forEach(field=>{
     field.value="";
-    field.readOnly=true;
+    field.readOnly=false;
+    field.dataset.manualEntry="false";
     field.setAttribute("data-lpignore","true");
     field.setAttribute("data-1p-ignore","true");
     field.setAttribute("data-bwignore","true");
@@ -2010,26 +2011,31 @@ function prepareFreshLoginFields(){
   email.setAttribute("autocomplete","off");
   password.setAttribute("autocomplete","new-password");
 
-  const unlockField=field=>{
-    field.readOnly=false;
-    field.value="";
-  };
+  // If Chrome/password managers inject a saved value visually, the first
+  // real interaction clears it. This avoids the old readOnly race that could
+  // make the login form look filled while leaving it unusable.
   [email,password].forEach(field=>{
-    field.addEventListener("pointerdown",()=>unlockField(field),{once:true});
-    field.addEventListener("focus",()=>unlockField(field),{once:true});
-    field.addEventListener("keydown",()=>{field.readOnly=false},{once:true});
+    field.addEventListener("focus",()=>{
+      if(field.dataset.manualEntry!=="true")field.value="";
+    },{once:true});
+
+    const markManual=()=>{field.dataset.manualEntry="true"};
+    field.addEventListener("keydown",markManual);
+    field.addEventListener("paste",markManual);
+    field.addEventListener("beforeinput",e=>{
+      if(document.activeElement===field && String(e.inputType||"").startsWith("insert"))markManual();
+    });
   });
 
-  // Some browsers/password managers try to inject saved values just after
-  // page load. Clear those values while the fields are still locked.
+  // Clear late autofill attempts while the user has not started typing.
   requestAnimationFrame(()=>{
-    if(email.readOnly)email.value="";
-    if(password.readOnly)password.value="";
+    if(email.dataset.manualEntry!=="true")email.value="";
+    if(password.dataset.manualEntry!=="true")password.value="";
   });
-  setTimeout(()=>{
-    if(email.readOnly)email.value="";
-    if(password.readOnly)password.value="";
-  },250);
+  [250,700].forEach(ms=>setTimeout(()=>{
+    if(document.activeElement!==email && email.dataset.manualEntry!=="true")email.value="";
+    if(document.activeElement!==password && password.dataset.manualEntry!=="true")password.value="";
+  },ms));
 }
 
 function showLogin(){
@@ -2055,11 +2061,32 @@ async function verifyAdminAndOpen(){
   revealAdminUi();
 }
 $("loginBtn").addEventListener("click",async()=>{
+  const email=$("loginEmail"),password=$("loginPassword");
+  // On a fresh browser session, do not accept credentials that only came
+  // from browser/password-manager autofill. The owner must interact with and
+  // enter both fields. Existing authenticated browser sessions never reach
+  // this screen, so they stay signed in as requested.
+  if(email.dataset.manualEntry!=="true"||password.dataset.manualEntry!=="true"){
+    email.value=""; password.value="";
+    email.dataset.manualEntry="false"; password.dataset.manualEntry="false";
+    $("loginStatus").textContent="For security, please type your admin email and password manually on this browser.";
+    email.focus();
+    return;
+  }
+  if(!email.value.trim()||!password.value){
+    $("loginStatus").textContent="Enter both your admin email and password.";
+    return;
+  }
   $("loginStatus").textContent="Signing in...";
-  const{error}=await sb.auth.signInWithPassword({email:$("loginEmail").value.trim(),password:$("loginPassword").value});
-  if(error){$("loginStatus").textContent=error.message;return}
-  $("loginStatus").textContent="";
-  await verifyAdminAndOpen();
+  try{
+    const{error}=await sb.auth.signInWithPassword({email:email.value.trim(),password:password.value});
+    if(error){$("loginStatus").textContent=error.message;return}
+    $("loginStatus").textContent="";
+    await verifyAdminAndOpen();
+  }catch(err){
+    console.error("Admin sign-in failed:",err);
+    $("loginStatus").textContent="Could not complete sign-in. Please reload and try again.";
+  }
 });
 $("logoutBtn").addEventListener("click",async()=>{await sb.auth.signOut();location.reload()});
 
