@@ -1784,7 +1784,7 @@
       }
       if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
 
-      await loadScript("admin.js?v=20260907-admin-login-stable-v4");
+      await loadScript("admin.js?v=20260907-login-tdz-fix-v5");
       if(button)button.disabled=false;
       if(status&&status.textContent===readyMessage)status.textContent="";
     }catch(err){
