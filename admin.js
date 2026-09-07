@@ -1787,7 +1787,14 @@ function sectionHasPublicContent(d,key){
   return true;
 }
 
-const sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
+let sb=null;
+function ensureSupabaseClient(){
+  if(sb)return sb;
+  if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
+  if(!window.SUPABASE_CONFIG?.url||!window.SUPABASE_CONFIG?.key)throw new Error("Supabase configuration is unavailable.");
+  sb=window.supabase.createClient(window.SUPABASE_CONFIG.url,window.SUPABASE_CONFIG.key);
+  return sb;
+}
 const ADMIN_THEMES=["classic-brown","soft-beige","slate-blue","deep-navy","forest-sage","olive-stone","burgundy","dusty-plum","charcoal","dark-academic","solar-citrus","electric-azure","coral-bloom","mint-pop","lemon-sky","aqua-lime","berry-fizz","peach-punch","lavender-glow","spring-green","midnight-gold","ink-cyan","black-coral","graphite-lime","royal-cream","espresso-ivory","aubergine-gold","emerald-night","crimson-slate","arctic-black","cobalt-white","scarlet-paper","emerald-white","violet-ivory","teal-porcelain","navy-sand","magenta-frost","orange-ink","indigo-mint","crimson-cream","powder-blue","sky-blue","ice-blue","cobalt-blue","cornflower-blue","steel-blue","denim-blue","arctic-blue","glacier-blue","mist-blue","ocean-blue","harbor-blue","cerulean-blue","periwinkle-blue","sapphire-blue","aegean-blue","frost-blue","azure-bloom","lapis-blue","cloud-blue","custom-theme"];
 function validAdminTheme(t){return ADMIN_THEMES.includes(t)?t:"classic-brown"}
 function selectedAdminTheme(){
@@ -1980,6 +1987,7 @@ function revealAdminUi(){
 
 async function boot(){
   try{
+    ensureSupabaseClient();
     const{data:{session}}=await sb.auth.getSession();
     if(session){
       await verifyAdminAndOpen();
@@ -1990,105 +1998,75 @@ async function boot(){
   }catch(err){
     console.error("Admin boot failed:",err);
     showLogin();
-    $("loginStatus").textContent="Could not initialize Admin. Please reload and try again.";
+    const status=$("loginStatus");
+    if(status)status.textContent="Admin login could not initialize. Reload the page; if this message remains, the authentication library did not load.";
     revealAdminUi();
   }
 }
-function prepareFreshLoginFields(){
-  const email=$("loginEmail"),password=$("loginPassword");
-  if(!email||!password)return;
-
-  // Existing Supabase sessions remain persistent. This guard applies only
-  // when the browser has no valid Admin session and the login form is shown.
-  [email,password].forEach(field=>{
-    field.value="";
-    field.readOnly=false;
-    field.dataset.manualEntry="false";
-    field.setAttribute("data-lpignore","true");
-    field.setAttribute("data-1p-ignore","true");
-    field.setAttribute("data-bwignore","true");
-  });
-  email.setAttribute("autocomplete","off");
-  password.setAttribute("autocomplete","new-password");
-
-  // If Chrome/password managers inject a saved value visually, the first
-  // real interaction clears it. This avoids the old readOnly race that could
-  // make the login form look filled while leaving it unusable.
-  [email,password].forEach(field=>{
-    field.addEventListener("focus",()=>{
-      if(field.dataset.manualEntry!=="true")field.value="";
-    },{once:true});
-
-    const markManual=()=>{field.dataset.manualEntry="true"};
-    field.addEventListener("keydown",markManual);
-    field.addEventListener("paste",markManual);
-    field.addEventListener("beforeinput",e=>{
-      if(document.activeElement===field && String(e.inputType||"").startsWith("insert"))markManual();
-    });
-  });
-
-  // Clear late autofill attempts while the user has not started typing.
-  requestAnimationFrame(()=>{
-    if(email.dataset.manualEntry!=="true")email.value="";
-    if(password.dataset.manualEntry!=="true")password.value="";
-  });
-  [250,700].forEach(ms=>setTimeout(()=>{
-    if(document.activeElement!==email && email.dataset.manualEntry!=="true")email.value="";
-    if(document.activeElement!==password && password.dataset.manualEntry!=="true")password.value="";
-  },ms));
-}
 
 function showLogin(){
-  $("loginView").classList.remove("hidden");
-  $("adminView").classList.add("hidden");
-  prepareFreshLoginFields();
+  $("loginView")?.classList.remove("hidden");
+  $("adminView")?.classList.add("hidden");
 }
+
 async function verifyAdminAndOpen(){
+  ensureSupabaseClient();
   const{data,error}=await sb.rpc("is_site_admin");
   if(error||data!==true){
     await sb.auth.signOut();
-    $("loginStatus").textContent="This account is not authorized to edit the website.";
+    const status=$("loginStatus");
+    if(status)status.textContent="This account is not authorized to edit the website.";
     showLogin();
     revealAdminUi();
     return;
   }
 
-  // Keep the current screen hidden (during reload) or keep the login screen
-  // visible (after a manual sign-in) until every saved field is populated.
   await loadContent();
-  $("loginView").classList.add("hidden");
-  $("adminView").classList.remove("hidden");
+  $("loginView")?.classList.add("hidden");
+  $("adminView")?.classList.remove("hidden");
   revealAdminUi();
 }
-$("loginBtn").addEventListener("click",async()=>{
-  const email=$("loginEmail"),password=$("loginPassword");
-  // On a fresh browser session, do not accept credentials that only came
-  // from browser/password-manager autofill. The owner must interact with and
-  // enter both fields. Existing authenticated browser sessions never reach
-  // this screen, so they stay signed in as requested.
-  if(email.dataset.manualEntry!=="true"||password.dataset.manualEntry!=="true"){
-    email.value=""; password.value="";
-    email.dataset.manualEntry="false"; password.dataset.manualEntry="false";
-    $("loginStatus").textContent="For security, please type your admin email and password manually on this browser.";
-    email.focus();
+
+async function handleAdminLogin(event){
+  event?.preventDefault?.();
+  const email=$("loginEmail"),password=$("loginPassword"),button=$("loginBtn"),status=$("loginStatus");
+  if(!email||!password||!button||!status)return;
+
+  const emailValue=email.value.trim();
+  const passwordValue=password.value;
+  if(!emailValue||!passwordValue){
+    status.textContent="Enter both your admin email and password.";
     return;
   }
-  if(!email.value.trim()||!password.value){
-    $("loginStatus").textContent="Enter both your admin email and password.";
-    return;
-  }
-  $("loginStatus").textContent="Signing in...";
+
+  button.disabled=true;
+  button.setAttribute("aria-busy","true");
+  status.textContent="Signing in...";
   try{
-    const{error}=await sb.auth.signInWithPassword({email:email.value.trim(),password:password.value});
-    if(error){$("loginStatus").textContent=error.message;return}
-    $("loginStatus").textContent="";
+    ensureSupabaseClient();
+    const{error}=await sb.auth.signInWithPassword({email:emailValue,password:passwordValue});
+    if(error){
+      status.textContent=error.message||"Sign-in failed. Check your email and password.";
+      return;
+    }
+    status.textContent="Verifying admin access...";
     await verifyAdminAndOpen();
   }catch(err){
     console.error("Admin sign-in failed:",err);
-    $("loginStatus").textContent="Could not complete sign-in. Please reload and try again.";
+    status.textContent="Could not complete sign-in. Reload the page and try again.";
+  }finally{
+    button.disabled=false;
+    button.removeAttribute("aria-busy");
   }
+}
+
+$("loginBtn")?.addEventListener("click",handleAdminLogin);
+["loginEmail","loginPassword"].forEach(id=>$(id)?.addEventListener("keydown",e=>{
+  if(e.key==="Enter")handleAdminLogin(e);
+}));
+$("logoutBtn")?.addEventListener("click",async()=>{
+  try{ensureSupabaseClient();await sb.auth.signOut()}finally{location.reload()}
 });
-$("logoutBtn").addEventListener("click",async()=>{await sb.auth.signOut();location.reload()});
 
 function activateAdminTab(tabName,{persist=true}={}){
   const btn=[...document.querySelectorAll("[data-tab]")].find(b=>b.dataset.tab===tabName);

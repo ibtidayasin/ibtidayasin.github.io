@@ -16,14 +16,14 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260907-login-manual-v1" rel="stylesheet"/>
+<link href="styles.css?v=20260907-admin-login-stable-v4" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
 <section class="admin-card login-wrap" id="loginView">
 <p class="eyebrow">Private Admin</p>
 <h1>Website login</h1>
-<p class="muted">Existing signed-in browser sessions stay active. On a new browser session, type your admin email and password manually; saved autofill is not accepted.</p>
+<p class="muted">Existing signed-in browser sessions stay active. New browser sessions require valid admin credentials.</p>
 <div class="form-grid">
 <div class="field full"><label>Email</label><input autocomplete="off" autocapitalize="none" autocorrect="off" data-1p-ignore="true" data-bwignore="true" data-lpignore="true" id="loginEmail" inputmode="email" spellcheck="false" type="email"/></div>
 <div class="field full"><label>Password</label><input autocomplete="new-password" autocapitalize="none" autocorrect="off" data-1p-ignore="true" data-bwignore="true" data-lpignore="true" id="loginPassword" spellcheck="false" type="password"/></div>
@@ -1737,7 +1737,6 @@
 </div>
 </section>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="supabase-config.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
@@ -1746,6 +1745,56 @@
         "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
     }
   </script>
-<script src="admin.js?v=20260907-login-manual-v1"></script>
+
+<script>
+(function(){
+  const status=document.getElementById("loginStatus");
+  const button=document.getElementById("loginBtn");
+  const readyMessage="Loading secure login...";
+  if(button)button.disabled=true;
+  if(status)status.textContent=readyMessage;
+
+  function revealAdminShell(){
+    document.documentElement.classList.remove("admin-booting");
+    document.documentElement.classList.add("admin-ready");
+  }
+  function loadScript(src){
+    return new Promise((resolve,reject)=>{
+      const s=document.createElement("script");
+      s.src=src;
+      s.async=false;
+      s.onload=()=>resolve();
+      s.onerror=()=>{s.remove();reject(new Error("Failed to load "+src));};
+      document.body.appendChild(s);
+    });
+  }
+
+  (async()=>{
+    try{
+      if(!window.SUPABASE_CONFIG?.url||!window.SUPABASE_CONFIG?.key){
+        throw new Error("Supabase configuration is missing.");
+      }
+      if(!window.supabase?.createClient){
+        try{
+          await loadScript("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2");
+        }catch(primaryError){
+          console.warn("Primary Supabase CDN failed; trying fallback.",primaryError);
+          await loadScript("https://unpkg.com/@supabase/supabase-js@2");
+        }
+      }
+      if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
+
+      await loadScript("admin.js?v=20260907-admin-login-stable-v4");
+      if(button)button.disabled=false;
+      if(status&&status.textContent===readyMessage)status.textContent="";
+    }catch(err){
+      console.error("Admin login bootstrap failed:",err);
+      revealAdminShell();
+      if(button)button.disabled=true;
+      if(status)status.textContent="Admin login service failed to load. Check your connection and reload this page.";
+    }
+  })();
+})();
+</script>
 </body>
 </html>
