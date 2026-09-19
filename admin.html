@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260919-courses-grades-v3" rel="stylesheet"/>
+<link href="styles.css?v=20260919-education-courses-nested-v1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -46,7 +46,6 @@
 <button data-tab="activities" type="button">Activities</button>
 <button data-tab="skills" type="button">Skills</button>
 <button data-tab="education" type="button">Education</button>
-<button data-tab="courses" type="button">Courses</button>
 <button data-tab="contact" type="button">Contact</button>
 <button data-tab="cv" type="button">CV</button>
 <button data-tab="appearance" type="button">Appearance</button>
@@ -292,6 +291,27 @@
 </div>
 </details>
 
+
+<details class="admin-card gradesheet-settings-fold">
+<summary><span><strong>Courses &amp; grades</strong><small>Controls the course record shown inside the public Education section. This does not create a separate website page.</small></span><span class="education-preset-chevron" aria-hidden="true"></span></summary>
+<div class="education-preset-fold-body">
+  <p class="helper">The course, credit, grade-point, letter-grade, semester GPA and cumulative GPA data are preloaded from the official grade certificate for this website.</p>
+  <div class="gradesheet-style-choice-grid" role="radiogroup" aria-label="Gradesheet listing style">
+    <label class="gradesheet-style-choice" data-gradesheet-style-card="official-transcript"><input name="gradesheetStyle" type="radio" value="official-transcript"/><span class="gradesheet-style-preview gsp-official"><i></i><i></i><i></i><i></i></span><strong>1. Formal Transcript</strong><small>Compact ruled tables modeled after an official grade certificate.</small></label>
+    <label class="gradesheet-style-choice" data-gradesheet-style-card="semester-cards"><input name="gradesheetStyle" type="radio" value="semester-cards"/><span class="gradesheet-style-preview gsp-cards"><i></i><i></i><i></i><i></i></span><strong>2. Semester Portfolio</strong><small>Polished semester cards with clear academic metrics.</small></label>
+    <label class="gradesheet-style-choice" data-gradesheet-style-card="academic-ledger"><input name="gradesheetStyle" type="radio" value="academic-ledger"/><span class="gradesheet-style-preview gsp-ledger"><i></i><i></i><i></i><i></i></span><strong>3. Academic Ledger</strong><small>Restrained editorial ledger with strong semester hierarchy.</small></label>
+    <label class="gradesheet-style-choice" data-gradesheet-style-card="performance-grid"><input name="gradesheetStyle" type="radio" value="performance-grid"/><span class="gradesheet-style-preview gsp-grid"><i></i><i></i><i></i><i></i></span><strong>4. Performance Grid</strong><small>Data-forward styling with stronger GPA and grade emphasis.</small></label>
+    <label class="gradesheet-style-choice" data-gradesheet-style-card="minimal-scholar"><input name="gradesheetStyle" type="radio" value="minimal-scholar"/><span class="gradesheet-style-preview gsp-minimal"><i></i><i></i><i></i><i></i></span><strong>5. Minimal Scholar</strong><small>Quiet typography-led listing with subtle academic dividers.</small></label>
+  </div>
+  <div class="cv-manager gradesheet-manager">
+    <div><h3>Current gradesheet PDF</h3><p class="muted" id="currentGradesheetName">No gradesheet PDF uploaded yet.</p><p class="muted small" id="currentGradesheetDate"></p></div>
+    <div class="cv-manager-actions"><a class="secondary hidden" href="#" id="currentGradesheetLink" rel="noopener" target="_blank">Open current gradesheet</a><button class="danger hidden" id="removeGradesheetBtn" type="button">Remove gradesheet</button></div>
+  </div>
+  <div class="field"><label>Upload / replace gradesheet</label><input accept="application/pdf,.pdf" id="gradesheetFile" type="file"/><span class="helper">PDF only · maximum 12 MB. This enables the public “View Gradesheet” button.</span></div>
+  <div class="field" style="margin-top:14px"><label>Or use an external gradesheet URL</label><input id="fGradesheetExternal" placeholder="https://..."/><span class="helper">Optional. If entered, this URL is used instead of an uploaded PDF.</span></div>
+</div>
+</details>
+
 <div class="collection-admin-toolbar">
   <span class="helper">Education records stay compact until you expand the one you want to edit.</span>
   <div class="collection-admin-toolbar-actions">
@@ -302,40 +322,6 @@
 <div id="educationEditor"></div>
 <button class="secondary" id="addEducationBtn" type="button">+ Add education</button>
 </div>
-<div class="admin-panel" data-panel="courses">
-<div class="form-grid section-heading-editor">
-<p class="heading-editor-note">Controls the Courses &amp; Grades section reached from the Education page.</p>
-<div class="field"><label>Section name</label><input id="fSectionCoursesTitle"/></div>
-<div class="field"><label>Section subtitle</label><input id="fSectionCoursesSubtitle"/></div>
-</div>
-<div class="admin-card gradesheet-style-admin">
-<div class="settings-head"><div><h2>Gradesheet listing style</h2><p class="muted">Choose how the semester-by-semester course record appears. Course and grade data stay unchanged.</p></div></div>
-<div class="gradesheet-style-choice-grid" role="radiogroup" aria-label="Gradesheet listing style">
-<label class="gradesheet-style-choice" data-gradesheet-style-card="official-transcript"><input name="gradesheetStyle" type="radio" value="official-transcript"/><span class="gradesheet-style-preview gsp-official"><i></i><i></i><i></i><i></i></span><strong>1. Formal Transcript</strong><small>Closest to an official grade certificate: compact ruled tables and precise academic totals.</small></label>
-<label class="gradesheet-style-choice" data-gradesheet-style-card="semester-cards"><input name="gradesheetStyle" type="radio" value="semester-cards"/><span class="gradesheet-style-preview gsp-cards"><i></i><i></i><i></i><i></i></span><strong>2. Semester Portfolio</strong><small>Polished semester cards with clear GPA metrics and readable grade badges.</small></label>
-<label class="gradesheet-style-choice" data-gradesheet-style-card="academic-ledger"><input name="gradesheetStyle" type="radio" value="academic-ledger"/><span class="gradesheet-style-preview gsp-ledger"><i></i><i></i><i></i><i></i></span><strong>3. Academic Ledger</strong><small>Professional editorial ledger with restrained rules, semester indexing, and strong hierarchy.</small></label>
-<label class="gradesheet-style-choice" data-gradesheet-style-card="performance-grid"><input name="gradesheetStyle" type="radio" value="performance-grid"/><span class="gradesheet-style-preview gsp-grid"><i></i><i></i><i></i><i></i></span><strong>4. Performance Grid</strong><small>Data-forward matrix with emphasized GPA, credits, and grade outcomes.</small></label>
-<label class="gradesheet-style-choice" data-gradesheet-style-card="minimal-scholar"><input name="gradesheetStyle" type="radio" value="minimal-scholar"/><span class="gradesheet-style-preview gsp-minimal"><i></i><i></i><i></i><i></i></span><strong>5. Minimal Scholar</strong><small>Airy, typography-led presentation with subtle dividers and minimal visual weight.</small></label>
-</div>
-</div>
-<div class="cv-manager gradesheet-manager">
-<div class="cv-current">
-<h3>Current gradesheet PDF</h3>
-<p class="muted" id="currentGradesheetName">No gradesheet PDF uploaded yet.</p>
-<p class="muted" id="currentGradesheetDate"></p>
-<div class="action-row">
-<a class="secondary hidden" href="#" id="currentGradesheetLink" rel="noopener" target="_blank">Open current gradesheet</a>
-<button class="danger hidden" id="removeGradesheetBtn" type="button">Remove gradesheet</button>
-</div>
-</div>
-<div>
-<div class="field"><label>Upload / replace gradesheet</label><input accept="application/pdf,.pdf" id="gradesheetFile" type="file"/><span class="helper">PDF only · maximum 12 MB. The public Courses page will show a “View Gradesheet” button after upload.</span></div>
-<div class="field" style="margin-top:14px"><label>Or use an external gradesheet URL</label><input id="fGradesheetExternal" placeholder="https://..."/><span class="helper">Optional. If entered, this URL is used instead of an uploaded PDF.</span></div>
-</div>
-</div>
-<div class="admin-card gradesheet-data-note"><strong>Course data</strong><p class="muted">The semester courses, credits, grade points, letter grades, semester GPA and cumulative GPA on the public page are preloaded from the official grade certificate supplied for this website.</p></div>
-</div>
-
 <div class="admin-panel" data-panel="contact">
 <div class="form-grid section-heading-editor">
 <p class="heading-editor-note">Controls the large public section name and the smaller line beneath it.</p>
@@ -1602,7 +1588,6 @@
 <label><input data-sidebar-section="activities" type="checkbox"/> Academic Activities</label>
 <label><input data-sidebar-section="skills" type="checkbox"/> Skills</label>
 <label><input data-sidebar-section="education" type="checkbox"/> Education</label>
-<label><input data-sidebar-section="courses" type="checkbox"/> Courses &amp; Grades</label>
 <label><input data-sidebar-section="contact" type="checkbox"/> Contact</label>
 <label><input data-sidebar-section="cv" type="checkbox"/> Curriculum Vitae</label>
 </div>
@@ -1653,7 +1638,6 @@
 <label><input data-cover-section="activities" type="checkbox"/> Academic Activities</label>
 <label><input data-cover-section="skills" type="checkbox"/> Skills</label>
 <label><input data-cover-section="education" type="checkbox"/> Education</label>
-<label><input data-cover-section="courses" type="checkbox"/> Courses &amp; Grades</label>
 <label><input data-cover-section="contact" type="checkbox"/> Contact</label>
 <label><input data-cover-section="cv" type="checkbox"/> Curriculum Vitae</label>
 </div>
@@ -1888,7 +1872,7 @@
       }
       if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
 
-      await loadScript("admin.js?v=20260919-courses-grades-v3");
+      await loadScript("admin.js?v=20260919-education-courses-nested-v1");
       if(button)button.disabled=false;
       if(status&&status.textContent===readyMessage)status.textContent="";
     }catch(err){

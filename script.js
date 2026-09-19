@@ -727,7 +727,6 @@ const DEFAULT_SECTION_HEADINGS={
   activities:{title:"Academic Activities",subtitle:"Presentations, training, and recognition"},
   skills:{title:"Skills",subtitle:"Research toolkit"},
   education:{title:"Education",subtitle:"Academic background"},
-  courses:{title:"Courses & Grades",subtitle:"Complete undergraduate academic record"},
   contact:{title:"Contact",subtitle:"Interested in computational materials and nanoscale mechanics?"},
   cv:{title:"Curriculum Vitae",subtitle:"Academic CV"}
 };
@@ -862,8 +861,8 @@ function applyCustomThemeVariables(theme){
 }
 
 
-const SITE_SECTION_KEYS=["about","research","thesis","publications","projects","activities","skills","education","courses","contact","cv"];
-const COVER_SECTION_KEYS=["research","thesis","publications","projects","activities","skills","education","courses","contact","cv"];
+const SITE_SECTION_KEYS=["about","research","thesis","publications","projects","activities","skills","education","contact","cv"];
+const COVER_SECTION_KEYS=["research","thesis","publications","projects","activities","skills","education","contact","cv"];
 const SIDEBAR_SECTION_KEYS=[...COVER_SECTION_KEYS];
 const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","skills","education","contact"];
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
@@ -905,9 +904,9 @@ function normalizeMainNavStyle(value){
   return LEGACY_MAIN_NAV_STYLE_MAP[value]||"current";
 }
 const DEFAULT_SITE_SETTINGS={
-  sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","courses","contact","cv"],
+  sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
   sectionVisibility:{
-    about:true,research:true,thesis:true,publications:true,projects:true,activities:true,skills:true,education:true,courses:true,contact:true,cv:true
+    about:true,research:true,thesis:true,publications:true,projects:true,activities:true,skills:true,education:true,contact:true,cv:true
   },
   layout:{
     maxWidth:1180,
@@ -937,10 +936,10 @@ const DEFAULT_SITE_SETTINGS={
     pageTransition:"fade",
     pagePager:true,
     sidebarScope:"home-cv",
-    sidebarSections:{research:false,thesis:false,publications:false,projects:false,activities:false,skills:false,education:false,courses:false,contact:false,cv:true},
+    sidebarSections:{research:false,thesis:false,publications:false,projects:false,activities:false,skills:false,education:false,contact:false,cv:true},
     sectionCoverEnabled:true,
     sectionCoverScope:"research",
-    sectionCoverSections:{research:true,thesis:true,publications:false,projects:false,activities:false,skills:false,education:false,courses:false,contact:false,cv:false},
+    sectionCoverSections:{research:true,thesis:true,publications:false,projects:false,activities:false,skills:false,education:false,contact:false,cv:false},
     sectionCoverStyle:"framed",
     sectionCoverPhotoFit:"crop",
     sectionCoverTopBlend:false,
@@ -1004,15 +1003,13 @@ const SITE_FONT_PAIRS={
 function normalizeSiteSettings(content){
   const raw=(content.siteSettings&&typeof content.siteSettings==="object")?content.siteSettings:{};
   const rawOrder=Array.isArray(raw.sectionOrder)?raw.sectionOrder.filter(x=>SITE_SECTION_KEYS.includes(x)):[];
-  let order=[...new Set([...rawOrder,...SITE_SECTION_KEYS])];
-  const placeMissingAfter=(key,after)=>{
-    if(rawOrder.includes(key))return;
-    order=order.filter(k=>k!==key);
-    const i=order.indexOf(after);
-    order.splice(i>=0?i+1:order.length,0,key);
-  };
-  placeMissingAfter("activities","projects");
-  placeMissingAfter("courses","education");
+  const mergedOrder=[...new Set([...rawOrder,...SITE_SECTION_KEYS])];
+  const order=rawOrder.includes("activities")?mergedOrder:(()=>{
+    const next=mergedOrder.filter(k=>k!=="activities");
+    const projectIndex=next.indexOf("projects");
+    next.splice(projectIndex>=0?projectIndex+1:next.length,0,"activities");
+    return next;
+  })();
   const rawVis=(raw.sectionVisibility&&typeof raw.sectionVisibility==="object")?raw.sectionVisibility:{};
   const l=(raw.layout&&typeof raw.layout==="object")?raw.layout:{};
   const e=(raw.experience&&typeof raw.experience==="object")?raw.experience:{};
@@ -1449,7 +1446,7 @@ function updateSectionPager(d,currentKey){
 }
 
 function activateSectionPageNav(key){
-  const navId=key==="about"?"home":key==="courses"?"education":key;
+  const navId=key==="about"?"home":key;
   document.querySelectorAll(".topbar nav a").forEach(a=>{
     a.classList.toggle("active-section",a.getAttribute("href")===`#${navId}`);
   });
@@ -1607,7 +1604,7 @@ function bindSectionPageNavigation(){
   sitePageModeClickBound=true;
 
   document.addEventListener("click",e=>{
-    const link=e.target.closest(".topbar nav a[href^='#'], .brand[href^='#'], .education-courses-link[href^='#']");
+    const link=e.target.closest(".topbar nav a[href^='#'], .brand[href^='#']");
     if(!link||!currentRenderedContent)return;
     if(currentRenderedContent.siteSettings?.layout?.navigationMode!=="sections")return;
 
@@ -1714,8 +1711,6 @@ function applyLayoutSettings(d){
   root.style.setProperty("--site-skills-columns",String(l.skillsColumns));
   const educationSection=document.querySelector('[data-section-key="education"]');
   if(educationSection)educationSection.dataset.educationPreset=EDUCATION_PRESET_VALUES.includes(l.educationPreset)?l.educationPreset:"current";
-  const coursesSection=document.querySelector('[data-section-key="courses"]');
-  if(coursesSection)coursesSection.dataset.gradesheetStyle=GRADESHEET_STYLE_VALUES.includes(d.gradesheet?.style)?d.gradesheet.style:"academic-ledger";
   root.style.setProperty("--site-shadow",siteShadowValue(l.shadow));
   root.style.setProperty("--site-font-body",pair.body);
   root.style.setProperty("--site-font-heading",pair.heading);
@@ -1724,6 +1719,7 @@ function applyLayoutSettings(d){
   root.dataset.sidebarDesign=normalizeSidebarDesign(l);
   root.dataset.sidebarLayout=normalizeSidebarLayout(l);
   root.dataset.sidebarPosition=normalizeSidebarPosition(l.sidebarPosition);
+  applySidebarInformationOrder(normalizeSidebarPosition(l.sidebarPosition));
   CARD_STYLE_SECTION_KEYS.forEach(key=>{
     const sec=document.querySelector(`[data-section-key="${key}"]`);
     if(sec){
@@ -2038,7 +2034,7 @@ function normalizeMediaDisplayList(value){
 }
 
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=31;
+const BUILDER_SETTINGS_SCHEMA_VERSION=30;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -2200,9 +2196,94 @@ function educationGradeLabel(item){
   return /\b(hsc|ssc)\b|higher secondary|secondary school/.test(degree)?"GPA":"CGPA";
 }
 
+
+let educationLocalView="education";
+let educationLocalNavBound=false;
+
+function normalizeGradesheet(content){
+  const base=structuredClone(DEFAULT_CONTENT.gradesheet||{});
+  const raw=(content.gradesheet&&typeof content.gradesheet==="object")?content.gradesheet:{};
+  const g=merge(base,raw);
+  g.style=GRADESHEET_STYLE_VALUES.includes(g.style)?g.style:"academic-ledger";
+  g.url=String(g.url||"");g.filename=String(g.filename||"");g.updated_at=String(g.updated_at||"");
+  g.degree=String(g.degree||"");g.institution=String(g.institution||"");g.department=String(g.department||"");g.session=String(g.session||"");
+  g.gradingScale=Array.isArray(g.gradingScale)?g.gradingScale:[];
+  g.semesters=Array.isArray(g.semesters)?g.semesters:[];
+  g.final=(g.final&&typeof g.final==="object")?g.final:{};
+  content.gradesheet=g;
+  return g;
+}
+
+function applyEducationLocalView(view,{scroll=false}={}){
+  const next=view==="courses"?"courses":"education";
+  educationLocalView=next;
+  document.querySelectorAll("[data-education-panel]").forEach(panel=>panel.classList.toggle("hidden",panel.dataset.educationPanel!==next));
+  document.querySelectorAll("[data-education-view]").forEach(button=>{
+    const active=button.dataset.educationView===next;
+    button.classList.toggle("active",active);
+    button.setAttribute("aria-selected",active?"true":"false");
+  });
+  if(scroll){
+    const section=$("education");
+    if(section){
+      const top=section.getBoundingClientRect().top+window.scrollY-(document.querySelector(".topbar")?.offsetHeight||0)-14;
+      window.scrollTo({top:Math.max(0,top),behavior:"smooth"});
+    }
+  }
+}
+
+function bindEducationLocalNav(){
+  if(educationLocalNavBound)return;
+  educationLocalNavBound=true;
+  document.addEventListener("click",event=>{
+    const button=event.target.closest("[data-education-view]");
+    if(!button)return;
+    event.preventDefault();
+    applyEducationLocalView(button.dataset.educationView,{scroll:true});
+  });
+}
+
+function renderGradesheet(d){
+  const g=normalizeGradesheet(d);
+  const panel=$("educationCoursesPanel");
+  if(panel)panel.dataset.gradesheetStyle=GRADESHEET_STYLE_VALUES.includes(g.style)?g.style:"academic-ledger";
+  if($("gradesheetPanelTitle"))$("gradesheetPanelTitle").textContent=g.title||"Courses & Grades";
+  if($("gradesheetPanelSubtitle"))$("gradesheetPanelSubtitle").textContent=g.subtitle||"Complete undergraduate academic record";
+  if($("gradesheetDegree"))$("gradesheetDegree").textContent=g.degree||"";
+  if($("gradesheetAcademicMeta"))$("gradesheetAcademicMeta").textContent=[g.institution,g.department,g.session?`Session ${g.session}`:""] .filter(Boolean).join(" · ");
+  const final=g.final||{};
+  if($("gradesheetFinalSummary"))$("gradesheetFinalSummary").innerHTML=[
+    ["Credits",final.credits],["CGPA",final.cgpa],["Letter Grade",final.letter]
+  ].filter(([,v])=>String(v||"").trim()).map(([label,value])=>`<div class="gradesheet-final-metric"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`).join("");
+  if($("gradingScale"))$("gradingScale").innerHTML=(g.gradingScale||[]).map(item=>`<div class="grading-scale-item"><span>${esc(item.range||"")}</span><strong><b>${esc(item.letter||"")}</b><em>${esc(item.point||"")}</em></strong></div>`).join("");
+  if($("gradesheetSemesters"))$("gradesheetSemesters").innerHTML=(g.semesters||[]).map(s=>`<article class="semester-record">
+    <header class="semester-record-head">
+      <div><span class="semester-index">Semester ${String(s.number||"").padStart(2,"0")}</span><h3>${esc(s.label||"")}</h3>${s.held?`<div class="semester-held">Held in ${esc(s.held)}</div>`:""}</div>
+      <div class="semester-head-stats"><div class="semester-stat"><span>GPA</span><strong>${esc(s.semesterGpa||"")}</strong></div><div class="semester-stat"><span>Credits</span><strong>${esc(s.semesterCredits||"")}</strong></div><div class="semester-stat"><span>Result</span><strong>${esc(s.semesterLetter||"")}</strong></div></div>
+    </header>
+    <div class="course-table-wrap"><table class="course-table"><thead><tr><th>Course No.</th><th>Course Title</th><th>Credit</th><th>Grade Point</th><th>Letter Grade</th></tr></thead><tbody>${(s.courses||[]).map(course=>`<tr><td>${esc(course.code||"")}</td><td>${esc(course.title||"")}</td><td>${esc(course.credit||"")}</td><td>${esc(course.point||"")}</td><td><span class="course-grade-letter ${String(course.letter||"").toUpperCase()==="F"?"grade-f":""}">${esc(course.letter||"")}</span></td></tr>`).join("")}</tbody></table></div>
+    <footer class="semester-record-foot"><span>This semester: <strong>${esc(s.semesterCredits||"")} credits · GPA ${esc(s.semesterGpa||"")} · ${esc(s.semesterLetter||"")}</strong></span><span>Cumulative: <strong>${esc(s.cumulativeCredits||"")} credits · GPA ${esc(s.cumulativeGpa||"")} · ${esc(s.cumulativeLetter||"")}</strong></span></footer>
+  </article>`).join("");
+  const link=$("gradesheetLink"),note=$("gradesheetPdfNote");
+  if(link&&note){
+    if(g.url){link.href=g.url;link.classList.remove("disabled");link.removeAttribute("aria-disabled");note.textContent=g.updated_at?`Official PDF · updated ${formatDate(g.updated_at)}`:"Official grade certificate PDF";}
+    else{link.href="#";link.classList.add("disabled");link.setAttribute("aria-disabled","true");note.textContent="PDF can be added from the private admin page.";}
+  }
+}
+
+function applySidebarInformationOrder(position){
+  const sidebar=document.querySelector(".sidebar"),meta=sidebar?.querySelector(":scope > .meta"),links=sidebar?.querySelector(":scope > .links"),cv=sidebar?.querySelector(":scope > .sidebar-cv");
+  if(!sidebar||!meta||!links||!cv)return;
+  if(position==="left"||position==="right"){
+    sidebar.insertBefore(links,meta);
+    sidebar.insertBefore(cv,meta);
+  }else{
+    sidebar.insertBefore(meta,links);
+  }
+}
+
 function sectionHasPublicContent(d,key){
   if(key==="activities")return (d.academicActivities||[]).some(academicActivityHasContent);
-  if(key==="courses")return (normalizeGradesheet(d).semesters||[]).length>0;
   return true;
 }
 
@@ -2238,21 +2319,6 @@ function normalizePublicationRecord(item){
   }
   out.media=normalizeMediaDisplayList(out.media);
   return out;
-}
-
-
-function normalizeGradesheet(content){
-  const base=structuredClone(DEFAULT_CONTENT.gradesheet||{});
-  const raw=(content.gradesheet&&typeof content.gradesheet==="object")?content.gradesheet:{};
-  const g=merge(base,raw);
-  g.style=GRADESHEET_STYLE_VALUES.includes(g.style)?g.style:"academic-ledger";
-  g.url=String(g.url||"");g.filename=String(g.filename||"");g.updated_at=String(g.updated_at||"");
-  g.degree=String(g.degree||"");g.institution=String(g.institution||"");g.department=String(g.department||"");g.session=String(g.session||"");
-  g.gradingScale=Array.isArray(g.gradingScale)?g.gradingScale:[];
-  g.semesters=Array.isArray(g.semesters)?g.semesters:[];
-  g.final=(g.final&&typeof g.final==="object")?g.final:{};
-  content.gradesheet=g;
-  return g;
 }
 
 function normalize(d){
@@ -2418,37 +2484,6 @@ function renderAcademicActivities(d){
   }).join("");
 }
 
-
-function renderGradesheet(d){
-  const g=normalizeGradesheet(d);
-  const section=$("courses");
-  if(section)section.dataset.gradesheetStyle=GRADESHEET_STYLE_VALUES.includes(g.style)?g.style:"academic-ledger";
-  $("gradesheetDegree").textContent=g.degree||"";
-  $("gradesheetAcademicMeta").textContent=[g.institution,g.department,g.session?`Session ${g.session}`:""].filter(Boolean).join(" · ");
-  const final=g.final||{};
-  $("gradesheetFinalSummary").innerHTML=[
-    ["Credits",final.credits],["CGPA",final.cgpa],["Letter Grade",final.letter]
-  ].filter(([,v])=>String(v||"").trim()).map(([label,value])=>`<div class="gradesheet-final-metric"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`).join("");
-  $("gradingScale").innerHTML=(g.gradingScale||[]).map(item=>`<div class="grading-scale-item"><span>${esc(item.range||"")}</span><strong><b>${esc(item.letter||"")}</b><em>${esc(item.point||"")}</em></strong></div>`).join("");
-  $("gradesheetSemesters").innerHTML=(g.semesters||[]).map(s=>`<article class="semester-record">
-    <header class="semester-record-head">
-      <div><span class="semester-index">Semester ${String(s.number||"").padStart(2,"0")}</span><h3>${esc(s.label||"")}</h3>${s.held?`<div class="semester-held">Held in ${esc(s.held)}</div>`:""}</div>
-      <div class="semester-head-stats">
-        <div class="semester-stat"><span>GPA</span><strong>${esc(s.semesterGpa||"")}</strong></div>
-        <div class="semester-stat"><span>Credits</span><strong>${esc(s.semesterCredits||"")}</strong></div>
-        <div class="semester-stat"><span>Result</span><strong>${esc(s.semesterLetter||"")}</strong></div>
-      </div>
-    </header>
-    <div class="course-table-wrap"><table class="course-table"><thead><tr><th>Course No.</th><th>Course Title</th><th>Credit</th><th>Grade Point</th><th>Letter Grade</th></tr></thead><tbody>${(s.courses||[]).map(course=>`<tr><td>${esc(course.code||"")}</td><td>${esc(course.title||"")}</td><td>${esc(course.credit||"")}</td><td>${esc(course.point||"")}</td><td><span class="course-grade-letter ${String(course.letter||"").toUpperCase()==="F"?"grade-f":""}">${esc(course.letter||"")}</span></td></tr>`).join("")}</tbody></table></div>
-    <footer class="semester-record-foot"><span>This semester: <strong>${esc(s.semesterCredits||"")} credits · GPA ${esc(s.semesterGpa||"")} · ${esc(s.semesterLetter||"")}</strong></span><span>Cumulative: <strong>${esc(s.cumulativeCredits||"")} credits · GPA ${esc(s.cumulativeGpa||"")} · ${esc(s.cumulativeLetter||"")}</strong></span></footer>
-  </article>`).join("");
-  const link=$("gradesheetLink"),note=$("gradesheetPdfNote");
-  if(g.url){link.href=g.url;link.classList.remove("disabled");link.removeAttribute("aria-disabled");note.textContent=g.updated_at?`Official PDF · updated ${formatDate(g.updated_at)}`:"Official grade certificate PDF";}
-  else{link.href="#";link.classList.add("disabled");link.setAttribute("aria-disabled","true");note.textContent="PDF can be added from the private admin page.";}
-  const courseLink=$("educationCoursesLink");
-  if(courseLink)courseLink.classList.toggle("hidden",d.siteSettings?.sectionVisibility?.courses===false||!(g.semesters||[]).length);
-}
-
 function render(d){
   document.title=`${d.name} | Academic Profile`;
   document.documentElement.dataset.theme=validSiteTheme(d.defaultTheme||"classic-brown");
@@ -2486,7 +2521,6 @@ function render(d){
   setPublicSection("activities","activitiesSectionTitle","activitiesSectionSubtitle","navActivities");
   setPublicSection("skills","skillsSectionTitle","skillsSectionSubtitle","navSkills");
   setPublicSection("education","educationSectionTitle","educationSectionSubtitle","navEducation");
-  setPublicSection("courses","coursesSectionTitle","coursesSectionSubtitle");
   setPublicSection("contact","contactSectionTitle","contactHeadline","navContact");
   setPublicSection("cv","cvSectionTitle","cvSectionSubtitle","navCv");
   $("aboutLead").textContent=d.aboutLead;
@@ -2606,6 +2640,8 @@ function render(d){
     </article>`).join("");
 
   renderGradesheet(d);
+  bindEducationLocalNav();
+  applyEducationLocalView(educationLocalView);
 
   $("contactMessage").textContent=d.contact?.message||"";
   const contactItems=[];
