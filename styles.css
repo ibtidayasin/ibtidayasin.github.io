@@ -7206,3 +7206,126 @@ body:not(.admin-body) #education[data-education-preset="stacked-bands"] .edu{dis
   .admin-body .gradesheet-selected-file{white-space:normal;overflow-wrap:anywhere}
   .admin-body .gradesheet-upload-now{width:100%}
 }
+
+
+/* =========================================================
+   ADMIN — UNIVERSAL PROFESSIONAL FILE PICKERS
+   ========================================================= */
+.admin-body .admin-universal-file-input{position:absolute!important;width:1px!important;height:1px!important;opacity:0!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important}
+.admin-body .admin-file-picker-shell{display:grid;gap:8px;margin-top:7px;min-width:0}
+.admin-body .admin-file-picker-dropzone{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:13px;min-height:78px;padding:14px 15px;border:1.5px dashed color-mix(in srgb,var(--accent) 42%,var(--line));border-radius:12px;background:var(--surface);cursor:pointer;transition:border-color .18s ease,background .18s ease,transform .18s ease,box-shadow .18s ease}
+.admin-body .admin-file-picker-dropzone:hover,.admin-body .admin-file-picker-shell.is-dragging .admin-file-picker-dropzone{border-color:var(--accent);background:color-mix(in srgb,var(--accent-soft) 58%,var(--surface));box-shadow:0 9px 24px rgba(0,0,0,.04)}
+.admin-body .admin-file-picker-shell.is-dragging .admin-file-picker-dropzone{transform:translateY(-1px)}
+.admin-body .admin-file-picker-shell.has-file .admin-file-picker-dropzone{border-style:solid;border-color:color-mix(in srgb,var(--accent) 62%,var(--line))}
+.admin-body .admin-file-picker-dropzone:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 25%,transparent);outline-offset:2px;border-color:var(--accent)}
+.admin-body .admin-file-picker-icon{display:grid;place-items:center;width:42px;height:42px;border-radius:11px;background:var(--accent-soft);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 18%,var(--line))}
+.admin-body .admin-file-picker-icon svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.admin-body .admin-file-picker-copy{display:grid;gap:3px;min-width:0}
+.admin-body .admin-file-picker-copy strong{font-size:13px;line-height:1.3;color:var(--text)}
+.admin-body .admin-file-picker-copy small{font-size:11px;line-height:1.45;color:var(--muted)}
+.admin-body .admin-file-picker-cta{display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:0 12px;border:1px solid color-mix(in srgb,var(--accent) 30%,var(--line));border-radius:9px;background:var(--surface);color:var(--accent);font-size:11px;font-weight:850;white-space:nowrap}
+.admin-body .admin-file-picker-status{min-width:0;padding:0 2px;font-size:11px;line-height:1.45;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.admin-body .admin-file-picker-shell.has-file .admin-file-picker-status{color:var(--text);font-weight:700}
+.admin-body .admin-file-picker-shell.is-compact{margin-top:4px}
+.admin-body .admin-file-picker-shell.is-compact .admin-file-picker-dropzone{min-height:64px;padding:10px 11px;gap:10px}
+.admin-body .admin-file-picker-shell.is-compact .admin-file-picker-icon{width:34px;height:34px;border-radius:9px}
+.admin-body .admin-file-picker-shell.is-compact .admin-file-picker-icon svg{width:18px;height:18px}
+.admin-body .admin-file-picker-shell.is-compact .admin-file-picker-copy strong{font-size:11px}
+.admin-body .admin-file-picker-shell.is-compact .admin-file-picker-copy small{font-size:10px}
+.admin-body .admin-file-picker-shell.is-compact .admin-file-picker-cta{min-height:30px;font-size:10px;padding:0 9px}
+@media(max-width:700px){
+  .admin-body .admin-file-picker-dropzone{grid-template-columns:auto minmax(0,1fr);padding:13px}
+  .admin-body .admin-file-picker-cta{grid-column:1/-1;width:100%;margin-top:1px}
+  .admin-body .admin-file-picker-status{white-space:normal;overflow-wrap:anywhere}
+}
+
+/* =========================================================
+   COURSES & GRADES — STYLES 6–10
+   All share the same semantic record and the same mobile-safe course cards.
+   ========================================================= */
+/* 6. Compact Register */
+#educationCoursesPanel[data-gradesheet-style="compact-register"] .gradesheet-hero{padding:18px 20px;border-radius:10px;border-top:4px solid var(--accent);box-shadow:none}
+#educationCoursesPanel[data-gradesheet-style="compact-register"] .gradesheet-semesters{gap:10px}
+#educationCoursesPanel[data-gradesheet-style="compact-register"] .semester-record{border-radius:10px;box-shadow:none}
+#educationCoursesPanel[data-gradesheet-style="compact-register"] .semester-record-head{padding:12px 15px;background:var(--surface-alt)}
+#educationCoursesPanel[data-gradesheet-style="compact-register"] .semester-record h3{font-size:17px}
+#educationCoursesPanel[data-gradesheet-style="compact-register"] .semester-head-stats{gap:5px}
+#educationCoursesPanel[data-gradesheet-style="compact-register"] .semester-stat{min-width:62px;padding:5px 7px;border-radius:6px;background:var(--surface)}
+#educationCoursesPanel[data-gradesheet-style="compact-register"] .course-table{font-size:10.5px}
+#educationCoursesPanel[data-gradesheet-style="compact-register"] .course-table th,#educationCoursesPanel[data-gradesheet-style="compact-register"] .course-table td{padding:6px 8px}
+#educationCoursesPanel[data-gradesheet-style="compact-register"] .semester-record-foot{padding:7px 14px;font-size:9.5px;background:var(--surface-alt)}
+
+/* 7. Semester Timeline */
+#educationCoursesPanel[data-gradesheet-style="semester-timeline"] .gradesheet-hero{box-shadow:none}
+#educationCoursesPanel[data-gradesheet-style="semester-timeline"] .gradesheet-semesters{position:relative;gap:0;padding-left:34px}
+#educationCoursesPanel[data-gradesheet-style="semester-timeline"] .gradesheet-semesters::before{content:"";position:absolute;left:10px;top:14px;bottom:18px;width:2px;background:color-mix(in srgb,var(--accent) 38%,var(--line))}
+#educationCoursesPanel[data-gradesheet-style="semester-timeline"] .semester-record{position:relative;margin:0 0 18px;border-radius:12px;box-shadow:none;overflow:visible}
+#educationCoursesPanel[data-gradesheet-style="semester-timeline"] .semester-record::before{content:"";position:absolute;left:-31px;top:23px;width:14px;height:14px;border-radius:50%;background:var(--accent);border:4px solid var(--bg);box-shadow:0 0 0 1px var(--accent)}
+#educationCoursesPanel[data-gradesheet-style="semester-timeline"] .semester-record-head{padding:15px 17px;background:linear-gradient(90deg,var(--accent-soft),var(--surface))}
+#educationCoursesPanel[data-gradesheet-style="semester-timeline"] .semester-index{color:var(--accent)}
+#educationCoursesPanel[data-gradesheet-style="semester-timeline"] .semester-record-foot{justify-content:flex-start;background:var(--surface-alt)}
+
+/* 8. Scholar Panels */
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .gradesheet-semesters{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .semester-record{min-width:0;border-radius:16px;box-shadow:0 10px 28px rgba(0,0,0,.045)}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .semester-record-head{display:block;padding:17px;background:var(--accent-soft)}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .semester-head-stats{justify-content:flex-start;margin-top:11px}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table{display:block;min-width:0;width:100%;font-size:10px}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table thead{display:none}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table tbody{display:grid;width:100%}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table tr{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;grid-template-rows:auto auto;column-gap:9px;padding:9px 12px;border-bottom:1px solid var(--line)}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table tr:last-child{border-bottom:0}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table td{padding:0;border:0;background:transparent;min-width:0}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table td:nth-child(1){grid-column:1;grid-row:1;font-size:9px;font-weight:850;color:var(--accent)}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table td:nth-child(2){grid-column:1;grid-row:2;font-size:10.5px;line-height:1.35;font-weight:700;padding-top:2px}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table td:nth-child(3){grid-column:2;grid-row:1/3;align-self:center}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table td:nth-child(4){grid-column:3;grid-row:1/3;align-self:center}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table td:nth-child(5){grid-column:4;grid-row:1/3;align-self:center}
+#educationCoursesPanel[data-gradesheet-style="scholar-panels"] .semester-record-foot{display:grid;grid-template-columns:1fr;gap:4px;justify-content:stretch;background:var(--surface-alt);font-size:9px}
+
+/* 9. Academic Journal */
+#educationCoursesPanel[data-gradesheet-style="accent-journal"] .gradesheet-hero{border:0;border-left:5px solid var(--accent);border-radius:0 12px 12px 0;background:var(--surface);box-shadow:none}
+#educationCoursesPanel[data-gradesheet-style="accent-journal"] .grading-scale-panel{border-radius:0 10px 10px 0;border-left:3px solid color-mix(in srgb,var(--accent) 55%,var(--line))}
+#educationCoursesPanel[data-gradesheet-style="accent-journal"] .semester-record{border:0;border-left:4px solid var(--accent);border-radius:0 12px 12px 0;box-shadow:none;background:var(--surface)}
+#educationCoursesPanel[data-gradesheet-style="accent-journal"] .semester-record-head{padding:17px 18px;background:transparent;border-bottom:1px solid var(--line)}
+#educationCoursesPanel[data-gradesheet-style="accent-journal"] .semester-index{letter-spacing:.13em;color:var(--accent)}
+#educationCoursesPanel[data-gradesheet-style="accent-journal"] .course-table th{background:transparent;border-bottom:1px solid var(--text)}
+#educationCoursesPanel[data-gradesheet-style="accent-journal"] .course-table td{border-bottom:1px solid color-mix(in srgb,var(--line) 72%,transparent)}
+#educationCoursesPanel[data-gradesheet-style="accent-journal"] .course-grade-letter{background:transparent;border:0;padding:0;color:var(--text)}
+#educationCoursesPanel[data-gradesheet-style="accent-journal"] .semester-record-foot{background:transparent;border-top:1px solid var(--line);justify-content:flex-start}
+
+/* 10. Executive Record */
+#educationCoursesPanel[data-gradesheet-style="executive-record"] .gradesheet-hero{background:linear-gradient(135deg,var(--surface),var(--accent-soft));border-color:color-mix(in srgb,var(--accent) 24%,var(--line));box-shadow:0 10px 28px rgba(0,0,0,.04)}
+#educationCoursesPanel[data-gradesheet-style="executive-record"] .gradesheet-final-metric{border-color:color-mix(in srgb,var(--accent) 28%,var(--line));background:var(--surface)}
+#educationCoursesPanel[data-gradesheet-style="executive-record"] .semester-record{border-radius:14px;border-color:color-mix(in srgb,var(--accent) 20%,var(--line));box-shadow:none}
+#educationCoursesPanel[data-gradesheet-style="executive-record"] .semester-record-head{padding:16px 18px;background:var(--surface)}
+#educationCoursesPanel[data-gradesheet-style="executive-record"] .semester-head-stats{gap:7px}
+#educationCoursesPanel[data-gradesheet-style="executive-record"] .semester-stat{border:0;border-bottom:2px solid var(--accent);border-radius:7px 7px 2px 2px;background:var(--accent-soft);padding:7px 10px}
+#educationCoursesPanel[data-gradesheet-style="executive-record"] .course-table th{background:var(--surface-alt);color:var(--text)}
+#educationCoursesPanel[data-gradesheet-style="executive-record"] .course-table tbody tr:nth-child(even) td{background:color-mix(in srgb,var(--surface-alt) 58%,var(--surface))}
+#educationCoursesPanel[data-gradesheet-style="executive-record"] .semester-record-foot{background:var(--accent-soft);border-top:1px solid color-mix(in srgb,var(--accent) 20%,var(--line));justify-content:space-between}
+
+/* Admin previews for styles 6–10 */
+.gsp-register{background:var(--surface);gap:2px}.gsp-register i{border-radius:1px;background:var(--line)}.gsp-register i:first-child{border-top:3px solid var(--accent);background:var(--surface-alt)}
+.gsp-timeline{position:relative;padding-left:18px;background:var(--surface)}.gsp-timeline::before{content:"";position:absolute;left:9px;top:8px;bottom:8px;width:2px;background:var(--accent)}.gsp-timeline i{position:relative;background:var(--surface-alt);border:1px solid var(--line)}.gsp-timeline i::before{content:"";position:absolute;left:-13px;top:5px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.gsp-panels{grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:5px;background:var(--surface-alt)}.gsp-panels i,.gsp-panels i:first-child{grid-column:auto;background:var(--surface);border:1px solid var(--line);border-radius:5px}
+.gsp-journal{border-left:4px solid var(--accent);border-radius:2px 8px 8px 2px;background:var(--surface)}.gsp-journal i{border-radius:0;background:var(--line)}.gsp-journal i:first-child{background:var(--accent-soft)}
+.gsp-executive{background:linear-gradient(135deg,var(--surface),var(--accent-soft));gap:5px}.gsp-executive i{background:var(--surface);border:1px solid var(--line);border-bottom:2px solid var(--accent)}.gsp-executive i:first-child{background:var(--accent-soft)}
+
+@media(max-width:980px){
+  #educationCoursesPanel[data-gradesheet-style="scholar-panels"] .gradesheet-semesters{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  #educationCoursesPanel[data-gradesheet-style="semester-timeline"] .gradesheet-semesters{padding-left:24px!important}
+  #educationCoursesPanel[data-gradesheet-style="semester-timeline"] .gradesheet-semesters::before{left:7px!important}
+  #educationCoursesPanel[data-gradesheet-style="semester-timeline"] .semester-record{overflow:visible!important}
+  #educationCoursesPanel[data-gradesheet-style="semester-timeline"] .semester-record::before{left:-23px!important;top:22px!important;width:12px!important;height:12px!important}
+  #educationCoursesPanel[data-gradesheet-style="scholar-panels"] .gradesheet-semesters{display:grid!important;grid-template-columns:1fr!important;gap:12px!important}
+  #educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table tr{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:auto auto auto!important;gap:5px 10px!important}
+  #educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table td:nth-child(1){grid-column:1/-1!important;grid-row:1!important}
+  #educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table td:nth-child(2){grid-column:1/-1!important;grid-row:2!important}
+  #educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table td:nth-child(3){grid-column:1!important;grid-row:3!important}
+  #educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table td:nth-child(4){grid-column:2!important;grid-row:3!important}
+  #educationCoursesPanel[data-gradesheet-style="scholar-panels"] .course-table td:nth-child(5){grid-column:3!important;grid-row:3!important}
+  #educationCoursesPanel[data-gradesheet-style="accent-journal"] .semester-record{border-left-width:3px}
+}

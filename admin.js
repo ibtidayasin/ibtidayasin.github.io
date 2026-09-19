@@ -425,7 +425,7 @@ const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"]
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
 const EDUCATION_PRESET_VALUES=["current","scholar-highlight","compact-timeline","split-panel","metric-grid","academic-profile","certificate-showcase","banner-spotlight","transcript-ledger","three-column-digest","minimal-chronicle"];
-const GRADESHEET_STYLE_VALUES=["official-transcript","semester-cards","academic-ledger","performance-grid","minimal-scholar"];
+const GRADESHEET_STYLE_VALUES=["official-transcript","semester-cards","academic-ledger","performance-grid","minimal-scholar","compact-register","semester-timeline","scholar-panels","accent-journal","executive-record"];
 const PRE_GRADE_SITE_SETTINGS={"layout":{"shadow":"theme","fontPair":"helvetica","maxWidth":1180,"layoutGap":58,"pagePager":true,"cardRadius":10,"cardStyles":{"thesis":"classic","publications":"classic","projects":"classic","activities":"classic","skills":"outline","education":"classic","contact":"classic"},"cardDesigns":{"thesis":"spotlight","publications":"standard","projects":"standard","activities":"standard","skills":"banded","education":"standard","contact":"standard"},"portraitFit":"cover","projectFlow":"grid","portraitSize":215,"sidebarScope":"home-cv","sidebarStyle":"current","sidebarWidth":255,"portraitShape":"slight","sidebarDesign":"current","sidebarLayout":"classic","skillsColumns":3,"stickySidebar":true,"navigationMode":"sections","pageTransition":"fade","projectColumns":1,"sectionSpacing":42,"activityColumns":1,"educationPreset":"split-panel","sectionCoverGap":12,"sidebarPosition":"top","sidebarSections":{"research":false,"thesis":false,"publications":false,"projects":false,"activities":false,"skills":false,"education":false,"contact":false,"cv":true},"portraitPosition":"center","sectionCoverFade":"medium","sectionCoverSide":"right","sectionCoverZoom":100,"sectionCoverScope":"research","sectionCoverStyle":"framed","sectionCoverHeight":300,"sectionCoverDetails":true,"sectionCoverEnabled":true,"sectionCoverSocials":true,"sectionCoverPhotoFit":"crop","sectionCoverSections":{"research":true,"thesis":true,"publications":false,"projects":false,"activities":false,"skills":false,"education":false,"contact":false,"cv":false},"sectionCoverTopBlend":false},"experience":{"lightbox":true,"activeNav":true,"backToTop":true,"animations":"subtle","copyButtons":true,"socialStyle":"labels","mainNavStyle":"segmented-strip","smoothScroll":true,"brandNameSize":23,"brandNameColor":"","brandNameStyle":"current","activityTabStyle":"segmented","hoverInteractions":"subtle","navHighlightStyle":"underline"},"sectionOrder":["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],"sectionVisibility":{"about":true,"research":true,"thesis":true,"publications":true,"projects":true,"activities":true,"skills":true,"education":true,"contact":true,"cv":true},"thesisDefaultVisibleApplied":true,"experienceDefaultsMigratedV1":true};
 const MAIN_NAV_STYLE_VALUES=["current","framed-links","accent-pills","floating-capsule","segmented-strip","top-rail","mini-cards","soft-chips","editorial-dividers","glass-rail","ribbon-blocks"];
 const BRAND_NAME_STYLE_VALUES=["current","accent-rail","signature-underline","soft-badge","outline-label","capsule","editorial-serif","small-caps","split-rule","accent-corner","glass-label"];
@@ -2355,6 +2355,7 @@ function fillForms(){
   $("fWebsite").value=currentContent.links?.website||"";
   $("fCvExternal").value="";
   if($("gradesheetFile"))$("gradesheetFile").value="";
+  refreshAllAdminFilePickers();
   renderGradesheetFileSelection();
   if($("fGradesheetExternal"))$("fGradesheetExternal").value="";
   if(currentContent.photo_url){
@@ -4136,6 +4137,7 @@ async function saveAll(){
   if(!ok)return;
   $("photoFile").value="";
   $("cvFile").value="";
+  refreshAllAdminFilePickers();
   $("fCvExternal").value="";
   if($("gradesheetFile"))$("gradesheetFile").value="";
   renderGradesheetFileSelection();
@@ -4380,6 +4382,76 @@ function setupAppearanceAccordions(){
     });
   });
 }
+
+
+
+/* =========================================================
+   UNIVERSAL ADMIN FILE PICKERS
+   Gives every image / PDF / media / backup chooser the same
+   professional drag-and-drop treatment as the gradesheet uploader.
+   ========================================================= */
+let adminFilePickerCounter=0;
+function adminFilePickerMeta(input){
+  const accept=String(input?.getAttribute("accept")||"").toLowerCase();
+  if(input?.id==="photoFile")return {title:"Upload profile image",prompt:"Choose an image or drag and drop it here",cta:"Choose image"};
+  if(input?.id==="cvFile")return {title:"Upload CV PDF",prompt:"Choose a PDF or drag and drop it here",cta:"Choose PDF"};
+  if(input?.id==="backupImportFile")return {title:"Import website backup",prompt:"Choose a JSON backup or drag and drop it here",cta:"Choose file"};
+  if(input?.matches?.("[data-video-thumb-file]"))return {title:"Upload video preview image",prompt:"Choose an image or drag and drop it here",cta:"Choose image"};
+  if(input?.matches?.("[data-pdf-thumb-file]"))return {title:"Upload PDF preview image",prompt:"Choose an image or drag and drop it here",cta:"Choose image"};
+  if(input?.matches?.("[data-media-replace-file]"))return {title:"Replace media file",prompt:"Choose a file or drag and drop it here",cta:"Choose file"};
+  if(input?.matches?.("[data-media-file]"))return {title:"Upload image, PDF or video",prompt:"Choose a file or drag and drop it here",cta:"Choose file"};
+  if(accept.includes("application/pdf")&&!accept.includes("image/")&&!accept.includes("video/"))return {title:"Upload PDF",prompt:"Choose a PDF or drag and drop it here",cta:"Choose PDF"};
+  if(accept.includes("image/")&&!accept.includes("application/pdf")&&!accept.includes("video/"))return {title:"Upload image",prompt:"Choose an image or drag and drop it here",cta:"Choose image"};
+  return {title:"Upload file",prompt:"Choose a file or drag and drop it here",cta:"Choose file"};
+}
+function refreshAdminFilePicker(input){
+  const shell=input?.nextElementSibling?.matches?.(".admin-file-picker-shell")?input.nextElementSibling:null;
+  if(!shell)return;
+  const file=input.files?.[0]||null;
+  shell.classList.toggle("has-file",!!file);
+  const status=shell.querySelector("[data-admin-file-status]");
+  if(status)status.textContent=file?`${file.name} · ${(file.size/1024/1024).toFixed(file.size>=1024*1024?1:2)} MB`:"No file selected";
+}
+function enhanceAdminFileInput(input){
+  if(!input||input.dataset.adminFileEnhanced==="1"||input.classList.contains("gradesheet-file-input"))return;
+  input.dataset.adminFileEnhanced="1";
+  input.classList.add("admin-universal-file-input");
+  if(!input.id)input.id=`adminFilePicker${++adminFilePickerCounter}`;
+  const meta=adminFilePickerMeta(input);
+  const compact=input.matches?.("[data-media-replace-file],[data-video-thumb-file],[data-pdf-thumb-file]");
+  const shell=document.createElement("div");
+  shell.className=`admin-file-picker-shell${compact?" is-compact":""}`;
+  shell.innerHTML=`<div class="admin-file-picker-dropzone" role="button" tabindex="0" aria-controls="${input.id}">
+      <span class="admin-file-picker-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg></span>
+      <span class="admin-file-picker-copy"><strong>${meta.title}</strong><small>${meta.prompt}</small></span>
+      <span class="admin-file-picker-cta">${meta.cta}</span>
+    </div><div class="admin-file-picker-status" data-admin-file-status aria-live="polite">No file selected</div>`;
+  input.insertAdjacentElement("afterend",shell);
+  const zone=shell.querySelector(".admin-file-picker-dropzone");
+  const openPicker=event=>{event?.preventDefault?.();event?.stopPropagation?.();input.click();};
+  zone.addEventListener("click",openPicker);
+  zone.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" ")openPicker(event);});
+  ["dragenter","dragover"].forEach(type=>zone.addEventListener(type,event=>{event.preventDefault();event.stopPropagation();shell.classList.add("is-dragging");}));
+  ["dragleave","drop"].forEach(type=>zone.addEventListener(type,event=>{event.preventDefault();event.stopPropagation();shell.classList.remove("is-dragging");}));
+  zone.addEventListener("drop",event=>{
+    const file=event.dataTransfer?.files?.[0];if(!file)return;
+    try{const transfer=new DataTransfer();transfer.items.add(file);input.files=transfer.files;}catch(_){return;}
+    input.dispatchEvent(new Event("change",{bubbles:true}));
+  });
+  input.addEventListener("change",()=>refreshAdminFilePicker(input));
+  refreshAdminFilePicker(input);
+}
+function enhanceAdminFileInputs(root=document){
+  if(root?.matches?.('input[type="file"]'))enhanceAdminFileInput(root);
+  root?.querySelectorAll?.('input[type="file"]').forEach(enhanceAdminFileInput);
+}
+function refreshAllAdminFilePickers(){document.querySelectorAll('input[type="file"][data-admin-file-enhanced="1"]').forEach(refreshAdminFilePicker);}
+function initUniversalAdminFilePickers(){
+  enhanceAdminFileInputs(document);
+  const observer=new MutationObserver(records=>records.forEach(record=>record.addedNodes.forEach(node=>{if(node.nodeType===1)enhanceAdminFileInputs(node);}))); 
+  observer.observe(document.body,{childList:true,subtree:true});
+}
+initUniversalAdminFilePickers();
 
 setupAppearanceAccordions();
 boot();

@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260920-upload-scroll-v1" rel="stylesheet"/>
+<link href="styles.css?v=20260920-upload-styles-v1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -302,6 +302,12 @@
     <label class="gradesheet-style-choice" data-gradesheet-style-card="academic-ledger"><input name="gradesheetStyle" type="radio" value="academic-ledger"/><span class="gradesheet-style-preview gsp-ledger"><i></i><i></i><i></i><i></i></span><strong>3. Academic Ledger</strong><small>Restrained editorial ledger with strong semester hierarchy.</small></label>
     <label class="gradesheet-style-choice" data-gradesheet-style-card="performance-grid"><input name="gradesheetStyle" type="radio" value="performance-grid"/><span class="gradesheet-style-preview gsp-grid"><i></i><i></i><i></i><i></i></span><strong>4. Performance Grid</strong><small>Data-forward styling with stronger GPA and grade emphasis.</small></label>
     <label class="gradesheet-style-choice" data-gradesheet-style-card="minimal-scholar"><input name="gradesheetStyle" type="radio" value="minimal-scholar"/><span class="gradesheet-style-preview gsp-minimal"><i></i><i></i><i></i><i></i></span><strong>5. Minimal Scholar</strong><small>Quiet typography-led listing with subtle academic dividers.</small></label>
+
+    <label class="gradesheet-style-choice" data-gradesheet-style-card="compact-register"><input name="gradesheetStyle" type="radio" value="compact-register"/><span class="gradesheet-style-preview gsp-register"><i></i><i></i><i></i><i></i></span><strong>6. Compact Register</strong><small>Dense, polished academic register with efficient spacing and crisp semester summaries.</small></label>
+    <label class="gradesheet-style-choice" data-gradesheet-style-card="semester-timeline"><input name="gradesheetStyle" type="radio" value="semester-timeline"/><span class="gradesheet-style-preview gsp-timeline"><i></i><i></i><i></i><i></i></span><strong>7. Semester Timeline</strong><small>Chronological academic timeline that keeps semester progression visually clear.</small></label>
+    <label class="gradesheet-style-choice" data-gradesheet-style-card="scholar-panels"><input name="gradesheetStyle" type="radio" value="scholar-panels"/><span class="gradesheet-style-preview gsp-panels"><i></i><i></i><i></i><i></i></span><strong>8. Scholar Panels</strong><small>Balanced two-column semester panels on laptop that collapse cleanly to one column on mobile.</small></label>
+    <label class="gradesheet-style-choice" data-gradesheet-style-card="accent-journal"><input name="gradesheetStyle" type="radio" value="accent-journal"/><span class="gradesheet-style-preview gsp-journal"><i></i><i></i><i></i><i></i></span><strong>9. Academic Journal</strong><small>Editorial record with a restrained accent rail, generous hierarchy, and clean tables.</small></label>
+    <label class="gradesheet-style-choice" data-gradesheet-style-card="executive-record"><input name="gradesheetStyle" type="radio" value="executive-record"/><span class="gradesheet-style-preview gsp-executive"><i></i><i></i><i></i><i></i></span><strong>10. Executive Record</strong><small>Modern professional transcript with structured metrics, subtle bands, and strong readability.</small></label>
   </div>
   <div class="cv-manager gradesheet-manager">
     <div><h3>Current gradesheet PDF</h3><p class="muted" id="currentGradesheetName">No gradesheet PDF uploaded yet.</p><p class="muted small" id="currentGradesheetDate"></p></div>
@@ -1889,7 +1895,7 @@
       }
       if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
 
-      await loadScript("admin.js?v=20260920-upload-scroll-v1");
+      await loadScript("admin.js?v=20260920-upload-styles-v1");
       if(button)button.disabled=false;
       if(status&&status.textContent===readyMessage)status.textContent="";
     }catch(err){
