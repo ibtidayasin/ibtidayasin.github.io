@@ -24,12 +24,6 @@ const DEFAULT_CONTENT={
     {"category":"Atomistic Analysis","items":["OVITO","PTM","DXA","RDF"],"media":[]}
   ],
   "education":[{"period":"B.Sc.","degree":"Mechanical Engineering","institution":"Shahjalal University of Science and Technology (SUST)","description":"Mechanical engineering education with growing focus on computational materials and atomistic simulation.","media":[]}],
-  "courseRecord": {
-    "style": "academic-ledger",
-    "url": "",
-    "filename": "",
-    "updated_at": ""
-  },
   "contact":{"headline":"Interested in computational materials and nanoscale mechanics?","message":"I am open to research discussions, graduate opportunities, and collaborations related to computational materials science and atomistic simulation.","email":"","phone":"","location":"Bangladesh","media":[]},
   "links":{"linkedin":"","github":"https://github.com/ibtidayasin","orcid":"","scholar":"","researchgate":"","scopus":"","wos":"","website":""},
   "cv":{"url":"","filename":"","updated_at":""},
@@ -190,6 +184,7 @@ const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
 const EDUCATION_PRESET_VALUES=["current","scholar-highlight","compact-timeline","split-panel","metric-grid","academic-profile","certificate-showcase","banner-spotlight","transcript-ledger","three-column-digest","minimal-chronicle"];
 const GRADESHEET_STYLE_VALUES=["official-transcript","semester-cards","academic-ledger","performance-grid","minimal-scholar"];
+const PRE_GRADE_SITE_SETTINGS={"layout":{"shadow":"theme","fontPair":"helvetica","maxWidth":1180,"layoutGap":58,"pagePager":true,"cardRadius":10,"cardStyles":{"thesis":"classic","publications":"classic","projects":"classic","activities":"classic","skills":"outline","education":"classic","contact":"classic"},"cardDesigns":{"thesis":"spotlight","publications":"standard","projects":"standard","activities":"standard","skills":"banded","education":"standard","contact":"standard"},"portraitFit":"cover","projectFlow":"grid","portraitSize":215,"sidebarScope":"home-cv","sidebarStyle":"current","sidebarWidth":255,"portraitShape":"slight","sidebarDesign":"current","sidebarLayout":"classic","skillsColumns":3,"stickySidebar":true,"navigationMode":"sections","pageTransition":"fade","projectColumns":1,"sectionSpacing":42,"activityColumns":1,"educationPreset":"split-panel","sectionCoverGap":12,"sidebarPosition":"top","sidebarSections":{"research":false,"thesis":false,"publications":false,"projects":false,"activities":false,"skills":false,"education":false,"contact":false,"cv":true},"portraitPosition":"center","sectionCoverFade":"medium","sectionCoverSide":"right","sectionCoverZoom":100,"sectionCoverScope":"research","sectionCoverStyle":"framed","sectionCoverHeight":300,"sectionCoverDetails":true,"sectionCoverEnabled":true,"sectionCoverSocials":true,"sectionCoverPhotoFit":"crop","sectionCoverSections":{"research":true,"thesis":true,"publications":false,"projects":false,"activities":false,"skills":false,"education":false,"contact":false,"cv":false},"sectionCoverTopBlend":false},"experience":{"lightbox":true,"activeNav":true,"backToTop":true,"animations":"subtle","copyButtons":true,"socialStyle":"labels","mainNavStyle":"segmented-strip","smoothScroll":true,"brandNameSize":23,"brandNameColor":"","brandNameStyle":"current","activityTabStyle":"segmented","hoverInteractions":"subtle","navHighlightStyle":"underline"},"sectionOrder":["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],"sectionVisibility":{"about":true,"research":true,"thesis":true,"publications":true,"projects":true,"activities":true,"skills":true,"education":true,"contact":true,"cv":true},"thesisDefaultVisibleApplied":true,"experienceDefaultsMigratedV1":true};
 const ACADEMIC_GRADE_DATA={"title":"Courses & Grades","subtitle":"Complete undergraduate academic record","degree":"B.Sc. (Engg.) in Mechanical Engineering","institution":"Shahjalal University of Science and Technology (SUST)","department":"Department of Mechanical Engineering","session":"2020-2021","gradingScale":[{"range":"80% or above","letter":"A+","point":"4.00"},{"range":"75% to less than 80%","letter":"A","point":"3.75"},{"range":"70% to less than 75%","letter":"A-","point":"3.50"},{"range":"65% to less than 70%","letter":"B+","point":"3.25"},{"range":"60% to less than 65%","letter":"B","point":"3.00"},{"range":"55% to less than 60%","letter":"B-","point":"2.75"},{"range":"50% to less than 55%","letter":"C+","point":"2.50"},{"range":"45% to less than 50%","letter":"C","point":"2.25"},{"range":"40% to less than 45%","letter":"C-","point":"2.00"},{"range":"Less than 40%","letter":"F","point":"0.00"}],"semesters":[{"number":1,"label":"1st Semester Examination","held":"September, 2022","semesterCredits":"22.00","semesterGpa":"3.63","semesterLetter":"A-","cumulativeCredits":"22.00","cumulativeGpa":"3.63","cumulativeLetter":"A-","courses":[{"code":"CHE101Q","title":"Fundamentals of Chemistry","credit":"3.00","point":"3.50","letter":"A-"},{"code":"CHE112Q","title":"Chemistry Sessional","credit":"1.50","point":"4.00","letter":"A+"},{"code":"ENG101Q","title":"Effective Communication in English","credit":"2.00","point":"3.50","letter":"A-"},{"code":"ENG102Q","title":"English Language Lab","credit":"1.00","point":"3.75","letter":"A"},{"code":"MAT101Q","title":"Differential Calculus and Geometry","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE172","title":"Mechanical Engineering Drawing","credit":"1.50","point":"4.00","letter":"A+"},{"code":"MEE176","title":"Foundry and Welding Shops","credit":"1.00","point":"3.75","letter":"A"},{"code":"MEE181","title":"Introduction to Mechanical Engineering","credit":"3.00","point":"3.25","letter":"B+"},{"code":"PHY107Q","title":"Physics I","credit":"3.00","point":"3.25","letter":"B+"},{"code":"SSS100","title":"History of the Emergence of Independent Bangladesh","credit":"3.00","point":"3.75","letter":"A"}]},{"number":2,"label":"2nd Semester Examination","held":"February, 2023","semesterCredits":"21.50","semesterGpa":"3.29","semesterLetter":"B+","cumulativeCredits":"43.50","cumulativeGpa":"3.46","cumulativeLetter":"B+","courses":[{"code":"CHE103Q","title":"Chemistry of Engineering Materials","credit":"3.00","point":"3.50","letter":"A-"},{"code":"EEE111Q","title":"Fundamentals of Electrical & Electronics Engineering","credit":"3.00","point":"2.00","letter":"C-"},{"code":"EEE112Q","title":"Fundamentals of Electrical & Electronics Engineering Sessional","credit":"1.00","point":"3.50","letter":"A-"},{"code":"MAT103Q","title":"Integral Calculus and Differential Equations","credit":"3.00","point":"3.00","letter":"B"},{"code":"MEE141","title":"Programming Methodology for Mechanical Engineering","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE142","title":"Programming Methodology for Mechanical Engineering Lab","credit":"1.00","point":"4.00","letter":"A+"},{"code":"MEE174","title":"Computer-aided Mechanical Engineering Drawing","credit":"1.50","point":"4.00","letter":"A+"},{"code":"MEE178","title":"Machine Shop Practice","credit":"1.00","point":"3.75","letter":"A"},{"code":"MEE188","title":"Comprehensive Viva-I","credit":"0.50","point":"3.50","letter":"A-"},{"code":"PHY109Q","title":"Physics-II","credit":"3.00","point":"2.75","letter":"B-"},{"code":"PHY112Q","title":"Physics Sessional","credit":"1.50","point":"4.00","letter":"A+"}]},{"number":3,"label":"3rd Semester Examination","held":"July, 2023","semesterCredits":"14.50","semesterGpa":"3.53","semesterLetter":"A-","cumulativeCredits":"58.00","cumulativeGpa":"3.48","cumulativeLetter":"B+","courses":[{"code":"ECO205Q","title":"Principles of Economics","credit":"3.00","point":"4.00","letter":"A+"},{"code":"EEE213Q","title":"Fundamentals of Electrical Machines","credit":"3.00","point":"0.00","letter":"F"},{"code":"EEE214Q","title":"Electrical Machines Sessional","credit":"1.00","point":"4.00","letter":"A+"},{"code":"MAT203Q","title":"Vector, Analysis, Matrices and Laplace Transform","credit":"3.00","point":"3.25","letter":"B+"},{"code":"MEE231","title":"Basic Thermodynamics","credit":"3.00","point":"3.50","letter":"A-"},{"code":"MEE232","title":"Basic Thermodynamics Sessional","credit":"1.50","point":"4.00","letter":"A+"},{"code":"MEE257","title":"Engineering Mechanics-I","credit":"3.00","point":"3.00","letter":"B"}]},{"number":4,"label":"4th Semester Examination","held":"November, 2023","semesterCredits":"19.50","semesterGpa":"3.67","semesterLetter":"A-","cumulativeCredits":"77.50","cumulativeGpa":"3.53","cumulativeLetter":"A-","courses":[{"code":"MAT205Q","title":"Complex Variables, Harmonic Analysis and Partial Differential Equations","credit":"4.00","point":"3.50","letter":"A-"},{"code":"MEE245","title":"Numerical Analysis","credit":"3.00","point":"3.75","letter":"A"},{"code":"MEE246","title":"Numerical Analysis Sessional","credit":"1.00","point":"3.75","letter":"A"},{"code":"MEE253","title":"Mechanics of Solids","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE254","title":"Mechanics of Solids Sessional","credit":"1.00","point":"4.00","letter":"A+"},{"code":"MEE255","title":"Engineering Materials (Metallic and Composites)","credit":"3.00","point":"3.75","letter":"A"},{"code":"MEE256","title":"Engineering Materials Sessional","credit":"1.00","point":"3.25","letter":"B+"},{"code":"MEE259","title":"Engineering Mechanics-II","credit":"3.00","point":"3.50","letter":"A-"},{"code":"MEE288","title":"Comprehensive Viva-II","credit":"0.50","point":"3.25","letter":"B+"}]},{"number":5,"label":"5th Semester Examination","held":"October, 2024","semesterCredits":"23.00","semesterGpa":"3.78","semesterLetter":"A","cumulativeCredits":"100.50","cumulativeGpa":"3.59","cumulativeLetter":"A-","courses":[{"code":"EEE213Q","title":"Fundamentals of Electrical Machines","credit":"3.00","point":"2.75","letter":"B-"},{"code":"MEE321","title":"Fluid Mechanics-I","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE322","title":"Fluid Mechanics-I Sessional","credit":"1.50","point":"4.00","letter":"A+"},{"code":"MEE331","title":"Conduction and Radiation Heat Transfer","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE332","title":"Heat Transfer Sessional","credit":"1.00","point":"2.75","letter":"B-"},{"code":"MEE351","title":"Mechanics of Machinery","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE352","title":"Mechanics of Machinery Sessional","credit":"1.00","point":"4.00","letter":"A+"},{"code":"MEE371","title":"Production Processes","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE372","title":"Production Processes Sessional","credit":"1.00","point":"4.00","letter":"A+"},{"code":"MEE382","title":"Industrial Tour (Selected by MEE Department)","credit":"0.50","point":"4.00","letter":"A+"},{"code":"SOC307Q","title":"Industrial Sociology","credit":"3.00","point":"4.00","letter":"A+"}]},{"number":6,"label":"6th Semester Examination","held":"April, 2025","semesterCredits":"21.50","semesterGpa":"3.97","semesterLetter":"A","cumulativeCredits":"122.00","cumulativeGpa":"3.65","cumulativeLetter":"A-","courses":[{"code":"MEE323","title":"Fluid Mechanics-II","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE324","title":"Fluid Mechanics-II Sessional","credit":"1.50","point":"3.75","letter":"A"},{"code":"MEE333","title":"Convection, Boiling, Condensation and Mass Transfer","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE334","title":"Heat and Mass Transfer Sessional","credit":"1.00","point":"4.00","letter":"A+"},{"code":"MEE353","title":"Machine Design","credit":"4.00","point":"4.00","letter":"A+"},{"code":"MEE354","title":"Machine Design Sessional","credit":"1.50","point":"4.00","letter":"A+"},{"code":"MEE367","title":"Instrumentation and Measurement","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE368","title":"Electro-mechanical System","credit":"1.00","point":"3.75","letter":"A"},{"code":"MEE375","title":"Machine Tools","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE388","title":"Comprehensive Viva-III","credit":"0.50","point":"4.00","letter":"A+"}]},{"number":7,"label":"7th Semester Examination","held":"October, 2025","semesterCredits":"18.00","semesterGpa":"3.96","semesterLetter":"A","cumulativeCredits":"140.00","cumulativeGpa":"3.69","cumulativeLetter":"A-","courses":[{"code":"MEE421","title":"Fluid Machinery","credit":"3.00","point":"3.75","letter":"A"},{"code":"MEE422","title":"Fluid Machinery Sessional","credit":"1.00","point":"4.00","letter":"A+"},{"code":"MEE431","title":"Internal Combustion Engines","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE432","title":"Heat Engine Sessional","credit":"1.00","point":"4.00","letter":"A+"},{"code":"MEE461","title":"Control Engineering","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE477","title":"Production Planning and Control","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE435","title":"Refrigeration, A.C. and Building Mechanical System","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE484","title":"Industrial Training","credit":"1.00","point":"4.00","letter":"A+"}]},{"number":8,"label":"8th Semester Examination","held":"April, 2026","semesterCredits":"22.00","semesterGpa":"4.00","semesterLetter":"A+","cumulativeCredits":"162.00","cumulativeGpa":"3.73","cumulativeLetter":"A-","courses":[{"code":"IPE405Q","title":"Industrial Management","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE433","title":"Power Plant Engineering","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE434","title":"Power Plant Engineering Sessional","credit":"1.00","point":"4.00","letter":"A+"},{"code":"MEE441","title":"Applied Engineering Mathematics","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE465","title":"Basic Mechatronics","credit":"3.00","point":"4.00","letter":"A+"},{"code":"MEE480","title":"Project/Thesis (Continuation)","credit":"6.00","point":"4.00","letter":"A+"},{"code":"MEE481","title":"Automobile Engineering","credit":"3.00","point":"4.00","letter":"A+"}]}],"final":{"credits":"162.0","cgpa":"3.73","letter":"A-"}};
 const MAIN_NAV_STYLE_VALUES=["current","framed-links","accent-pills","floating-capsule","segmented-strip","top-rail","mini-cards","soft-chips","editorial-dividers","glass-rail","ribbon-blocks"];
 const BRAND_NAME_STYLE_VALUES=["current","accent-rail","signature-underline","soft-badge","outline-label","capsule","editorial-serif","small-caps","split-rule","accent-corner","glass-label"];
@@ -1519,21 +1514,43 @@ function educationGradeLabel(item){
 
 let educationLocalView="education";
 let educationLocalNavBound=false;
-function normalizeCourseRecord(content){
-  const raw=(content.courseRecord&&typeof content.courseRecord==="object")?content.courseRecord:{};
-  const legacy=(content.gradesheet&&typeof content.gradesheet==="object")?content.gradesheet:{};
-  const g={...DEFAULT_CONTENT.courseRecord,...raw};
-  if(!raw.style&&legacy.style)g.style=legacy.style;
-  if(!raw.url&&legacy.url)g.url=legacy.url;
-  if(!raw.filename&&legacy.filename)g.filename=legacy.filename;
-  if(!raw.updated_at&&legacy.updated_at)g.updated_at=legacy.updated_at;
-  g.style=GRADESHEET_STYLE_VALUES.includes(g.style)?g.style:"academic-ledger";
-  g.url=String(g.url||"");g.filename=String(g.filename||"");g.updated_at=String(g.updated_at||"");
-  content.courseRecord=g;
-  if("gradesheet" in content)delete content.gradesheet;
-  return g;
+let gradesheetRendered=false;
+
+function courseRecordSettings(content){
+  const raw=(content?.courseRecord&&typeof content.courseRecord==="object")?content.courseRecord:{};
+  const legacy=(content?.gradesheet&&typeof content.gradesheet==="object")?content.gradesheet:{};
+  const styleCandidate=raw.style||legacy.style||"academic-ledger";
+  return {
+    style:GRADESHEET_STYLE_VALUES.includes(styleCandidate)?styleCandidate:"academic-ledger",
+    url:String(raw.url||legacy.url||""),
+    filename:String(raw.filename||legacy.filename||""),
+    updated_at:String(raw.updated_at||legacy.updated_at||"")
+  };
 }
-function applyEducationLocalView(view,{scroll=false}={}){
+
+function legacyCourseRevision(revision){
+  const c=revision?.content;
+  if(!c||typeof c!=="object")return false;
+  return !!(c.gradesheet||c.courseRecord||c.siteSettings?.sectionOrder?.includes?.("courses")||Object.prototype.hasOwnProperty.call(c.siteSettings?.sectionVisibility||{},"courses"));
+}
+
+function repairPreGradesheetStateInMemory(content){
+  if(!content||typeof content!=="object")return content;
+  const settings=courseRecordSettings(content);
+  content.builderState=(content.builderState&&typeof content.builderState==="object")?content.builderState:{};
+  if(content.builderState.coursesRepairV3!==true){
+    // Restore only the builder/site settings from the user's last backup before
+    // the gradesheet feature. Personal content remains the newest saved content.
+    content.siteSettings=structuredClone(PRE_GRADE_SITE_SETTINGS);
+    if(Array.isArray(content.builderState.revisions))content.builderState.revisions=content.builderState.revisions.filter(r=>!legacyCourseRevision(r));
+    content.builderState.coursesRepairV3=true;
+  }
+  content.courseRecord=settings;
+  if(content.gradesheet)delete content.gradesheet;
+  return content;
+}
+
+function setEducationLocalView(view,{scroll=false}={}){
   const next=view==="courses"?"courses":"education";
   educationLocalView=next;
   document.querySelectorAll("[data-education-panel]").forEach(panel=>panel.classList.toggle("hidden",panel.dataset.educationPanel!==next));
@@ -1542,32 +1559,55 @@ function applyEducationLocalView(view,{scroll=false}={}){
     button.classList.toggle("active",active);
     button.setAttribute("aria-selected",active?"true":"false");
   });
+  if(next==="courses"&&currentRenderedContent)renderGradesheetLazy(currentRenderedContent);
   if(scroll){
     const section=$("education");
-    if(section){const top=section.getBoundingClientRect().top+window.scrollY-(document.querySelector(".topbar")?.offsetHeight||0)-14;window.scrollTo({top:Math.max(0,top),behavior:"smooth"});}
+    if(section){
+      const top=section.getBoundingClientRect().top+window.scrollY-(document.querySelector(".topbar")?.offsetHeight||0)-14;
+      window.scrollTo({top:Math.max(0,top),behavior:"smooth"});
+    }
   }
 }
+
 function bindEducationLocalNav(){
-  if(educationLocalNavBound)return;educationLocalNavBound=true;
+  if(educationLocalNavBound)return;
+  educationLocalNavBound=true;
   document.addEventListener("click",event=>{
     const button=event.target.closest("[data-education-view]");
     if(!button)return;
-    event.preventDefault();applyEducationLocalView(button.dataset.educationView,{scroll:true});
+    event.preventDefault();
+    setEducationLocalView(button.dataset.educationView,{scroll:true});
   });
 }
-function renderGradesheet(d){
-  const settings=normalizeCourseRecord(d),g=ACADEMIC_GRADE_DATA;
-  const panel=$("educationCoursesPanel");if(panel)panel.dataset.gradesheetStyle=settings.style;
-  if($("gradesheetPanelTitle"))$("gradesheetPanelTitle").textContent=g.title||"Courses & Grades";
-  if($("gradesheetPanelSubtitle"))$("gradesheetPanelSubtitle").textContent=g.subtitle||"Complete undergraduate academic record";
-  if($("gradesheetDegree"))$("gradesheetDegree").textContent=g.degree||"";
-  if($("gradesheetAcademicMeta"))$("gradesheetAcademicMeta").textContent=[g.institution,g.department,g.session?`Session ${g.session}`:""] .filter(Boolean).join(" · ");
-  const final=g.final||{};
-  if($("gradesheetFinalSummary"))$("gradesheetFinalSummary").innerHTML=[["Credits",final.credits],["CGPA",final.cgpa],["Letter Grade",final.letter]].filter(([,v])=>String(v||"").trim()).map(([label,value])=>`<div class="gradesheet-final-metric"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`).join("");
-  if($("gradingScale"))$("gradingScale").innerHTML=(g.gradingScale||[]).map(item=>`<div class="grading-scale-item"><span>${esc(item.range||"")}</span><strong><b>${esc(item.letter||"")}</b><em>${esc(item.point||"")}</em></strong></div>`).join("");
-  if($("gradesheetSemesters"))$("gradesheetSemesters").innerHTML=(g.semesters||[]).map(s=>`<article class="semester-record"><header class="semester-record-head"><div><span class="semester-index">Semester ${String(s.number||"").padStart(2,"0")}</span><h3>${esc(s.label||"")}</h3>${s.held?`<div class="semester-held">Held in ${esc(s.held)}</div>`:""}</div><div class="semester-head-stats"><div class="semester-stat"><span>GPA</span><strong>${esc(s.semesterGpa||"")}</strong></div><div class="semester-stat"><span>Credits</span><strong>${esc(s.semesterCredits||"")}</strong></div><div class="semester-stat"><span>Result</span><strong>${esc(s.semesterLetter||"")}</strong></div></div></header><div class="course-table-wrap"><table class="course-table"><thead><tr><th>Course No.</th><th>Course Title</th><th>Credit</th><th>Grade Point</th><th>Letter Grade</th></tr></thead><tbody>${(s.courses||[]).map(course=>`<tr><td>${esc(course.code||"")}</td><td>${esc(course.title||"")}</td><td>${esc(course.credit||"")}</td><td>${esc(course.point||"")}</td><td><span class="course-grade-letter ${String(course.letter||"").toUpperCase()==="F"?"grade-f":""}">${esc(course.letter||"")}</span></td></tr>`).join("")}</tbody></table></div><footer class="semester-record-foot"><span>This semester: <strong>${esc(s.semesterCredits||"")} credits · GPA ${esc(s.semesterGpa||"")} · ${esc(s.semesterLetter||"")}</strong></span><span>Cumulative: <strong>${esc(s.cumulativeCredits||"")} credits · GPA ${esc(s.cumulativeGpa||"")} · ${esc(s.cumulativeLetter||"")}</strong></span></footer></article>`).join("");
-  const link=$("gradesheetLink"),note=$("gradesheetPdfNote");
-  if(link&&note){if(settings.url){link.href=settings.url;link.classList.remove("disabled");link.removeAttribute("aria-disabled");note.textContent=settings.updated_at?`Official PDF · updated ${formatDate(settings.updated_at)}`:"Official grade certificate PDF";}else{link.href="#";link.classList.add("disabled");link.setAttribute("aria-disabled","true");note.textContent="PDF can be added from the private admin page.";}}
+
+function courseGradePanelHtml(settings){
+  const g=ACADEMIC_GRADE_DATA,final=g.final||{};
+  return `<div class="education-courses-heading"><div><span class="gradesheet-kicker">Undergraduate academic record</span><h3>${esc(g.title||"Courses & Grades")}</h3><p class="muted small">${esc(g.subtitle||"Complete undergraduate academic record")}</p></div></div>
+    <div class="gradesheet-hero"><div class="gradesheet-hero-copy"><h3>${esc(g.degree||"")}</h3><p class="muted">${esc([g.institution,g.department,g.session?`Session ${g.session}`:""].filter(Boolean).join(" · "))}</p></div><div class="gradesheet-final-summary">${[["Credits",final.credits],["CGPA",final.cgpa],["Letter Grade",final.letter]].filter(([,v])=>String(v||"").trim()).map(([label,value])=>`<div class="gradesheet-final-metric"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`).join("")}</div><div class="gradesheet-pdf-action">${settings.url?`<a class="button" href="${escAttr(settings.url)}" target="_blank" rel="noopener">View Gradesheet</a>`:`<a class="button disabled" href="#" aria-disabled="true">View Gradesheet</a>`}<span class="gradesheet-pdf-note">${settings.url?(settings.updated_at?`Official PDF · updated ${esc(formatDate(settings.updated_at))}`:"Official grade certificate PDF"):"PDF can be added from the private admin page."}</span></div></div>
+    <details class="grading-scale-panel" open><summary>Grading scale</summary><div class="grading-scale-grid">${(g.gradingScale||[]).map(item=>`<div class="grading-scale-item"><span>${esc(item.range||"")}</span><strong><b>${esc(item.letter||"")}</b><em>${esc(item.point||"")}</em></strong></div>`).join("")}</div></details>
+    <div class="gradesheet-semesters">${(g.semesters||[]).map(s=>`<article class="semester-record"><header class="semester-record-head"><div><span class="semester-index">Semester ${String(s.number||"").padStart(2,"0")}</span><h3>${esc(s.label||"")}</h3>${s.held?`<div class="semester-held">Held in ${esc(s.held)}</div>`:""}</div><div class="semester-head-stats"><div class="semester-stat"><span>GPA</span><strong>${esc(s.semesterGpa||"")}</strong></div><div class="semester-stat"><span>Credits</span><strong>${esc(s.semesterCredits||"")}</strong></div><div class="semester-stat"><span>Result</span><strong>${esc(s.semesterLetter||"")}</strong></div></div></header><div class="course-table-wrap"><table class="course-table"><thead><tr><th>Course No.</th><th>Course Title</th><th>Credit</th><th>Grade Point</th><th>Letter Grade</th></tr></thead><tbody>${(s.courses||[]).map(course=>`<tr><td>${esc(course.code||"")}</td><td>${esc(course.title||"")}</td><td>${esc(course.credit||"")}</td><td>${esc(course.point||"")}</td><td><span class="course-grade-letter ${String(course.letter||"").toUpperCase()==="F"?"grade-f":""}">${esc(course.letter||"")}</span></td></tr>`).join("")}</tbody></table></div><footer class="semester-record-foot"><span>This semester: <strong>${esc(s.semesterCredits||"")} credits · GPA ${esc(s.semesterGpa||"")} · ${esc(s.semesterLetter||"")}</strong></span><span>Cumulative: <strong>${esc(s.cumulativeCredits||"")} credits · GPA ${esc(s.cumulativeGpa||"")} · ${esc(s.cumulativeLetter||"")}</strong></span></footer></article>`).join("")}</div>`;
+}
+
+function prepareGradesheetPanel(d){
+  const panel=$("educationCoursesPanel");
+  if(!panel)return;
+  const settings=courseRecordSettings(d);
+  panel.dataset.gradesheetStyle=settings.style;
+  gradesheetRendered=false;
+  const mount=$("gradesheetMount");
+  if(mount)mount.innerHTML='<div class="gradesheet-loading-placeholder"><span>Courses &amp; Grades</span><small>Select Courses to load the semester record.</small></div>';
+}
+
+function renderGradesheetLazy(d){
+  const panel=$("educationCoursesPanel"),mount=$("gradesheetMount");
+  if(!panel||!mount)return;
+  const settings=courseRecordSettings(d);
+  panel.dataset.gradesheetStyle=settings.style;
+  if(gradesheetRendered&&mount.dataset.style===settings.style&&mount.dataset.url===settings.url)return;
+  mount.innerHTML=courseGradePanelHtml(settings);
+  mount.dataset.style=settings.style;
+  mount.dataset.url=settings.url;
+  gradesheetRendered=true;
 }
 
 function sectionHasPublicContent(d,key){
@@ -1618,7 +1658,6 @@ function normalize(d){
   normalizeCustomTheme(d);
   normalizeTypography(d);
   normalizeSectionHeadings(d);
-  normalizeCourseRecord(d);
   d.sectionMedia=d.sectionMedia||{profile:[]};
   d.sectionMedia.profile=normalizeMediaDisplayList(d.sectionMedia.profile);
   d.featuredResearch=d.featuredResearch||{};d.featuredResearch.media=normalizeMediaDisplayList(d.featuredResearch.media);
@@ -1654,6 +1693,7 @@ async function loadContent(){
     const{data:row,error}=await sb.from("site_content").select("content").eq("id","main").single();
     if(!error&&row?.content&&Object.keys(row.content).length)data=merge(DEFAULT_CONTENT,row.content);
   }catch(e){console.error(e)}
+  repairPreGradesheetStateInMemory(data);
   render(normalize(data));
   releaseSiteBoot();
 }
@@ -1927,9 +1967,9 @@ function render(d){
       </div>
     </article>`).join("");
 
-  renderGradesheet(d);
+  prepareGradesheetPanel(d);
   bindEducationLocalNav();
-  applyEducationLocalView(educationLocalView);
+  setEducationLocalView(educationLocalView);
 
   $("contactMessage").textContent=d.contact?.message||"";
   const contactItems=[];

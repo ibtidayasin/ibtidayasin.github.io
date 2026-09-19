@@ -7054,7 +7054,6 @@ body:not(.admin-body) #education[data-education-preset="stacked-bands"] .edu{dis
   body:not(.admin-body) #education[data-education-preset="three-column-digest"] .edu-course-list{grid-template-columns:1fr!important}
 }
 
-
 /* =========================================================
    EDUCATION / COURSES — nested view only
    Does not participate in the global section/page system.
@@ -7082,11 +7081,28 @@ body:not(.admin-body) #education[data-education-preset="stacked-bands"] .edu{dis
 @media(max-width:760px){.gradesheet-hero{grid-template-columns:1fr;grid-template-areas:"copy" "summary" "action";padding:17px}.gradesheet-final-summary{grid-template-columns:repeat(3,1fr)}.gradesheet-pdf-action{justify-items:start}.gradesheet-pdf-note{text-align:left}.semester-record-head{display:block}.semester-head-stats{justify-content:flex-start;margin-top:12px}#educationCoursesPanel[data-gradesheet-style="academic-ledger"] .semester-record{display:block}#educationCoursesPanel[data-gradesheet-style="academic-ledger"] .semester-record-head{padding:19px 0 12px;border-right:0;border-bottom:1px solid var(--line)}#educationCoursesPanel[data-gradesheet-style="academic-ledger"] .course-table-wrap{padding-left:0}#educationCoursesPanel[data-gradesheet-style="academic-ledger"] .semester-record-foot{padding-left:0}.grading-scale-grid{grid-template-columns:1fr 1fr}.gradesheet-style-choice-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:480px){.gradesheet-final-summary{grid-template-columns:1fr}.grading-scale-grid{grid-template-columns:1fr}.grading-scale-item,.grading-scale-item:nth-child(2n),.grading-scale-item:nth-last-child(-n+2){border-right:0;border-bottom:1px solid var(--line)}.grading-scale-item:last-child{border-bottom:0}.gradesheet-style-choice-grid{grid-template-columns:1fr}}
 
+.gradesheet-loading-placeholder{padding:26px;border:1px dashed var(--line);border-radius:14px;background:var(--surface-alt);color:var(--muted);display:grid;gap:5px}.gradesheet-loading-placeholder span{font-weight:800;color:var(--text)}.gradesheet-loading-placeholder small{font-size:11px}
 
 
-/* Left/right sidebars only: visual order change; DOM structure remains untouched so sidebar presets keep working. */
+/* =========================================================
+   LEFT / RIGHT SIDEBAR CONTENT ORDER
+   Social links and View CV come before Location / Focus.
+   The Top profile header keeps its existing grid-area composition.
+   ========================================================= */
 @media(min-width:901px){
-html[data-sidebar-position="left"] body:not(.admin-body) .sidebar>.links,html[data-sidebar-position="right"] body:not(.admin-body) .sidebar>.links{order:30!important}
-html[data-sidebar-position="left"] body:not(.admin-body) .sidebar>.sidebar-cv,html[data-sidebar-position="right"] body:not(.admin-body) .sidebar>.sidebar-cv{order:31!important}
-html[data-sidebar-position="left"] body:not(.admin-body) .sidebar>.meta,html[data-sidebar-position="right"] body:not(.admin-body) .sidebar>.meta{order:40!important}
+  /* Flex layouts that hard-code an order need explicit left/right overrides. */
+  html[data-sidebar-position="left"][data-sidebar-layout="name-first"] body:not(.admin-body) .sidebar .links,
+  html[data-sidebar-position="right"][data-sidebar-layout="name-first"] body:not(.admin-body) .sidebar .links{order:5!important}
+  html[data-sidebar-position="left"][data-sidebar-layout="name-first"] body:not(.admin-body) .sidebar .sidebar-cv,
+  html[data-sidebar-position="right"][data-sidebar-layout="name-first"] body:not(.admin-body) .sidebar .sidebar-cv{order:6!important}
+  html[data-sidebar-position="left"][data-sidebar-layout="name-first"] body:not(.admin-body) .sidebar .meta,
+  html[data-sidebar-position="right"][data-sidebar-layout="name-first"] body:not(.admin-body) .sidebar .meta{order:7!important}
+
+  html[data-sidebar-position="left"][data-sidebar-layout="research-first"] body:not(.admin-body) .sidebar .links,
+  html[data-sidebar-position="right"][data-sidebar-layout="research-first"] body:not(.admin-body) .sidebar .links{order:6!important}
+  html[data-sidebar-position="left"][data-sidebar-layout="research-first"] body:not(.admin-body) .sidebar .sidebar-cv,
+  html[data-sidebar-position="right"][data-sidebar-layout="research-first"] body:not(.admin-body) .sidebar .sidebar-cv{order:7!important}
+  html[data-sidebar-position="left"][data-sidebar-layout="research-first"] body:not(.admin-body) .sidebar .meta,
+  html[data-sidebar-position="right"][data-sidebar-layout="research-first"] body:not(.admin-body) .sidebar .meta{order:8!important}
 }
+

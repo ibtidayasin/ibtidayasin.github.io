@@ -24,7 +24,6 @@ const DEFAULT_CONTENT={
     {"category":"Atomistic Analysis","items":["OVITO","PTM","DXA","RDF"],"media":[]}
   ],
   "education":[{"period":"B.Sc.","degree":"Mechanical Engineering","institution":"Shahjalal University of Science and Technology (SUST)","description":"Mechanical engineering education with growing focus on computational materials and atomistic simulation.","media":[]}],
-  "courseRecord": {"style":"academic-ledger","url":"","filename":"","updated_at":""},
   "contact":{"headline":"Interested in computational materials and nanoscale mechanics?","message":"I am open to research discussions, graduate opportunities, and collaborations related to computational materials science and atomistic simulation.","email":"","phone":"","location":"Bangladesh","media":[]},
   "links":{"linkedin":"","github":"https://github.com/ibtidayasin","orcid":"","scholar":"","researchgate":"","scopus":"","wos":"","website":""},
   "cv":{"url":"","filename":"","updated_at":""},
@@ -427,6 +426,7 @@ const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
 const EDUCATION_PRESET_VALUES=["current","scholar-highlight","compact-timeline","split-panel","metric-grid","academic-profile","certificate-showcase","banner-spotlight","transcript-ledger","three-column-digest","minimal-chronicle"];
 const GRADESHEET_STYLE_VALUES=["official-transcript","semester-cards","academic-ledger","performance-grid","minimal-scholar"];
+const PRE_GRADE_SITE_SETTINGS={"layout":{"shadow":"theme","fontPair":"helvetica","maxWidth":1180,"layoutGap":58,"pagePager":true,"cardRadius":10,"cardStyles":{"thesis":"classic","publications":"classic","projects":"classic","activities":"classic","skills":"outline","education":"classic","contact":"classic"},"cardDesigns":{"thesis":"spotlight","publications":"standard","projects":"standard","activities":"standard","skills":"banded","education":"standard","contact":"standard"},"portraitFit":"cover","projectFlow":"grid","portraitSize":215,"sidebarScope":"home-cv","sidebarStyle":"current","sidebarWidth":255,"portraitShape":"slight","sidebarDesign":"current","sidebarLayout":"classic","skillsColumns":3,"stickySidebar":true,"navigationMode":"sections","pageTransition":"fade","projectColumns":1,"sectionSpacing":42,"activityColumns":1,"educationPreset":"split-panel","sectionCoverGap":12,"sidebarPosition":"top","sidebarSections":{"research":false,"thesis":false,"publications":false,"projects":false,"activities":false,"skills":false,"education":false,"contact":false,"cv":true},"portraitPosition":"center","sectionCoverFade":"medium","sectionCoverSide":"right","sectionCoverZoom":100,"sectionCoverScope":"research","sectionCoverStyle":"framed","sectionCoverHeight":300,"sectionCoverDetails":true,"sectionCoverEnabled":true,"sectionCoverSocials":true,"sectionCoverPhotoFit":"crop","sectionCoverSections":{"research":true,"thesis":true,"publications":false,"projects":false,"activities":false,"skills":false,"education":false,"contact":false,"cv":false},"sectionCoverTopBlend":false},"experience":{"lightbox":true,"activeNav":true,"backToTop":true,"animations":"subtle","copyButtons":true,"socialStyle":"labels","mainNavStyle":"segmented-strip","smoothScroll":true,"brandNameSize":23,"brandNameColor":"","brandNameStyle":"current","activityTabStyle":"segmented","hoverInteractions":"subtle","navHighlightStyle":"underline"},"sectionOrder":["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],"sectionVisibility":{"about":true,"research":true,"thesis":true,"publications":true,"projects":true,"activities":true,"skills":true,"education":true,"contact":true,"cv":true},"thesisDefaultVisibleApplied":true,"experienceDefaultsMigratedV1":true};
 const MAIN_NAV_STYLE_VALUES=["current","framed-links","accent-pills","floating-capsule","segmented-strip","top-rail","mini-cards","soft-chips","editorial-dividers","glass-rail","ribbon-blocks"];
 const BRAND_NAME_STYLE_VALUES=["current","accent-rail","signature-underline","soft-badge","outline-label","capsule","editorial-serif","small-caps","split-rule","accent-corner","glass-label"];
 const SIDEBAR_DESIGN_VALUES=["current","profile-card","editorial-sidebar","accent-rail","soft-tint-panel","floating-profile","portrait-header","centered-academic","split-portrait","framed-portrait","minimal-identity","academic-id","researcher-badge","top-accent-banner","overlap-portrait","asymmetric-editorial","compact-sticky","sectioned-sidebar","glass-academic","faculty-premium"];
@@ -1380,7 +1380,6 @@ function cleanRevisionSnapshot(content){
   const snap=deepCloneSafe(content);
   if(!snap.builderState)snap.builderState={};
   delete snap.builderState.revisions;
-  if(snap.gradesheet)delete snap.gradesheet;
   return snap;
 }
 function ensureRevisionArray(){
@@ -1969,12 +1968,13 @@ document.addEventListener("change",e=>{
   setStatus("Education card preset updated. Save all changes to publish it.");
 });
 
-document.addEventListener("change",event=>{
-  const input=event.target.closest?.('input[name="gradesheetStyle"]');
+document.addEventListener("change",e=>{
+  const input=e.target.closest?.('input[name="gradesheetStyle"]');
   if(!input||!GRADESHEET_STYLE_VALUES.includes(input.value))return;
-  normalizeCourseRecord(currentContent);currentContent.courseRecord.style=input.value;
+  setCourseRecordSettings(currentContent,{style:input.value});
   document.querySelectorAll("[data-gradesheet-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.gradesheetStyleCard===input.value));
-  checkpointAfterEditorChange();scheduleAdminPreview(true);
+  scheduleAdminPreview(true);
+  setStatus("Courses & grades style updated. Save all changes to publish it.");
 });
 
 document.addEventListener("change",e=>{
@@ -2164,44 +2164,62 @@ function normalizeSkillGroupRecord(item){
 }
 
 
-function normalizeCourseRecord(content){
-  const raw=(content.courseRecord&&typeof content.courseRecord==="object")?content.courseRecord:{};
-  const legacy=(content.gradesheet&&typeof content.gradesheet==="object")?content.gradesheet:{};
-  const g={...DEFAULT_CONTENT.courseRecord,...raw};
-  if(!raw.style&&legacy.style)g.style=legacy.style;
-  if(!raw.url&&legacy.url)g.url=legacy.url;
-  if(!raw.filename&&legacy.filename)g.filename=legacy.filename;
-  if(!raw.updated_at&&legacy.updated_at)g.updated_at=legacy.updated_at;
-  g.style=GRADESHEET_STYLE_VALUES.includes(g.style)?g.style:"academic-ledger";
-  g.url=String(g.url||"");g.filename=String(g.filename||"");g.updated_at=String(g.updated_at||"");
-  content.courseRecord=g;
-  if("gradesheet" in content)delete content.gradesheet;
-  return g;
+function cleanCourseRecordSettings(content){
+  const raw=(content?.courseRecord&&typeof content.courseRecord==="object")?content.courseRecord:{};
+  const legacy=(content?.gradesheet&&typeof content.gradesheet==="object")?content.gradesheet:{};
+  const candidate=raw.style||legacy.style||"academic-ledger";
+  return {
+    style:GRADESHEET_STYLE_VALUES.includes(candidate)?candidate:"academic-ledger",
+    url:String(raw.url||legacy.url||""),
+    filename:String(raw.filename||legacy.filename||""),
+    updated_at:String(raw.updated_at||legacy.updated_at||"")
+  };
 }
-function stripLegacyGradesheetPayload(content){
+function setCourseRecordSettings(content,patch={}){
+  const next={...cleanCourseRecordSettings(content),...patch};
+  next.style=GRADESHEET_STYLE_VALUES.includes(next.style)?next.style:"academic-ledger";
+  next.url=String(next.url||"");next.filename=String(next.filename||"");next.updated_at=String(next.updated_at||"");
+  content.courseRecord=next;
+  if("gradesheet" in content)delete content.gradesheet;
+  return next;
+}
+function legacyCourseRevision(revision){
+  const c=revision?.content;
+  if(!c||typeof c!=="object")return false;
+  return !!(c.gradesheet||c.courseRecord||c.siteSettings?.sectionOrder?.includes?.("courses")||Object.prototype.hasOwnProperty.call(c.siteSettings?.sectionVisibility||{},"courses"));
+}
+function repairPreGradesheetState(content){
   if(!content||typeof content!=="object")return false;
   let changed=false;
-  if(content.gradesheet&&typeof content.gradesheet==="object"){
-    const legacy=content.gradesheet;
-    const current=(content.courseRecord&&typeof content.courseRecord==="object")?content.courseRecord:{};
-    content.courseRecord={...DEFAULT_CONTENT.courseRecord,...current,
-      style:GRADESHEET_STYLE_VALUES.includes(current.style)?current.style:(GRADESHEET_STYLE_VALUES.includes(legacy.style)?legacy.style:DEFAULT_CONTENT.courseRecord.style),
-      url:String(current.url||legacy.url||""),filename:String(current.filename||legacy.filename||""),updated_at:String(current.updated_at||legacy.updated_at||"")};
-    delete content.gradesheet;changed=true;
+  const clean=cleanCourseRecordSettings(content);
+  content.builderState=(content.builderState&&typeof content.builderState==="object")?content.builderState:{};
+  if(content.builderState.coursesRepairV3!==true){
+    content.siteSettings=structuredClone(PRE_GRADE_SITE_SETTINGS);
+    if(Array.isArray(content.builderState.revisions)){
+      const before=content.builderState.revisions.length;
+      content.builderState.revisions=content.builderState.revisions.filter(r=>!legacyCourseRevision(r));
+      if(content.builderState.revisions.length!==before)changed=true;
+    }
+    content.builderState.coursesRepairV3=true;
+    changed=true;
   }
-  const revisions=content.builderState?.revisions;
-  if(Array.isArray(revisions)){
-    revisions.forEach(r=>{if(r?.content?.gradesheet){delete r.content.gradesheet;changed=true;} if(r?.content?.courseRecord&&typeof r.content.courseRecord==="object"){const x=r.content.courseRecord;r.content.courseRecord={style:GRADESHEET_STYLE_VALUES.includes(x.style)?x.style:DEFAULT_CONTENT.courseRecord.style,url:String(x.url||""),filename:String(x.filename||""),updated_at:String(x.updated_at||"")};}});
+  if(content.gradesheet&&typeof content.gradesheet==="object")changed=true;
+  if(content.courseRecord&&typeof content.courseRecord==="object"){
+    const keys=Object.keys(content.courseRecord);
+    if(keys.some(k=>!["style","url","filename","updated_at"].includes(k)))changed=true;
   }
+  content.courseRecord=clean;
+  if("gradesheet" in content)delete content.gradesheet;
   return changed;
 }
 function renderGradesheetAdminState(){
-  const g=normalizeCourseRecord(currentContent);
+  const g=cleanCourseRecordSettings(currentContent);
   const selected=document.querySelector(`input[name="gradesheetStyle"][value="${g.style}"]`);if(selected)selected.checked=true;
   document.querySelectorAll("[data-gradesheet-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.gradesheetStyleCard===g.style));
   if($("currentGradesheetName"))$("currentGradesheetName").textContent=g.filename||(g.url?"External gradesheet link":"No gradesheet PDF uploaded yet.");
   if($("currentGradesheetDate"))$("currentGradesheetDate").textContent=g.updated_at?`Updated ${new Date(g.updated_at).toLocaleString()}`:"";
-  if($("currentGradesheetLink")&&$("removeGradesheetBtn")){if(g.url){$("currentGradesheetLink").href=g.url;$("currentGradesheetLink").classList.remove("hidden");$("removeGradesheetBtn").classList.remove("hidden");}else{$("currentGradesheetLink").classList.add("hidden");$("removeGradesheetBtn").classList.add("hidden");}}
+  const link=$("currentGradesheetLink"),remove=$("removeGradesheetBtn");
+  if(link&&remove){if(g.url){link.href=g.url;link.classList.remove("hidden");remove.classList.remove("hidden");}else{link.classList.add("hidden");remove.classList.add("hidden");}}
 }
 
 function normalizeMedia(content){
@@ -2212,7 +2230,6 @@ function normalizeMedia(content){
   normalizeCustomTheme(content);
   normalizeTypography(content);
   normalizeSectionHeadings(content);
-  normalizeCourseRecord(content);
   content.sectionMedia=content.sectionMedia||{};
   content.sectionMedia.profile=normalizeMediaDisplayList(content.sectionMedia.profile);
   content.publications=(content.publications||[]).map(normalizePublicationRecord);
@@ -2228,8 +2245,8 @@ function normalizeMedia(content){
 async function loadContent(){
   const{data:row,error}=await sb.from("site_content").select("content").eq("id","main").single();
   const rawContent=!error&&row?.content&&Object.keys(row.content).length?row.content:{};
-  const legacyGradesheetCleaned=stripLegacyGradesheetPayload(rawContent);
-  const neededMigration=builderSettingsNeedMigration(rawContent)||legacyGradesheetCleaned;
+  const gradePayloadCleaned=repairPreGradesheetState(rawContent);
+  const neededMigration=builderSettingsNeedMigration(rawContent)||gradePayloadCleaned;
 
   currentContent=Object.keys(rawContent).length?merge(DEFAULT_CONTENT,rawContent):structuredClone(DEFAULT_CONTENT);
   normalizeMedia(currentContent);
@@ -2312,6 +2329,7 @@ function fillForms(){
   $("fWos").value=currentContent.links?.wos||"";
   $("fWebsite").value=currentContent.links?.website||"";
   $("fCvExternal").value="";
+  if($("gradesheetFile"))$("gradesheetFile").value="";
   if($("fGradesheetExternal"))$("fGradesheetExternal").value="";
   if(currentContent.photo_url){
     $("photoPreview").src=currentContent.photo_url;
@@ -2322,6 +2340,7 @@ function fillForms(){
   }
   renderAllEditors();
   renderCvState();
+  if($("fGradesheetExternal"))$("fGradesheetExternal").value="";
   renderGradesheetAdminState();
   fillThemeChooser();
   fillTypographyControls();
@@ -3259,9 +3278,6 @@ function syncAllForms(){
     location:$("fContactLocation").value.trim(),
     media:contactMedia
   };
-  normalizeCourseRecord(currentContent);
-  const gradesheetStyle=document.querySelector('input[name="gradesheetStyle"]:checked')?.value;
-  if(GRADESHEET_STYLE_VALUES.includes(gradesheetStyle))currentContent.courseRecord.style=gradesheetStyle;
   currentContent.links={
     linkedin:$("fLinkedIn").value.trim(),
     github:$("fGitHub").value.trim(),
@@ -3968,7 +3984,7 @@ async function persistContent(successMessage){
   // Protect all design/admin preferences from being accidentally dropped by
   // an unrelated feature patch or partial editor operation.
   restoreMissingBuilderSettings(currentContent,savedBuilderSettingsSnapshot);
-  stripLegacyGradesheetPayload(currentContent);
+  repairPreGradesheetState(currentContent);
   normalizeMedia(currentContent);
   ensureBuilderState(currentContent);
 
@@ -3997,8 +4013,9 @@ $("removeGradesheetBtn")?.addEventListener("click",async()=>{
   if(!confirm("Remove the current gradesheet PDF from your public website?"))return;
   $("saveStatus").textContent="Removing gradesheet...";
   try{await sb.storage.from("cv-files").remove(["Ibtida_Yasin_Gradesheet.pdf"])}catch{}
-  normalizeCourseRecord(currentContent);currentContent.courseRecord={...currentContent.courseRecord,url:"",filename:"",updated_at:""};
-  const ok=await persistContent("Gradesheet removed.");if(ok)renderGradesheetAdminState();
+  setCourseRecordSettings(currentContent,{url:"",filename:"",updated_at:""});
+  const ok=await persistContent("Gradesheet removed.");
+  if(ok)renderGradesheetAdminState();
 });
 
 $("removeCvBtn").addEventListener("click",async()=>{
@@ -4041,7 +4058,6 @@ async function saveAll(){
     currentContent.cv={url:external,filename:"External CV link",updated_at:new Date().toISOString()};
   }
 
-  normalizeCourseRecord(currentContent);
   const gradesheetExternal=$("fGradesheetExternal")?.value.trim()||"";
   const gradesheetFile=$("gradesheetFile")?.files?.[0];
   if(gradesheetFile){
@@ -4051,10 +4067,10 @@ async function saveAll(){
     const{error}=await sb.storage.from("cv-files").upload(path,gradesheetFile,{upsert:true,contentType:"application/pdf",cacheControl:"3600"});
     if(error)return setStatus("Gradesheet upload failed: "+error.message);
     const{data}=sb.storage.from("cv-files").getPublicUrl(path);
-    currentContent.courseRecord={...currentContent.courseRecord,url:data.publicUrl+"?v="+Date.now(),filename:gradesheetFile.name,updated_at:new Date().toISOString()};
+    setCourseRecordSettings(currentContent,{url:data.publicUrl+"?v="+Date.now(),filename:gradesheetFile.name,updated_at:new Date().toISOString()});
   }else if(gradesheetExternal){
     if(!/^https?:\/\//i.test(gradesheetExternal))return setStatus("External gradesheet URL must start with http:// or https://");
-    currentContent.courseRecord={...currentContent.courseRecord,url:gradesheetExternal,filename:"External gradesheet link",updated_at:new Date().toISOString()};
+    setCourseRecordSettings(currentContent,{url:gradesheetExternal,filename:"External gradesheet link",updated_at:new Date().toISOString()});
   }
 
   const ok=await persistContent("Saved. Your public website is updated.");
