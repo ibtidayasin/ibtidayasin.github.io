@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260919-courses-mobile-v4" rel="stylesheet"/>
+<link href="styles.css?v=20260920-courses-reload-v5" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -1872,7 +1872,7 @@
       }
       if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
 
-      await loadScript("admin.js?v=20260919-courses-mobile-v4");
+      await loadScript("admin.js?v=20260920-courses-reload-v5");
       if(button)button.disabled=false;
       if(status&&status.textContent===readyMessage)status.textContent="";
     }catch(err){

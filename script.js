@@ -2023,6 +2023,10 @@ function render(d){
     $("cvNote").textContent=d.cv.updated_at?`Current CV · updated ${formatDate(d.cv.updated_at)}`:"Current academic CV.";
   }
   applySiteSettings(d);
+  // On a reload, the remembered Courses sub-view is restored before
+  // applySiteSettings() initializes currentRenderedContent. Render the
+  // lazy semester record now that the content context is available.
+  if(educationLocalView==="courses")renderGradesheetLazy(d);
 }
 
 function mediaHtml(media){
