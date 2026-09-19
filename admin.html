@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260907-admin-login-stable-v4" rel="stylesheet"/>
+<link href="styles.css?v=20260919-education-presets-v1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -224,6 +224,46 @@
 <div class="field"><label>Section name</label><input id="fSectionEducationTitle"/></div>
 <div class="field"><label>Section subtitle</label><input id="fSectionEducationSubtitle"/></div>
 </div>
+
+<details class="admin-card education-preset-fold" open>
+<summary><span><strong>Education card preset</strong><small>Choose a specialized composition for the public Education cards. “Current” keeps the existing general Education Card Finish/Design settings.</small></span><span class="education-preset-chevron" aria-hidden="true"></span></summary>
+<div class="education-preset-fold-body">
+<div class="education-preset-choice-grid" role="radiogroup" aria-label="Education card preset">
+<label class="education-preset-choice" data-education-preset-card="current">
+<input name="educationPreset" type="radio" value="current"/>
+<span class="education-preset-preview edu-preview-current"><i class="ep-degree"></i><i class="ep-school"></i><i class="ep-date"></i><i class="ep-score"></i><i class="ep-copy"></i><i class="ep-chips"></i></span>
+<span class="education-preset-name">Current</span><span class="education-preset-desc">Keeps your existing Education card finish and design.</span>
+</label>
+<label class="education-preset-choice" data-education-preset-card="scholar-highlight">
+<input name="educationPreset" type="radio" value="scholar-highlight"/>
+<span class="education-preset-preview edu-preview-scholar"><i class="ep-degree"></i><i class="ep-school"></i><i class="ep-date"></i><i class="ep-score"></i><i class="ep-copy"></i><i class="ep-chips"></i></span>
+<span class="education-preset-name">1. Scholar Highlight</span><span class="education-preset-desc">Achievement-forward with a prominent academic-performance panel.</span>
+</label>
+<label class="education-preset-choice" data-education-preset-card="compact-timeline">
+<input name="educationPreset" type="radio" value="compact-timeline"/>
+<span class="education-preset-preview edu-preview-timeline"><i class="ep-degree"></i><i class="ep-school"></i><i class="ep-date"></i><i class="ep-score"></i><i class="ep-copy"></i><i class="ep-chips"></i></span>
+<span class="education-preset-name">2. Compact Timeline</span><span class="education-preset-desc">Lean academic timeline with a strong left rail and compact metrics.</span>
+</label>
+<label class="education-preset-choice" data-education-preset-card="split-panel">
+<input name="educationPreset" type="radio" value="split-panel"/>
+<span class="education-preset-preview edu-preview-split"><i class="ep-degree"></i><i class="ep-school"></i><i class="ep-date"></i><i class="ep-score"></i><i class="ep-copy"></i><i class="ep-chips"></i></span>
+<span class="education-preset-name">3. Split Panel</span><span class="education-preset-desc">Degree and institution on one side; performance and details on the other.</span>
+</label>
+<label class="education-preset-choice" data-education-preset-card="metric-grid">
+<input name="educationPreset" type="radio" value="metric-grid"/>
+<span class="education-preset-preview edu-preview-metric"><i class="ep-degree"></i><i class="ep-school"></i><i class="ep-date"></i><i class="ep-score"></i><i class="ep-copy"></i><i class="ep-chips"></i></span>
+<span class="education-preset-name">4. Metric Grid</span><span class="education-preset-desc">Data-first composition with performance and narrative balanced side by side.</span>
+</label>
+<label class="education-preset-choice" data-education-preset-card="academic-profile">
+<input name="educationPreset" type="radio" value="academic-profile"/>
+<span class="education-preset-preview edu-preview-profile"><i class="ep-degree"></i><i class="ep-school"></i><i class="ep-date"></i><i class="ep-score"></i><i class="ep-copy"></i><i class="ep-chips"></i></span>
+<span class="education-preset-name">5. Academic Profile</span><span class="education-preset-desc">Editorial, scholarly treatment with restrained metrics and elegant rules.</span>
+</label>
+</div>
+<p class="helper">These presets follow the active website theme. The specialized presets override the general Education Card Design composition while preserving your content and Card Finish palette.</p>
+</div>
+</details>
+
 <div class="collection-admin-toolbar">
   <span class="helper">Education records stay compact until you expand the one you want to edit.</span>
   <div class="collection-admin-toolbar-actions">
@@ -1784,7 +1824,7 @@
       }
       if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
 
-      await loadScript("admin.js?v=20260907-login-tdz-fix-v5");
+      await loadScript("admin.js?v=20260919-education-presets-v1");
       if(button)button.disabled=false;
       if(status&&status.textContent===readyMessage)status.textContent="";
     }catch(err){

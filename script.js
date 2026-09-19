@@ -182,6 +182,7 @@ const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
+const EDUCATION_PRESET_VALUES=["current","scholar-highlight","compact-timeline","split-panel","metric-grid","academic-profile"];
 const MAIN_NAV_STYLE_VALUES=["current","framed-links","accent-pills","floating-capsule","segmented-strip","top-rail","mini-cards","soft-chips","editorial-dividers","glass-rail","ribbon-blocks"];
 const BRAND_NAME_STYLE_VALUES=["current","accent-rail","signature-underline","soft-badge","outline-label","capsule","editorial-serif","small-caps","split-rule","accent-corner","glass-label"];
 const SIDEBAR_DESIGN_VALUES=["current","profile-card","editorial-sidebar","accent-rail","soft-tint-panel","floating-profile","portrait-header","centered-academic","split-portrait","framed-portrait","minimal-identity","academic-id","researcher-badge","top-accent-banner","overlap-portrait","asymmetric-editorial","compact-sticky","sectioned-sidebar","glass-academic","faculty-premium"];
@@ -236,6 +237,7 @@ const DEFAULT_SITE_SETTINGS={
     projectFlow:"grid",
     activityColumns:2,
     skillsColumns:3,
+    educationPreset:"current",
     fontPair:"classic",
     shadow:"theme",
     stickySidebar:true,
@@ -363,6 +365,7 @@ function normalizeSiteSettings(content){
       projectFlow:["grid","masonry"].includes(l.projectFlow)?l.projectFlow:DEFAULT_SITE_SETTINGS.layout.projectFlow,
       activityColumns:[1,2,3].includes(Number(l.activityColumns))?Number(l.activityColumns):DEFAULT_SITE_SETTINGS.layout.activityColumns,
       skillsColumns:[1,2,3].includes(Number(l.skillsColumns))?Number(l.skillsColumns):DEFAULT_SITE_SETTINGS.layout.skillsColumns,
+      educationPreset:EDUCATION_PRESET_VALUES.includes(l.educationPreset)?l.educationPreset:DEFAULT_SITE_SETTINGS.layout.educationPreset,
       fontPair:Object.prototype.hasOwnProperty.call(SITE_FONT_PAIRS,l.fontPair)?l.fontPair:DEFAULT_SITE_SETTINGS.layout.fontPair,
       shadow:["theme","none","subtle","medium"].includes(l.shadow)?l.shadow:DEFAULT_SITE_SETTINGS.layout.shadow,
       stickySidebar:Object.prototype.hasOwnProperty.call(l,"stickySidebar")?l.stickySidebar!==false:DEFAULT_SITE_SETTINGS.layout.stickySidebar,
@@ -1019,6 +1022,8 @@ function applyLayoutSettings(d){
   root.style.setProperty("--site-activity-columns",String(l.activityColumns));
   root.dataset.activityColumns=String(l.activityColumns);
   root.style.setProperty("--site-skills-columns",String(l.skillsColumns));
+  const educationSection=document.querySelector('[data-section-key="education"]');
+  if(educationSection)educationSection.dataset.educationPreset=EDUCATION_PRESET_VALUES.includes(l.educationPreset)?l.educationPreset:"current";
   root.style.setProperty("--site-shadow",siteShadowValue(l.shadow));
   root.style.setProperty("--site-font-body",pair.body);
   root.style.setProperty("--site-font-heading",pair.heading);
