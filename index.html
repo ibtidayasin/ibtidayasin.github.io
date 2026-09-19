@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Ibtida Yasin — Mechanical Engineering and Computational Materials">
   <title>Ibtida Yasin | Academic Profile</title>
-  <link id="siteStylesheet" rel="stylesheet" href="styles.css?v=20260919-education-courses-nested-v1">
+  <link id="siteStylesheet" rel="stylesheet" href="styles.css?v=20260919-courses-minimal-v1">
   <script>
     (function(){
       var b=new URLSearchParams(location.search).get('previewBust');
-      if(b) document.getElementById('siteStylesheet').href='styles.css?v=20260919-education-courses-nested-v1'+encodeURIComponent(b);
+      if(b) document.getElementById('siteStylesheet').href='styles.css?v=20260919-courses-minimal-v1'+encodeURIComponent(b);
     })();
   </script>
 
@@ -140,37 +140,15 @@
     <section class="section" id="education" data-section-key="education">
       <h2 class="section-title" id="educationSectionTitle">Education</h2>
       <p class="section-subtitle" id="educationSectionSubtitle">Academic background</p>
-
       <nav class="education-subnav" aria-label="Education navigation">
-        <button class="education-subnav-btn active" id="educationOverviewTab" type="button" data-education-view="education" aria-selected="true">Education</button>
-        <button class="education-subnav-btn" id="educationCoursesTab" type="button" data-education-view="courses" aria-selected="false">Courses</button>
+        <button class="education-subnav-btn active" type="button" data-education-view="education" aria-selected="true">Education</button>
+        <button class="education-subnav-btn" type="button" data-education-view="courses" aria-selected="false">Courses</button>
       </nav>
-      <div id="educationOverviewPanel" data-education-panel="education">
-        <div id="educationList"></div>
-      </div>
+      <div id="educationOverviewPanel" data-education-panel="education"><div id="educationList"></div></div>
       <div id="educationCoursesPanel" class="education-courses-panel hidden" data-education-panel="courses" data-gradesheet-style="academic-ledger">
-        <div class="education-courses-heading">
-          <div>
-            <span class="gradesheet-kicker">Undergraduate academic record</span>
-            <h3 id="gradesheetPanelTitle">Courses &amp; Grades</h3>
-            <p class="muted small" id="gradesheetPanelSubtitle">Complete semester-by-semester course and grade record</p>
-          </div>
-        </div>
-        <div class="gradesheet-hero" id="gradesheetHero">
-          <div class="gradesheet-hero-copy">
-            <h3 id="gradesheetDegree"></h3>
-            <p id="gradesheetAcademicMeta" class="muted"></p>
-          </div>
-          <div class="gradesheet-final-summary" id="gradesheetFinalSummary"></div>
-          <div class="gradesheet-pdf-action">
-            <a class="button disabled" id="gradesheetLink" href="#" aria-disabled="true" target="_blank" rel="noopener">View Gradesheet</a>
-            <span class="gradesheet-pdf-note" id="gradesheetPdfNote">PDF can be added from the private admin page.</span>
-          </div>
-        </div>
-        <details class="grading-scale-panel" open>
-          <summary>Grading scale</summary>
-          <div class="grading-scale-grid" id="gradingScale"></div>
-        </details>
+        <div class="education-courses-heading"><div><span class="gradesheet-kicker">Undergraduate academic record</span><h3 id="gradesheetPanelTitle">Courses &amp; Grades</h3><p class="muted small" id="gradesheetPanelSubtitle"></p></div></div>
+        <div class="gradesheet-hero"><div class="gradesheet-hero-copy"><h3 id="gradesheetDegree"></h3><p id="gradesheetAcademicMeta" class="muted"></p></div><div class="gradesheet-final-summary" id="gradesheetFinalSummary"></div><div class="gradesheet-pdf-action"><a class="button disabled" id="gradesheetLink" href="#" aria-disabled="true" target="_blank" rel="noopener">View Gradesheet</a><span class="gradesheet-pdf-note" id="gradesheetPdfNote">PDF can be added from the private admin page.</span></div></div>
+        <details class="grading-scale-panel" open><summary>Grading scale</summary><div class="grading-scale-grid" id="gradingScale"></div></details>
         <div class="gradesheet-semesters" id="gradesheetSemesters"></div>
       </div>
     </section>
@@ -203,7 +181,7 @@
   (function(){
     var b=new URLSearchParams(location.search).get('previewBust');
     var s=document.createElement('script');
-    s.src='script.js?v=20260919-education-courses-nested-v1'+(b?'&previewBust='+encodeURIComponent(b):'');
+    s.src='script.js?v=20260919-courses-minimal-v1'+(b?'&previewBust='+encodeURIComponent(b):'');
     s.async=false;
     document.body.appendChild(s);
   })();
