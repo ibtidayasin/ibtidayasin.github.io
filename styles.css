@@ -7106,3 +7106,72 @@ body:not(.admin-body) #education[data-education-preset="stacked-bands"] .edu{dis
   html[data-sidebar-position="right"][data-sidebar-layout="research-first"] body:not(.admin-body) .sidebar .meta{order:8!important}
 }
 
+
+
+/* =========================================================
+   COURSES & GRADES — RELOAD + MOBILE REFINEMENTS
+   ========================================================= */
+/* All letter grades use the same visual treatment, including F. */
+.course-grade-letter.grade-f{background:var(--accent-soft)!important;color:var(--accent)!important}
+
+/* On phones, convert each semester table row into a compact academic record card.
+   This keeps every field visible without horizontal overflow. */
+@media(max-width:760px){
+  #educationCoursesPanel,
+  #educationCoursesPanel .gradesheet-semesters,
+  #educationCoursesPanel .semester-record,
+  #educationCoursesPanel .course-table-wrap{min-width:0!important;max-width:100%!important;width:100%!important}
+
+  #educationCoursesPanel .semester-record{overflow:hidden!important}
+  #educationCoursesPanel .semester-record-head{padding:16px!important}
+  #educationCoursesPanel .semester-head-stats{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important;width:100%!important}
+  #educationCoursesPanel .semester-stat{min-width:0!important;padding:7px 6px!important}
+
+  #educationCoursesPanel .course-table-wrap{overflow:visible!important;padding:0!important}
+  #educationCoursesPanel .course-table{display:block!important;width:100%!important;min-width:0!important;border-collapse:separate!important;font-size:12px!important}
+  #educationCoursesPanel .course-table thead{display:none!important}
+  #educationCoursesPanel .course-table tbody{display:grid!important;gap:0!important;width:100%!important}
+  #educationCoursesPanel .course-table tr{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:5px 10px!important;width:100%!important;min-width:0!important;padding:11px 14px!important;border-bottom:1px solid var(--line)!important;background:var(--surface)!important}
+  #educationCoursesPanel .course-table tr:last-child{border-bottom:0!important}
+  #educationCoursesPanel .course-table td{display:block!important;min-width:0!important;width:auto!important;padding:0!important;border:0!important;background:transparent!important;text-align:left!important;white-space:normal!important;overflow-wrap:anywhere!important}
+  #educationCoursesPanel .course-table td:nth-child(1){grid-column:1/-1!important;grid-row:1!important;font-size:10px!important;line-height:1.35!important;font-weight:850!important;letter-spacing:.045em!important;color:var(--accent)!important}
+  #educationCoursesPanel .course-table td:nth-child(2){grid-column:1/-1!important;grid-row:2!important;min-width:0!important;padding-bottom:3px!important;font-size:12px!important;line-height:1.45!important;font-weight:700!important;color:var(--text)!important}
+  #educationCoursesPanel .course-table td:nth-child(3),
+  #educationCoursesPanel .course-table td:nth-child(4),
+  #educationCoursesPanel .course-table td:nth-child(5){grid-row:3!important;display:grid!important;gap:2px!important;align-content:start!important;padding-top:6px!important;border-top:1px solid color-mix(in srgb,var(--line) 72%,transparent)!important;text-align:left!important}
+  #educationCoursesPanel .course-table td:nth-child(3){grid-column:1!important}
+  #educationCoursesPanel .course-table td:nth-child(4){grid-column:2!important}
+  #educationCoursesPanel .course-table td:nth-child(5){grid-column:3!important}
+  #educationCoursesPanel .course-table td:nth-child(3)::before,
+  #educationCoursesPanel .course-table td:nth-child(4)::before,
+  #educationCoursesPanel .course-table td:nth-child(5)::before{font-size:8px!important;line-height:1.2!important;letter-spacing:.06em!important;text-transform:uppercase!important;color:var(--muted)!important;font-weight:850!important}
+  #educationCoursesPanel .course-table td:nth-child(3)::before{content:"Credit"}
+  #educationCoursesPanel .course-table td:nth-child(4)::before{content:"Grade point"}
+  #educationCoursesPanel .course-table td:nth-child(5)::before{content:"Letter grade"}
+  #educationCoursesPanel .course-grade-letter{display:inline!important;min-width:0!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;color:var(--text)!important;font-size:12px!important;font-weight:850!important}
+
+  #educationCoursesPanel .semester-record-foot{display:grid!important;grid-template-columns:1fr!important;gap:5px!important;padding:10px 14px 14px!important;justify-content:stretch!important;font-size:10px!important;line-height:1.5!important}
+
+  /* Neutralize style-specific desktop table rules that can force overflow. */
+  #educationCoursesPanel[data-gradesheet-style="official-transcript"] .course-table th,
+  #educationCoursesPanel[data-gradesheet-style="official-transcript"] .course-table td,
+  #educationCoursesPanel[data-gradesheet-style="semester-cards"] .course-table th,
+  #educationCoursesPanel[data-gradesheet-style="semester-cards"] .course-table td,
+  #educationCoursesPanel[data-gradesheet-style="academic-ledger"] .course-table th,
+  #educationCoursesPanel[data-gradesheet-style="academic-ledger"] .course-table td,
+  #educationCoursesPanel[data-gradesheet-style="performance-grid"] .course-table th,
+  #educationCoursesPanel[data-gradesheet-style="performance-grid"] .course-table td,
+  #educationCoursesPanel[data-gradesheet-style="minimal-scholar"] .course-table th,
+  #educationCoursesPanel[data-gradesheet-style="minimal-scholar"] .course-table td{min-width:0!important}
+}
+
+@media(max-width:420px){
+  #educationCoursesPanel .semester-record-head{padding:14px 12px!important}
+  #educationCoursesPanel .semester-head-stats{gap:5px!important}
+  #educationCoursesPanel .semester-stat{padding:6px 4px!important}
+  #educationCoursesPanel .semester-stat span{font-size:7px!important}
+  #educationCoursesPanel .semester-stat strong{font-size:12px!important}
+  #educationCoursesPanel .course-table tr{padding:10px 12px!important;gap:4px 8px!important}
+  #educationCoursesPanel .course-table td:nth-child(2){font-size:11.5px!important}
+  #educationCoursesPanel .semester-record-foot{padding-left:12px!important;padding-right:12px!important}
+}

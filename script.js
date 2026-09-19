@@ -1512,7 +1512,14 @@ function educationGradeLabel(item){
 }
 
 
-let educationLocalView="education";
+const EDUCATION_LOCAL_VIEW_STORAGE_KEY="academic-site:education-local-view";
+function readEducationLocalView(){
+  try{return sessionStorage.getItem(EDUCATION_LOCAL_VIEW_STORAGE_KEY)==="courses"?"courses":"education";}catch(_){return "education";}
+}
+function rememberEducationLocalView(view){
+  try{sessionStorage.setItem(EDUCATION_LOCAL_VIEW_STORAGE_KEY,view==="courses"?"courses":"education");}catch(_){}
+}
+let educationLocalView=readEducationLocalView();
 let educationLocalNavBound=false;
 let gradesheetRendered=false;
 
@@ -1553,6 +1560,7 @@ function repairPreGradesheetStateInMemory(content){
 function setEducationLocalView(view,{scroll=false}={}){
   const next=view==="courses"?"courses":"education";
   educationLocalView=next;
+  rememberEducationLocalView(next);
   document.querySelectorAll("[data-education-panel]").forEach(panel=>panel.classList.toggle("hidden",panel.dataset.educationPanel!==next));
   document.querySelectorAll("[data-education-view]").forEach(button=>{
     const active=button.dataset.educationView===next;
@@ -1585,7 +1593,7 @@ function courseGradePanelHtml(settings){
   return `<div class="education-courses-heading"><div><span class="gradesheet-kicker">Undergraduate academic record</span><h3>${esc(g.title||"Courses & Grades")}</h3><p class="muted small">${esc(g.subtitle||"Complete undergraduate academic record")}</p></div></div>
     <div class="gradesheet-hero"><div class="gradesheet-hero-copy"><h3>${esc(g.degree||"")}</h3><p class="muted">${esc([g.institution,g.department,g.session?`Session ${g.session}`:""].filter(Boolean).join(" · "))}</p></div><div class="gradesheet-final-summary">${[["Credits",final.credits],["CGPA",final.cgpa],["Letter Grade",final.letter]].filter(([,v])=>String(v||"").trim()).map(([label,value])=>`<div class="gradesheet-final-metric"><span>${esc(label)}</span><strong>${esc(value)}</strong></div>`).join("")}</div><div class="gradesheet-pdf-action">${settings.url?`<a class="button" href="${escAttr(settings.url)}" target="_blank" rel="noopener">View Gradesheet</a>`:`<a class="button disabled" href="#" aria-disabled="true">View Gradesheet</a>`}<span class="gradesheet-pdf-note">${settings.url?(settings.updated_at?`Official PDF · updated ${esc(formatDate(settings.updated_at))}`:"Official grade certificate PDF"):"PDF can be added from the private admin page."}</span></div></div>
     <details class="grading-scale-panel" open><summary>Grading scale</summary><div class="grading-scale-grid">${(g.gradingScale||[]).map(item=>`<div class="grading-scale-item"><span>${esc(item.range||"")}</span><strong><b>${esc(item.letter||"")}</b><em>${esc(item.point||"")}</em></strong></div>`).join("")}</div></details>
-    <div class="gradesheet-semesters">${(g.semesters||[]).map(s=>`<article class="semester-record"><header class="semester-record-head"><div><span class="semester-index">Semester ${String(s.number||"").padStart(2,"0")}</span><h3>${esc(s.label||"")}</h3>${s.held?`<div class="semester-held">Held in ${esc(s.held)}</div>`:""}</div><div class="semester-head-stats"><div class="semester-stat"><span>GPA</span><strong>${esc(s.semesterGpa||"")}</strong></div><div class="semester-stat"><span>Credits</span><strong>${esc(s.semesterCredits||"")}</strong></div><div class="semester-stat"><span>Result</span><strong>${esc(s.semesterLetter||"")}</strong></div></div></header><div class="course-table-wrap"><table class="course-table"><thead><tr><th>Course No.</th><th>Course Title</th><th>Credit</th><th>Grade Point</th><th>Letter Grade</th></tr></thead><tbody>${(s.courses||[]).map(course=>`<tr><td>${esc(course.code||"")}</td><td>${esc(course.title||"")}</td><td>${esc(course.credit||"")}</td><td>${esc(course.point||"")}</td><td><span class="course-grade-letter ${String(course.letter||"").toUpperCase()==="F"?"grade-f":""}">${esc(course.letter||"")}</span></td></tr>`).join("")}</tbody></table></div><footer class="semester-record-foot"><span>This semester: <strong>${esc(s.semesterCredits||"")} credits · GPA ${esc(s.semesterGpa||"")} · ${esc(s.semesterLetter||"")}</strong></span><span>Cumulative: <strong>${esc(s.cumulativeCredits||"")} credits · GPA ${esc(s.cumulativeGpa||"")} · ${esc(s.cumulativeLetter||"")}</strong></span></footer></article>`).join("")}</div>`;
+    <div class="gradesheet-semesters">${(g.semesters||[]).map(s=>`<article class="semester-record"><header class="semester-record-head"><div><span class="semester-index">Semester ${String(s.number||"").padStart(2,"0")}</span><h3>${esc(s.label||"")}</h3>${s.held?`<div class="semester-held">Held in ${esc(s.held)}</div>`:""}</div><div class="semester-head-stats"><div class="semester-stat"><span>GPA</span><strong>${esc(s.semesterGpa||"")}</strong></div><div class="semester-stat"><span>Credits</span><strong>${esc(s.semesterCredits||"")}</strong></div><div class="semester-stat"><span>Result</span><strong>${esc(s.semesterLetter||"")}</strong></div></div></header><div class="course-table-wrap"><table class="course-table"><thead><tr><th>Course No.</th><th>Course Title</th><th>Credit</th><th>Grade Point</th><th>Letter Grade</th></tr></thead><tbody>${(s.courses||[]).map(course=>`<tr><td>${esc(course.code||"")}</td><td>${esc(course.title||"")}</td><td>${esc(course.credit||"")}</td><td>${esc(course.point||"")}</td><td><span class="course-grade-letter">${esc(course.letter||"")}</span></td></tr>`).join("")}</tbody></table></div><footer class="semester-record-foot"><span>This semester: <strong>${esc(s.semesterCredits||"")} credits · GPA ${esc(s.semesterGpa||"")} · ${esc(s.semesterLetter||"")}</strong></span><span>Cumulative: <strong>${esc(s.cumulativeCredits||"")} credits · GPA ${esc(s.cumulativeGpa||"")} · ${esc(s.cumulativeLetter||"")}</strong></span></footer></article>`).join("")}</div>`;
 }
 
 function prepareGradesheetPanel(d){
