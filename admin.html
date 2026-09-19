@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260919-education-presets-v2" rel="stylesheet"/>
+<link href="styles.css?v=20260919-scholar-orbit-v3" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -278,7 +278,7 @@
 <label class="education-preset-choice" data-education-preset-card="three-column-digest">
 <input name="educationPreset" type="radio" value="three-column-digest"/>
 <span class="education-preset-preview edu-preview-digest"><i class="ep-degree"></i><i class="ep-school"></i><i class="ep-date"></i><i class="ep-score"></i><i class="ep-copy"></i><i class="ep-chips"></i></span>
-<span class="education-preset-name">9. Three-Column Digest</span><span class="education-preset-desc">Editorial three-column structure with separate areas for metrics, narrative, and coursework.</span>
+<span class="education-preset-name">9. Scholar Orbit</span><span class="education-preset-desc">Asymmetrical academic profile with a circular grade medallion, accent spine, and orbit-style coursework chips.</span>
 </label>
 <label class="education-preset-choice" data-education-preset-card="minimal-chronicle">
 <input name="educationPreset" type="radio" value="minimal-chronicle"/>
@@ -1851,7 +1851,7 @@
       }
       if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
 
-      await loadScript("admin.js?v=20260919-education-presets-v2");
+      await loadScript("admin.js?v=20260919-scholar-orbit-v3");
       if(button)button.disabled=false;
       if(status&&status.textContent===readyMessage)status.textContent="";
     }catch(err){
