@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260920-courses-reload-v5" rel="stylesheet"/>
+<link href="styles.css?v=20260920-upload-scroll-v1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -307,7 +307,24 @@
     <div><h3>Current gradesheet PDF</h3><p class="muted" id="currentGradesheetName">No gradesheet PDF uploaded yet.</p><p class="muted small" id="currentGradesheetDate"></p></div>
     <div class="cv-manager-actions"><a class="secondary hidden" href="#" id="currentGradesheetLink" rel="noopener" target="_blank">Open current gradesheet</a><button class="danger hidden" id="removeGradesheetBtn" type="button">Remove gradesheet</button></div>
   </div>
-  <div class="field"><label>Upload / replace gradesheet</label><input accept="application/pdf,.pdf" id="gradesheetFile" type="file"/><span class="helper">PDF only · maximum 12 MB. This enables the public “View Gradesheet” button.</span></div>
+    <div class="field gradesheet-upload-field">
+    <label>Upload / replace gradesheet</label>
+    <div class="gradesheet-upload-card" id="gradesheetUploadCard">
+      <input accept="application/pdf,.pdf" class="gradesheet-file-input" id="gradesheetFile" type="file"/>
+      <label class="gradesheet-upload-dropzone" id="gradesheetUploadDropzone" for="gradesheetFile">
+        <span class="gradesheet-upload-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false"><path d="M12 16V5"></path><path d="m8 9 4-4 4 4"></path><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"></path></svg>
+        </span>
+        <span class="gradesheet-upload-copy"><strong>Upload gradesheet PDF</strong><small>Choose a PDF or drag and drop it here</small></span>
+        <span class="gradesheet-upload-cta">Choose PDF</span>
+      </label>
+      <div class="gradesheet-upload-footer">
+        <span class="gradesheet-selected-file" id="gradesheetSelectedFile" aria-live="polite">No new PDF selected</span>
+        <button class="secondary gradesheet-upload-now" id="uploadGradesheetBtn" type="button" disabled>Upload PDF</button>
+      </div>
+    </div>
+    <span class="helper">PDF only · maximum 12 MB. Uploading immediately updates the public “View Gradesheet” button.</span>
+  </div>
   <div class="field" style="margin-top:14px"><label>Or use an external gradesheet URL</label><input id="fGradesheetExternal" placeholder="https://..."/><span class="helper">Optional. If entered, this URL is used instead of an uploaded PDF.</span></div>
 </div>
 </details>
@@ -1872,7 +1889,7 @@
       }
       if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
 
-      await loadScript("admin.js?v=20260920-courses-reload-v5");
+      await loadScript("admin.js?v=20260920-upload-scroll-v1");
       if(button)button.disabled=false;
       if(status&&status.textContent===readyMessage)status.textContent="";
     }catch(err){

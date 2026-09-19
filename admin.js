@@ -2212,6 +2212,31 @@ function repairPreGradesheetState(content){
   if("gradesheet" in content)delete content.gradesheet;
   return changed;
 }
+
+function renderGradesheetFileSelection(){
+  const input=$("gradesheetFile"),file=input?.files?.[0]||null;
+  const card=$("gradesheetUploadCard"),label=$("gradesheetSelectedFile"),button=$("uploadGradesheetBtn");
+  if(card)card.classList.toggle("has-file",!!file);
+  if(label)label.textContent=file?`${file.name} · ${Math.max(1,Math.round(file.size/1024))} KB`:"No new PDF selected";
+  if(button)button.disabled=!file;
+}
+function validateGradesheetPdf(file){
+  if(!file)return "Choose a gradesheet PDF first.";
+  if(file.size>12*1024*1024)return "Gradesheet is larger than 12 MB.";
+  if(file.type!=="application/pdf"&&!file.name.toLowerCase().endsWith(".pdf"))return "Gradesheet must be a PDF.";
+  return "";
+}
+async function uploadGradesheetPdfFile(file){
+  const problem=validateGradesheetPdf(file);
+  if(problem){setStatus(problem);return false;}
+  const path="Ibtida_Yasin_Gradesheet.pdf";
+  const{error}=await sb.storage.from("cv-files").upload(path,file,{upsert:true,contentType:"application/pdf",cacheControl:"3600"});
+  if(error){setStatus("Gradesheet upload failed: "+error.message);return false;}
+  const{data}=sb.storage.from("cv-files").getPublicUrl(path);
+  setCourseRecordSettings(currentContent,{url:data.publicUrl+"?v="+Date.now(),filename:file.name,updated_at:new Date().toISOString()});
+  return true;
+}
+
 function renderGradesheetAdminState(){
   const g=cleanCourseRecordSettings(currentContent);
   const selected=document.querySelector(`input[name="gradesheetStyle"][value="${g.style}"]`);if(selected)selected.checked=true;
@@ -2330,6 +2355,7 @@ function fillForms(){
   $("fWebsite").value=currentContent.links?.website||"";
   $("fCvExternal").value="";
   if($("gradesheetFile"))$("gradesheetFile").value="";
+  renderGradesheetFileSelection();
   if($("fGradesheetExternal"))$("fGradesheetExternal").value="";
   if(currentContent.photo_url){
     $("photoPreview").src=currentContent.photo_url;
@@ -4009,6 +4035,44 @@ async function persistContent(successMessage){
   return true;
 }
 
+
+$("gradesheetFile")?.addEventListener("change",renderGradesheetFileSelection);
+const gradesheetDropzone=$("gradesheetUploadDropzone");
+const gradesheetUploadCard=$("gradesheetUploadCard");
+if(gradesheetDropzone&&gradesheetUploadCard){
+  ["dragenter","dragover"].forEach(type=>gradesheetDropzone.addEventListener(type,event=>{
+    event.preventDefault();event.stopPropagation();gradesheetUploadCard.classList.add("is-dragging");
+  }));
+  ["dragleave","drop"].forEach(type=>gradesheetDropzone.addEventListener(type,event=>{
+    event.preventDefault();event.stopPropagation();gradesheetUploadCard.classList.remove("is-dragging");
+  }));
+  gradesheetDropzone.addEventListener("drop",event=>{
+    const file=event.dataTransfer?.files?.[0];
+    const input=$("gradesheetFile");
+    if(!file||!input)return;
+    try{
+      const transfer=new DataTransfer();transfer.items.add(file);input.files=transfer.files;
+      renderGradesheetFileSelection();
+    }catch(_){setStatus("Please use Choose PDF to select this file.");}
+  });
+}
+$("uploadGradesheetBtn")?.addEventListener("click",async()=>{
+  const file=$("gradesheetFile")?.files?.[0];
+  const problem=validateGradesheetPdf(file);
+  if(problem){setStatus(problem);return;}
+  const button=$("uploadGradesheetBtn");
+  if(button)button.disabled=true;
+  setStatus("Uploading gradesheet...");
+  const uploaded=await uploadGradesheetPdfFile(file);
+  if(!uploaded){renderGradesheetFileSelection();return;}
+  const ok=await persistContent("Gradesheet uploaded. Your public website is updated.");
+  if(ok){
+    $("gradesheetFile").value="";
+    renderGradesheetFileSelection();
+    renderGradesheetAdminState();
+  }else renderGradesheetFileSelection();
+});
+
 $("removeGradesheetBtn")?.addEventListener("click",async()=>{
   if(!confirm("Remove the current gradesheet PDF from your public website?"))return;
   $("saveStatus").textContent="Removing gradesheet...";
@@ -4061,13 +4125,8 @@ async function saveAll(){
   const gradesheetExternal=$("fGradesheetExternal")?.value.trim()||"";
   const gradesheetFile=$("gradesheetFile")?.files?.[0];
   if(gradesheetFile){
-    if(gradesheetFile.size>12*1024*1024)return setStatus("Gradesheet is larger than 12 MB.");
-    if(gradesheetFile.type!=="application/pdf"&&!gradesheetFile.name.toLowerCase().endsWith(".pdf"))return setStatus("Gradesheet must be a PDF.");
-    const path="Ibtida_Yasin_Gradesheet.pdf";
-    const{error}=await sb.storage.from("cv-files").upload(path,gradesheetFile,{upsert:true,contentType:"application/pdf",cacheControl:"3600"});
-    if(error)return setStatus("Gradesheet upload failed: "+error.message);
-    const{data}=sb.storage.from("cv-files").getPublicUrl(path);
-    setCourseRecordSettings(currentContent,{url:data.publicUrl+"?v="+Date.now(),filename:gradesheetFile.name,updated_at:new Date().toISOString()});
+    const uploaded=await uploadGradesheetPdfFile(gradesheetFile);
+    if(!uploaded)return;
   }else if(gradesheetExternal){
     if(!/^https?:\/\//i.test(gradesheetExternal))return setStatus("External gradesheet URL must start with http:// or https://");
     setCourseRecordSettings(currentContent,{url:gradesheetExternal,filename:"External gradesheet link",updated_at:new Date().toISOString()});
@@ -4079,6 +4138,7 @@ async function saveAll(){
   $("cvFile").value="";
   $("fCvExternal").value="";
   if($("gradesheetFile"))$("gradesheetFile").value="";
+  renderGradesheetFileSelection();
   if($("fGradesheetExternal"))$("fGradesheetExternal").value="";
   if(currentContent.photo_url){
     $("photoPreview").src=currentContent.photo_url;
