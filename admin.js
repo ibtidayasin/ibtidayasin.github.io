@@ -24,6 +24,692 @@ const DEFAULT_CONTENT={
     {"category":"Atomistic Analysis","items":["OVITO","PTM","DXA","RDF"],"media":[]}
   ],
   "education":[{"period":"B.Sc.","degree":"Mechanical Engineering","institution":"Shahjalal University of Science and Technology (SUST)","description":"Mechanical engineering education with growing focus on computational materials and atomistic simulation.","media":[]}],
+  "gradesheet": {
+    "title": "Courses & Grades",
+    "subtitle": "Complete undergraduate academic record",
+    "style": "academic-ledger",
+    "url": "",
+    "filename": "",
+    "updated_at": "",
+    "degree": "B.Sc. (Engg.) in Mechanical Engineering",
+    "institution": "Shahjalal University of Science and Technology (SUST)",
+    "department": "Department of Mechanical Engineering",
+    "session": "2020-2021",
+    "gradingScale": [
+      {
+        "range": "80% or above",
+        "letter": "A+",
+        "point": "4.00"
+      },
+      {
+        "range": "75% to less than 80%",
+        "letter": "A",
+        "point": "3.75"
+      },
+      {
+        "range": "70% to less than 75%",
+        "letter": "A-",
+        "point": "3.50"
+      },
+      {
+        "range": "65% to less than 70%",
+        "letter": "B+",
+        "point": "3.25"
+      },
+      {
+        "range": "60% to less than 65%",
+        "letter": "B",
+        "point": "3.00"
+      },
+      {
+        "range": "55% to less than 60%",
+        "letter": "B-",
+        "point": "2.75"
+      },
+      {
+        "range": "50% to less than 55%",
+        "letter": "C+",
+        "point": "2.50"
+      },
+      {
+        "range": "45% to less than 50%",
+        "letter": "C",
+        "point": "2.25"
+      },
+      {
+        "range": "40% to less than 45%",
+        "letter": "C-",
+        "point": "2.00"
+      },
+      {
+        "range": "Less than 40%",
+        "letter": "F",
+        "point": "0.00"
+      }
+    ],
+    "semesters": [
+      {
+        "number": 1,
+        "label": "1st Semester Examination",
+        "held": "September, 2022",
+        "semesterCredits": "22.00",
+        "semesterGpa": "3.63",
+        "semesterLetter": "A-",
+        "cumulativeCredits": "22.00",
+        "cumulativeGpa": "3.63",
+        "cumulativeLetter": "A-",
+        "courses": [
+          {
+            "code": "CHE101Q",
+            "title": "Fundamentals of Chemistry",
+            "credit": "3.00",
+            "point": "3.50",
+            "letter": "A-"
+          },
+          {
+            "code": "CHE112Q",
+            "title": "Chemistry Sessional",
+            "credit": "1.50",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "ENG101Q",
+            "title": "Effective Communication in English",
+            "credit": "2.00",
+            "point": "3.50",
+            "letter": "A-"
+          },
+          {
+            "code": "ENG102Q",
+            "title": "English Language Lab",
+            "credit": "1.00",
+            "point": "3.75",
+            "letter": "A"
+          },
+          {
+            "code": "MAT101Q",
+            "title": "Differential Calculus and Geometry",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE172",
+            "title": "Mechanical Engineering Drawing",
+            "credit": "1.50",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE176",
+            "title": "Foundry and Welding Shops",
+            "credit": "1.00",
+            "point": "3.75",
+            "letter": "A"
+          },
+          {
+            "code": "MEE181",
+            "title": "Introduction to Mechanical Engineering",
+            "credit": "3.00",
+            "point": "3.25",
+            "letter": "B+"
+          },
+          {
+            "code": "PHY107Q",
+            "title": "Physics I",
+            "credit": "3.00",
+            "point": "3.25",
+            "letter": "B+"
+          },
+          {
+            "code": "SSS100",
+            "title": "History of the Emergence of Independent Bangladesh",
+            "credit": "3.00",
+            "point": "3.75",
+            "letter": "A"
+          }
+        ]
+      },
+      {
+        "number": 2,
+        "label": "2nd Semester Examination",
+        "held": "February, 2023",
+        "semesterCredits": "21.50",
+        "semesterGpa": "3.29",
+        "semesterLetter": "B+",
+        "cumulativeCredits": "43.50",
+        "cumulativeGpa": "3.46",
+        "cumulativeLetter": "B+",
+        "courses": [
+          {
+            "code": "CHE103Q",
+            "title": "Chemistry of Engineering Materials",
+            "credit": "3.00",
+            "point": "3.50",
+            "letter": "A-"
+          },
+          {
+            "code": "EEE111Q",
+            "title": "Fundamentals of Electrical & Electronics Engineering",
+            "credit": "3.00",
+            "point": "2.00",
+            "letter": "C-"
+          },
+          {
+            "code": "EEE112Q",
+            "title": "Fundamentals of Electrical & Electronics Engineering Sessional",
+            "credit": "1.00",
+            "point": "3.50",
+            "letter": "A-"
+          },
+          {
+            "code": "MAT103Q",
+            "title": "Integral Calculus and Differential Equations",
+            "credit": "3.00",
+            "point": "3.00",
+            "letter": "B"
+          },
+          {
+            "code": "MEE141",
+            "title": "Programming Methodology for Mechanical Engineering",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE142",
+            "title": "Programming Methodology for Mechanical Engineering Lab",
+            "credit": "1.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE174",
+            "title": "Computer-aided Mechanical Engineering Drawing",
+            "credit": "1.50",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE178",
+            "title": "Machine Shop Practice",
+            "credit": "1.00",
+            "point": "3.75",
+            "letter": "A"
+          },
+          {
+            "code": "MEE188",
+            "title": "Comprehensive Viva-I",
+            "credit": "0.50",
+            "point": "3.50",
+            "letter": "A-"
+          },
+          {
+            "code": "PHY109Q",
+            "title": "Physics-II",
+            "credit": "3.00",
+            "point": "2.75",
+            "letter": "B-"
+          },
+          {
+            "code": "PHY112Q",
+            "title": "Physics Sessional",
+            "credit": "1.50",
+            "point": "4.00",
+            "letter": "A+"
+          }
+        ]
+      },
+      {
+        "number": 3,
+        "label": "3rd Semester Examination",
+        "held": "July, 2023",
+        "semesterCredits": "14.50",
+        "semesterGpa": "3.53",
+        "semesterLetter": "A-",
+        "cumulativeCredits": "58.00",
+        "cumulativeGpa": "3.48",
+        "cumulativeLetter": "B+",
+        "courses": [
+          {
+            "code": "ECO205Q",
+            "title": "Principles of Economics",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "EEE213Q",
+            "title": "Fundamentals of Electrical Machines",
+            "credit": "3.00",
+            "point": "0.00",
+            "letter": "F"
+          },
+          {
+            "code": "EEE214Q",
+            "title": "Electrical Machines Sessional",
+            "credit": "1.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MAT203Q",
+            "title": "Vector, Analysis, Matrices and Laplace Transform",
+            "credit": "3.00",
+            "point": "3.25",
+            "letter": "B+"
+          },
+          {
+            "code": "MEE231",
+            "title": "Basic Thermodynamics",
+            "credit": "3.00",
+            "point": "3.50",
+            "letter": "A-"
+          },
+          {
+            "code": "MEE232",
+            "title": "Basic Thermodynamics Sessional",
+            "credit": "1.50",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE257",
+            "title": "Engineering Mechanics-I",
+            "credit": "3.00",
+            "point": "3.00",
+            "letter": "B"
+          }
+        ]
+      },
+      {
+        "number": 4,
+        "label": "4th Semester Examination",
+        "held": "November, 2023",
+        "semesterCredits": "19.50",
+        "semesterGpa": "3.67",
+        "semesterLetter": "A-",
+        "cumulativeCredits": "77.50",
+        "cumulativeGpa": "3.53",
+        "cumulativeLetter": "A-",
+        "courses": [
+          {
+            "code": "MAT205Q",
+            "title": "Complex Variables, Harmonic Analysis and Partial Differential Equations",
+            "credit": "4.00",
+            "point": "3.50",
+            "letter": "A-"
+          },
+          {
+            "code": "MEE245",
+            "title": "Numerical Analysis",
+            "credit": "3.00",
+            "point": "3.75",
+            "letter": "A"
+          },
+          {
+            "code": "MEE246",
+            "title": "Numerical Analysis Sessional",
+            "credit": "1.00",
+            "point": "3.75",
+            "letter": "A"
+          },
+          {
+            "code": "MEE253",
+            "title": "Mechanics of Solids",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE254",
+            "title": "Mechanics of Solids Sessional",
+            "credit": "1.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE255",
+            "title": "Engineering Materials (Metallic and Composites)",
+            "credit": "3.00",
+            "point": "3.75",
+            "letter": "A"
+          },
+          {
+            "code": "MEE256",
+            "title": "Engineering Materials Sessional",
+            "credit": "1.00",
+            "point": "3.25",
+            "letter": "B+"
+          },
+          {
+            "code": "MEE259",
+            "title": "Engineering Mechanics-II",
+            "credit": "3.00",
+            "point": "3.50",
+            "letter": "A-"
+          },
+          {
+            "code": "MEE288",
+            "title": "Comprehensive Viva-II",
+            "credit": "0.50",
+            "point": "3.25",
+            "letter": "B+"
+          }
+        ]
+      },
+      {
+        "number": 5,
+        "label": "5th Semester Examination",
+        "held": "October, 2024",
+        "semesterCredits": "23.00",
+        "semesterGpa": "3.78",
+        "semesterLetter": "A",
+        "cumulativeCredits": "100.50",
+        "cumulativeGpa": "3.59",
+        "cumulativeLetter": "A-",
+        "courses": [
+          {
+            "code": "EEE213Q",
+            "title": "Fundamentals of Electrical Machines",
+            "credit": "3.00",
+            "point": "2.75",
+            "letter": "B-"
+          },
+          {
+            "code": "MEE321",
+            "title": "Fluid Mechanics-I",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE322",
+            "title": "Fluid Mechanics-I Sessional",
+            "credit": "1.50",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE331",
+            "title": "Conduction and Radiation Heat Transfer",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE332",
+            "title": "Heat Transfer Sessional",
+            "credit": "1.00",
+            "point": "2.75",
+            "letter": "B-"
+          },
+          {
+            "code": "MEE351",
+            "title": "Mechanics of Machinery",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE352",
+            "title": "Mechanics of Machinery Sessional",
+            "credit": "1.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE371",
+            "title": "Production Processes",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE372",
+            "title": "Production Processes Sessional",
+            "credit": "1.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE382",
+            "title": "Industrial Tour (Selected by MEE Department)",
+            "credit": "0.50",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "SOC307Q",
+            "title": "Industrial Sociology",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          }
+        ]
+      },
+      {
+        "number": 6,
+        "label": "6th Semester Examination",
+        "held": "April, 2025",
+        "semesterCredits": "21.50",
+        "semesterGpa": "3.97",
+        "semesterLetter": "A",
+        "cumulativeCredits": "122.00",
+        "cumulativeGpa": "3.65",
+        "cumulativeLetter": "A-",
+        "courses": [
+          {
+            "code": "MEE323",
+            "title": "Fluid Mechanics-II",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE324",
+            "title": "Fluid Mechanics-II Sessional",
+            "credit": "1.50",
+            "point": "3.75",
+            "letter": "A"
+          },
+          {
+            "code": "MEE333",
+            "title": "Convection, Boiling, Condensation and Mass Transfer",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE334",
+            "title": "Heat and Mass Transfer Sessional",
+            "credit": "1.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE353",
+            "title": "Machine Design",
+            "credit": "4.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE354",
+            "title": "Machine Design Sessional",
+            "credit": "1.50",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE367",
+            "title": "Instrumentation and Measurement",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE368",
+            "title": "Electro-mechanical System",
+            "credit": "1.00",
+            "point": "3.75",
+            "letter": "A"
+          },
+          {
+            "code": "MEE375",
+            "title": "Machine Tools",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE388",
+            "title": "Comprehensive Viva-III",
+            "credit": "0.50",
+            "point": "4.00",
+            "letter": "A+"
+          }
+        ]
+      },
+      {
+        "number": 7,
+        "label": "7th Semester Examination",
+        "held": "October, 2025",
+        "semesterCredits": "18.00",
+        "semesterGpa": "3.96",
+        "semesterLetter": "A",
+        "cumulativeCredits": "140.00",
+        "cumulativeGpa": "3.69",
+        "cumulativeLetter": "A-",
+        "courses": [
+          {
+            "code": "MEE421",
+            "title": "Fluid Machinery",
+            "credit": "3.00",
+            "point": "3.75",
+            "letter": "A"
+          },
+          {
+            "code": "MEE422",
+            "title": "Fluid Machinery Sessional",
+            "credit": "1.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE431",
+            "title": "Internal Combustion Engines",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE432",
+            "title": "Heat Engine Sessional",
+            "credit": "1.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE461",
+            "title": "Control Engineering",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE477",
+            "title": "Production Planning and Control",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE435",
+            "title": "Refrigeration, A.C. and Building Mechanical System",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE484",
+            "title": "Industrial Training",
+            "credit": "1.00",
+            "point": "4.00",
+            "letter": "A+"
+          }
+        ]
+      },
+      {
+        "number": 8,
+        "label": "8th Semester Examination",
+        "held": "April, 2026",
+        "semesterCredits": "22.00",
+        "semesterGpa": "4.00",
+        "semesterLetter": "A+",
+        "cumulativeCredits": "162.00",
+        "cumulativeGpa": "3.73",
+        "cumulativeLetter": "A-",
+        "courses": [
+          {
+            "code": "IPE405Q",
+            "title": "Industrial Management",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE433",
+            "title": "Power Plant Engineering",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE434",
+            "title": "Power Plant Engineering Sessional",
+            "credit": "1.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE441",
+            "title": "Applied Engineering Mathematics",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE465",
+            "title": "Basic Mechatronics",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE480",
+            "title": "Project/Thesis (Continuation)",
+            "credit": "6.00",
+            "point": "4.00",
+            "letter": "A+"
+          },
+          {
+            "code": "MEE481",
+            "title": "Automobile Engineering",
+            "credit": "3.00",
+            "point": "4.00",
+            "letter": "A+"
+          }
+        ]
+      }
+    ],
+    "final": {
+      "credits": "162.0",
+      "cgpa": "3.73",
+      "letter": "A-"
+    }
+  },
   "contact":{"headline":"Interested in computational materials and nanoscale mechanics?","message":"I am open to research discussions, graduate opportunities, and collaborations related to computational materials science and atomistic simulation.","email":"","phone":"","location":"Bangladesh","media":[]},
   "links":{"linkedin":"","github":"https://github.com/ibtidayasin","orcid":"","scholar":"","researchgate":"","scopus":"","wos":"","website":""},
   "cv":{"url":"","filename":"","updated_at":""},
@@ -42,6 +728,7 @@ const DEFAULT_SECTION_HEADINGS={
   activities:{title:"Academic Activities",subtitle:"Presentations, training, and recognition"},
   skills:{title:"Skills",subtitle:"Research toolkit"},
   education:{title:"Education",subtitle:"Academic background"},
+  courses:{title:"Courses & Grades",subtitle:"Complete undergraduate academic record"},
   contact:{title:"Contact",subtitle:"Interested in computational materials and nanoscale mechanics?"},
   cv:{title:"Curriculum Vitae",subtitle:"Academic CV"}
 };
@@ -417,14 +1104,15 @@ function undoTypographyControls(){
   setStatus("Unsaved typography changes were undone.");
 }
 
-const SITE_SECTION_KEYS=["about","research","thesis","publications","projects","activities","skills","education","contact","cv"];
-const COVER_SECTION_KEYS=["research","thesis","publications","projects","activities","skills","education","contact","cv"];
+const SITE_SECTION_KEYS=["about","research","thesis","publications","projects","activities","skills","education","courses","contact","cv"];
+const COVER_SECTION_KEYS=["research","thesis","publications","projects","activities","skills","education","courses","contact","cv"];
 const SIDEBAR_SECTION_KEYS=[...COVER_SECTION_KEYS];
 const CARD_STYLE_SECTION_KEYS=["thesis","publications","projects","activities","skills","education","contact"];
 const CARD_STYLE_VALUES=["classic","clean","outline","soft","accent","elevated"];
 const CARD_DESIGN_VALUES=["standard","editorial","banded","ledger","spotlight","framed","activity-split","activity-showcase","activity-media-fill","activity-certificate-full","activity-certificate-grid"];
 const ACTIVITY_TAB_STYLE_VALUES=["strong-pills", "segmented", "elevated", "outline-fill", "underline-fill", "soft-cards", "icon-label", "two-tone", "glass", "ribbon"];
 const EDUCATION_PRESET_VALUES=["current","scholar-highlight","compact-timeline","split-panel","metric-grid","academic-profile","certificate-showcase","banner-spotlight","transcript-ledger","three-column-digest","minimal-chronicle"];
+const GRADESHEET_STYLE_VALUES=["official-transcript","semester-cards","academic-ledger","performance-grid","minimal-scholar"];
 const MAIN_NAV_STYLE_VALUES=["current","framed-links","accent-pills","floating-capsule","segmented-strip","top-rail","mini-cards","soft-chips","editorial-dividers","glass-rail","ribbon-blocks"];
 const BRAND_NAME_STYLE_VALUES=["current","accent-rail","signature-underline","soft-badge","outline-label","capsule","editorial-serif","small-caps","split-rule","accent-corner","glass-label"];
 const SIDEBAR_DESIGN_VALUES=["current","profile-card","editorial-sidebar","accent-rail","soft-tint-panel","floating-profile","portrait-header","centered-academic","split-portrait","framed-portrait","minimal-identity","academic-id","researcher-badge","top-accent-banner","overlap-portrait","asymmetric-editorial","compact-sticky","sectioned-sidebar","glass-academic","faculty-premium"];
@@ -459,9 +1147,9 @@ function normalizeMainNavStyle(value){
   return LEGACY_MAIN_NAV_STYLE_MAP[value]||"current";
 }
 const DEFAULT_SITE_SETTINGS={
-  sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","contact","cv"],
+  sectionOrder:["about","research","thesis","publications","projects","activities","skills","education","courses","contact","cv"],
   sectionVisibility:{
-    about:true,research:true,thesis:true,publications:true,projects:true,activities:true,skills:true,education:true,contact:true,cv:true
+    about:true,research:true,thesis:true,publications:true,projects:true,activities:true,skills:true,education:true,courses:true,contact:true,cv:true
   },
   layout:{
     maxWidth:1180,
@@ -491,10 +1179,10 @@ const DEFAULT_SITE_SETTINGS={
     pageTransition:"fade",
     pagePager:true,
     sidebarScope:"home-cv",
-    sidebarSections:{research:false,thesis:false,publications:false,projects:false,activities:false,skills:false,education:false,contact:false,cv:true},
+    sidebarSections:{research:false,thesis:false,publications:false,projects:false,activities:false,skills:false,education:false,courses:false,contact:false,cv:true},
     sectionCoverEnabled:true,
     sectionCoverScope:"research",
-    sectionCoverSections:{research:true,thesis:true,publications:false,projects:false,activities:false,skills:false,education:false,contact:false,cv:false},
+    sectionCoverSections:{research:true,thesis:true,publications:false,projects:false,activities:false,skills:false,education:false,courses:false,contact:false,cv:false},
     sectionCoverStyle:"framed",
     sectionCoverPhotoFit:"crop",
     sectionCoverTopBlend:false,
@@ -558,13 +1246,15 @@ const SITE_FONT_PAIRS={
 function normalizeSiteSettings(content){
   const raw=(content.siteSettings&&typeof content.siteSettings==="object")?content.siteSettings:{};
   const rawOrder=Array.isArray(raw.sectionOrder)?raw.sectionOrder.filter(x=>SITE_SECTION_KEYS.includes(x)):[];
-  const mergedOrder=[...new Set([...rawOrder,...SITE_SECTION_KEYS])];
-  const order=rawOrder.includes("activities")?mergedOrder:(()=>{
-    const next=mergedOrder.filter(k=>k!=="activities");
-    const projectIndex=next.indexOf("projects");
-    next.splice(projectIndex>=0?projectIndex+1:next.length,0,"activities");
-    return next;
-  })();
+  let order=[...new Set([...rawOrder,...SITE_SECTION_KEYS])];
+  const placeMissingAfter=(key,after)=>{
+    if(rawOrder.includes(key))return;
+    order=order.filter(k=>k!==key);
+    const i=order.indexOf(after);
+    order.splice(i>=0?i+1:order.length,0,key);
+  };
+  placeMissingAfter("activities","projects");
+  placeMissingAfter("courses","education");
   const rawVis=(raw.sectionVisibility&&typeof raw.sectionVisibility==="object")?raw.sectionVisibility:{};
   const l=(raw.layout&&typeof raw.layout==="object")?raw.layout:{};
   const e=(raw.experience&&typeof raw.experience==="object")?raw.experience:{};
@@ -780,6 +1470,10 @@ function fillSiteCustomizationControls(){
   const educationPresetInput=document.querySelector(`input[name="educationPreset"][value="${educationPreset}"]`);
   if(educationPresetInput)educationPresetInput.checked=true;
   document.querySelectorAll("[data-education-preset-card]").forEach(card=>card.classList.toggle("selected",card.dataset.educationPresetCard===educationPreset));
+  const gradesheetStyle=GRADESHEET_STYLE_VALUES.includes(currentContent.gradesheet?.style)?currentContent.gradesheet.style:"academic-ledger";
+  const gradesheetStyleInput=document.querySelector(`input[name="gradesheetStyle"][value="${gradesheetStyle}"]`);
+  if(gradesheetStyleInput)gradesheetStyleInput.checked=true;
+  document.querySelectorAll("[data-gradesheet-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.gradesheetStyleCard===gradesheetStyle));
   $("fFontPair").value=l.fontPair;
   $("fShadow").value=l.shadow;
   const cardSection=(CARD_STYLE_SECTION_KEYS.includes($("fCardStyleSection")?.value)?$("fCardStyleSection").value:"skills");
@@ -1204,7 +1898,7 @@ function normalizeMediaDisplayList(value){
   return (Array.isArray(value)?value:[]).map(normalizeMediaDisplayItem);
 }
 
-const BUILDER_SETTINGS_SCHEMA_VERSION=30;
+const BUILDER_SETTINGS_SCHEMA_VERSION=31;
 let savedBuilderSettingsSnapshot=null;
 
 function deepCloneSafe(value){
@@ -1951,6 +2645,19 @@ document.addEventListener("change",e=>{
   setStatus("Header name style updated. Save all changes to publish it.");
 });
 
+
+document.addEventListener("change",e=>{
+  const input=e.target.closest?.('input[name="gradesheetStyle"]');
+  if(!input)return;
+  const value=input.value;
+  if(!GRADESHEET_STYLE_VALUES.includes(value))return;
+  normalizeGradesheet(currentContent);
+  currentContent.gradesheet.style=value;
+  document.querySelectorAll("[data-gradesheet-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.gradesheetStyleCard===value));
+  scheduleAdminPreview(true);
+  setStatus("Gradesheet listing style updated. Save all changes to publish it.");
+});
+
 document.addEventListener("change",e=>{
   const input=e.target.closest('input[name="educationPreset"]');
   if(!input)return;
@@ -2151,6 +2858,21 @@ function normalizeSkillGroupRecord(item){
   return out;
 }
 
+
+function normalizeGradesheet(content){
+  const base=structuredClone(DEFAULT_CONTENT.gradesheet||{});
+  const raw=(content.gradesheet&&typeof content.gradesheet==="object")?content.gradesheet:{};
+  const g=merge(base,raw);
+  g.style=GRADESHEET_STYLE_VALUES.includes(g.style)?g.style:"academic-ledger";
+  g.url=String(g.url||"");g.filename=String(g.filename||"");g.updated_at=String(g.updated_at||"");
+  g.degree=String(g.degree||"");g.institution=String(g.institution||"");g.department=String(g.department||"");g.session=String(g.session||"");
+  g.gradingScale=Array.isArray(g.gradingScale)?g.gradingScale:[];
+  g.semesters=Array.isArray(g.semesters)?g.semesters:[];
+  g.final=(g.final&&typeof g.final==="object")?g.final:{};
+  content.gradesheet=g;
+  return g;
+}
+
 function normalizeMedia(content){
   normalizeAcademicArchitecture(content);
   normalizeResearchInterests(content);
@@ -2159,6 +2881,7 @@ function normalizeMedia(content){
   normalizeCustomTheme(content);
   normalizeTypography(content);
   normalizeSectionHeadings(content);
+  normalizeGradesheet(content);
   content.sectionMedia=content.sectionMedia||{};
   content.sectionMedia.profile=normalizeMediaDisplayList(content.sectionMedia.profile);
   content.publications=(content.publications||[]).map(normalizePublicationRecord);
@@ -2225,6 +2948,8 @@ function fillForms(){
   $("fSectionSkillsSubtitle").value=sections.skills.subtitle||"";
   $("fSectionEducationTitle").value=sections.education.title||"";
   $("fSectionEducationSubtitle").value=sections.education.subtitle||"";
+  $("fSectionCoursesTitle").value=sections.courses.title||"";
+  $("fSectionCoursesSubtitle").value=sections.courses.subtitle||"";
   $("fSectionContactTitle").value=sections.contact.title||"";
   $("fContactHeadline").value=sections.contact.subtitle||"";
   $("fSectionCvTitle").value=sections.cv.title||"";
@@ -2257,6 +2982,7 @@ function fillForms(){
   $("fWos").value=currentContent.links?.wos||"";
   $("fWebsite").value=currentContent.links?.website||"";
   $("fCvExternal").value="";
+  $("fGradesheetExternal").value="";
   if(currentContent.photo_url){
     $("photoPreview").src=currentContent.photo_url;
     $("photoPreview").classList.remove("hidden");
@@ -2266,6 +2992,7 @@ function fillForms(){
   }
   renderAllEditors();
   renderCvState();
+  renderGradesheetState();
   fillThemeChooser();
   fillTypographyControls();
   fillCustomThemeControls();
@@ -2902,6 +3629,14 @@ function mediaEditor(owner,media,title){
   </div>`;
 }
 
+function renderGradesheetState(){
+  const g=normalizeGradesheet(currentContent);
+  $("currentGradesheetName").textContent=g.filename||(g.url?"External gradesheet link":"No gradesheet PDF uploaded yet.");
+  $("currentGradesheetDate").textContent=g.updated_at?`Updated ${new Date(g.updated_at).toLocaleString()}`:"";
+  if(g.url){$("currentGradesheetLink").href=g.url;$("currentGradesheetLink").classList.remove("hidden");$("removeGradesheetBtn").classList.remove("hidden");}
+  else{$("currentGradesheetLink").classList.add("hidden");$("removeGradesheetBtn").classList.add("hidden");}
+}
+
 function renderCvState(){
   const cv=currentContent.cv||{};
   $("currentCvName").textContent=cv.filename||(cv.url?"External CV link":"No CV uploaded yet.");
@@ -3159,6 +3894,7 @@ function syncAllForms(){
     activities:{title:$("fSectionActivitiesTitle").value.trim(),subtitle:$("fSectionActivitiesSubtitle").value.trim()},
     skills:{title:$("fSectionSkillsTitle").value.trim(),subtitle:$("fSectionSkillsSubtitle").value.trim()},
     education:{title:$("fSectionEducationTitle").value.trim(),subtitle:$("fSectionEducationSubtitle").value.trim()},
+    courses:{title:$("fSectionCoursesTitle").value.trim(),subtitle:$("fSectionCoursesSubtitle").value.trim()},
     contact:{title:$("fSectionContactTitle").value.trim(),subtitle:$("fContactHeadline").value.trim()},
     cv:{title:$("fSectionCvTitle").value.trim(),subtitle:$("fSectionCvSubtitle").value.trim()}
   };
@@ -3202,6 +3938,10 @@ function syncAllForms(){
     location:$("fContactLocation").value.trim(),
     media:contactMedia
   };
+  normalizeGradesheet(currentContent);
+  const gradesheetStyle=document.querySelector('input[name="gradesheetStyle"]:checked')?.value;
+  if(GRADESHEET_STYLE_VALUES.includes(gradesheetStyle))currentContent.gradesheet.style=gradesheetStyle;
+
   currentContent.links={
     linkedin:$("fLinkedIn").value.trim(),
     github:$("fGitHub").value.trim(),
@@ -3932,6 +4672,16 @@ async function persistContent(successMessage){
   return true;
 }
 
+$("removeGradesheetBtn").addEventListener("click",async()=>{
+  if(!confirm("Remove the current gradesheet PDF from your public website?"))return;
+  $("saveStatus").textContent="Removing gradesheet...";
+  try{await sb.storage.from("cv-files").remove(["Ibtida_Yasin_Gradesheet.pdf"])}catch{}
+  normalizeGradesheet(currentContent);
+  currentContent.gradesheet={...currentContent.gradesheet,url:"",filename:"",updated_at:""};
+  const ok=await persistContent("Gradesheet removed.");
+  if(ok)renderGradesheetState();
+});
+
 $("removeCvBtn").addEventListener("click",async()=>{
   if(!confirm("Remove the current CV from your public website?"))return;
   $("saveStatus").textContent="Removing CV...";
@@ -3972,16 +4722,35 @@ async function saveAll(){
     currentContent.cv={url:external,filename:"External CV link",updated_at:new Date().toISOString()};
   }
 
+  normalizeGradesheet(currentContent);
+  const gradesheetExternal=$("fGradesheetExternal").value.trim();
+  const gradesheetFile=$("gradesheetFile").files[0];
+  if(gradesheetFile){
+    if(gradesheetFile.size>12*1024*1024)return setStatus("Gradesheet is larger than 12 MB.");
+    if(gradesheetFile.type!=="application/pdf"&&!gradesheetFile.name.toLowerCase().endsWith(".pdf"))return setStatus("Gradesheet must be a PDF.");
+    const path="Ibtida_Yasin_Gradesheet.pdf";
+    const{error}=await sb.storage.from("cv-files").upload(path,gradesheetFile,{upsert:true,contentType:"application/pdf",cacheControl:"3600"});
+    if(error)return setStatus("Gradesheet upload failed: "+error.message);
+    const{data}=sb.storage.from("cv-files").getPublicUrl(path);
+    currentContent.gradesheet={...currentContent.gradesheet,url:data.publicUrl+"?v="+Date.now(),filename:gradesheetFile.name,updated_at:new Date().toISOString()};
+  }else if(gradesheetExternal){
+    if(!/^https?:\/\//i.test(gradesheetExternal))return setStatus("External gradesheet URL must start with http:// or https://");
+    currentContent.gradesheet={...currentContent.gradesheet,url:gradesheetExternal,filename:"External gradesheet link",updated_at:new Date().toISOString()};
+  }
+
   const ok=await persistContent("Saved. Your public website is updated.");
   if(!ok)return;
   $("photoFile").value="";
   $("cvFile").value="";
   $("fCvExternal").value="";
+  $("gradesheetFile").value="";
+  $("fGradesheetExternal").value="";
   if(currentContent.photo_url){
     $("photoPreview").src=currentContent.photo_url;
     $("photoPreview").classList.remove("hidden");
   }
   renderCvState();
+  renderGradesheetState();
   typographySavedSnapshot=typographyStateFromContent();
   updateTypographyUndoButton();
 }
