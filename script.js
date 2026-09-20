@@ -1552,25 +1552,54 @@ function educationGradeLabel(item){
 
 
 /* Custom Education document subsections ----------------------------------- */
+const PERMANENT_EDUCATION_DOCUMENTS=[
+  {id:"provisional-certificate",title:"Provisional Certificate"},
+  {id:"transcript",title:"Transcript"},
+  {id:"testimonial",title:"Testimonial"}
+];
+function permanentEducationDocumentDefinition(value){
+  const token=String(value||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+  return PERMANENT_EDUCATION_DOCUMENTS.find(item=>item.id===token||item.title.toLowerCase()===String(value||"").trim().toLowerCase())||null;
+}
+
 function normalizeEducationDocuments(content){
   if(!content||typeof content!=="object")return [];
   const raw=Array.isArray(content.educationDocuments)?content.educationDocuments:[];
-  const seen=new Set();
-  content.educationDocuments=raw.slice(0,16).map((item,index)=>{
+  const normalized=raw.map((item,index)=>{
     const src=(item&&typeof item==="object")?item:{};
     let id=String(src.id||"").trim().toLowerCase().replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"").slice(0,64);
     if(!id)id=`document-${index+1}`;
-    let candidate=id,n=2;
+    return {id,title:String(src.title||"").trim(),description:String(src.description||""),visible:src.visible!==false,url:String(src.url||""),filename:String(src.filename||""),updated_at:String(src.updated_at||"")};
+  });
+  const used=new Set();
+  const permanent=PERMANENT_EDUCATION_DOCUMENTS.map(def=>{
+    const idx=normalized.findIndex((item,i)=>!used.has(i)&&(item.id===def.id||String(item.title||"").trim().toLowerCase()===def.title.toLowerCase()));
+    if(idx>=0){used.add(idx);return {...normalized[idx],id:def.id,title:def.title,visible:normalized[idx].visible!==false};}
+    return {id:def.id,title:def.title,description:"",visible:true,url:"",filename:"",updated_at:""};
+  });
+  const seen=new Set(permanent.map(item=>item.id));
+  const extras=[];
+  normalized.forEach((item,index)=>{
+    if(used.has(index))return;
+    if(permanentEducationDocumentDefinition(item.id)||permanentEducationDocumentDefinition(item.title))return;
+    let id=item.id||`document-${index+1}`,candidate=id,n=2;
     while(seen.has(candidate))candidate=`${id}-${n++}`;
-    seen.add(candidate);
-    return {id:candidate,title:String(src.title||"").trim(),description:String(src.description||""),visible:src.visible===true,url:String(src.url||""),filename:String(src.filename||""),updated_at:String(src.updated_at||"")};
-  }).filter(item=>item.title||item.url||item.filename);
+    seen.add(candidate);extras.push({...item,id:candidate,visible:item.visible===true});
+  });
+  content.educationDocuments=[...permanent,...extras].slice(0,16);
   return content.educationDocuments;
 }
 function educationDocumentViewId(doc){return `document-${doc.id}`;}
+function educationDocumentIcon(doc){
+  const id=String(doc?.id||"");
+  if(id==="provisional-certificate")return `<svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h12v13H6z"></path><path d="M9 7h6M9 10h4"></path><circle cx="12" cy="15.5" r="2.5"></circle><path d="m10.5 17.5-1 3 2.5-1 2.5 1-1-3"></path></svg>`;
+  if(id==="transcript")return `<svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h12v18H6z"></path><path d="M9 7h6M9 11h6M9 15h6"></path><path d="M8 7h.01M8 11h.01M8 15h.01"></path></svg>`;
+  if(id==="testimonial")return `<svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h12v18H6z"></path><path d="M9 8h6M9 17h5"></path><path d="M9 12c0-1 .6-1.8 1.6-1.8v2.6H9V12Zm4 0c0-1 .6-1.8 1.6-1.8v2.6H13V12Z"></path></svg>`;
+  return `<svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h9l3 3v15H6z"></path><path d="M15 3v4h4"></path><path d="M9 12h6M9 16h6"></path></svg>`;
+}
 function educationDocumentTabHtml(doc){
   const view=educationDocumentViewId(doc);
-  return `<button class="activity-tab" type="button" data-education-view="${escAttr(view)}" data-education-dynamic="true" role="tab" aria-selected="false"><span class="activity-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h9l3 3v15H6z"></path><path d="M15 3v4h4"></path><path d="M9 12h6M9 16h6"></path></svg></span><span class="activity-tab-label">${esc(doc.title)}</span></button>`;
+  return `<button class="activity-tab" type="button" data-education-view="${escAttr(view)}" data-education-dynamic="true" role="tab" aria-selected="false"><span class="activity-tab-icon" aria-hidden="true">${educationDocumentIcon(doc)}</span><span class="activity-tab-label">${esc(doc.title)}</span></button>`;
 }
 function educationDocumentPanelHtml(doc){
   const view=educationDocumentViewId(doc),hasUrl=!!safeUrl(doc.url),url=safeUrl(doc.url);
@@ -1580,7 +1609,7 @@ function renderEducationDocumentSubsections(content){
   const tabs=$("educationTabs"),panels=$("educationDocumentPanels");
   if(!tabs||!panels)return;
   tabs.querySelectorAll('[data-education-dynamic="true"]').forEach(node=>node.remove());
-  const docs=normalizeEducationDocuments(content).filter(doc=>doc.visible===true&&doc.title);
+  const docs=normalizeEducationDocuments(content).filter(doc=>doc.visible!==false&&doc.title&&safeUrl(doc.url));
   docs.forEach(doc=>tabs.insertAdjacentHTML("beforeend",educationDocumentTabHtml(doc)));
   panels.innerHTML=docs.map(educationDocumentPanelHtml).join("");
 }
@@ -1713,8 +1742,14 @@ function merge(base,extra){
   }
   return extra??base;
 }
+function normalizePublicationStatusEvidence(value){
+  const src=(value&&typeof value==="object")?value:{};
+  const rawType=String(src.type||"").toLowerCase();
+  return {url:String(src.url||""),filename:String(src.filename||""),updated_at:String(src.updated_at||""),storagePath:String(src.storagePath||""),type:["image","pdf"].includes(rawType)?rawType:""};
+}
 function normalizePublicationRecord(item){
   const out={...(item||{})};
+  out.statusEvidence=normalizePublicationStatusEvidence(out.statusEvidence);
   out.authorNote=String(out.authorNote||"").trim();
   const description=String(out.description||"").trim();
   if(!out.authorNote&&description){
@@ -2000,6 +2035,7 @@ function render(d){
       <div class="pub-links">
         ${p.doi?`<a class="text-link" href="https://doi.org/${escAttr(p.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//i,""))}" target="_blank" rel="noopener">DOI ↗</a>`:""}
         ${safeUrl(p.url)?`<a class="text-link" href="${escAttr(safeUrl(p.url))}" target="_blank" rel="noopener">Publication ↗</a>`:""}
+        ${safeUrl(p.statusEvidence?.url)?`<a class="text-link publication-status-evidence-link" href="${escAttr(safeUrl(p.statusEvidence.url))}" target="_blank" rel="noopener">View Status Evidence ↗</a>`:""}
       </div>
       <div class="item-media">${mediaHtml(p.media||[])}</div>
     </article>`).join(""):`<div class="empty-state">No publications listed yet.</div>`;

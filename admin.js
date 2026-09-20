@@ -2155,8 +2155,14 @@ function merge(base,extra){
   }
   return extra??base;
 }
+function normalizePublicationStatusEvidence(value){
+  const src=(value&&typeof value==="object")?value:{};
+  const rawType=String(src.type||"").toLowerCase();
+  return {url:String(src.url||""),filename:String(src.filename||""),updated_at:String(src.updated_at||""),storagePath:String(src.storagePath||""),type:["image","pdf"].includes(rawType)?rawType:""};
+}
 function normalizePublicationRecord(item){
   const out={...(item||{})};
+  out.statusEvidence=normalizePublicationStatusEvidence(out.statusEvidence);
   out.authorNote=String(out.authorNote||"").trim();
   const description=String(out.description||"").trim();
   if(!out.authorNote&&description){
@@ -2241,6 +2247,16 @@ function repairPreGradesheetState(content){
 
 
 /* Custom Education document subsections ----------------------------------- */
+const PERMANENT_EDUCATION_DOCUMENTS=[
+  {id:"provisional-certificate",title:"Provisional Certificate"},
+  {id:"transcript",title:"Transcript"},
+  {id:"testimonial",title:"Testimonial"}
+];
+function permanentEducationDocumentDefinition(value){
+  const token=String(value||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
+  return PERMANENT_EDUCATION_DOCUMENTS.find(item=>item.id===token||item.title.toLowerCase()===String(value||"").trim().toLowerCase())||null;
+}
+
 function educationDocumentIdSeed(value,index=0){
   const base=String(value||"document").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,42)||"document";
   return `${base}-${index+1}`;
@@ -2248,25 +2264,39 @@ function educationDocumentIdSeed(value,index=0){
 function normalizeEducationDocuments(content){
   if(!content||typeof content!=="object")return [];
   const raw=Array.isArray(content.educationDocuments)?content.educationDocuments:[];
-  const seen=new Set();
-  content.educationDocuments=raw.slice(0,16).map((item,index)=>{
+  const normalizeOne=(item,index)=>{
     const src=(item&&typeof item==="object")?item:{};
     let id=String(src.id||"").trim().toLowerCase().replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"").slice(0,64);
     if(!id)id=educationDocumentIdSeed(src.title,index);
-    let candidate=id,n=2;
-    while(seen.has(candidate))candidate=`${id}-${n++}`;
-    seen.add(candidate);
     return {
-      id:candidate,
+      id,
       title:String(src.title||"").trim(),
       description:String(src.description||""),
-      visible:src.visible===true,
+      visible:src.visible!==false,
       url:String(src.url||""),
       filename:String(src.filename||""),
       updated_at:String(src.updated_at||""),
       storagePath:String(src.storagePath||"")
     };
-  }).filter(item=>item.title||item.url||item.filename);
+  };
+  const normalized=raw.map(normalizeOne);
+  const used=new Set();
+  const permanent=PERMANENT_EDUCATION_DOCUMENTS.map((def,index)=>{
+    const match=normalized.find((item,i)=>!used.has(i)&&(item.id===def.id||String(item.title||"").trim().toLowerCase()===def.title.toLowerCase()));
+    if(match){used.add(normalized.indexOf(match));return {...match,id:def.id,title:def.title,visible:match.visible!==false};}
+    return {id:def.id,title:def.title,description:"",visible:true,url:"",filename:"",updated_at:"",storagePath:""};
+  });
+  const seen=new Set(permanent.map(item=>item.id));
+  const extras=[];
+  normalized.forEach((item,index)=>{
+    if(used.has(index))return;
+    if(permanentEducationDocumentDefinition(item.id)||permanentEducationDocumentDefinition(item.title))return;
+    let id=item.id||educationDocumentIdSeed(item.title,index),candidate=id,n=2;
+    while(seen.has(candidate))candidate=`${id}-${n++}`;
+    seen.add(candidate);
+    extras.push({...item,id:candidate,visible:item.visible===true});
+  });
+  content.educationDocuments=[...permanent,...extras].slice(0,16);
   return content.educationDocuments;
 }
 function educationDocumentPdfProblem(file){
@@ -2292,24 +2322,24 @@ async function uploadEducationDocumentPdf(index,file){
   doc.filename=file.name;
   doc.updated_at=new Date().toISOString();
   doc.storagePath=path;
+  if(permanentEducationDocumentDefinition(doc.id))doc.visible=true;
   return true;
 }
 function educationDocumentRowHtml(doc,index){
   const inputId=`educationDocumentFile_${index}`;
   const updated=doc.updated_at?`Updated ${esc(new Date(doc.updated_at).toLocaleString())}`:"";
   const current=doc.url?`<a class="secondary" href="${esc(doc.url)}" target="_blank" rel="noopener">Open current PDF</a>`:`<span class="muted small">No PDF uploaded yet.</span>`;
-  return `<article class="education-subsection-admin-item" data-education-document-index="${index}">
+  const permanent=!!permanentEducationDocumentDefinition(doc.id);
+  return `<article class="education-subsection-admin-item ${permanent?"education-document-permanent":""}" data-education-document-index="${index}">
     <div class="education-subsection-admin-head">
       <div><span class="education-subsection-order">${String(index+1).padStart(2,"0")}</span><strong>${esc(doc.title||"Untitled subsection")}</strong>${doc.filename?`<small>${esc(doc.filename)}</small>`:""}</div>
       <div class="education-subsection-admin-actions">
         <label class="repeat-public-toggle"><input type="checkbox" data-education-document-visible="${index}" ${doc.visible?"checked":""}> Show publicly</label>
-        <button class="secondary" type="button" data-move-education-document="${index}:-1" title="Move up">↑</button>
-        <button class="secondary" type="button" data-move-education-document="${index}:1" title="Move down">↓</button>
-        <button class="danger" type="button" data-remove-education-document="${index}">Remove</button>
+        ${permanent?`<span class="education-permanent-badge">Built in</span>`:`<button class="secondary" type="button" data-move-education-document="${index}:-1" title="Move up">↑</button><button class="secondary" type="button" data-move-education-document="${index}:1" title="Move down">↓</button><button class="danger" type="button" data-remove-education-document="${index}">Remove</button>`}
       </div>
     </div>
     <div class="form-grid education-subsection-fields">
-      <div class="field"><label>Subsection name</label><input data-education-document-field="title" data-education-document-index="${index}" value="${esc(doc.title||"")}"></div>
+      <div class="field"><label>Subsection name</label><input data-education-document-field="title" data-education-document-index="${index}" value="${esc(doc.title||"")}" ${permanent?"readonly":""}></div>
       <div class="field full"><label>Short description (optional)</label><textarea data-education-document-field="description" data-education-document-index="${index}" placeholder="A short note shown above the document button.">${esc(doc.description||"")}</textarea></div>
     </div>
     <div class="education-document-current"><div>${current}${updated?`<span class="muted small">${updated}</span>`:""}</div>${doc.url?`<button class="danger secondary-danger" type="button" data-remove-education-document-file="${index}">Remove PDF</button>`:""}</div>
@@ -2337,6 +2367,8 @@ function addEducationDocumentSubsection(title){
   let name=String(title||"").trim();
   if(!name)name=String(prompt("Subsection name","")||"").trim();
   if(!name)return;
+  const permanent=permanentEducationDocumentDefinition(name);
+  if(permanent){educationAdminActiveCategory=`document:${permanent.id}`;try{localStorage.setItem(EDUCATION_ADMIN_CATEGORY_STORAGE_KEY,educationAdminActiveCategory)}catch{}renderEducationSubsectionEditor();setStatus(`${permanent.title} is a permanent Education subsection.`);return;}
   if(currentContent.educationDocuments.some(doc=>doc.title.toLowerCase()===name.toLowerCase())){setStatus(`${name} already exists.`);return;}
   const token=Date.now().toString(36);
   const base=name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,42)||"document";
@@ -2572,6 +2604,46 @@ function collectionRows(type){
   return selector?[...document.querySelectorAll(selector)]:[];
 }
 
+function publicationStatusEvidenceHtml(publication,index){
+  const evidence=normalizePublicationStatusEvidence(publication?.statusEvidence);
+  const hasEvidence=!!evidence.url;
+  const updated=evidence.updated_at?` · updated ${esc(new Date(evidence.updated_at).toLocaleString())}`:"";
+  return `<div class="publication-status-evidence-admin" data-publication-evidence-panel="${index}">
+    <div class="education-document-current publication-evidence-current"><div><strong>Status evidence</strong><span class="muted small">Optional proof of submission/review status, such as an Editorial Manager screenshot or PDF.</span>${hasEvidence?`<span class="muted small">${esc(evidence.filename||"Status evidence")}${updated}</span>`:`<span class="muted small">No status evidence uploaded.</span>`}</div><div class="cv-manager-actions">${hasEvidence?`<a class="secondary" href="${escAttr(evidence.url)}" target="_blank" rel="noopener">Open evidence</a><button class="danger secondary-danger" type="button" data-remove-publication-evidence="${index}">Remove evidence</button>`:""}</div></div>
+    <div class="field"><label>Upload / replace status evidence</label><input type="file" accept="image/*,application/pdf,.pdf" data-publication-evidence-file="${index}"><span class="helper">Image or PDF · maximum 12 MB. The public publication card shows “View Status Evidence” only when evidence exists.</span></div>
+    <div class="collection-admin-toolbar-actions"><button class="secondary" type="button" data-upload-publication-evidence="${index}" disabled>Upload evidence</button></div>
+  </div>`;
+}
+function publicationEvidenceProblem(file){
+  if(!file)return "Choose an image or PDF first.";
+  if(file.size>12*1024*1024)return "Status evidence is larger than 12 MB.";
+  const name=String(file.name||"").toLowerCase();
+  const pdf=file.type==="application/pdf"||name.endsWith(".pdf");
+  const image=String(file.type||"").startsWith("image/")||/\.(png|jpe?g|webp|gif)$/i.test(name);
+  if(!pdf&&!image)return "Status evidence must be an image or PDF.";
+  return "";
+}
+function publicationEvidenceStoragePath(index,file){
+  const name=String(file?.name||"").toLowerCase();
+  const ext=name.endsWith(".pdf")?"pdf":name.match(/\.(png|jpe?g|webp|gif)$/i)?.[1]?.replace("jpeg","jpg")||"jpg";
+  const title=String(currentContent.publications?.[index]?.title||`publication-${index+1}`).toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,52)||`publication-${index+1}`;
+  return `publication-evidence/${title}-${Date.now()}.${ext}`;
+}
+async function uploadPublicationStatusEvidence(index,file){
+  syncAllForms();
+  const publication=currentContent.publications?.[index];
+  if(!publication)return false;
+  const problem=publicationEvidenceProblem(file);if(problem){setStatus(problem);return false;}
+  const old=normalizePublicationStatusEvidence(publication.statusEvidence),path=publicationEvidenceStoragePath(index,file);
+  const contentType=file.type||((String(file.name||"").toLowerCase().endsWith(".pdf"))?"application/pdf":"image/jpeg");
+  const{error}=await sb.storage.from("site-media").upload(path,file,{upsert:false,contentType,cacheControl:"3600"});
+  if(error){setStatus("Status evidence upload failed: "+error.message);return false;}
+  const{data}=sb.storage.from("site-media").getPublicUrl(path);
+  publication.statusEvidence={url:data.publicUrl+"?v="+Date.now(),filename:file.name,updated_at:new Date().toISOString(),storagePath:path,type:contentType==="application/pdf"?"pdf":"image"};
+  if(old.storagePath&&old.storagePath!==path){try{await sb.storage.from("site-media").remove([old.storagePath])}catch{}}
+  return true;
+}
+
 function renderPublicationsEditor(){
   $("publicationsEditor").innerHTML=(currentContent.publications||[]).map((p,i)=>repeatBlock("publication",i,p.title||`Publication ${i+1}`,[
     {label:"Title",key:"title",value:p.title,full:true},{label:"Authors",key:"authors",value:p.authors,full:true},
@@ -2579,7 +2651,7 @@ function renderPublicationsEditor(){
     {label:"Journal / Conference",key:"venue",value:p.venue},{label:"Year",key:"year",value:p.year},
     {label:"Status",key:"status",value:p.status,kind:"select"},{label:"DOI",key:"doi",value:p.doi},
     {label:"Publication URL",key:"url",value:p.url,full:true},{label:"Short note / description",key:"description",value:p.description,kind:"textarea",full:true}
-  ],p.media||[],p.visible!==false)).join("")||`<div class="empty-state">No publications added yet.</div>`;
+  ],p.media||[],p.visible!==false,publicationStatusEvidenceHtml(p,i))).join("")||`<div class="empty-state">No publications added yet.</div>`;
 }
 function renderProjectsEditor(){
   $("projectsEditor").innerHTML=(currentContent.projects||[]).map((p,i)=>repeatBlock("project",i,p.title||`Project / Simulation ${i+1}`,[
@@ -2639,7 +2711,7 @@ function educationAdminCategories(){
   return [
     {key:"education",label:"Education",count:(currentContent.education||[]).length,builtIn:true},
     {key:"gradesheet",label:"Gradesheet",count:1,builtIn:true},
-    ...docs.map(doc=>({key:educationAdminKeyForDocument(doc),label:doc.title||"Untitled subsection",count:1,builtIn:false,id:doc.id}))
+    ...docs.map(doc=>({key:educationAdminKeyForDocument(doc),label:doc.title||"Untitled subsection",count:doc.url?1:0,builtIn:!!permanentEducationDocumentDefinition(doc.id),id:doc.id}))
   ];
 }
 function normalizeEducationAdminCategoryKey(key){
@@ -3395,11 +3467,35 @@ document.addEventListener("click",async e=>{
   b=e.target.closest?.("[data-move-education-document]");
   if(b){normalizeEducationDocuments(currentContent);const[i,delta]=b.dataset.moveEducationDocument.split(":").map(Number),j=i+delta,arr=currentContent.educationDocuments;if(i>=0&&j>=0&&j<arr.length){[arr[i],arr[j]]=[arr[j],arr[i]];renderEducationSubsectionEditor();scheduleAdminPreview(true);}return;}
   b=e.target.closest?.("[data-remove-education-document]");
-  if(b){normalizeEducationDocuments(currentContent);const i=Number(b.dataset.removeEducationDocument),doc=currentContent.educationDocuments[i];if(!doc)return;if(!confirm(`Remove the ${doc.title||"document"} subsection?`))return;if(doc.storagePath){try{await sb.storage.from("cv-files").remove([doc.storagePath])}catch{}}const removedKey=educationAdminKeyForDocument(doc);currentContent.educationDocuments.splice(i,1);if(educationAdminActiveCategory===removedKey)educationAdminActiveCategory="education";renderEducationSubsectionEditor();scheduleAdminPreview(true);return;}
+  if(b){normalizeEducationDocuments(currentContent);const i=Number(b.dataset.removeEducationDocument),doc=currentContent.educationDocuments[i];if(!doc)return;if(permanentEducationDocumentDefinition(doc.id)){setStatus(`${doc.title} is a permanent Education subsection. Remove its PDF or turn off Show publicly instead.`);return;}if(!confirm(`Remove the ${doc.title||"document"} subsection?`))return;if(doc.storagePath){try{await sb.storage.from("cv-files").remove([doc.storagePath])}catch{}}const removedKey=educationAdminKeyForDocument(doc);currentContent.educationDocuments.splice(i,1);if(educationAdminActiveCategory===removedKey)educationAdminActiveCategory="education";renderEducationSubsectionEditor();scheduleAdminPreview(true);return;}
   b=e.target.closest?.("[data-remove-education-document-file]");
   if(b){normalizeEducationDocuments(currentContent);const i=Number(b.dataset.removeEducationDocumentFile),doc=currentContent.educationDocuments[i];if(!doc)return;if(doc.storagePath){try{await sb.storage.from("cv-files").remove([doc.storagePath])}catch{}}doc.url="";doc.filename="";doc.updated_at="";doc.storagePath="";renderEducationSubsectionEditor();scheduleAdminPreview(true);return;}
   b=e.target.closest?.("[data-upload-education-document]");
   if(b){const i=Number(b.dataset.uploadEducationDocument),input=document.querySelector(`[data-education-document-file="${i}"]`),file=input?.files?.[0];if(!file){setStatus("Choose a PDF first.");return;}b.disabled=true;setStatus("Uploading education document...");const ok=await uploadEducationDocumentPdf(i,file);b.disabled=false;if(ok){await persistContent("Education document uploaded.");renderEducationSubsectionEditor();scheduleAdminPreview(true);}return;}
+});
+
+document.addEventListener("change",e=>{
+  const input=e.target.closest?.("[data-publication-evidence-file]");
+  if(!input)return;
+  const index=Number(input.dataset.publicationEvidenceFile),button=document.querySelector(`[data-upload-publication-evidence="${index}"]`);
+  if(button)button.disabled=!input.files?.[0];
+});
+document.addEventListener("click",async e=>{
+  let button=e.target.closest?.("[data-upload-publication-evidence]");
+  if(button){
+    const index=Number(button.dataset.uploadPublicationEvidence),input=document.querySelector(`[data-publication-evidence-file="${index}"]`),file=input?.files?.[0];
+    const problem=publicationEvidenceProblem(file);if(problem){setStatus(problem);return;}
+    button.disabled=true;setStatus("Uploading publication status evidence...");
+    const ok=await uploadPublicationStatusEvidence(index,file);button.disabled=false;
+    if(ok){await persistContent("Publication status evidence uploaded.");renderPublicationsEditor();const row=document.querySelector(`#publicationsEditor [data-publication="${index}"]`);if(row)setRepeatRowCollapsed(row,false);scheduleAdminPreview(true);}
+    return;
+  }
+  button=e.target.closest?.("[data-remove-publication-evidence]");
+  if(button){
+    const index=Number(button.dataset.removePublicationEvidence);syncAllForms();const publication=currentContent.publications?.[index];if(!publication)return;
+    const evidence=normalizePublicationStatusEvidence(publication.statusEvidence);if(evidence.storagePath){try{await sb.storage.from("site-media").remove([evidence.storagePath])}catch{}}
+    publication.statusEvidence=normalizePublicationStatusEvidence(null);await persistContent("Publication status evidence removed.");renderPublicationsEditor();const row=document.querySelector(`#publicationsEditor [data-publication="${index}"]`);if(row)setRepeatRowCollapsed(row,false);scheduleAdminPreview(true);return;
+  }
 });
 
 document.addEventListener("click",async e=>{
@@ -3597,7 +3693,7 @@ function syncAllForms(){
 function readRepeaters(){
   currentContent.publications=[...document.querySelectorAll("[data-publication]")].map((r,i)=>{
     const old=currentContent.publications[i]||{};
-    return {title:get(r,"title"),authors:get(r,"authors"),authorNote:get(r,"authorNote"),venue:get(r,"venue"),year:get(r,"year"),status:get(r,"status"),doi:get(r,"doi"),url:get(r,"url"),description:get(r,"description"),visible:r.querySelector("[data-item-visible]")?.checked!==false,media:old.media||[]};
+    return {title:get(r,"title"),authors:get(r,"authors"),authorNote:get(r,"authorNote"),venue:get(r,"venue"),year:get(r,"year"),status:get(r,"status"),doi:get(r,"doi"),url:get(r,"url"),description:get(r,"description"),visible:r.querySelector("[data-item-visible]")?.checked!==false,statusEvidence:normalizePublicationStatusEvidence(old.statusEvidence),media:old.media||[]};
   }).filter(x=>x.title||x.venue||x.media.length);
 
   currentContent.projects=[...document.querySelectorAll("[data-project]")].map((r,i)=>{
@@ -4671,6 +4767,7 @@ function adminFilePickerMeta(input){
   const accept=String(input?.getAttribute("accept")||"").toLowerCase();
   if(input?.id==="photoFile")return {title:"Upload profile image",prompt:"Choose an image or drag and drop it here",cta:"Choose image"};
   if(input?.id==="cvFile")return {title:"Upload CV PDF",prompt:"Choose a PDF or drag and drop it here",cta:"Choose PDF"};
+  if(input?.matches?.("[data-publication-evidence-file]"))return {title:"Upload status evidence",prompt:"Choose an image or PDF or drag and drop it here",cta:"Choose file"};
   if(input?.id==="backupImportFile")return {title:"Import website backup",prompt:"Choose a JSON backup or drag and drop it here",cta:"Choose file"};
   if(input?.matches?.("[data-video-thumb-file]"))return {title:"Upload video preview image",prompt:"Choose an image or drag and drop it here",cta:"Choose image"};
   if(input?.matches?.("[data-pdf-thumb-file]"))return {title:"Upload PDF preview image",prompt:"Choose an image or drag and drop it here",cta:"Choose image"};
