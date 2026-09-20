@@ -1549,12 +1549,48 @@ function educationGradeLabel(item){
 }
 
 
+
+
+/* Custom Education document subsections ----------------------------------- */
+function normalizeEducationDocuments(content){
+  if(!content||typeof content!=="object")return [];
+  const raw=Array.isArray(content.educationDocuments)?content.educationDocuments:[];
+  const seen=new Set();
+  content.educationDocuments=raw.slice(0,16).map((item,index)=>{
+    const src=(item&&typeof item==="object")?item:{};
+    let id=String(src.id||"").trim().toLowerCase().replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"").slice(0,64);
+    if(!id)id=`document-${index+1}`;
+    let candidate=id,n=2;
+    while(seen.has(candidate))candidate=`${id}-${n++}`;
+    seen.add(candidate);
+    return {id:candidate,title:String(src.title||"").trim(),description:String(src.description||""),visible:src.visible===true,url:String(src.url||""),filename:String(src.filename||""),updated_at:String(src.updated_at||"")};
+  }).filter(item=>item.title||item.url||item.filename);
+  return content.educationDocuments;
+}
+function educationDocumentViewId(doc){return `document-${doc.id}`;}
+function educationDocumentTabHtml(doc){
+  const view=educationDocumentViewId(doc);
+  return `<button class="activity-tab" type="button" data-education-view="${escAttr(view)}" data-education-dynamic="true" role="tab" aria-selected="false"><span class="activity-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h9l3 3v15H6z"></path><path d="M15 3v4h4"></path><path d="M9 12h6M9 16h6"></path></svg></span><span class="activity-tab-label">${esc(doc.title)}</span></button>`;
+}
+function educationDocumentPanelHtml(doc){
+  const view=educationDocumentViewId(doc),hasUrl=!!safeUrl(doc.url),url=safeUrl(doc.url);
+  return `<div class="education-document-panel hidden" data-education-panel="${escAttr(view)}" data-education-dynamic="true"><article class="education-document-card"><div class="education-document-copy"><span class="gradesheet-kicker">Education document</span><h3>${esc(doc.title)}</h3>${doc.description?`<p class="muted">${esc(doc.description)}</p>`:""}${doc.filename?`<p class="education-document-meta">${esc(doc.filename)}${doc.updated_at?` · updated ${esc(formatDate(doc.updated_at))}`:""}</p>`:""}</div><div class="education-document-action">${hasUrl?`<a class="button" href="${escAttr(url)}" target="_blank" rel="noopener">View ${esc(doc.title)}</a>`:`<span class="muted small">Document has not been uploaded yet.</span>`}</div></article></div>`;
+}
+function renderEducationDocumentSubsections(content){
+  const tabs=$("educationTabs"),panels=$("educationDocumentPanels");
+  if(!tabs||!panels)return;
+  tabs.querySelectorAll('[data-education-dynamic="true"]').forEach(node=>node.remove());
+  const docs=normalizeEducationDocuments(content).filter(doc=>doc.visible===true&&doc.title);
+  docs.forEach(doc=>tabs.insertAdjacentHTML("beforeend",educationDocumentTabHtml(doc)));
+  panels.innerHTML=docs.map(educationDocumentPanelHtml).join("");
+}
+
 const EDUCATION_LOCAL_VIEW_STORAGE_KEY="academic-site:education-local-view";
 function readEducationLocalView(){
-  try{const value=sessionStorage.getItem(EDUCATION_LOCAL_VIEW_STORAGE_KEY);return (value==="gradesheet"||value==="courses")?"gradesheet":"education";}catch(_){return "education";}
+  try{const value=String(sessionStorage.getItem(EDUCATION_LOCAL_VIEW_STORAGE_KEY)||"education");return /^[a-z0-9-]{1,80}$/i.test(value)?(value==="courses"?"gradesheet":value):"education";}catch(_){return "education";}
 }
 function rememberEducationLocalView(view){
-  try{sessionStorage.setItem(EDUCATION_LOCAL_VIEW_STORAGE_KEY,(view==="gradesheet"||view==="courses")?"gradesheet":"education");}catch(_){}
+  try{const value=String(view||"education");sessionStorage.setItem(EDUCATION_LOCAL_VIEW_STORAGE_KEY,/^[a-z0-9-]{1,80}$/i.test(value)?(value==="courses"?"gradesheet":value):"education");}catch(_){}
 }
 let educationLocalView=readEducationLocalView();
 let educationLocalNavBound=false;
@@ -1595,11 +1631,15 @@ function repairPreGradesheetStateInMemory(content){
 }
 
 function setEducationLocalView(view,{scroll=false}={}){
-  const next=(view==="gradesheet"||view==="courses")?"gradesheet":"education";
+  let requested=String(view||"education");
+  if(requested==="courses")requested="gradesheet";
+  const buttons=[...document.querySelectorAll("[data-education-view]")];
+  const exists=buttons.some(button=>button.dataset.educationView===requested);
+  const next=exists?requested:"education";
   educationLocalView=next;
   rememberEducationLocalView(next);
   document.querySelectorAll("[data-education-panel]").forEach(panel=>panel.classList.toggle("hidden",panel.dataset.educationPanel!==next));
-  document.querySelectorAll("[data-education-view]").forEach(button=>{
+  buttons.forEach(button=>{
     const active=button.dataset.educationView===next;
     button.classList.toggle("active",active);
     button.setAttribute("aria-selected",active?"true":"false");
@@ -1718,6 +1758,7 @@ function normalize(d){
   };
   d.skills=(d.skills||[]).map(normalizeSkillGroupRecord);
   d.education=(d.education||[]).map(x=>({...x,gradeLabel:["CGPA","GPA"].includes(String(x?.gradeLabel||"").toUpperCase())?String(x.gradeLabel).toUpperCase():"",cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:normalizeMediaDisplayList(x.media)}));
+  normalizeEducationDocuments(d);
   d.contact=d.contact||{};d.contact.media=normalizeMediaDisplayList(d.contact.media);
   d.thesis.media=normalizeMediaDisplayList(d.thesis.media);
   d.academicActivities=(d.academicActivities||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
@@ -2014,6 +2055,7 @@ function render(d){
     </article>`).join("");
 
   prepareGradesheetPanel(d);
+  renderEducationDocumentSubsections(d);
   const educationTabs=$("educationTabs");
   if(educationTabs){
     const educationTabStyle=ACTIVITY_TAB_STYLE_VALUES.includes(d.siteSettings?.experience?.educationTabStyle)?d.siteSettings.experience.educationTabStyle:(ACTIVITY_TAB_STYLE_VALUES.includes(d.siteSettings?.experience?.activityTabStyle)?d.siteSettings.experience.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.educationTabStyle);

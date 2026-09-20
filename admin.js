@@ -2238,6 +2238,117 @@ function repairPreGradesheetState(content){
   return changed;
 }
 
+
+
+/* Custom Education document subsections ----------------------------------- */
+function educationDocumentIdSeed(value,index=0){
+  const base=String(value||"document").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,42)||"document";
+  return `${base}-${index+1}`;
+}
+function normalizeEducationDocuments(content){
+  if(!content||typeof content!=="object")return [];
+  const raw=Array.isArray(content.educationDocuments)?content.educationDocuments:[];
+  const seen=new Set();
+  content.educationDocuments=raw.slice(0,16).map((item,index)=>{
+    const src=(item&&typeof item==="object")?item:{};
+    let id=String(src.id||"").trim().toLowerCase().replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"").slice(0,64);
+    if(!id)id=educationDocumentIdSeed(src.title,index);
+    let candidate=id,n=2;
+    while(seen.has(candidate))candidate=`${id}-${n++}`;
+    seen.add(candidate);
+    return {
+      id:candidate,
+      title:String(src.title||"").trim(),
+      description:String(src.description||""),
+      visible:src.visible===true,
+      url:String(src.url||""),
+      filename:String(src.filename||""),
+      updated_at:String(src.updated_at||""),
+      storagePath:String(src.storagePath||"")
+    };
+  }).filter(item=>item.title||item.url||item.filename);
+  return content.educationDocuments;
+}
+function educationDocumentPdfProblem(file){
+  if(!file)return "Choose a PDF first.";
+  if(file.size>12*1024*1024)return "Document is larger than 12 MB.";
+  if(file.type!=="application/pdf"&&!String(file.name||"").toLowerCase().endsWith(".pdf"))return "Education documents must be PDF files.";
+  return "";
+}
+function educationDocumentUploadPath(doc){
+  return `education-documents/${String(doc?.id||"document").replace(/[^a-z0-9-]+/gi,"-")}.pdf`;
+}
+async function uploadEducationDocumentPdf(index,file){
+  normalizeEducationDocuments(currentContent);
+  const doc=currentContent.educationDocuments[index];
+  if(!doc)return false;
+  const problem=educationDocumentPdfProblem(file);
+  if(problem){setStatus(problem);return false;}
+  const path=educationDocumentUploadPath(doc);
+  const{error}=await sb.storage.from("cv-files").upload(path,file,{upsert:true,contentType:"application/pdf",cacheControl:"3600"});
+  if(error){setStatus("Document upload failed: "+error.message);return false;}
+  const{data}=sb.storage.from("cv-files").getPublicUrl(path);
+  doc.url=data.publicUrl+"?v="+Date.now();
+  doc.filename=file.name;
+  doc.updated_at=new Date().toISOString();
+  doc.storagePath=path;
+  return true;
+}
+function educationDocumentRowHtml(doc,index){
+  const inputId=`educationDocumentFile_${index}`;
+  const updated=doc.updated_at?`Updated ${esc(new Date(doc.updated_at).toLocaleString())}`:"";
+  const current=doc.url?`<a class="secondary" href="${esc(doc.url)}" target="_blank" rel="noopener">Open current PDF</a>`:`<span class="muted small">No PDF uploaded yet.</span>`;
+  return `<article class="education-subsection-admin-item" data-education-document-index="${index}">
+    <div class="education-subsection-admin-head">
+      <div><span class="education-subsection-order">${String(index+1).padStart(2,"0")}</span><strong>${esc(doc.title||"Untitled subsection")}</strong>${doc.filename?`<small>${esc(doc.filename)}</small>`:""}</div>
+      <div class="education-subsection-admin-actions">
+        <label class="repeat-public-toggle"><input type="checkbox" data-education-document-visible="${index}" ${doc.visible?"checked":""}> Show publicly</label>
+        <button class="secondary" type="button" data-move-education-document="${index}:-1" title="Move up">↑</button>
+        <button class="secondary" type="button" data-move-education-document="${index}:1" title="Move down">↓</button>
+        <button class="danger" type="button" data-remove-education-document="${index}">Remove</button>
+      </div>
+    </div>
+    <div class="form-grid education-subsection-fields">
+      <div class="field"><label>Subsection name</label><input data-education-document-field="title" data-education-document-index="${index}" value="${esc(doc.title||"")}"></div>
+      <div class="field full"><label>Short description (optional)</label><textarea data-education-document-field="description" data-education-document-index="${index}" placeholder="A short note shown above the document button.">${esc(doc.description||"")}</textarea></div>
+    </div>
+    <div class="education-document-current"><div>${current}${updated?`<span class="muted small">${updated}</span>`:""}</div>${doc.url?`<button class="danger secondary-danger" type="button" data-remove-education-document-file="${index}">Remove PDF</button>`:""}</div>
+    <div class="gradesheet-upload-card education-document-upload-card" data-education-document-upload-card="${index}">
+      <input accept="application/pdf,.pdf" class="gradesheet-file-input" id="${inputId}" type="file" data-education-document-file="${index}">
+      <label class="gradesheet-upload-dropzone" for="${inputId}">
+        <span class="gradesheet-upload-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M12 16V5"></path><path d="m8 9 4-4 4 4"></path><path d="M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"></path></svg></span>
+        <span class="gradesheet-upload-copy"><strong>Upload ${esc(doc.title||"document")} PDF</strong><small>Choose a PDF or drag and drop it here</small></span>
+        <span class="gradesheet-upload-cta">Choose PDF</span>
+      </label>
+      <div class="gradesheet-upload-footer"><span class="gradesheet-selected-file" data-education-document-file-label="${index}">No new PDF selected</span><button class="secondary gradesheet-upload-now" type="button" data-upload-education-document="${index}" disabled>Upload PDF</button></div>
+    </div>
+    <div class="field education-document-external"><label>Or use an external PDF URL</label><input data-education-document-field="url" data-education-document-index="${index}" value="${esc(doc.url||"")}" placeholder="https://..."><span class="helper">Optional. An uploaded PDF will populate this automatically.</span></div>
+  </article>`;
+}
+function renderEducationSubsectionEditor(){
+  const box=$("educationSubsectionEditor");
+  if(!box)return;
+  const docs=normalizeEducationDocuments(currentContent);
+  box.innerHTML=docs.length?docs.map(educationDocumentRowHtml).join(""):`<div class="empty-state education-subsection-empty">No additional Education subsections yet. Use one of the buttons above whenever you receive a new document.</div>`;
+  ["Provisional Certificate","Transcript","Testimonial"].forEach(title=>{
+    const btn=document.querySelector(`[data-add-education-subsection="${title}"]`);
+    if(btn)btn.disabled=docs.some(doc=>doc.title.toLowerCase()===title.toLowerCase());
+  });
+}
+function addEducationDocumentSubsection(title){
+  normalizeEducationDocuments(currentContent);
+  let name=String(title||"").trim();
+  if(!name)name=String(prompt("Subsection name","")||"").trim();
+  if(!name)return;
+  if(currentContent.educationDocuments.some(doc=>doc.title.toLowerCase()===name.toLowerCase())){setStatus(`${name} already exists.`);return;}
+  const token=Date.now().toString(36);
+  const base=name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,42)||"document";
+  currentContent.educationDocuments.push({id:`${base}-${token}`,title:name,description:"",visible:false,url:"",filename:"",updated_at:"",storagePath:""});
+  renderEducationSubsectionEditor();
+  scheduleAdminPreview(true);
+  setStatus(`${name} subsection added. Upload its PDF and enable Show publicly when ready.`);
+}
+
 function renderGradesheetFileSelection(){
   const input=$("gradesheetFile"),file=input?.files?.[0]||null;
   const card=$("gradesheetUploadCard"),label=$("gradesheetSelectedFile"),button=$("uploadGradesheetBtn");
@@ -2287,6 +2398,7 @@ function normalizeMedia(content){
   content.academicActivities=(content.academicActivities||[]).map(x=>({...x,media:normalizeMediaDisplayList(x.media)}));
   content.skills=(content.skills||[]).map(normalizeSkillGroupRecord);
   content.education=(content.education||[]).map(x=>({...x,gradeLabel:["CGPA","GPA"].includes(String(x?.gradeLabel||"").toUpperCase())?String(x.gradeLabel).toUpperCase():"",cgpa:String(x?.cgpa??""),cgpaSubtitle:String(x?.cgpaSubtitle??""),courses:Array.isArray(x?.courses)?x.courses.map(v=>String(v).trim()).filter(Boolean):String(x?.courses??"").split(/\r?\n|,/).map(v=>v.trim()).filter(Boolean),media:normalizeMediaDisplayList(x.media)}));
+  normalizeEducationDocuments(content);
   content.contact=content.contact||{};
   content.contact.media=normalizeMediaDisplayList(content.contact.media);
   content.thesis.media=normalizeMediaDisplayList(content.thesis.media);
@@ -2409,6 +2521,7 @@ function renderAllEditors(){
   renderActivitiesEditor();
   renderSkillsEditor();
   renderEducationEditor();
+  renderEducationSubsectionEditor();
   $("profileMediaEditor").innerHTML=mediaEditor("profile",currentContent.sectionMedia?.profile||[],"Profile / About media");
   $("thesisMediaEditor").innerHTML=mediaEditor("thesis",currentContent.thesis?.media||[],"Thesis media & attachments");
   $("contactMediaEditor").innerHTML=mediaEditor("contact",currentContent.contact?.media||[],"Contact media");
@@ -3149,6 +3262,37 @@ document.addEventListener("dragend",()=>{
 document.addEventListener("change",e=>{
   const input=e.target.closest?.("[data-media-file]");
   if(input)previewSelectedMediaFile(input);
+});
+
+
+
+document.addEventListener("input",e=>{
+  const field=e.target.closest?.("[data-education-document-field]");
+  if(!field)return;
+  normalizeEducationDocuments(currentContent);
+  const index=Number(field.dataset.educationDocumentIndex),key=field.dataset.educationDocumentField,doc=currentContent.educationDocuments[index];
+  if(!doc||!["title","description","url"].includes(key))return;
+  doc[key]=field.value;
+  if(key==="title"){const row=field.closest(".education-subsection-admin-item");const strong=row?.querySelector(".education-subsection-admin-head strong");if(strong)strong.textContent=field.value.trim()||"Untitled subsection";}
+  scheduleAdminPreview();
+});
+document.addEventListener("change",e=>{
+  const visible=e.target.closest?.("[data-education-document-visible]");
+  if(visible){normalizeEducationDocuments(currentContent);const i=Number(visible.dataset.educationDocumentVisible);if(currentContent.educationDocuments[i])currentContent.educationDocuments[i].visible=visible.checked;scheduleAdminPreview(true);return;}
+  const fileInput=e.target.closest?.("[data-education-document-file]");
+  if(fileInput){const i=Number(fileInput.dataset.educationDocumentFile),file=fileInput.files?.[0]||null,label=document.querySelector(`[data-education-document-file-label="${i}"]`),button=document.querySelector(`[data-upload-education-document="${i}"]`),card=document.querySelector(`[data-education-document-upload-card="${i}"]`);if(label)label.textContent=file?`${file.name} · ${Math.max(1,Math.round(file.size/1024))} KB`:"No new PDF selected";if(button)button.disabled=!file;if(card)card.classList.toggle("has-file",!!file);}
+});
+document.addEventListener("click",async e=>{
+  let b=e.target.closest?.("[data-add-education-subsection]");
+  if(b){addEducationDocumentSubsection(b.dataset.addEducationSubsection);return;}
+  b=e.target.closest?.("[data-move-education-document]");
+  if(b){normalizeEducationDocuments(currentContent);const[i,delta]=b.dataset.moveEducationDocument.split(":").map(Number),j=i+delta,arr=currentContent.educationDocuments;if(i>=0&&j>=0&&j<arr.length){[arr[i],arr[j]]=[arr[j],arr[i]];renderEducationSubsectionEditor();scheduleAdminPreview(true);}return;}
+  b=e.target.closest?.("[data-remove-education-document]");
+  if(b){normalizeEducationDocuments(currentContent);const i=Number(b.dataset.removeEducationDocument),doc=currentContent.educationDocuments[i];if(!doc)return;if(!confirm(`Remove the ${doc.title||"document"} subsection?`))return;if(doc.storagePath){try{await sb.storage.from("cv-files").remove([doc.storagePath])}catch{}}currentContent.educationDocuments.splice(i,1);renderEducationSubsectionEditor();scheduleAdminPreview(true);return;}
+  b=e.target.closest?.("[data-remove-education-document-file]");
+  if(b){normalizeEducationDocuments(currentContent);const i=Number(b.dataset.removeEducationDocumentFile),doc=currentContent.educationDocuments[i];if(!doc)return;if(doc.storagePath){try{await sb.storage.from("cv-files").remove([doc.storagePath])}catch{}}doc.url="";doc.filename="";doc.updated_at="";doc.storagePath="";renderEducationSubsectionEditor();scheduleAdminPreview(true);return;}
+  b=e.target.closest?.("[data-upload-education-document]");
+  if(b){const i=Number(b.dataset.uploadEducationDocument),input=document.querySelector(`[data-education-document-file="${i}"]`),file=input?.files?.[0];if(!file){setStatus("Choose a PDF first.");return;}b.disabled=true;setStatus("Uploading education document...");const ok=await uploadEducationDocumentPdf(i,file);b.disabled=false;if(ok){await persistContent("Education document uploaded.");renderEducationSubsectionEditor();scheduleAdminPreview(true);}return;}
 });
 
 document.addEventListener("click",async e=>{

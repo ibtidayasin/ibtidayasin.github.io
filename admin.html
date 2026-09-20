@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260920-education-subsections-v1" rel="stylesheet"/>
+<link href="styles.css?v=20260920-education-manager-v1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -291,6 +291,31 @@
 </div>
 </details>
 
+
+
+<details class="admin-card education-subsection-manager-fold" open>
+<summary><span><strong>Education subsections</strong><small>Add document subsections now or later without creating another website page.</small></span><span class="education-preset-chevron" aria-hidden="true"></span></summary>
+<div class="education-preset-fold-body">
+  <div class="education-subsection-manager-intro">
+    <div>
+      <h3>Subsection manager</h3>
+      <p class="muted">Education and Gradesheet are built in. Add Provisional Certificate, Transcript, Testimonial, or any other document subsection whenever you receive the file.</p>
+    </div>
+  </div>
+  <div class="education-subsection-fixed-list">
+    <div class="education-subsection-fixed"><span class="education-subsection-lock">Built in</span><strong>Education</strong></div>
+    <div class="education-subsection-fixed"><span class="education-subsection-lock">Built in</span><strong>Gradesheet</strong></div>
+  </div>
+  <div class="education-subsection-quick-add" aria-label="Quick add education subsection">
+    <button class="secondary" type="button" data-add-education-subsection="Provisional Certificate">+ Provisional Certificate</button>
+    <button class="secondary" type="button" data-add-education-subsection="Transcript">+ Transcript</button>
+    <button class="secondary" type="button" data-add-education-subsection="Testimonial">+ Testimonial</button>
+    <button class="secondary" type="button" data-add-education-subsection="">+ Custom subsection</button>
+  </div>
+  <div id="educationSubsectionEditor" class="education-subsection-editor"></div>
+  <p class="helper">New subsections start hidden, so visitors never see an empty tab. Upload the PDF, switch on <b>Show publicly</b>, then click <b>Save all changes</b>.</p>
+</div>
+</details>
 
 <details class="admin-card gradesheet-settings-fold">
 <summary><span><strong>Gradesheet</strong><small>Controls the official semester-by-semester gradesheet shown as an Education subsection.</small></span><span class="education-preset-chevron" aria-hidden="true"></span></summary>
@@ -1959,7 +1984,7 @@
       }
       if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
 
-      await loadScript("admin.js?v=20260920-education-subsections-v1");
+      await loadScript("admin.js?v=20260920-education-manager-v1");
       if(button)button.disabled=false;
       if(status&&status.textContent===readyMessage)status.textContent="";
     }catch(err){
