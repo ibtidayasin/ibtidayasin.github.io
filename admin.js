@@ -2065,7 +2065,6 @@ async function boot(){
 }
 
 function showLogin(){
-  visualEditorAuthReady=false;
   $("loginView")?.classList.remove("hidden");
   $("adminView")?.classList.add("hidden");
 }
@@ -2085,10 +2084,21 @@ async function verifyAdminAndOpen(){
   await loadContent();
   $("loginView")?.classList.add("hidden");
   $("adminView")?.classList.remove("hidden");
-  visualEditorAuthReady=true;
-  initVisualEditor();
   revealAdminUi();
-  if(document.querySelector('[data-panel="visual"]')?.classList.contains("active"))setTimeout(startVisualEditor,0);
+
+  /* Visual Editor must never be part of the authentication critical path.
+     Start it only after the authenticated Admin shell is already open. */
+  setTimeout(()=>{
+    visualEditorAuthReady=true;
+    try{
+      initVisualEditor();
+      if(document.querySelector('[data-panel="visual"]')?.classList.contains("active"))startVisualEditor();
+    }catch(err){
+      console.error("Visual Editor initialization failed:",err);
+      const status=$("visualEditorStatus");
+      if(status)status.textContent="Visual Editor could not initialize. Main Admin is still fully available.";
+    }
+  },0);
 }
 
 async function handleAdminLogin(event){
