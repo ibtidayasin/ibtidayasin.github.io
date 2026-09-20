@@ -2069,22 +2069,71 @@ function showLogin(){
   $("adminView")?.classList.add("hidden");
 }
 
+function adminAuthErrorDetail(err){
+  if(!err)return "Unknown Supabase error";
+  const parts=[];
+  const message=String(err.message||err.error_description||err.details||err.hint||"").trim();
+  if(message)parts.push(message);
+  if(err.code&&!parts.some(v=>v.includes(String(err.code))))parts.push(`code ${err.code}`);
+  if(err.status)parts.push(`HTTP ${err.status}`);
+  return parts.join(" · ")||String(err);
+}
+function waitForAdminAuth(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
 async function verifyAdminAndOpen(){
   ensureSupabaseClient();
-  const{data,error}=await sb.rpc("is_site_admin");
-  if(error||data!==true){
-    await sb.auth.signOut();
-    const status=$("loginStatus");
-    if(status)status.textContent="This account is not authorized to edit the website.";
-    showLogin();
-    revealAdminUi();
-    return;
+  const status=$("loginStatus");
+  let lastError=null;
+
+  /* Supabase is currently rolling out a fix for intermittent JWT rejections.
+     Keep a valid Auth session and retry the Data API/RPC instead of signing the
+     user out whenever verification temporarily returns a transport/401 error. */
+  for(let attempt=1;attempt<=5;attempt++){
+    try{
+      const{data,error}=await sb.rpc("is_site_admin");
+      if(!error){
+        if(data!==true){
+          try{await sb.auth.signOut()}catch(signOutError){console.warn("Admin sign-out warning:",signOutError)}
+          if(status)status.textContent="This account is signed in but is not authorized to edit this website.";
+          showLogin();
+          revealAdminUi();
+          return false;
+        }
+
+        if(status)status.textContent="Loading website editor...";
+        try{
+          await loadContent();
+        }catch(loadError){
+          console.error("Admin content loading failed:",loadError);
+          if(status)status.textContent=`Signed in successfully, but the website editor could not load: ${adminAuthErrorDetail(loadError)}`;
+          showLogin();
+          revealAdminUi();
+          return false;
+        }
+        $("loginView")?.classList.add("hidden");
+        $("adminView")?.classList.remove("hidden");
+        revealAdminUi();
+        return true;
+      }
+      lastError=error;
+    }catch(err){
+      lastError=err;
+    }
+
+    console.warn(`Admin verification attempt ${attempt} failed:`,lastError);
+    if(attempt<5){
+      if(status)status.textContent=`Signed in. Supabase admin verification is temporarily unavailable — retrying (${attempt}/5)...`;
+      await waitForAdminAuth(500*attempt);
+    }
   }
 
-  await loadContent();
-  $("loginView")?.classList.add("hidden");
-  $("adminView")?.classList.remove("hidden");
+  /* Important: do NOT sign out here. Auth may be healthy while PostgREST/API
+     Gateway is temporarily rejecting the new JWT. Keeping the session lets a
+     reload retry verification without asking for the password again. */
+  const detail=adminAuthErrorDetail(lastError);
+  if(status)status.textContent=`Signed in, but Supabase could not verify Admin access after 5 attempts: ${detail}. Your login session has been kept; reload this page to retry.`;
+  showLogin();
   revealAdminUi();
+  return false;
 }
 
 async function handleAdminLogin(event){
@@ -2113,7 +2162,7 @@ async function handleAdminLogin(event){
     await verifyAdminAndOpen();
   }catch(err){
     console.error("Admin sign-in failed:",err);
-    status.textContent="Could not complete sign-in. Reload the page and try again.";
+    status.textContent=`Sign-in request failed: ${adminAuthErrorDetail(err)}. If this is a network/API error, reload and retry; your website content is unaffected.`;
   }finally{
     button.disabled=false;
     button.removeAttribute("aria-busy");
