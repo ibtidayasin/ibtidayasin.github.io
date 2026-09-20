@@ -2329,11 +2329,8 @@ function renderEducationSubsectionEditor(){
   const box=$("educationSubsectionEditor");
   if(!box)return;
   const docs=normalizeEducationDocuments(currentContent);
-  box.innerHTML=docs.length?docs.map(educationDocumentRowHtml).join(""):`<div class="empty-state education-subsection-empty">No additional Education subsections yet. Use one of the buttons above whenever you receive a new document.</div>`;
-  ["Provisional Certificate","Transcript","Testimonial"].forEach(title=>{
-    const btn=document.querySelector(`[data-add-education-subsection="${title}"]`);
-    if(btn)btn.disabled=docs.some(doc=>doc.title.toLowerCase()===title.toLowerCase());
-  });
+  box.innerHTML=docs.length?docs.map(educationDocumentRowHtml).join(""):`<div class="empty-state education-subsection-empty">No additional Education subsections yet. Use <b>+ Add subsection</b> whenever you receive a new document.</div>`;
+  renderEducationAdminOrganizer();
 }
 function addEducationDocumentSubsection(title){
   normalizeEducationDocuments(currentContent);
@@ -2343,7 +2340,10 @@ function addEducationDocumentSubsection(title){
   if(currentContent.educationDocuments.some(doc=>doc.title.toLowerCase()===name.toLowerCase())){setStatus(`${name} already exists.`);return;}
   const token=Date.now().toString(36);
   const base=name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,42)||"document";
-  currentContent.educationDocuments.push({id:`${base}-${token}`,title:name,description:"",visible:false,url:"",filename:"",updated_at:"",storagePath:""});
+  const created={id:`${base}-${token}`,title:name,description:"",visible:false,url:"",filename:"",updated_at:"",storagePath:""};
+  currentContent.educationDocuments.push(created);
+  educationAdminActiveCategory=educationAdminKeyForDocument(created);
+  try{localStorage.setItem(EDUCATION_ADMIN_CATEGORY_STORAGE_KEY,educationAdminActiveCategory)}catch{}
   renderEducationSubsectionEditor();
   scheduleAdminPreview(true);
   setStatus(`${name} subsection added. Upload its PDF and enable Show publicly when ready.`);
@@ -2522,6 +2522,7 @@ function renderAllEditors(){
   renderSkillsEditor();
   renderEducationEditor();
   renderEducationSubsectionEditor();
+  renderEducationAdminOrganizer();
   $("profileMediaEditor").innerHTML=mediaEditor("profile",currentContent.sectionMedia?.profile||[],"Profile / About media");
   $("thesisMediaEditor").innerHTML=mediaEditor("thesis",currentContent.thesis?.media||[],"Thesis media & attachments");
   $("contactMediaEditor").innerHTML=mediaEditor("contact",currentContent.contact?.media||[],"Contact media");
@@ -2624,6 +2625,97 @@ function savedActivityAdminCategory(){
 }
 
 let activityAdminActiveCategory=savedActivityAdminCategory()||ACTIVITY_ADMIN_CATEGORIES[0];
+
+
+const EDUCATION_ADMIN_CATEGORY_STORAGE_KEY="academicAdminEducationCategory";
+function educationAdminKeyForDocument(doc){return doc?.id?`document:${doc.id}`:""}
+function savedEducationAdminCategory(){
+  try{return String(localStorage.getItem(EDUCATION_ADMIN_CATEGORY_STORAGE_KEY)||"")}catch{return ""}
+}
+let educationAdminActiveCategory=savedEducationAdminCategory()||"education";
+
+function educationAdminCategories(){
+  const docs=normalizeEducationDocuments(currentContent);
+  return [
+    {key:"education",label:"Education",count:(currentContent.education||[]).length,builtIn:true},
+    {key:"gradesheet",label:"Gradesheet",count:1,builtIn:true},
+    ...docs.map(doc=>({key:educationAdminKeyForDocument(doc),label:doc.title||"Untitled subsection",count:1,builtIn:false,id:doc.id}))
+  ];
+}
+function normalizeEducationAdminCategoryKey(key){
+  const categories=educationAdminCategories();
+  return categories.some(item=>item.key===key)?key:"education";
+}
+function renderEducationAdminCategoryTabs(){
+  const tabs=$("educationAdminCategoryTabs");
+  if(!tabs)return;
+  educationAdminActiveCategory=normalizeEducationAdminCategoryKey(educationAdminActiveCategory);
+  tabs.innerHTML=educationAdminCategories().map(item=>{
+    const active=item.key===educationAdminActiveCategory;
+    return `<button class="activity-category-tab ${active?"active":""}" type="button" role="tab" aria-selected="${active?"true":"false"}" data-education-admin-category="${esc(item.key)}"><span>${esc(item.label)}</span><small>${item.count}</small></button>`;
+  }).join("");
+}
+function educationRecordSearchText(item){
+  return [item?.degree,item?.institution,item?.period,item?.cgpa,item?.cgpaSubtitle,item?.description,...(item?.courses||[])].filter(Boolean).join(" ").toLowerCase();
+}
+function applyEducationAdminOrganizer(){
+  const categories=educationAdminCategories();
+  educationAdminActiveCategory=normalizeEducationAdminCategoryKey(educationAdminActiveCategory);
+  const active=categories.find(item=>item.key===educationAdminActiveCategory)||categories[0];
+  const isEducation=active.key==="education",isGradesheet=active.key==="gradesheet",isDocument=active.key.startsWith("document:");
+  $("educationAdminViewEducation")?.classList.toggle("hidden",!isEducation);
+  $("educationAdminViewGradesheet")?.classList.toggle("hidden",!isGradesheet);
+  $("educationAdminViewDocument")?.classList.toggle("hidden",!isDocument);
+  document.querySelectorAll("#educationAdminCategoryTabs [data-education-admin-category]").forEach(btn=>{
+    const selected=btn.dataset.educationAdminCategory===active.key;
+    btn.classList.toggle("active",selected);btn.setAttribute("aria-selected",selected?"true":"false");
+  });
+
+  const search=$("educationSearchInput"),expand=$("expandEducationAdminBtn"),collapse=$("collapseEducationAdminBtn"),addEdu=$("addEducationBtn");
+  if(search){search.disabled=!isEducation;search.placeholder=isEducation?"Search Education records":(isDocument?`Viewing ${active.label}`:"Gradesheet settings");if(!isEducation)search.value="";}
+  if(expand)expand.classList.toggle("hidden",!isEducation);
+  if(collapse)collapse.classList.toggle("hidden",!isEducation);
+  if(addEdu){addEdu.classList.toggle("hidden",!isEducation);addEdu.textContent="+ Add to Education";}
+
+  let shown=0;
+  const query=isEducation?String(search?.value||"").trim().toLowerCase():"";
+  document.querySelectorAll('#educationEditor [data-education]').forEach(row=>{
+    const i=Number(row.dataset.education),item=currentContent.education?.[i]||{};
+    const visible=isEducation&&(!query||educationRecordSearchText(item).includes(query));
+    row.classList.toggle("activity-admin-filtered-out",!visible);
+    if(visible)shown++;
+  });
+
+  const docs=normalizeEducationDocuments(currentContent);
+  const docId=isDocument?active.key.slice("document:".length):"";
+  let docFound=false;
+  document.querySelectorAll('#educationSubsectionEditor [data-education-document-index]').forEach(row=>{
+    const i=Number(row.dataset.educationDocumentIndex),doc=docs[i];
+    const visible=isDocument&&doc?.id===docId;
+    row.classList.toggle("activity-admin-filtered-out",!visible);
+    if(visible)docFound=true;
+  });
+
+  const status=$("educationAdminCategoryStatus");
+  if(status){
+    if(isEducation)status.textContent=query?`${shown} matching ${shown===1?"record":"records"} in Education`:`${shown} ${shown===1?"record":"records"} in Education`;
+    else if(isGradesheet)status.textContent="Official semester-by-semester gradesheet settings";
+    else status.textContent=docFound?`1 document in ${active.label}`:`${active.label} document subsection`;
+  }
+  const empty=$("educationAdminCategoryEmptyState");
+  if(empty){
+    const showEmpty=isEducation&&shown===0;
+    empty.classList.toggle("hidden",!showEmpty);
+    if(showEmpty)empty.textContent=query?`No Education records match “${search?.value||""}”.`:`No Education records yet.`;
+  }
+}
+function renderEducationAdminOrganizer(){renderEducationAdminCategoryTabs();applyEducationAdminOrganizer()}
+function setEducationAdminCategory(key,persist=true){
+  educationAdminActiveCategory=normalizeEducationAdminCategoryKey(key);
+  if(persist){try{localStorage.setItem(EDUCATION_ADMIN_CATEGORY_STORAGE_KEY,educationAdminActiveCategory)}catch{}}
+  if($("educationSearchInput"))$("educationSearchInput").value="";
+  applyEducationAdminOrganizer();
+}
 
 function activityCardStyleSummary(item){
   const explicit=normalizeActivityCardDesign(item?.cardDesign);
@@ -2865,8 +2957,9 @@ function renderEducationEditor(){
     {label:"Grade subtitle / academic distinction",key:"cgpaSubtitle",value:e.cgpaSubtitle||"",full:true},
     {label:"Description",key:"description",value:e.description,kind:"textarea",full:true},
     {label:"Important Courses — one per line",key:"courses",value:(e.courses||[]).join("\n"),kind:"textarea",full:true}
-  ],e.media||[],e.visible!==false)).join("")||`<div class="empty-state">No education entries added.</div>`;
+  ],e.media||[],e.visible!==false)).join("")||`<div class="empty-state">No education entries added.</div>`;  renderEducationAdminOrganizer();
 }
+
 
 function adminVideoEmbed(url){
   try{
@@ -3200,6 +3293,20 @@ $("collapseActivitiesBtn")?.addEventListener("click",()=>{
   document.querySelectorAll('#activitiesEditor [data-activity]:not(.activity-admin-filtered-out)').forEach(row=>setActivityRowCollapsed(row,true));
 });
 
+
+$("educationSearchInput")?.addEventListener("input",applyEducationAdminOrganizer);
+$("expandEducationAdminBtn")?.addEventListener("click",()=>{
+  document.querySelectorAll('#educationEditor [data-education]:not(.activity-admin-filtered-out)').forEach(row=>setRepeatRowCollapsed(row,false));
+});
+$("collapseEducationAdminBtn")?.addEventListener("click",()=>{
+  document.querySelectorAll('#educationEditor [data-education]:not(.activity-admin-filtered-out)').forEach(row=>setRepeatRowCollapsed(row,true));
+});
+$("addEducationSubsectionBtn")?.addEventListener("click",()=>addEducationDocumentSubsection(""));
+document.addEventListener("click",e=>{
+  const tab=e.target.closest?.("[data-education-admin-category]");
+  if(tab){setEducationAdminCategory(tab.dataset.educationAdminCategory);return}
+});
+
 document.addEventListener("input",e=>{
   const row=e.target.closest?.('#activitiesEditor [data-activity]');
   if(!row)return;
@@ -3273,7 +3380,7 @@ document.addEventListener("input",e=>{
   const index=Number(field.dataset.educationDocumentIndex),key=field.dataset.educationDocumentField,doc=currentContent.educationDocuments[index];
   if(!doc||!["title","description","url"].includes(key))return;
   doc[key]=field.value;
-  if(key==="title"){const row=field.closest(".education-subsection-admin-item");const strong=row?.querySelector(".education-subsection-admin-head strong");if(strong)strong.textContent=field.value.trim()||"Untitled subsection";}
+  if(key==="title"){const row=field.closest(".education-subsection-admin-item");const strong=row?.querySelector(".education-subsection-admin-head strong");if(strong)strong.textContent=field.value.trim()||"Untitled subsection";renderEducationAdminCategoryTabs();applyEducationAdminOrganizer();}
   scheduleAdminPreview();
 });
 document.addEventListener("change",e=>{
@@ -3288,7 +3395,7 @@ document.addEventListener("click",async e=>{
   b=e.target.closest?.("[data-move-education-document]");
   if(b){normalizeEducationDocuments(currentContent);const[i,delta]=b.dataset.moveEducationDocument.split(":").map(Number),j=i+delta,arr=currentContent.educationDocuments;if(i>=0&&j>=0&&j<arr.length){[arr[i],arr[j]]=[arr[j],arr[i]];renderEducationSubsectionEditor();scheduleAdminPreview(true);}return;}
   b=e.target.closest?.("[data-remove-education-document]");
-  if(b){normalizeEducationDocuments(currentContent);const i=Number(b.dataset.removeEducationDocument),doc=currentContent.educationDocuments[i];if(!doc)return;if(!confirm(`Remove the ${doc.title||"document"} subsection?`))return;if(doc.storagePath){try{await sb.storage.from("cv-files").remove([doc.storagePath])}catch{}}currentContent.educationDocuments.splice(i,1);renderEducationSubsectionEditor();scheduleAdminPreview(true);return;}
+  if(b){normalizeEducationDocuments(currentContent);const i=Number(b.dataset.removeEducationDocument),doc=currentContent.educationDocuments[i];if(!doc)return;if(!confirm(`Remove the ${doc.title||"document"} subsection?`))return;if(doc.storagePath){try{await sb.storage.from("cv-files").remove([doc.storagePath])}catch{}}const removedKey=educationAdminKeyForDocument(doc);currentContent.educationDocuments.splice(i,1);if(educationAdminActiveCategory===removedKey)educationAdminActiveCategory="education";renderEducationSubsectionEditor();scheduleAdminPreview(true);return;}
   b=e.target.closest?.("[data-remove-education-document-file]");
   if(b){normalizeEducationDocuments(currentContent);const i=Number(b.dataset.removeEducationDocumentFile),doc=currentContent.educationDocuments[i];if(!doc)return;if(doc.storagePath){try{await sb.storage.from("cv-files").remove([doc.storagePath])}catch{}}doc.url="";doc.filename="";doc.updated_at="";doc.storagePath="";renderEducationSubsectionEditor();scheduleAdminPreview(true);return;}
   b=e.target.closest?.("[data-upload-education-document]");

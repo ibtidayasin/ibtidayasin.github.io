@@ -7343,3 +7343,19 @@ body:not(.admin-body) #education[data-education-preset="stacked-bands"] .edu{dis
 /* Education subsection manager */
 .education-subsection-manager-intro{display:flex;justify-content:space-between;gap:20px;align-items:flex-start}.education-subsection-manager-intro h3{margin:0 0 6px}.education-subsection-fixed-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:16px 0}.education-subsection-fixed{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface-alt)}.education-subsection-lock{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:4px 7px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}.education-subsection-quick-add{display:flex;gap:9px;flex-wrap:wrap;margin:4px 0 16px}.education-subsection-editor{display:grid;gap:12px}.education-subsection-admin-item{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface)}.education-subsection-admin-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:14px}.education-subsection-admin-head>div:first-child{display:flex;align-items:center;gap:9px;min-width:0;flex-wrap:wrap}.education-subsection-admin-head small{color:var(--muted)}.education-subsection-order{display:inline-grid;place-items:center;min-width:30px;height:26px;border-radius:8px;background:var(--accent-soft);color:var(--accent);font-size:10px;font-weight:800}.education-subsection-admin-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.education-subsection-fields{margin-bottom:12px}.education-document-current{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:4px 0 12px;padding:10px 12px;border-radius:10px;background:var(--surface-alt)}.education-document-current>div{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.education-document-upload-card{margin-top:0}.education-document-external{margin-top:12px}.education-subsection-empty{margin:8px 0 2px}.secondary-danger{border-color:color-mix(in srgb,#c44 35%,var(--line));color:#a33}
 @media(max-width:760px){.education-subsection-fixed-list{grid-template-columns:1fr}.education-subsection-admin-head,.education-document-current{align-items:flex-start;flex-direction:column}.education-subsection-admin-actions{width:100%}}
+
+
+/* Education Admin Organizer — mirrors Academic Activities organizer */
+.education-admin-organizer{margin:18px 0 14px}
+.education-admin-category-view.hidden{display:none!important}
+#educationEditor .activity-admin-filtered-out,
+#educationSubsectionEditor .activity-admin-filtered-out{display:none!important}
+#educationAdminViewDocument .education-subsection-editor{margin-top:0}
+#educationAdminCategoryTabs .activity-category-tab small{min-width:18px;text-align:center}
+@media(max-width:760px){
+  #educationAdminOrganizer .activity-admin-toolbar{align-items:stretch}
+  #educationAdminOrganizer .activity-admin-toolbar-actions{width:100%}
+  #educationAdminOrganizer .activity-search-wrap{min-width:0;flex:1 1 100%}
+  #educationAdminOrganizer .activity-admin-category-action{align-items:flex-start;gap:10px;flex-direction:column}
+  #educationAdminOrganizer .activity-admin-category-action .collection-admin-toolbar-actions{width:100%;flex-wrap:wrap}
+}
