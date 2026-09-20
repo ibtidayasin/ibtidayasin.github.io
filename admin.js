@@ -4837,3 +4837,451 @@ document.querySelectorAll('[data-sidebar-fold]').forEach(fold=>{
   if(saved!==null)fold.open=saved==='1';
   fold.addEventListener('toggle',()=>localStorage.setItem(key,fold.open?'1':'0'));
 });
+
+
+/* =========================================================
+   VISUAL EDITOR — 20260920-v1
+   This interface intentionally shares currentContent, history, saveAll(),
+   fillForms(), and every existing Admin panel with the form editor.
+   ========================================================= */
+const VISUAL_EDITOR_PANEL_KEYS=["profile","research","thesis","publications","projects","activities","skills","education","contact","cv","appearance","navigation","sidebar","typography","layout","structure","cover","experience","history","backup"];
+const VISUAL_EDITOR_VIEWPORTS={
+  desktop:{width:1280,height:800,label:"Desktop · 1280 × 800"},
+  tablet:{width:768,height:1024,label:"Tablet · 768 × 1024"},
+  mobile:{width:390,height:844,label:"Mobile · 390 × 844"}
+};
+let visualEditorMode=localStorage.getItem("academicVisualEditorMode")==="layout"?"layout":"content";
+let visualEditorDevice=Object.prototype.hasOwnProperty.call(VISUAL_EDITOR_VIEWPORTS,localStorage.getItem("academicVisualEditorDevice"))?localStorage.getItem("academicVisualEditorDevice"):"desktop";
+let visualInspectorTab=localStorage.getItem("academicVisualInspectorTab")==="settings"?"settings":"selected";
+let visualSelected=null;
+let visualUpdateTimer=null;
+let visualDockedPanel=null;
+let visualDockPlaceholder=null;
+let visualDragPayload=null;
+let visualFramePreparedFor=null;
+let visualDirty=false;
+
+function visualEditorIsActive(){return document.querySelector('[data-panel="visual"]')?.classList.contains("active")}
+function visualFrame(){return $("visualEditorFrame")}
+function visualSetStatus(message,{dirty}={}){
+  if($("visualEditorStatus"))$("visualEditorStatus").textContent=message||"Ready.";
+  if(typeof dirty==="boolean")visualDirty=dirty;
+  $("visualSaveDot")?.classList.toggle("is-dirty",visualDirty);
+}
+function visualMarkDirty(message="Unsaved visual changes · Main Admin is synchronized"){
+  visualSetStatus(message,{dirty:true});
+}
+function visualClearDirty(message="Published. Visual Editor and Main Admin are synchronized."){
+  visualSetStatus(message,{dirty:false});
+}
+function visualSectionHash(key){return key==="about"?"#home":`#${key}`}
+function visualSectionLabel(key){
+  const headings=normalizeSectionHeadings(currentContent).sectionHeadings;
+  return headings?.[key]?.title||DEFAULT_SECTION_HEADINGS?.[key]?.title||key;
+}
+
+function applyVisualEditorViewport(device=visualEditorDevice){
+  if(!Object.prototype.hasOwnProperty.call(VISUAL_EDITOR_VIEWPORTS,device))device="desktop";
+  visualEditorDevice=device;localStorage.setItem("academicVisualEditorDevice",device);
+  const spec=VISUAL_EDITOR_VIEWPORTS[device],shell=$("visualEditorFrameShell"),stage=$("visualEditorScaleStage"),canvas=$("visualEditorCanvas"),frame=visualFrame();
+  if(!shell||!stage||!canvas||!frame)return;
+  shell.style.width=`${spec.width}px`;shell.style.height=`${spec.height}px`;frame.style.width="100%";frame.style.height="100%";
+  const applyScale=()=>{
+    const available=Math.max(300,canvas.clientWidth-36);
+    const scale=Math.min(1,available/spec.width);
+    shell.style.transform=`scale(${scale})`;
+    stage.style.width=`${Math.round(spec.width*scale)}px`;
+    stage.style.height=`${Math.round(spec.height*scale)}px`;
+  };
+  requestAnimationFrame(applyScale);
+  document.querySelectorAll("[data-visual-device]").forEach(b=>b.classList.toggle("active",b.dataset.visualDevice===device));
+  if($("visualViewportLabel"))$("visualViewportLabel").textContent=spec.label;
+  try{frame.contentWindow?.dispatchEvent(new Event("resize"))}catch{}
+}
+
+function visualCurrentHash(){
+  const frame=visualFrame();
+  try{return frame?.contentWindow?.location?.hash||previewLastHash||"#home"}catch{return previewLastHash||"#home"}
+}
+function sendVisualEditorContent(){
+  const frame=visualFrame();if(!frame?.contentWindow)return;
+  setHistoryMuted(()=>{try{syncAllForms()}catch{}});
+  frame.contentWindow.postMessage({type:"academic-site-preview",content:historySnapshot(currentContent)},location.origin);
+}
+function scheduleVisualEditorUpdate(force=false){
+  if(!visualEditorIsActive()&&!force)return;
+  clearTimeout(visualUpdateTimer);
+  visualUpdateTimer=setTimeout(()=>{sendVisualEditorContent();renderVisualSectionOutline();renderVisualSelectedInspector()},force?20:180);
+}
+function reloadVisualEditor(){
+  const frame=visualFrame();if(!frame)return;
+  setHistoryMuted(()=>{try{syncAllForms()}catch{}});
+  const hash=visualCurrentHash();
+  const bust=`${Date.now()}-${Math.random().toString(36).slice(2,8)}`;
+  visualFramePreparedFor=null;
+  frame.src=`index.html?adminPreview=1&visualEditor=1&previewBust=${encodeURIComponent(bust)}${hash}`;
+  visualSetStatus("Reloading visual canvas…");
+}
+
+function visualReturnDockedPanel(){
+  if(!visualDockedPanel)return;
+  try{
+    if(visualDockPlaceholder?.parentNode)visualDockPlaceholder.parentNode.insertBefore(visualDockedPanel,visualDockPlaceholder);
+    visualDockPlaceholder?.remove();
+  }catch{}
+  visualDockedPanel.classList.remove("visual-docked-panel");
+  visualDockedPanel=null;visualDockPlaceholder=null;
+}
+function visualDockSettingsPanel(panelName,{focusSelector=""}={}){
+  if(!VISUAL_EDITOR_PANEL_KEYS.includes(panelName))panelName="profile";
+  visualReturnDockedPanel();
+  const panel=document.querySelector(`[data-panel="${panelName}"]`),dock=$("visualSettingsDock");
+  if(!panel||!dock||panel.dataset.panel==="visual")return;
+  visualDockPlaceholder=document.createComment(`visual-editor-placeholder:${panelName}`);
+  panel.parentNode?.insertBefore(visualDockPlaceholder,panel);
+  dock.appendChild(panel);panel.classList.add("visual-docked-panel");
+  visualDockedPanel=panel;
+  if($("visualSettingsPanelSelect"))$("visualSettingsPanelSelect").value=panelName;
+  if(focusSelector){
+    setTimeout(()=>{
+      const target=panel.querySelector(focusSelector);
+      if(target){target.scrollIntoView({behavior:"smooth",block:"center"});target.focus?.()}
+    },80);
+  }
+}
+function setVisualInspectorTab(tab){
+  visualInspectorTab=tab==="settings"?"settings":"selected";localStorage.setItem("academicVisualInspectorTab",visualInspectorTab);
+  document.querySelectorAll("[data-visual-inspector-tab]").forEach(b=>b.classList.toggle("active",b.dataset.visualInspectorTab===visualInspectorTab));
+  document.querySelectorAll("[data-visual-inspector-view]").forEach(v=>v.classList.toggle("active",v.dataset.visualInspectorView===visualInspectorTab));
+  if(visualInspectorTab==="settings"&&!visualDockedPanel){
+    const saved=localStorage.getItem("academicVisualSettingsPanel");
+    visualDockSettingsPanel(VISUAL_EDITOR_PANEL_KEYS.includes(saved)?saved:"profile");
+  }
+}
+function visualOpenFullSettings(panelName,focusSelector=""){
+  setVisualInspectorTab("settings");
+  localStorage.setItem("academicVisualSettingsPanel",panelName);
+  visualDockSettingsPanel(panelName,{focusSelector});
+}
+
+function visualSetByPath(root,path,value){
+  const parts=String(path||"").split(".").filter(Boolean);if(!parts.length)return;
+  let obj=root;
+  for(let i=0;i<parts.length-1;i++){
+    const p=/^\d+$/.test(parts[i])?Number(parts[i]):parts[i];
+    if(obj[p]==null)obj[p]=/^\d+$/.test(parts[i+1])?[]:{};
+    obj=obj[p];
+  }
+  const last=/^\d+$/.test(parts.at(-1))?Number(parts.at(-1)):parts.at(-1);
+  obj[last]=value;
+}
+function visualGetByPath(root,path){
+  return String(path||"").split(".").filter(Boolean).reduce((o,p)=>o==null?undefined:o[/^\d+$/.test(p)?Number(p):p],root);
+}
+function visualCommitMutation(mutator,message="Visual edit applied"){
+  capturePreMutation();
+  mutator();
+  normalizeSiteSettings(currentContent);normalizeSectionHeadings(currentContent);normalizeMedia(currentContent);
+  setHistoryMuted(()=>fillForms());
+  globalHistoryLast=historySnapshot(currentContent);globalRedoStack=[];updateHistoryUi();
+  visualMarkDirty(message);
+  scheduleVisualEditorUpdate(true);
+}
+function visualCommitPath(path,value,label="Content"){
+  visualCommitMutation(()=>visualSetByPath(currentContent,path,value),`${label} updated · Main Admin synchronized`);
+}
+
+const VISUAL_INLINE_MAP={
+  name:{path:"name",label:"Name",panel:"profile"},
+  title:{path:"title",label:"Professional title",panel:"profile"},
+  institution:{path:"institution",label:"Institution",panel:"profile"},
+  location:{path:"location",label:"Location",panel:"profile"},
+  focus:{path:"focus",label:"Research focus",panel:"profile"},
+  aboutSectionTitle:{path:"sectionHeadings.about.title",label:"About section title",panel:"profile"},
+  aboutHeadline:{path:"sectionHeadings.about.subtitle",label:"About section subtitle",panel:"profile"},
+  aboutLead:{path:"aboutLead",label:"Short introduction",panel:"profile",multiline:true},
+  aboutBio:{path:"aboutBio",label:"Biography",panel:"profile",multiline:true},
+  researchSectionTitle:{path:"sectionHeadings.research.title",label:"Research section title",panel:"research"},
+  researchSectionSubtitle:{path:"sectionHeadings.research.subtitle",label:"Research section subtitle",panel:"research"},
+  thesisSectionTitle:{path:"sectionHeadings.thesis.title",label:"Thesis section title",panel:"thesis"},
+  thesisSectionSubtitle:{path:"sectionHeadings.thesis.subtitle",label:"Thesis section subtitle",panel:"thesis"},
+  thesisTitle:{path:"thesis.title",label:"Thesis title",panel:"thesis"},
+  thesisDescription:{path:"thesis.description",label:"Thesis description",panel:"thesis",multiline:true},
+  publicationsSectionTitle:{path:"sectionHeadings.publications.title",label:"Publications section title",panel:"publications"},
+  publicationsSectionSubtitle:{path:"sectionHeadings.publications.subtitle",label:"Publications section subtitle",panel:"publications"},
+  projectsSectionTitle:{path:"sectionHeadings.projects.title",label:"Projects section title",panel:"projects"},
+  projectsSectionSubtitle:{path:"sectionHeadings.projects.subtitle",label:"Projects section subtitle",panel:"projects"},
+  activitiesSectionTitle:{path:"sectionHeadings.activities.title",label:"Activities section title",panel:"activities"},
+  activitiesSectionSubtitle:{path:"sectionHeadings.activities.subtitle",label:"Activities section subtitle",panel:"activities"},
+  skillsSectionTitle:{path:"sectionHeadings.skills.title",label:"Skills section title",panel:"skills"},
+  skillsSectionSubtitle:{path:"sectionHeadings.skills.subtitle",label:"Skills section subtitle",panel:"skills"},
+  educationSectionTitle:{path:"sectionHeadings.education.title",label:"Education section title",panel:"education"},
+  educationSectionSubtitle:{path:"sectionHeadings.education.subtitle",label:"Education section subtitle",panel:"education"},
+  contactSectionTitle:{path:"sectionHeadings.contact.title",label:"Contact section title",panel:"contact"},
+  contactHeadline:{path:"sectionHeadings.contact.subtitle",label:"Contact section subtitle",panel:"contact"},
+  contactMessage:{path:"contact.message",label:"Contact message",panel:"contact",multiline:true},
+  cvSectionTitle:{path:"sectionHeadings.cv.title",label:"CV section title",panel:"cv"},
+  cvSectionSubtitle:{path:"sectionHeadings.cv.subtitle",label:"CV section subtitle",panel:"cv"}
+};
+
+function visualVisibleIndexes(arr,predicate=()=>true){const out=[];(arr||[]).forEach((item,i)=>{if(item?.visible!==false&&predicate(item))out.push(i)});return out}
+function annotateVisualFrame(doc){
+  if(!doc?.body)return;
+  Object.entries(VISUAL_INLINE_MAP).forEach(([id,meta])=>{
+    const el=doc.getElementById(id);if(!el)return;
+    el.dataset.vePath=meta.path;el.dataset.veLabel=meta.label;el.dataset.vePanel=meta.panel;el.classList.add("ve-editable-text");
+  });
+  const profile=doc.querySelector(".profile-card,.sidebar-profile,.profile-panel,.sidebar");if(profile){profile.dataset.veKind="profile";profile.dataset.vePanel="profile"}
+  doc.querySelectorAll(".section[data-section-key]").forEach(sec=>{sec.dataset.veKind="section";sec.dataset.vePanel=sec.dataset.sectionKey});
+  const assign=(selector,type,indices)=>doc.querySelectorAll(selector).forEach((el,pos)=>{const index=indices[pos];if(index==null)return;el.dataset.veKind="item";el.dataset.veType=type;el.dataset.veIndex=String(index);el.dataset.vePanel=type==="publication"?"publications":type==="project"?"projects":type==="activity"?"activities":type==="skill"?"skills":"education";el.classList.add("ve-editable-card")});
+  assign("#publicationsList .pub-item","publication",visualVisibleIndexes(currentContent.publications));
+  assign("#projectsList .card","project",visualVisibleIndexes(currentContent.projects));
+  assign("#skillsList .skill-card","skill",visualVisibleIndexes(currentContent.skills));
+  assign("#educationList .edu","education",visualVisibleIndexes(currentContent.education));
+  doc.querySelectorAll("#activitiesList [data-activity-panel]").forEach(panel=>{
+    const category=panel.dataset.activityPanel;
+    const indices=visualVisibleIndexes(currentContent.academicActivities,item=>academicActivityHasContent(item)&&item.category===category);
+    panel.querySelectorAll(".activity-card").forEach((el,pos)=>{if(indices[pos]==null)return;el.dataset.veKind="item";el.dataset.veType="activity";el.dataset.veIndex=String(indices[pos]);el.dataset.vePanel="activities";el.classList.add("ve-editable-card")});
+  });
+}
+
+function injectVisualFrameStyle(doc){
+  if(doc.getElementById("visualEditorInjectedStyle"))return;
+  const style=doc.createElement("style");style.id="visualEditorInjectedStyle";style.textContent=`
+    html.visual-editor-frame body{cursor:default!important}
+    html.visual-editor-frame .ve-editable-text,html.visual-editor-frame [data-ve-kind=section],html.visual-editor-frame .ve-editable-card,html.visual-editor-frame [data-ve-kind=profile]{position:relative;outline:1px solid transparent;outline-offset:4px;transition:outline-color .12s ease,box-shadow .12s ease}
+    html.visual-editor-frame.visual-mode-content .ve-editable-text:hover,html.visual-editor-frame.visual-mode-content .ve-editable-card:hover,html.visual-editor-frame.visual-mode-content [data-ve-kind=profile]:hover,html.visual-editor-frame.visual-mode-content [data-ve-kind=section]:hover{outline:1px dashed rgba(63,119,159,.75);outline-offset:4px}
+    html.visual-editor-frame .ve-selected{outline:2px solid #4f89b2!important;outline-offset:4px!important;box-shadow:0 0 0 5px rgba(79,137,178,.10)!important}
+    html.visual-editor-frame .ve-inline-editing{outline:2px solid #2c78ad!important;background:rgba(240,248,254,.95)!important;border-radius:3px;cursor:text!important}
+    html.visual-editor-frame.visual-mode-layout [data-ve-kind=section],html.visual-editor-frame.visual-mode-layout .ve-editable-card{outline:1px dashed rgba(78,95,118,.45);outline-offset:5px;cursor:grab!important}
+    html.visual-editor-frame.visual-mode-layout [data-ve-kind=section]::before,html.visual-editor-frame.visual-mode-layout .ve-editable-card::before{content:"⋮⋮  DRAG";position:absolute;z-index:9999;left:6px;top:6px;background:#203449;color:#fff;font:700 9px/1 system-ui,sans-serif;letter-spacing:.08em;padding:6px 7px;border-radius:6px;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.18)}
+    html.visual-editor-frame .ve-drag-over{outline:3px solid #4f89b2!important;outline-offset:6px!important}
+  `;doc.head.appendChild(style);
+}
+function setVisualFrameMode(doc){
+  if(!doc?.documentElement)return;
+  doc.documentElement.classList.add("visual-editor-frame");
+  doc.documentElement.classList.toggle("visual-mode-content",visualEditorMode==="content");
+  doc.documentElement.classList.toggle("visual-mode-layout",visualEditorMode==="layout");
+  doc.querySelectorAll('[data-ve-kind="section"],.ve-editable-card').forEach(el=>el.draggable=visualEditorMode==="layout");
+}
+function visualSelectionFromElement(el){
+  const pathEl=el.closest?.("[data-ve-path]");
+  if(pathEl)return{kind:"path",path:pathEl.dataset.vePath,label:pathEl.dataset.veLabel||"Text",panel:pathEl.dataset.vePanel||"profile",element:pathEl};
+  const item=el.closest?.('[data-ve-kind="item"]');
+  if(item)return{kind:"item",type:item.dataset.veType,index:Number(item.dataset.veIndex),panel:item.dataset.vePanel||"profile",element:item};
+  const sec=el.closest?.('[data-ve-kind="section"]');
+  if(sec)return{kind:"section",key:sec.dataset.sectionKey,panel:sec.dataset.sectionKey,element:sec};
+  const profile=el.closest?.('[data-ve-kind="profile"]');
+  if(profile)return{kind:"profile",panel:"profile",element:profile};
+  return null;
+}
+function clearVisualFrameSelection(doc){doc?.querySelectorAll(".ve-selected").forEach(el=>el.classList.remove("ve-selected"))}
+function selectVisualElement(selection){
+  visualSelected=selection?{...selection,element:undefined}:null;
+  const doc=visualFrame()?.contentDocument;clearVisualFrameSelection(doc);selection?.element?.classList.add("ve-selected");
+  renderVisualSelectedInspector();
+}
+function beginVisualInlineEdit(el){
+  if(visualEditorMode!=="content"||!el?.dataset.vePath)return;
+  const original=el.textContent;el.contentEditable="true";el.spellcheck=true;el.classList.add("ve-inline-editing");el.focus();
+  const range=el.ownerDocument.createRange();range.selectNodeContents(el);range.collapse(false);const sel=el.ownerDocument.getSelection();sel.removeAllRanges();sel.addRange(range);
+  const finish=(commit=true)=>{
+    el.contentEditable="false";el.classList.remove("ve-inline-editing");
+    const next=el.textContent.replace(/\u00a0/g," ").trim();
+    if(commit&&next!==original)visualCommitPath(el.dataset.vePath,next,el.dataset.veLabel||"Text");
+    else if(!commit)el.textContent=original;
+  };
+  el.addEventListener("blur",()=>finish(true),{once:true});
+  el.addEventListener("keydown",e=>{
+    if(e.key==="Escape"){e.preventDefault();finish(false);el.blur()}
+    const single=/^(H1|H2|H3|H4|SPAN|STRONG)$/.test(el.tagName);
+    if((single&&e.key==="Enter")||((e.ctrlKey||e.metaKey)&&e.key==="Enter")){e.preventDefault();el.blur()}
+  });
+}
+function reorderVisualArray(type,fromIndex,toIndex){
+  const map={publication:"publications",project:"projects",activity:"academicActivities",skill:"skills",education:"education"},key=map[type];
+  const arr=currentContent[key];if(!Array.isArray(arr)||fromIndex===toIndex||fromIndex<0||toIndex<0)return;
+  visualCommitMutation(()=>{const [item]=arr.splice(fromIndex,1);const adjusted=fromIndex<toIndex?toIndex-1:toIndex;arr.splice(adjusted,0,item)},`${type[0].toUpperCase()+type.slice(1)} reordered · Main Admin synchronized`);
+}
+function reorderVisualSection(fromKey,toKey){
+  const arr=currentContent.siteSettings?.sectionOrder;if(!Array.isArray(arr)||fromKey===toKey)return;
+  visualCommitMutation(()=>{const a=arr.indexOf(fromKey),b=arr.indexOf(toKey);if(a<0||b<0)return;arr.splice(a,1);arr.splice(a<b?b-1:b,0,fromKey)},"Section order updated · Main Admin synchronized");
+}
+
+function prepareVisualFrame(){
+  const frame=visualFrame();if(!frame?.contentDocument)return;
+  const doc=frame.contentDocument;
+  injectVisualFrameStyle(doc);annotateVisualFrame(doc);setVisualFrameMode(doc);
+  visualFramePreparedFor=doc;
+  if(doc.documentElement.dataset.visualParentBound==="1")return;
+  doc.documentElement.dataset.visualParentBound="1";
+  doc.addEventListener("click",e=>{
+    if(e.target.closest("[data-activity-tab],[data-education-tab],.pager-link,.nav-link,[data-section-link]"))return;
+    const anchor=e.target.closest("a");if(anchor)e.preventDefault();
+    if(visualEditorMode==="layout")return;
+    const selection=visualSelectionFromElement(e.target);if(selection){e.preventDefault();e.stopPropagation();selectVisualElement(selection)}
+  },true);
+  doc.addEventListener("dblclick",e=>{const el=e.target.closest("[data-ve-path]");if(el){e.preventDefault();e.stopPropagation();selectVisualElement(visualSelectionFromElement(el));beginVisualInlineEdit(el)}},true);
+  doc.addEventListener("dragstart",e=>{
+    if(visualEditorMode!=="layout")return;
+    const item=e.target.closest('[data-ve-kind="item"]'),sec=e.target.closest('[data-ve-kind="section"]');
+    if(item)visualDragPayload={kind:"item",type:item.dataset.veType,index:Number(item.dataset.veIndex)};
+    else if(sec)visualDragPayload={kind:"section",key:sec.dataset.sectionKey};
+    else{e.preventDefault();return}
+    e.dataTransfer.effectAllowed="move";try{e.dataTransfer.setData("text/plain",JSON.stringify(visualDragPayload))}catch{}
+  });
+  doc.addEventListener("dragover",e=>{if(visualEditorMode!=="layout"||!visualDragPayload)return;const target=visualDragPayload.kind==="section"?e.target.closest('[data-ve-kind="section"]'):e.target.closest(`[data-ve-kind="item"][data-ve-type="${visualDragPayload.type}"]`);if(target){e.preventDefault();doc.querySelectorAll(".ve-drag-over").forEach(x=>x.classList.remove("ve-drag-over"));target.classList.add("ve-drag-over")}});
+  doc.addEventListener("dragleave",e=>{e.target.closest?.(".ve-drag-over")?.classList.remove("ve-drag-over")});
+  doc.addEventListener("drop",e=>{
+    if(visualEditorMode!=="layout"||!visualDragPayload)return;
+    e.preventDefault();const payload=visualDragPayload;visualDragPayload=null;doc.querySelectorAll(".ve-drag-over").forEach(x=>x.classList.remove("ve-drag-over"));
+    if(payload.kind==="section"){const target=e.target.closest('[data-ve-kind="section"]');if(target)reorderVisualSection(payload.key,target.dataset.sectionKey)}
+    else{const target=e.target.closest(`[data-ve-kind="item"][data-ve-type="${payload.type}"]`);if(target)reorderVisualArray(payload.type,payload.index,Number(target.dataset.veIndex))}
+  });
+  doc.addEventListener("dragend",()=>{visualDragPayload=null;doc.querySelectorAll(".ve-drag-over").forEach(x=>x.classList.remove("ve-drag-over"))});
+  renderVisualSectionOutline();
+}
+
+function visualFieldHtml(label,path,value,{multiline=false,type="text",options=null}={}){
+  const v=value==null?"":String(value);
+  if(options){return `<div class="visual-inspector-field"><label>${esc(label)}</label><select data-visual-edit-path="${esc(path)}">${options.map(([val,text])=>`<option value="${esc(val)}" ${String(val)===v?"selected":""}>${esc(text)}</option>`).join("")}</select></div>`}
+  return `<div class="visual-inspector-field"><label>${esc(label)}</label>${multiline?`<textarea data-visual-edit-path="${esc(path)}">${esc(v)}</textarea>`:`<input data-visual-edit-path="${esc(path)}" type="${type}" value="${esc(v)}"/>`}</div>`;
+}
+function visualItemConfig(type,index){
+  const configs={
+    publication:{key:"publications",panel:"publications",title:"Publication",fields:[["Title","title",1],["Authors","authors",1],["Author note","authorNote",1],["Journal / venue","venue",0],["Year","year",0],["Status","status",0],["Description","description",1],["DOI","doi",0],["Publication URL","url",0]]},
+    project:{key:"projects",panel:"projects",title:"Project",fields:[["Title","title",1],["Type","type",0],["Role / contribution","contribution",1],["Description","description",1],["Tools / metadata","meta",0],["Project URL","url",0]]},
+    activity:{key:"academicActivities",panel:"activities",title:"Academic Activity",fields:[["Title","title",1],["Category","category",0],["Activity type","activityType",0],["Organization","organization",0],["Date","date",0],["Description","description",1],["Topics (comma separated)","topics",2],["URL","url",0]]},
+    skill:{key:"skills",panel:"skills",title:"Skill Group",fields:[["Category","category",0],["General skills (one per line)","items",3]]},
+    education:{key:"education",panel:"education",title:"Education Record",fields:[["Degree","degree",0],["Institution","institution",0],["Period","period",0],["Grade label","gradeLabel",0],["CGPA / GPA","cgpa",0],["Grade subtitle","cgpaSubtitle",0],["Description","description",1],["Important courses (one per line)","courses",3]]}
+  };
+  const cfg=configs[type];if(!cfg)return null;return{...cfg,index,item:currentContent[cfg.key]?.[index]};
+}
+function renderVisualSelectedInspector(){
+  const host=$("visualSelectedInspector");if(!host)return;
+  if(!visualSelected){host.innerHTML=`<div class="visual-empty-selection"><span class="visual-empty-icon">⌁</span><strong>Select something in the website</strong><p>Click a heading, paragraph, section, card, image area, or profile block. Double-click editable text to type directly on the preview.</p></div>`;return}
+  if(visualSelected.kind==="profile"){
+    host.innerHTML=`<div class="visual-selection-head"><div><span class="visual-selection-type">Profile</span><h3>${esc(currentContent.name||"Profile")}</h3></div></div><div class="visual-editor-direct-note"><strong>Direct editing:</strong> change the most common profile fields here, or open the complete Profile settings for photo, media, portrait sizing and all other controls.</div><div class="visual-inspector-fields">${visualFieldHtml("Name","name",currentContent.name)}${visualFieldHtml("Professional title","title",currentContent.title,{multiline:true})}${visualFieldHtml("Institution","institution",currentContent.institution,{multiline:true})}${visualFieldHtml("Location","location",currentContent.location)}${visualFieldHtml("Research focus","focus",currentContent.focus,{multiline:true})}</div><button class="secondary visual-open-full-settings" data-visual-open-settings="profile" type="button">Open complete Profile settings</button>`;return
+  }
+  if(visualSelected.kind==="path"){
+    const value=visualGetByPath(currentContent,visualSelected.path)||"";
+    const multiline=!!Object.values(VISUAL_INLINE_MAP).find(x=>x.path===visualSelected.path)?.multiline;
+    host.innerHTML=`<div class="visual-selection-head"><div><span class="visual-selection-type">Text</span><h3>${esc(visualSelected.label||"Selected text")}</h3></div></div><div class="visual-editor-direct-note">You can also <strong>double-click this text in the website preview</strong> and type directly.</div><div class="visual-inspector-fields">${visualFieldHtml(visualSelected.label||"Text",visualSelected.path,value,{multiline})}</div><button class="secondary visual-open-full-settings" data-visual-open-settings="${esc(visualSelected.panel||"profile")}" type="button">Open complete settings</button>`;return
+  }
+  if(visualSelected.kind==="section"){
+    const key=visualSelected.key,headings=normalizeSectionHeadings(currentContent).sectionHeadings,item=headings[key]||{title:key,subtitle:""},visible=currentContent.siteSettings?.sectionVisibility?.[key]!==false;
+    host.innerHTML=`<div class="visual-selection-head"><div><span class="visual-selection-type">Section</span><h3>${esc(item.title||key)}</h3></div><div class="visual-selection-actions"><button data-visual-section-move="-1" type="button" title="Move section up">↑</button><button data-visual-section-move="1" type="button" title="Move section down">↓</button></div></div><div class="visual-inspector-fields">${visualFieldHtml("Section title",`sectionHeadings.${key}.title`,item.title)}${visualFieldHtml("Section subtitle",`sectionHeadings.${key}.subtitle`,item.subtitle,{multiline:true})}<label class="visual-inspector-toggle"><input type="checkbox" data-visual-section-visible="${esc(key)}" ${visible?"checked":""}/> Show this section publicly</label></div><button class="secondary visual-open-full-settings" data-visual-open-settings="${esc(key)}" type="button">Open complete ${esc(item.title||key)} settings</button>`;return
+  }
+  if(visualSelected.kind==="item"){
+    const cfg=visualItemConfig(visualSelected.type,visualSelected.index);if(!cfg?.item){visualSelected=null;renderVisualSelectedInspector();return}
+    const item=cfg.item,base=`${cfg.key}.${cfg.index}`;
+    const fields=cfg.fields.map(([label,key,kind])=>{
+      let value=item[key];if(kind===2)value=Array.isArray(value)?value.join(", "):value;if(kind===3)value=Array.isArray(value)?value.join("\n"):value;
+      return visualFieldHtml(label,`${base}.${key}`,value,{multiline:kind===1||kind===2||kind===3});
+    }).join("");
+    host.innerHTML=`<div class="visual-selection-head"><div><span class="visual-selection-type">${esc(cfg.title)}</span><h3>${esc(item.title||item.degree||item.category||`${cfg.title} ${cfg.index+1}`)}</h3></div><div class="visual-selection-actions"><button data-visual-item-move="-1" type="button" title="Move item up">↑</button><button data-visual-item-move="1" type="button" title="Move item down">↓</button></div></div><div class="visual-inspector-fields">${fields}<label class="visual-inspector-toggle"><input type="checkbox" data-visual-item-visible ${item.visible!==false?"checked":""}/> Show publicly</label></div><button class="secondary visual-open-full-settings" data-visual-open-settings="${cfg.panel}" data-visual-focus-item="${visualSelected.type}:${cfg.index}" type="button">Open complete ${esc(cfg.title)} settings</button>`;return
+  }
+}
+
+function renderVisualSectionOutline(){
+  const host=$("visualSectionOutline");if(!host)return;normalizeSiteSettings(currentContent);
+  const order=currentContent.siteSettings.sectionOrder||[];const hash=visualCurrentHash();const activeKey=hash==="#home"||!hash?"about":hash.replace(/^#/,"");
+  host.innerHTML=order.map(key=>{const visible=currentContent.siteSettings.sectionVisibility?.[key]!==false;return `<div class="visual-outline-item ${visible?"":"is-hidden"} ${key===activeKey?"active":""}" draggable="true" data-visual-outline-key="${esc(key)}"><span class="visual-outline-drag" title="Drag to reorder">⠿</span><span class="visual-outline-title">${esc(visualSectionLabel(key))}</span><button class="visual-outline-eye" data-visual-outline-visible="${esc(key)}" type="button" title="${visible?"Hide":"Show"} section">${visible?"◉":"○"}</button></div>`}).join("");
+}
+function visualFocusSection(key){
+  const frame=visualFrame();if(!frame?.contentWindow)return;try{frame.contentWindow.location.hash=visualSectionHash(key)}catch{};setTimeout(()=>{renderVisualSectionOutline();prepareVisualFrame()},80)
+}
+function visualMoveSectionByDelta(key,delta){
+  normalizeSiteSettings(currentContent);const arr=currentContent.siteSettings.sectionOrder||[],i=arr.indexOf(key),j=i+delta;if(i<0||j<0||j>=arr.length)return;
+  visualCommitMutation(()=>{[arr[i],arr[j]]=[arr[j],arr[i]]},"Section order updated · Main Admin synchronized");
+}
+function visualMoveItemByDelta(type,index,delta){
+  const cfg=visualItemConfig(type,index);if(!cfg)return;const arr=currentContent[cfg.key],j=index+delta;if(!Array.isArray(arr)||j<0||j>=arr.length)return;
+  visualCommitMutation(()=>{[arr[index],arr[j]]=[arr[j],arr[index]]},`${cfg.title} reordered · Main Admin synchronized`);visualSelected={kind:"item",type,index:j,panel:cfg.panel};
+}
+
+function setVisualEditorMode(mode){
+  visualEditorMode=mode==="layout"?"layout":"content";localStorage.setItem("academicVisualEditorMode",visualEditorMode);
+  $("visualModeContentBtn")?.classList.toggle("active",visualEditorMode==="content");$("visualModeLayoutBtn")?.classList.toggle("active",visualEditorMode==="layout");
+  if($("visualCanvasTip"))$("visualCanvasTip").textContent=visualEditorMode==="content"?"Click anything to select it · double-click text to edit directly":"Drag sections and cards directly in the preview · or reorder sections from the outline";
+  prepareVisualFrame();setVisualFrameMode(visualFrame()?.contentDocument);
+}
+function startVisualEditor(){
+  if(!visualEditorIsActive())return;
+  const frame=visualFrame();
+  setVisualEditorMode(visualEditorMode);setVisualInspectorTab(visualInspectorTab);applyVisualEditorViewport(visualEditorDevice);renderVisualSectionOutline();
+  if(frame&&frame.dataset.visualLoaded!=="1"){
+    frame.dataset.visualLoaded="1";
+    const hash=previewLastHash||"#home";
+    frame.src=`index.html?adminPreview=1&visualEditor=1${hash}`;
+    visualSetStatus("Opening visual canvas…");
+    return;
+  }
+  setTimeout(()=>{sendVisualEditorContent();applyVisualEditorViewport(visualEditorDevice)},40);
+}
+function stopVisualEditor(){visualReturnDockedPanel()}
+
+function initVisualEditor(){
+  const frame=visualFrame();if(!frame)return;
+  frame.addEventListener("load",()=>{if(!visualEditorIsActive())return;applyVisualEditorViewport(visualEditorDevice);setTimeout(()=>sendVisualEditorContent(),30)});
+  window.addEventListener("resize",()=>{if(visualEditorIsActive())applyVisualEditorViewport(visualEditorDevice)});
+  window.addEventListener("message",e=>{
+    const vf=visualFrame();if(e.origin!==location.origin||e.source!==vf?.contentWindow)return;
+    if(e.data?.type==="academic-site-preview-location"){previewLastHash=String(e.data.hash||"#home");localStorage.setItem("academicPreviewHash",previewLastHash);renderVisualSectionOutline();return}
+    if(e.data?.type==="academic-site-preview-shell-ready"){if(visualEditorIsActive())sendVisualEditorContent();return}
+    if(e.data?.type==="academic-site-preview-ready"){setTimeout(()=>{prepareVisualFrame();applyVisualEditorViewport(visualEditorDevice);visualSetStatus(visualDirty?"Unsaved visual changes · Main Admin is synchronized":"Visual canvas ready · Synced with Main Admin")},20)}
+  });
+  document.querySelectorAll("[data-visual-device]").forEach(b=>b.addEventListener("click",()=>applyVisualEditorViewport(b.dataset.visualDevice)));
+  $("visualModeContentBtn")?.addEventListener("click",()=>setVisualEditorMode("content"));
+  $("visualModeLayoutBtn")?.addEventListener("click",()=>setVisualEditorMode("layout"));
+  $("visualReloadBtn")?.addEventListener("click",reloadVisualEditor);
+  $("visualRefreshOutlineBtn")?.addEventListener("click",renderVisualSectionOutline);
+  $("visualOpenStructureBtn")?.addEventListener("click",()=>visualOpenFullSettings("structure"));
+  $("visualUndoBtn")?.addEventListener("click",()=>{globalUndo();setTimeout(()=>{scheduleVisualEditorUpdate(true);renderVisualSectionOutline()},40);visualMarkDirty("Undo applied · Main Admin synchronized")});
+  $("visualRedoBtn")?.addEventListener("click",()=>{globalRedo();setTimeout(()=>{scheduleVisualEditorUpdate(true);renderVisualSectionOutline()},40);visualMarkDirty("Redo applied · Main Admin synchronized")});
+  $("visualPublishBtn")?.addEventListener("click",async()=>{const b=$("visualPublishBtn");if(b)b.disabled=true;visualSetStatus("Publishing website…");try{await saveAll();const saved=/^Saved\.|public website is updated/i.test(String($("saveStatus")?.textContent||""));if(saved)visualClearDirty("Published successfully · Main Admin and Visual Editor are synchronized");else visualSetStatus(String($("saveStatus")?.textContent||"Publish did not complete."),{dirty:true});scheduleVisualEditorUpdate(true)}finally{if(b)b.disabled=false}});
+  document.querySelectorAll("[data-visual-inspector-tab]").forEach(b=>b.addEventListener("click",()=>setVisualInspectorTab(b.dataset.visualInspectorTab)));
+  $("visualSettingsPanelSelect")?.addEventListener("change",e=>{localStorage.setItem("academicVisualSettingsPanel",e.target.value);visualDockSettingsPanel(e.target.value)});
+
+  $("visualSelectedInspector")?.addEventListener("change",e=>{
+    const input=e.target.closest("[data-visual-edit-path]");
+    if(input){
+      let value=input.value;const path=input.dataset.visualEditPath;
+      if(/\.topics$/.test(path))value=value.split(",").map(x=>x.trim()).filter(Boolean);
+      if(/\.(items|courses)$/.test(path))value=value.split("\n").map(x=>x.trim()).filter(Boolean);
+      visualCommitPath(path,value,input.previousElementSibling?.textContent||"Content");return
+    }
+    const vis=e.target.closest("[data-visual-section-visible]");if(vis){const key=vis.dataset.visualSectionVisible;visualCommitMutation(()=>{currentContent.siteSettings.sectionVisibility[key]=vis.checked},`${visualSectionLabel(key)} visibility updated`);return}
+    if(e.target.matches("[data-visual-item-visible]")&&visualSelected?.kind==="item"){
+      const cfg=visualItemConfig(visualSelected.type,visualSelected.index);if(cfg?.item)visualCommitMutation(()=>{cfg.item.visible=e.target.checked},`${cfg.title} visibility updated`);return
+    }
+  });
+  $("visualSelectedInspector")?.addEventListener("click",e=>{
+    const open=e.target.closest("[data-visual-open-settings]");if(open){
+      let focus="";const token=open.dataset.visualFocusItem;
+      if(token){const [type,index]=token.split(":");focus=`[data-${type}="${index}"]`}
+      visualOpenFullSettings(open.dataset.visualOpenSettings,focus);return
+    }
+    const sm=e.target.closest("[data-visual-section-move]");if(sm&&visualSelected?.kind==="section"){visualMoveSectionByDelta(visualSelected.key,Number(sm.dataset.visualSectionMove));return}
+    const im=e.target.closest("[data-visual-item-move]");if(im&&visualSelected?.kind==="item"){visualMoveItemByDelta(visualSelected.type,visualSelected.index,Number(im.dataset.visualItemMove));return}
+  });
+
+  $("visualSectionOutline")?.addEventListener("click",e=>{
+    const eye=e.target.closest("[data-visual-outline-visible]");if(eye){e.stopPropagation();const key=eye.dataset.visualOutlineVisible;visualCommitMutation(()=>{currentContent.siteSettings.sectionVisibility[key]=currentContent.siteSettings.sectionVisibility[key]===false},`${visualSectionLabel(key)} visibility updated`);return}
+    const item=e.target.closest("[data-visual-outline-key]");if(item)visualFocusSection(item.dataset.visualOutlineKey);
+  });
+  $("visualSectionOutline")?.addEventListener("dragstart",e=>{const item=e.target.closest("[data-visual-outline-key]");if(item){visualDragPayload={kind:"section",key:item.dataset.visualOutlineKey};e.dataTransfer.effectAllowed="move"}});
+  $("visualSectionOutline")?.addEventListener("dragover",e=>{if(visualDragPayload?.kind==="section"&&e.target.closest("[data-visual-outline-key]"))e.preventDefault()});
+  $("visualSectionOutline")?.addEventListener("drop",e=>{const item=e.target.closest("[data-visual-outline-key]");if(item&&visualDragPayload?.kind==="section"){e.preventDefault();const from=visualDragPayload.key;visualDragPayload=null;reorderVisualSection(from,item.dataset.visualOutlineKey)}});
+
+  document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{if(btn.dataset.tab==="visual")setTimeout(startVisualEditor,0);else if(visualDockedPanel)stopVisualEditor()}));
+  ["input","change"].forEach(type=>document.addEventListener(type,e=>{
+    if(!visualEditorIsActive()||e.target.closest("#visualSelectedInspector"))return;
+    scheduleVisualEditorUpdate();visualMarkDirty("Admin setting changed · Visual canvas updating…");
+  }));
+  if(visualEditorIsActive())startVisualEditor();
+}
+
+/* Initialize after the rest of Admin has bound its controls. */
+setTimeout(initVisualEditor,0);

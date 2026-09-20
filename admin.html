@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260920-publication-evidence-permanent-docs-v1" rel="stylesheet"/>
+<link href="styles.css?v=20260920-visual-editor-v1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -56,6 +56,7 @@
 <button data-tab="structure" type="button">Structure</button>
 <button data-tab="cover" type="button">Cover</button>
 <button data-tab="experience" type="button">Experience</button>
+<button data-tab="visual" type="button">Visual Editor</button>
 <button data-tab="preview" type="button">Preview</button>
 <button data-tab="history" type="button">History</button>
 <button data-tab="backup" type="button">Backup</button>
@@ -1863,6 +1864,116 @@
 </div>
 </div>
 </div>
+
+<div class="admin-panel visual-editor-admin-panel" data-panel="visual">
+  <div class="visual-editor-root" id="visualEditorRoot">
+    <div class="visual-editor-topbar">
+      <div class="visual-editor-brand">
+        <span class="visual-editor-kicker">Visual Editor</span>
+        <strong>Edit the live website directly</strong>
+        <span class="visual-editor-sync"><i></i> Synced with Main Admin</span>
+      </div>
+      <div class="visual-editor-toolbar-group visual-editor-mode-switch" role="group" aria-label="Visual editor mode">
+        <button class="visual-tool active" id="visualModeContentBtn" type="button" title="Select and edit website content">Content</button>
+        <button class="visual-tool" id="visualModeLayoutBtn" type="button" title="Drag sections and cards to reorder them">Layout</button>
+      </div>
+      <div class="visual-editor-toolbar-group visual-editor-device-switch" role="group" aria-label="Visual editor viewport">
+        <button class="visual-tool active" data-visual-device="desktop" type="button">Desktop</button>
+        <button class="visual-tool" data-visual-device="tablet" type="button">Tablet</button>
+        <button class="visual-tool" data-visual-device="mobile" type="button">Mobile</button>
+      </div>
+      <div class="visual-editor-toolbar-actions">
+        <button class="visual-icon-tool" id="visualUndoBtn" type="button" title="Undo">↶</button>
+        <button class="visual-icon-tool" id="visualRedoBtn" type="button" title="Redo">↷</button>
+        <button class="visual-icon-tool" id="visualReloadBtn" type="button" title="Reload visual preview">↻</button>
+        <button class="primary visual-publish-btn" id="visualPublishBtn" type="button">Publish changes</button>
+      </div>
+    </div>
+
+    <div class="visual-editor-workspace">
+      <aside class="visual-editor-outline-panel">
+        <div class="visual-pane-heading">
+          <div><span class="visual-pane-kicker">Structure</span><h3>Page outline</h3></div>
+          <button class="visual-mini-btn" id="visualRefreshOutlineBtn" type="button" title="Refresh outline">↻</button>
+        </div>
+        <p class="visual-pane-help">Click a section to open it. In Layout mode, drag sections here or directly in the preview.</p>
+        <div class="visual-section-outline" id="visualSectionOutline"></div>
+        <div class="visual-outline-footer">
+          <button class="secondary visual-full-width" id="visualOpenStructureBtn" type="button">Structure settings</button>
+        </div>
+      </aside>
+
+      <section class="visual-editor-canvas-panel">
+        <div class="visual-canvas-topline">
+          <span id="visualViewportLabel">Desktop · 1280 × 800</span>
+          <span class="visual-canvas-tip" id="visualCanvasTip">Click anything to select it · double-click text to edit directly</span>
+        </div>
+        <div class="visual-editor-canvas" id="visualEditorCanvas">
+          <div class="visual-editor-scale-stage" id="visualEditorScaleStage">
+            <div class="visual-editor-frame-shell" id="visualEditorFrameShell">
+              <iframe id="visualEditorFrame" sandbox="allow-scripts allow-same-origin allow-forms allow-popups" src="about:blank" data-visual-src="index.html?adminPreview=1&amp;visualEditor=1" title="Visual website editor"></iframe>
+            </div>
+          </div>
+        </div>
+        <div class="visual-editor-statusbar">
+          <span class="visual-save-dot" id="visualSaveDot"></span>
+          <span id="visualEditorStatus">Ready. Select an element in the preview to edit it.</span>
+        </div>
+      </section>
+
+      <aside class="visual-editor-inspector-panel">
+        <div class="visual-inspector-tabs" role="tablist" aria-label="Visual editor inspector">
+          <button class="active" data-visual-inspector-tab="selected" type="button">Selected</button>
+          <button data-visual-inspector-tab="settings" type="button">Full Settings</button>
+        </div>
+        <div class="visual-inspector-view active" data-visual-inspector-view="selected">
+          <div id="visualSelectedInspector" class="visual-selected-inspector">
+            <div class="visual-empty-selection">
+              <span class="visual-empty-icon">⌁</span>
+              <strong>Select something in the website</strong>
+              <p>Click a heading, paragraph, section, card, image area, or profile block. Double-click editable text to type directly on the preview.</p>
+            </div>
+          </div>
+        </div>
+        <div class="visual-inspector-view" data-visual-inspector-view="settings">
+          <div class="visual-settings-picker">
+            <label for="visualSettingsPanelSelect">Settings category</label>
+            <select id="visualSettingsPanelSelect">
+              <optgroup label="Content">
+                <option value="profile">Profile & About</option>
+                <option value="research">Research</option>
+                <option value="thesis">Thesis</option>
+                <option value="publications">Publications</option>
+                <option value="projects">Projects & Simulations</option>
+                <option value="activities">Academic Activities</option>
+                <option value="skills">Skills</option>
+                <option value="education">Education</option>
+                <option value="contact">Contact</option>
+                <option value="cv">Curriculum Vitae</option>
+              </optgroup>
+              <optgroup label="Design & Structure">
+                <option value="appearance">Appearance</option>
+                <option value="navigation">Navigation</option>
+                <option value="sidebar">Sidebar</option>
+                <option value="typography">Typography</option>
+                <option value="layout">Layout</option>
+                <option value="structure">Structure</option>
+                <option value="cover">Cover</option>
+                <option value="experience">Experience</option>
+              </optgroup>
+              <optgroup label="Safety & History">
+                <option value="history">History</option>
+                <option value="backup">Backup</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="visual-settings-dock" id="visualSettingsDock"></div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
 <div class="admin-panel" data-panel="preview">
 <div class="admin-card preview-admin-card">
 <div class="settings-head">
@@ -1995,7 +2106,7 @@
       }
       if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
 
-      await loadScript("admin.js?v=20260920-publication-evidence-permanent-docs-v1");
+      await loadScript("admin.js?v=20260920-visual-editor-v1");
       if(button)button.disabled=false;
       if(status&&status.textContent===readyMessage)status.textContent="";
     }catch(err){
