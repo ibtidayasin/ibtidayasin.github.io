@@ -4574,6 +4574,7 @@ async function saveAll(){
 }
 function setStatus(s){$("saveStatus").textContent=s}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]))}
+function escAttr(s){return esc(String(s??"").replace(/javascript:/gi,""))}
 
 
 ["fSectionTitleSize","fSectionTitleSizeNumber"].forEach(id=>{
