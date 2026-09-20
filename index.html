@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Ibtida Yasin — Mechanical Engineering and Computational Materials">
   <title>Ibtida Yasin | Academic Profile</title>
-  <link id="siteStylesheet" rel="stylesheet" href="styles.css?v=20260920-upload-styles-v1">
+  <link id="siteStylesheet" rel="stylesheet" href="styles.css?v=20260920-education-subsections-v1">
   <script>
     (function(){
       var b=new URLSearchParams(location.search).get('previewBust');
-      if(b) document.getElementById('siteStylesheet').href='styles.css?v=20260920-upload-styles-v1'+encodeURIComponent(b);
+      if(b) document.getElementById('siteStylesheet').href='styles.css?v=20260920-education-subsections-v1'+encodeURIComponent(b);
     })();
   </script>
 
@@ -140,12 +140,18 @@
     <section class="section" id="education" data-section-key="education">
       <h2 class="section-title" id="educationSectionTitle">Education</h2>
       <p class="section-subtitle" id="educationSectionSubtitle">Academic background</p>
-      <nav class="education-subnav" aria-label="Education navigation">
-        <button class="education-subnav-btn active" type="button" data-education-view="education" aria-selected="true">Education</button>
-        <button class="education-subnav-btn" type="button" data-education-view="courses" aria-selected="false">Courses</button>
-      </nav>
+      <div class="activity-tabs education-subsection-tabs" id="educationTabs" role="tablist" aria-label="Education subsections">
+        <button class="activity-tab active" type="button" data-education-view="education" role="tab" aria-selected="true">
+          <span class="activity-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M4 7.5 12 4l8 3.5-8 3.5-8-3.5Z"></path><path d="M7 9.2V14c0 1.9 2.2 3.4 5 3.4s5-1.5 5-3.4V9.2"></path><path d="M20 7.5V14"></path></svg></span>
+          <span class="activity-tab-label">Education</span>
+        </button>
+        <button class="activity-tab" type="button" data-education-view="gradesheet" role="tab" aria-selected="false">
+          <span class="activity-tab-icon" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h9l3 3v15H6z"></path><path d="M15 3v4h4"></path><path d="M9 11h6M9 15h6M9 19h4"></path></svg></span>
+          <span class="activity-tab-label">Gradesheet</span>
+        </button>
+      </div>
       <div id="educationOverviewPanel" data-education-panel="education"><div id="educationList"></div></div>
-      <div id="educationCoursesPanel" class="education-courses-panel hidden" data-education-panel="courses" data-gradesheet-style="academic-ledger">
+      <div id="educationCoursesPanel" class="education-courses-panel hidden" data-education-panel="gradesheet" data-gradesheet-style="academic-ledger">
         <div id="gradesheetMount"></div>
       </div>
     </section>
@@ -178,7 +184,7 @@
   (function(){
     var b=new URLSearchParams(location.search).get('previewBust');
     var s=document.createElement('script');
-    s.src='script.js?v=20260920-upload-styles-v1'+(b?'&previewBust='+encodeURIComponent(b):'');
+    s.src='script.js?v=20260920-education-subsections-v1'+(b?'&previewBust='+encodeURIComponent(b):'');
     s.async=false;
     document.body.appendChild(s);
   })();

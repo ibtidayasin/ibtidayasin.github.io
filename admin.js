@@ -519,6 +519,7 @@ const DEFAULT_SITE_SETTINGS={
     navHighlightStyle:"underline",
     socialStyle:"labels",
     activityTabStyle:"strong-pills",
+    educationTabStyle:"strong-pills",
     mainNavStyle:"current",
     brandNameSize:18,
     brandNameColor:"",
@@ -648,6 +649,7 @@ function normalizeSiteSettings(content){
       navHighlightStyle:["underline","pill","text"].includes(e.navHighlightStyle)?e.navHighlightStyle:DEFAULT_SITE_SETTINGS.experience.navHighlightStyle,
       socialStyle:["labels","icons"].includes(e.socialStyle)?e.socialStyle:DEFAULT_SITE_SETTINGS.experience.socialStyle,
       activityTabStyle:ACTIVITY_TAB_STYLE_VALUES.includes(e.activityTabStyle)?e.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.activityTabStyle,
+      educationTabStyle:ACTIVITY_TAB_STYLE_VALUES.includes(e.educationTabStyle)?e.educationTabStyle:(ACTIVITY_TAB_STYLE_VALUES.includes(e.activityTabStyle)?e.activityTabStyle:DEFAULT_SITE_SETTINGS.experience.educationTabStyle),
       mainNavStyle:normalizeMainNavStyle(e.mainNavStyle),
       brandNameSize:clampNumber(e.brandNameSize,14,32,DEFAULT_SITE_SETTINGS.experience.brandNameSize),
       brandNameColor:validHex(e.brandNameColor)?e.brandNameColor.toUpperCase():"",
@@ -838,6 +840,10 @@ function fillSiteCustomizationControls(){
   const activityTabInput=document.querySelector(`input[name="activityTabStyle"][value="${activityTabStyle}"]`);
   if(activityTabInput)activityTabInput.checked=true;
   document.querySelectorAll("[data-activity-tab-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.activityTabStyleCard===activityTabStyle));
+  const educationTabStyle=ACTIVITY_TAB_STYLE_VALUES.includes(e.educationTabStyle)?e.educationTabStyle:activityTabStyle;
+  const educationTabInput=document.querySelector(`input[name="educationTabStyle"][value="${educationTabStyle}"]`);
+  if(educationTabInput)educationTabInput.checked=true;
+  document.querySelectorAll("[data-education-tab-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.educationTabStyleCard===educationTabStyle));
   const mainNavStyle=normalizeMainNavStyle(e.mainNavStyle);
   const mainNavInput=document.querySelector(`input[name="mainNavStyle"][value="${mainNavStyle}"]`);
   if(mainNavInput)mainNavInput.checked=true;
@@ -993,6 +999,8 @@ function syncSiteCustomizationFromControls(){
   e.socialStyle=$("fSocialStyle").value;
   const activityTabStyle=document.querySelector('input[name="activityTabStyle"]:checked')?.value;
   if(ACTIVITY_TAB_STYLE_VALUES.includes(activityTabStyle))e.activityTabStyle=activityTabStyle;
+  const educationTabStyle=document.querySelector('input[name="educationTabStyle"]:checked')?.value;
+  if(ACTIVITY_TAB_STYLE_VALUES.includes(educationTabStyle))e.educationTabStyle=educationTabStyle;
   const mainNavStyle=document.querySelector('input[name="mainNavStyle"]:checked')?.value;
   if(MAIN_NAV_STYLE_VALUES.includes(mainNavStyle))e.mainNavStyle=mainNavStyle;
   e.brandNameSize=clampNumber($("fBrandNameSizeNumber")?.value||$("fBrandNameSize")?.value,14,32,18);
@@ -1974,7 +1982,7 @@ document.addEventListener("change",e=>{
   setCourseRecordSettings(currentContent,{style:input.value});
   document.querySelectorAll("[data-gradesheet-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.gradesheetStyleCard===input.value));
   scheduleAdminPreview(true);
-  setStatus("Courses & grades style updated. Save all changes to publish it.");
+  setStatus("Gradesheet listing style updated. Save all changes to publish it.");
 });
 
 document.addEventListener("change",e=>{
@@ -2007,6 +2015,23 @@ document.addEventListener("change",e=>{
   renderDesignPresets();
   scheduleAdminPreview(true);
   setStatus("Academic Activities navigation style updated. Save all changes to publish it.");
+});
+
+/* Education subsection-navigation style — mirrors the complete Academic
+   Activities navigation library but saves independently. */
+document.addEventListener("change",e=>{
+  const input=e.target.closest('input[name="educationTabStyle"]');
+  if(!input)return;
+  const value=input.value;
+  if(!ACTIVITY_TAB_STYLE_VALUES.includes(value))return;
+  normalizeSiteSettings(currentContent);
+  currentContent.siteSettings.experience.educationTabStyle=value;
+  currentContent.appearance=currentContent.appearance||{};
+  currentContent.appearance.designPreset="custom";
+  document.querySelectorAll("[data-education-tab-style-card]").forEach(card=>card.classList.toggle("selected",card.dataset.educationTabStyleCard===value));
+  renderDesignPresets();
+  scheduleAdminPreview(true);
+  setStatus("Education subsection navigation style updated. Save all changes to publish it.");
 });
 
 let currentContent=structuredClone(DEFAULT_CONTENT);

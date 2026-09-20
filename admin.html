@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260920-upload-styles-v1" rel="stylesheet"/>
+<link href="styles.css?v=20260920-education-subsections-v1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -293,10 +293,10 @@
 
 
 <details class="admin-card gradesheet-settings-fold">
-<summary><span><strong>Courses &amp; grades</strong><small>Controls the course record shown inside Education only. It does not create another website page.</small></span><span class="education-preset-chevron" aria-hidden="true"></span></summary>
+<summary><span><strong>Gradesheet</strong><small>Controls the official semester-by-semester gradesheet shown as an Education subsection.</small></span><span class="education-preset-chevron" aria-hidden="true"></span></summary>
 <div class="education-preset-fold-body">
   <p class="helper">All course codes, titles, credits, grade points, letter grades, semester GPA and cumulative GPA are fixed from the official grade certificate for this website.</p>
-  <div class="gradesheet-style-choice-grid" role="radiogroup" aria-label="Courses and grades listing style">
+  <div class="gradesheet-style-choice-grid" role="radiogroup" aria-label="Gradesheet listing style">
     <label class="gradesheet-style-choice" data-gradesheet-style-card="official-transcript"><input name="gradesheetStyle" type="radio" value="official-transcript"/><span class="gradesheet-style-preview gsp-official"><i></i><i></i><i></i><i></i></span><strong>1. Formal Transcript</strong><small>Compact ruled tables inspired by an official grade certificate.</small></label>
     <label class="gradesheet-style-choice" data-gradesheet-style-card="semester-cards"><input name="gradesheetStyle" type="radio" value="semester-cards"/><span class="gradesheet-style-preview gsp-cards"><i></i><i></i><i></i><i></i></span><strong>2. Semester Portfolio</strong><small>Polished semester cards with clear academic metrics.</small></label>
     <label class="gradesheet-style-choice" data-gradesheet-style-card="academic-ledger"><input name="gradesheetStyle" type="radio" value="academic-ledger"/><span class="gradesheet-style-preview gsp-ledger"><i></i><i></i><i></i><i></i></span><strong>3. Academic Ledger</strong><small>Restrained editorial ledger with strong semester hierarchy.</small></label>
@@ -1276,6 +1276,70 @@
 <p class="helper">The selected style follows the active website theme automatically. Click <b>Save all changes</b> to publish it.</p>
 </div>
 </details>
+<details class="admin-card navigation-fold">
+<summary><span><strong>Education subsection navigation</strong><small>Choose how the Education and Gradesheet subsection buttons appear.</small></span><span class="navigation-fold-chevron" aria-hidden="true"></span></summary>
+<div class="navigation-fold-body">
+<div class="settings-head">
+<div>
+<h3>Education subsection navigation</h3>
+<p class="muted">Uses the same complete set of subsection navigation styles as Academic Activities, but the Education style can be selected independently.</p>
+</div>
+</div>
+<div class="activity-tab-style-choice-grid" role="radiogroup" aria-label="Education subsection navigation style">
+<label class="activity-tab-style-choice" data-education-tab-style-card="strong-pills">
+<input name="educationTabStyle" type="radio" value="strong-pills"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="strong-pills"><span class="activity-tab">Education</span><span class="activity-tab active">Gradesheet</span></span>
+<span class="activity-tab-style-name">1. Strong Filled Pills</span>
+</label>
+<label class="activity-tab-style-choice" data-education-tab-style-card="segmented">
+<input name="educationTabStyle" type="radio" value="segmented"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="segmented"><span class="activity-tab">Education</span><span class="activity-tab active">Gradesheet</span></span>
+<span class="activity-tab-style-name">2. Segmented Control</span>
+</label>
+<label class="activity-tab-style-choice" data-education-tab-style-card="elevated">
+<input name="educationTabStyle" type="radio" value="elevated"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="elevated"><span class="activity-tab">Education</span><span class="activity-tab active">Gradesheet</span></span>
+<span class="activity-tab-style-name">3. Elevated Buttons</span>
+</label>
+<label class="activity-tab-style-choice" data-education-tab-style-card="outline-fill">
+<input name="educationTabStyle" type="radio" value="outline-fill"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="outline-fill"><span class="activity-tab">Education</span><span class="activity-tab active">Gradesheet</span></span>
+<span class="activity-tab-style-name">4. Outline + Soft Fill</span>
+</label>
+<label class="activity-tab-style-choice" data-education-tab-style-card="underline-fill">
+<input name="educationTabStyle" type="radio" value="underline-fill"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="underline-fill"><span class="activity-tab">Education</span><span class="activity-tab active">Gradesheet</span></span>
+<span class="activity-tab-style-name">5. Underline + Fill</span>
+</label>
+<label class="activity-tab-style-choice" data-education-tab-style-card="soft-cards">
+<input name="educationTabStyle" type="radio" value="soft-cards"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="soft-cards"><span class="activity-tab">Education</span><span class="activity-tab active">Gradesheet</span></span>
+<span class="activity-tab-style-name">6. Soft Card Tabs</span>
+</label>
+<label class="activity-tab-style-choice" data-education-tab-style-card="icon-label">
+<input name="educationTabStyle" type="radio" value="icon-label"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="icon-label"><span class="activity-tab"><span class="activity-tab-icon activity-tab-icon-demo">◇</span>Education</span><span class="activity-tab active"><span class="activity-tab-icon activity-tab-icon-demo">▣</span>Gradesheet</span></span>
+<span class="activity-tab-style-name">7. Icon + Label</span>
+</label>
+<label class="activity-tab-style-choice" data-education-tab-style-card="two-tone">
+<input name="educationTabStyle" type="radio" value="two-tone"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="two-tone"><span class="activity-tab">Education</span><span class="activity-tab active">Gradesheet</span></span>
+<span class="activity-tab-style-name">8. Two-Tone Accent</span>
+</label>
+<label class="activity-tab-style-choice" data-education-tab-style-card="glass">
+<input name="educationTabStyle" type="radio" value="glass"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="glass"><span class="activity-tab">Education</span><span class="activity-tab active">Gradesheet</span></span>
+<span class="activity-tab-style-name">9. Glass Highlight</span>
+</label>
+<label class="activity-tab-style-choice" data-education-tab-style-card="ribbon">
+<input name="educationTabStyle" type="radio" value="ribbon"/>
+<span class="activity-tabs activity-tab-style-preview" data-activity-tab-style="ribbon"><span class="activity-tab">Education</span><span class="activity-tab active">Gradesheet</span></span>
+<span class="activity-tab-style-name">10. Ribbon Tags</span>
+</label>
+</div>
+<p class="helper">The selected style follows the active website theme automatically. It controls the Education subsection bar only and does not change Academic Activities.</p>
+</div>
+</details>
 </div>
 
 
@@ -1895,7 +1959,7 @@
       }
       if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
 
-      await loadScript("admin.js?v=20260920-upload-styles-v1");
+      await loadScript("admin.js?v=20260920-education-subsections-v1");
       if(button)button.disabled=false;
       if(status&&status.textContent===readyMessage)status.textContent="";
     }catch(err){
