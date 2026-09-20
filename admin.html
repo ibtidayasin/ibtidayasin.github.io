@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260920-auth-resilient-v5" rel="stylesheet"/>
+<link href="styles.css?v=20260920-visual-studio-v7" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -1865,47 +1865,73 @@
 </div>
 </div>
 
+
 <div class="admin-panel visual-editor-admin-panel" data-panel="visual">
-  <div class="visual-editor-root" id="visualEditorRoot">
-    <div class="visual-editor-topbar">
-      <div class="visual-editor-brand">
-        <span class="visual-editor-kicker">Visual Editor</span>
-        <strong>Edit the live website directly</strong>
-        <span class="visual-editor-sync"><i></i> Synced with Main Admin</span>
+  <div class="visual-editor-root" id="visualEditorRoot" data-visual-drawer="none" data-visual-device="desktop">
+    <header class="visual-editor-topbar">
+      <div class="visual-editor-topbar-left">
+        <button class="visual-back-admin" id="visualExitBtn" type="button" title="Return to the normal Admin editor">
+          <span aria-hidden="true">←</span><strong>Main Admin</strong>
+        </button>
+        <div class="visual-editor-brand">
+          <span class="visual-editor-kicker">Visual Editor</span>
+          <strong>Live Website Canvas</strong>
+          <span class="visual-editor-sync"><i></i> Synced</span>
+        </div>
       </div>
-      <div class="visual-editor-toolbar-group visual-editor-mode-switch" role="group" aria-label="Visual editor mode">
-        <button class="visual-tool active" id="visualModeContentBtn" type="button" title="Select and edit website content">Content</button>
-        <button class="visual-tool" id="visualModeLayoutBtn" type="button" title="Drag sections and cards to reorder them">Layout</button>
+      <div class="visual-editor-ribbon">
+        <div class="visual-editor-toolbar-group visual-editor-mode-switch" role="group" aria-label="Visual editor mode">
+          <span class="visual-ribbon-label">Edit</span>
+          <button class="visual-tool active" id="visualModeContentBtn" type="button" title="Select and edit website content">Content</button>
+          <button class="visual-tool" id="visualModeLayoutBtn" type="button" title="Drag sections and cards to reorder them">Layout</button>
+        </div>
+        <div class="visual-editor-toolbar-group visual-editor-device-switch" role="group" aria-label="Visual editor viewport">
+          <span class="visual-ribbon-label">View</span>
+          <button class="visual-tool active" data-visual-device="desktop" type="button">Desktop</button>
+          <button class="visual-tool" data-visual-device="tablet" type="button">Tablet</button>
+          <button class="visual-tool" data-visual-device="mobile" type="button">Mobile</button>
+        </div>
+        <div class="visual-editor-toolbar-actions" aria-label="History and publish controls">
+          <button class="visual-icon-tool" id="visualUndoBtn" type="button" title="Undo">↶</button>
+          <button class="visual-icon-tool" id="visualRedoBtn" type="button" title="Redo">↷</button>
+          <button class="visual-icon-tool" id="visualReloadBtn" type="button" title="Reload live canvas">↻</button>
+          <button class="primary visual-publish-btn" id="visualPublishBtn" type="button">Publish</button>
+        </div>
       </div>
-      <div class="visual-editor-toolbar-group visual-editor-device-switch" role="group" aria-label="Visual editor viewport">
-        <button class="visual-tool active" data-visual-device="desktop" type="button">Desktop</button>
-        <button class="visual-tool" data-visual-device="tablet" type="button">Tablet</button>
-        <button class="visual-tool" data-visual-device="mobile" type="button">Mobile</button>
-      </div>
-      <div class="visual-editor-toolbar-actions">
-        <button class="visual-icon-tool" id="visualUndoBtn" type="button" title="Undo">↶</button>
-        <button class="visual-icon-tool" id="visualRedoBtn" type="button" title="Redo">↷</button>
-        <button class="visual-icon-tool" id="visualReloadBtn" type="button" title="Reload visual preview">↻</button>
-        <button class="primary visual-publish-btn" id="visualPublishBtn" type="button">Publish changes</button>
-      </div>
-    </div>
+    </header>
 
     <div class="visual-editor-workspace">
-      <aside class="visual-editor-outline-panel">
-        <div class="visual-pane-heading">
+      <nav class="visual-editor-toolrail" aria-label="Visual editor tools">
+        <button class="visual-rail-tool" data-visual-drawer-target="outline" type="button" title="Page outline">
+          <span class="visual-rail-glyph" aria-hidden="true">☷</span><span class="visual-rail-label">Outline</span>
+        </button>
+        <button class="visual-rail-tool" data-visual-drawer-target="selected" type="button" title="Selected element properties">
+          <span class="visual-rail-glyph" aria-hidden="true">◇</span><span class="visual-rail-label">Selected</span>
+        </button>
+        <button class="visual-rail-tool" data-visual-drawer-target="settings" type="button" title="Complete website settings">
+          <span class="visual-rail-glyph" aria-hidden="true">☷</span><span class="visual-rail-label">Settings</span>
+        </button>
+        <div class="visual-rail-spacer"></div>
+        <button class="visual-rail-tool" id="visualRailRefreshBtn" type="button" title="Refresh website canvas">
+          <span class="visual-rail-glyph" aria-hidden="true">↻</span><span class="visual-rail-label">Refresh</span>
+        </button>
+      </nav>
+
+      <aside class="visual-editor-outline-panel" data-visual-drawer-panel="outline">
+        <div class="visual-drawer-head">
           <div><span class="visual-pane-kicker">Structure</span><h3>Page outline</h3></div>
-          <button class="visual-mini-btn" id="visualRefreshOutlineBtn" type="button" title="Refresh outline">↻</button>
+          <button class="visual-drawer-close" id="visualCloseOutlineBtn" type="button" title="Close panel">×</button>
         </div>
-        <p class="visual-pane-help">Click a section to open it. In Layout mode, drag sections here or directly in the preview.</p>
+        <p class="visual-pane-help">Open a section, change visibility, or drag sections to reorder the website.</p>
         <div class="visual-section-outline" id="visualSectionOutline"></div>
         <div class="visual-outline-footer">
-          <button class="secondary visual-full-width" id="visualOpenStructureBtn" type="button">Structure settings</button>
+          <button class="secondary visual-full-width" id="visualOpenStructureBtn" type="button">Open Structure settings</button>
         </div>
       </aside>
 
       <section class="visual-editor-canvas-panel">
         <div class="visual-canvas-topline">
-          <span id="visualViewportLabel">Desktop · 1280 × 800</span>
+          <span id="visualViewportLabel">Desktop · Live viewport</span>
           <span class="visual-canvas-tip" id="visualCanvasTip">Click anything to select it · double-click text to edit directly</span>
         </div>
         <div class="visual-editor-canvas" id="visualEditorCanvas">
@@ -1917,11 +1943,16 @@
         </div>
         <div class="visual-editor-statusbar">
           <span class="visual-save-dot" id="visualSaveDot"></span>
-          <span id="visualEditorStatus">Ready. Select an element in the preview to edit it.</span>
+          <span id="visualEditorStatus">Ready. Select an element in the website to edit it.</span>
+          <span class="visual-status-hint">Esc closes panels · Ctrl/Cmd + S publishes</span>
         </div>
       </section>
 
-      <aside class="visual-editor-inspector-panel">
+      <aside class="visual-editor-inspector-panel" data-visual-drawer-panel="inspector">
+        <div class="visual-drawer-head visual-inspector-drawer-head">
+          <div><span class="visual-pane-kicker">Inspector</span><h3>Website controls</h3></div>
+          <button class="visual-drawer-close" id="visualCloseInspectorBtn" type="button" title="Close panel">×</button>
+        </div>
         <div class="visual-inspector-tabs" role="tablist" aria-label="Visual editor inspector">
           <button class="active" data-visual-inspector-tab="selected" type="button">Selected</button>
           <button data-visual-inspector-tab="settings" type="button">Full Settings</button>
@@ -1931,7 +1962,7 @@
             <div class="visual-empty-selection">
               <span class="visual-empty-icon">⌁</span>
               <strong>Select something in the website</strong>
-              <p>Click a heading, paragraph, section, card, image area, or profile block. Double-click editable text to type directly on the preview.</p>
+              <p>Click a heading, paragraph, section, card, image area, or profile block. Double-click editable text to type directly on the live canvas.</p>
             </div>
           </div>
         </div>
@@ -2106,7 +2137,7 @@
       }
       if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
 
-      await loadScript("admin.js?v=20260920-escattr-fix-v6");
+      await loadScript("admin.js?v=20260920-visual-studio-v7");
       if(button)button.disabled=false;
       if(status&&status.textContent===readyMessage)status.textContent="";
     }catch(err){
@@ -2121,7 +2152,7 @@
 
 <script type="text/plain" id="visualEditorIsolatedSource">
 /* =========================================================
-   VISUAL EDITOR — 20260920-v1
+   VISUAL EDITOR — FULL-SCREEN STUDIO 20260920-v2
    This interface intentionally shares currentContent, history, saveAll(),
    fillForms(), and every existing Admin panel with the form editor.
    ========================================================= */
@@ -2137,6 +2168,8 @@ const VISUAL_EDITOR_VIEWPORTS={
 let visualEditorMode=localStorage.getItem("academicVisualEditorMode")==="layout"?"layout":"content";
 let visualEditorDevice=Object.prototype.hasOwnProperty.call(VISUAL_EDITOR_VIEWPORTS,localStorage.getItem("academicVisualEditorDevice"))?localStorage.getItem("academicVisualEditorDevice"):"desktop";
 let visualInspectorTab=localStorage.getItem("academicVisualInspectorTab")==="settings"?"settings":"selected";
+let visualDrawer=["outline","inspector","none"].includes(localStorage.getItem("academicVisualDrawer"))?localStorage.getItem("academicVisualDrawer"):"none";
+let visualReturnTab=localStorage.getItem("academicVisualReturnTab")||"profile";
 let visualSelected=null;
 let visualUpdateTimer=null;
 let visualDockedPanel=null;
@@ -2170,20 +2203,54 @@ function visualSectionLabel(key){
 function applyVisualEditorViewport(device=visualEditorDevice){
   if(!Object.prototype.hasOwnProperty.call(VISUAL_EDITOR_VIEWPORTS,device))device="desktop";
   visualEditorDevice=device;localStorage.setItem("academicVisualEditorDevice",device);
-  const spec=VISUAL_EDITOR_VIEWPORTS[device],shell=$("visualEditorFrameShell"),stage=$("visualEditorScaleStage"),canvas=$("visualEditorCanvas"),frame=visualFrame();
+  const spec=VISUAL_EDITOR_VIEWPORTS[device],shell=$("visualEditorFrameShell"),stage=$("visualEditorScaleStage"),canvas=$("visualEditorCanvas"),frame=visualFrame(),root=$("visualEditorRoot");
   if(!shell||!stage||!canvas||!frame)return;
-  shell.style.width=`${spec.width}px`;shell.style.height=`${spec.height}px`;frame.style.width="100%";frame.style.height="100%";
+  if(root)root.dataset.visualDevice=device;
+  frame.style.width="100%";frame.style.height="100%";
   const applyScale=()=>{
-    const available=Math.max(300,canvas.clientWidth-36);
-    const scale=Math.min(1,available/spec.width);
-    shell.style.transform=`scale(${scale})`;
-    stage.style.width=`${Math.round(spec.width*scale)}px`;
-    stage.style.height=`${Math.round(spec.height*scale)}px`;
+    if(device==="desktop"){
+      stage.style.width="100%";stage.style.height="100%";
+      shell.style.width="100%";shell.style.height="100%";shell.style.transform="none";
+      if($("visualViewportLabel"))$("visualViewportLabel").textContent=`Desktop · ${Math.max(0,Math.round(canvas.clientWidth))} × ${Math.max(0,Math.round(canvas.clientHeight))}`;
+    }else{
+      shell.style.width=`${spec.width}px`;shell.style.height=`${spec.height}px`;
+      const availableW=Math.max(280,canvas.clientWidth-44),availableH=Math.max(420,canvas.clientHeight-44);
+      const scale=Math.min(1,availableW/spec.width,availableH/spec.height);
+      shell.style.transform=`scale(${scale})`;
+      stage.style.width=`${Math.round(spec.width*scale)}px`;stage.style.height=`${Math.round(spec.height*scale)}px`;
+      if($("visualViewportLabel"))$("visualViewportLabel").textContent=spec.label;
+    }
   };
   requestAnimationFrame(applyScale);
   document.querySelectorAll("[data-visual-device]").forEach(b=>b.classList.toggle("active",b.dataset.visualDevice===device));
-  if($("visualViewportLabel"))$("visualViewportLabel").textContent=spec.label;
   try{frame.contentWindow?.dispatchEvent(new Event("resize"))}catch{}
+}
+
+function setVisualDrawer(target="none",{persist=true}={}){
+  const root=$("visualEditorRoot");
+  const next=["outline","inspector","none"].includes(target)?target:"none";
+  visualDrawer=next;
+  if(root)root.dataset.visualDrawer=next;
+  if(persist)localStorage.setItem("academicVisualDrawer",next);
+  document.querySelectorAll("[data-visual-drawer-target]").forEach(btn=>{
+    const t=btn.dataset.visualDrawerTarget;
+    const active=(t==="outline"&&next==="outline")||((t==="selected"||t==="settings")&&next==="inspector"&&visualInspectorTab===t);
+    btn.classList.toggle("active",active);
+  });
+  requestAnimationFrame(()=>applyVisualEditorViewport(visualEditorDevice));
+}
+function visualOpenDrawerTool(tool){
+  if(tool==="outline"){setVisualDrawer(visualDrawer==="outline"?"none":"outline");return}
+  if(tool==="selected"||tool==="settings"){
+    setVisualInspectorTab(tool);
+    setVisualDrawer("inspector");
+  }
+}
+function visualLeaveEditor(){
+  setVisualDrawer("none",{persist:false});
+  stopVisualEditor();
+  const target=VISUAL_EDITOR_PANEL_KEYS.includes(visualReturnTab)&&visualReturnTab!=="visual"?visualReturnTab:"profile";
+  activateAdminTab(target);
 }
 
 function visualCurrentHash(){
@@ -2238,15 +2305,18 @@ function visualDockSettingsPanel(panelName,{focusSelector=""}={}){
 }
 function setVisualInspectorTab(tab){
   visualInspectorTab=tab==="settings"?"settings":"selected";localStorage.setItem("academicVisualInspectorTab",visualInspectorTab);
+  if($("visualEditorRoot"))$("visualEditorRoot").dataset.visualInspector=visualInspectorTab;
   document.querySelectorAll("[data-visual-inspector-tab]").forEach(b=>b.classList.toggle("active",b.dataset.visualInspectorTab===visualInspectorTab));
   document.querySelectorAll("[data-visual-inspector-view]").forEach(v=>v.classList.toggle("active",v.dataset.visualInspectorView===visualInspectorTab));
   if(visualInspectorTab==="settings"&&!visualDockedPanel){
     const saved=localStorage.getItem("academicVisualSettingsPanel");
     visualDockSettingsPanel(VISUAL_EDITOR_PANEL_KEYS.includes(saved)?saved:"profile");
   }
+  if(visualDrawer==="inspector")setVisualDrawer("inspector",{persist:false});
 }
 function visualOpenFullSettings(panelName,focusSelector=""){
   setVisualInspectorTab("settings");
+  setVisualDrawer("inspector");
   localStorage.setItem("academicVisualSettingsPanel",panelName);
   visualDockSettingsPanel(panelName,{focusSelector});
 }
@@ -2368,6 +2438,7 @@ function selectVisualElement(selection){
   visualSelected=selection?{...selection,element:undefined}:null;
   const doc=visualFrame()?.contentDocument;clearVisualFrameSelection(doc);selection?.element?.classList.add("ve-selected");
   renderVisualSelectedInspector();
+  if(selection&&visualDrawer==="none")setVisualDrawer("inspector");
 }
 function beginVisualInlineEdit(el){
   if(visualEditorMode!=="content"||!el?.dataset.vePath)return;
@@ -2497,7 +2568,7 @@ function setVisualEditorMode(mode){
 function startVisualEditor(){
   if(!visualEditorIsActive())return;
   const frame=visualFrame();
-  setVisualEditorMode(visualEditorMode);setVisualInspectorTab(visualInspectorTab);applyVisualEditorViewport(visualEditorDevice);renderVisualSectionOutline();
+  setVisualEditorMode(visualEditorMode);setVisualInspectorTab(visualInspectorTab);setVisualDrawer(visualDrawer,{persist:false});applyVisualEditorViewport(visualEditorDevice);renderVisualSectionOutline();
   if(frame&&frame.dataset.visualLoaded!=="1"){
     frame.dataset.visualLoaded="1";
     const hash=previewLastHash||"#home";
@@ -2522,6 +2593,11 @@ function initVisualEditor(){
     if(e.data?.type==="academic-site-preview-ready"){setTimeout(()=>{prepareVisualFrame();applyVisualEditorViewport(visualEditorDevice);visualSetStatus(visualDirty?"Unsaved visual changes · Main Admin is synchronized":"Visual canvas ready · Synced with Main Admin")},20)}
   });
   document.querySelectorAll("[data-visual-device]").forEach(b=>b.addEventListener("click",()=>applyVisualEditorViewport(b.dataset.visualDevice)));
+  document.querySelectorAll("[data-visual-drawer-target]").forEach(b=>b.addEventListener("click",()=>visualOpenDrawerTool(b.dataset.visualDrawerTarget)));
+  $("visualCloseOutlineBtn")?.addEventListener("click",()=>setVisualDrawer("none"));
+  $("visualCloseInspectorBtn")?.addEventListener("click",()=>setVisualDrawer("none"));
+  $("visualExitBtn")?.addEventListener("click",visualLeaveEditor);
+  $("visualRailRefreshBtn")?.addEventListener("click",reloadVisualEditor);
   $("visualModeContentBtn")?.addEventListener("click",()=>setVisualEditorMode("content"));
   $("visualModeLayoutBtn")?.addEventListener("click",()=>setVisualEditorMode("layout"));
   $("visualReloadBtn")?.addEventListener("click",reloadVisualEditor);
@@ -2564,6 +2640,16 @@ function initVisualEditor(){
   $("visualSectionOutline")?.addEventListener("dragover",e=>{if(visualDragPayload?.kind==="section"&&e.target.closest("[data-visual-outline-key]"))e.preventDefault()});
   $("visualSectionOutline")?.addEventListener("drop",e=>{const item=e.target.closest("[data-visual-outline-key]");if(item&&visualDragPayload?.kind==="section"){e.preventDefault();const from=visualDragPayload.key;visualDragPayload=null;reorderVisualSection(from,item.dataset.visualOutlineKey)}});
 
+  document.addEventListener("pointerdown",e=>{
+    const btn=e.target.closest?.('[data-tab="visual"]');if(!btn)return;
+    const current=document.querySelector('[data-tab].active');
+    if(current?.dataset.tab&&current.dataset.tab!=="visual"){visualReturnTab=current.dataset.tab;localStorage.setItem("academicVisualReturnTab",visualReturnTab)}
+  },true);
+  document.addEventListener("keydown",e=>{
+    if(!visualEditorIsActive())return;
+    if(e.key==="Escape"&&visualDrawer!=="none"){e.preventDefault();setVisualDrawer("none");return}
+    if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"){e.preventDefault();$("visualPublishBtn")?.click()}
+  });
   document.querySelectorAll("[data-tab]").forEach(btn=>btn.addEventListener("click",()=>{if(btn.dataset.tab==="visual")setTimeout(startVisualEditor,0);else if(visualDockedPanel)stopVisualEditor()}));
   ["input","change"].forEach(type=>document.addEventListener(type,e=>{
     if(!visualEditorIsActive()||e.target.closest("#visualSelectedInspector"))return;
