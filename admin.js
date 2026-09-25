@@ -2296,6 +2296,20 @@ function repairPreGradesheetState(content){
 
 
 /* Custom Education document subsections ----------------------------------- */
+const PROVISIONAL_CERTIFICATE_STYLE_VALUES=["official-credential","framed-certificate","split-dossier","gallery-display","minimal-archive"];
+const PROVISIONAL_CERTIFICATE_SIZE_VALUES=["very-small","small","standard","medium","large","full","original"];
+const PROVISIONAL_CERTIFICATE_FIT_VALUES=["exact","center","fill"];
+function normalizeProvisionalCertificatePresentation(src){
+  const item=(src&&typeof src==="object")?src:{};
+  return {
+    presentationStyle:PROVISIONAL_CERTIFICATE_STYLE_VALUES.includes(item.presentationStyle)?item.presentationStyle:"official-credential",
+    previewSize:PROVISIONAL_CERTIFICATE_SIZE_VALUES.includes(item.previewSize)?item.previewSize:"large",
+    previewFit:PROVISIONAL_CERTIFICATE_FIT_VALUES.includes(item.previewFit)?item.previewFit:"exact",
+    previewUrl:String(item.previewUrl||""),
+    previewPath:String(item.previewPath||"")
+  };
+}
+
 const PERMANENT_EDUCATION_DOCUMENTS=[
   {id:"provisional-certificate",title:"Provisional Certificate"},
   {id:"transcript",title:"Transcript"},
@@ -2325,7 +2339,8 @@ function normalizeEducationDocuments(content){
       url:String(src.url||""),
       filename:String(src.filename||""),
       updated_at:String(src.updated_at||""),
-      storagePath:String(src.storagePath||"")
+      storagePath:String(src.storagePath||""),
+      ...normalizeProvisionalCertificatePresentation(src)
     };
   };
   const normalized=raw.map(normalizeOne);
@@ -2333,7 +2348,7 @@ function normalizeEducationDocuments(content){
   const permanent=PERMANENT_EDUCATION_DOCUMENTS.map((def,index)=>{
     const match=normalized.find((item,i)=>!used.has(i)&&(item.id===def.id||String(item.title||"").trim().toLowerCase()===def.title.toLowerCase()));
     if(match){used.add(normalized.indexOf(match));return {...match,id:def.id,title:def.title,visible:match.visible!==false};}
-    return {id:def.id,title:def.title,description:"",visible:true,url:"",filename:"",updated_at:"",storagePath:""};
+    return {id:def.id,title:def.title,description:"",visible:true,url:"",filename:"",updated_at:"",storagePath:"",...normalizeProvisionalCertificatePresentation({})};
   });
   const seen=new Set(permanent.map(item=>item.id));
   const extras=[];
@@ -2371,9 +2386,73 @@ async function uploadEducationDocumentPdf(index,file){
   doc.filename=file.name;
   doc.updated_at=new Date().toISOString();
   doc.storagePath=path;
+  if(doc.id==="provisional-certificate"){
+    try{await createEducationDocumentPreviewFromFile(doc,file)}catch(err){console.warn("Provisional Certificate preview generation failed:",err)}
+  }
   if(permanentEducationDocumentDefinition(doc.id))doc.visible=true;
   return true;
 }
+function provisionalCertificateStyleCards(doc,index){
+  const selected=normalizeProvisionalCertificatePresentation(doc).presentationStyle;
+  const styles=[
+    ["official-credential","Official Credential","Formal university-record presentation with restrained rules and a centered document preview.","pcs-official"],
+    ["framed-certificate","Framed Certificate","A refined certificate frame with a soft academic border and prominent page presentation.","pcs-framed"],
+    ["split-dossier","Split Dossier","Professional two-column dossier: document details beside the certificate preview on larger screens.","pcs-split"],
+    ["gallery-display","Gallery Display","A spacious gallery-style document stage that makes the certificate itself the visual focus.","pcs-gallery"],
+    ["minimal-archive","Minimal Archive","Quiet archival presentation with minimal chrome, metadata, and a clean document page.","pcs-minimal"]
+  ];
+  return `<div class="provisional-presentation-admin">
+    <div class="settings-head provisional-presentation-head"><div><h4>Provisional Certificate page style</h4><p class="muted small">Choose how the Provisional Certificate subsection appears publicly. The PDF preview remains clickable in every style.</p></div></div>
+    <div class="provisional-style-choice-grid" role="radiogroup" aria-label="Provisional Certificate page style">${styles.map(([value,title,desc,preview])=>`<label class="provisional-style-choice ${selected===value?"selected":""}" data-provisional-style-card="${value}"><input type="radio" name="provisionalCertificateStyle_${index}" value="${value}" data-provisional-presentation-field="presentationStyle" data-provisional-document-index="${index}" ${selected===value?"checked":""}><span class="provisional-style-preview ${preview}"><i></i><i></i><i></i></span><strong>${title}</strong><small>${desc}</small></label>`).join("")}</div>
+    <div class="form-grid provisional-preview-controls">
+      <div class="field"><label>PDF preview size</label><select data-provisional-presentation-field="previewSize" data-provisional-document-index="${index}">
+        ${[["very-small","Very small"],["small","Small"],["standard","Standard"],["medium","Medium"],["large","Large"],["full","Full width"],["original","Original / natural"]].map(([value,label])=>`<option value="${value}" ${normalizeProvisionalCertificatePresentation(doc).previewSize===value?"selected":""}>${label}</option>`).join("")}
+      </select><span class="helper">Uses the same size scale as your normal attachment/media controls.</span></div>
+      <div class="field"><label>Preview fit</label><select data-provisional-presentation-field="previewFit" data-provisional-document-index="${index}">
+        <option value="exact" ${normalizeProvisionalCertificatePresentation(doc).previewFit==="exact"?"selected":""}>Exact page</option>
+        <option value="center" ${normalizeProvisionalCertificatePresentation(doc).previewFit==="center"?"selected":""}>Center fit</option>
+        <option value="fill" ${normalizeProvisionalCertificatePresentation(doc).previewFit==="fill"?"selected":""}>Fill / crop</option>
+      </select></div>
+    </div>
+  </div>`;
+}
+function provisionalCertificatePreviewAdminHtml(doc,index){
+  const presentation=normalizeProvisionalCertificatePresentation(doc);
+  const preview=String(presentation.previewUrl||"").trim();
+  if(!doc.url)return `<div class="provisional-admin-preview empty"><span class="muted small">Upload the Provisional Certificate PDF to generate its page-1 preview automatically.</span></div>`;
+  return `<div class="provisional-admin-preview"><div><strong>Certificate preview</strong><span class="muted small">${preview?"Page 1 preview generated from the PDF.":"No page preview yet. You can generate one from the uploaded PDF."}</span></div>${preview?`<a href="${escAttr(doc.url)}" target="_blank" rel="noopener"><img src="${escAttr(preview)}" alt="Provisional Certificate page 1 preview"></a>`:""}<button class="secondary" type="button" data-generate-provisional-preview="${index}">${preview?"Regenerate preview":"Generate preview"}</button></div>`;
+}
+async function saveEducationDocumentPreview(doc,blob){
+  if(doc.previewPath){try{await sb.storage.from("site-media").remove([doc.previewPath])}catch{}}
+  const path=`education-documents/previews/${String(doc.id||"document").replace(/[^a-z0-9-]+/gi,"-")}-${Date.now()}-page1.png`;
+  const{error}=await sb.storage.from("site-media").upload(path,blob,{upsert:false,contentType:"image/png",cacheControl:"3600"});
+  if(error)throw error;
+  const{data}=sb.storage.from("site-media").getPublicUrl(path);
+  doc.previewUrl=data.publicUrl+"?v="+Date.now();
+  doc.previewPath=path;
+}
+async function createEducationDocumentPreviewFromFile(doc,file){
+  if(doc?.id!=="provisional-certificate")return;
+  const blob=await createPdfPreviewBlob(await file.arrayBuffer());
+  await saveEducationDocumentPreview(doc,blob);
+}
+async function regenerateProvisionalCertificatePreview(index){
+  normalizeEducationDocuments(currentContent);
+  const doc=currentContent.educationDocuments[index];
+  if(!doc||doc.id!=="provisional-certificate"||!doc.url){setStatus("Upload the Provisional Certificate PDF first.");return false;}
+  setStatus("Generating Provisional Certificate preview...");
+  try{
+    const response=await fetch(doc.url,{cache:"no-store"});
+    if(!response.ok)throw new Error(`Could not read PDF (${response.status}).`);
+    const blob=await createPdfPreviewBlob(await response.arrayBuffer());
+    await saveEducationDocumentPreview(doc,blob);
+    await persistContent("Provisional Certificate preview generated.");
+    renderEducationSubsectionEditor();
+    scheduleAdminPreview(true);
+    return true;
+  }catch(err){console.error(err);setStatus("Could not generate the Provisional Certificate preview. Re-upload the PDF to generate it from the local file.");return false;}
+}
+
 function educationDocumentRowHtml(doc,index){
   const inputId=`educationDocumentFile_${index}`;
   const updated=doc.updated_at?`Updated ${esc(new Date(doc.updated_at).toLocaleString())}`:"";
@@ -2391,6 +2470,8 @@ function educationDocumentRowHtml(doc,index){
       <div class="field"><label>Subsection name</label><input data-education-document-field="title" data-education-document-index="${index}" value="${esc(doc.title||"")}" ${permanent?"readonly":""}></div>
       <div class="field full"><label>Short description (optional)</label><textarea data-education-document-field="description" data-education-document-index="${index}" placeholder="A short note shown above the document button.">${esc(doc.description||"")}</textarea></div>
     </div>
+    ${doc.id==="provisional-certificate"?provisionalCertificateStyleCards(doc,index):""}
+    ${doc.id==="provisional-certificate"?provisionalCertificatePreviewAdminHtml(doc,index):""}
     <div class="education-document-current"><div>${current}${updated?`<span class="muted small">${updated}</span>`:""}</div>${doc.url?`<button class="danger secondary-danger" type="button" data-remove-education-document-file="${index}">Remove PDF</button>`:""}</div>
     <div class="gradesheet-upload-card education-document-upload-card" data-education-document-upload-card="${index}">
       <input accept="application/pdf,.pdf" class="gradesheet-file-input" id="${inputId}" type="file" data-education-document-file="${index}">
@@ -2693,12 +2774,53 @@ async function uploadPublicationStatusEvidence(index,file){
   return true;
 }
 
+const PUBLICATION_STATUS_OPTIONS=[
+  "",
+  "In Preparation",
+  "Preprint",
+  "Submitted",
+  "Under Review",
+  "Revision Requested",
+  "Under Revision",
+  "Revised & Resubmitted",
+  "Accepted",
+  "In Press / Article in Press",
+  "Online First / Early Access",
+  "Published",
+  "Withdrawn",
+  "Rejected"
+];
+function canonicalPublicationStatus(value){
+  const raw=String(value||"").trim();
+  if(!raw)return "";
+  const legacy={
+    "manuscript in preparation":"In Preparation",
+    "in preparation":"In Preparation",
+    "under review":"Under Review",
+    "revision requested":"Revision Requested",
+    "under revision":"Under Revision",
+    "revised & resubmitted":"Revised & Resubmitted",
+    "revised and resubmitted":"Revised & Resubmitted",
+    "in press":"In Press / Article in Press",
+    "article in press":"In Press / Article in Press",
+    "online first":"Online First / Early Access",
+    "early access":"Online First / Early Access"
+  };
+  return legacy[raw.toLowerCase()]||raw;
+}
+function publicationStatusOptions(value){
+  const current=canonicalPublicationStatus(value);
+  const options=[...PUBLICATION_STATUS_OPTIONS];
+  if(current&&!options.includes(current))options.splice(1,0,current);
+  return options;
+}
+
 function renderPublicationsEditor(){
   $("publicationsEditor").innerHTML=(currentContent.publications||[]).map((p,i)=>repeatBlock("publication",i,p.title||`Publication ${i+1}`,[
     {label:"Title",key:"title",value:p.title,full:true},{label:"Authors",key:"authors",value:p.authors,full:true},
     {label:"Author symbol / contribution note",key:"authorNote",value:p.authorNote||"",full:true},
     {label:"Journal / Conference",key:"venue",value:p.venue},{label:"Year",key:"year",value:p.year},
-    {label:"Status",key:"status",value:p.status,kind:"select"},{label:"DOI",key:"doi",value:p.doi},
+    {label:"Status",key:"status",value:canonicalPublicationStatus(p.status),kind:"select",options:publicationStatusOptions(p.status)},{label:"DOI",key:"doi",value:p.doi},
     {label:"Publication URL",key:"url",value:p.url,full:true},{label:"Short note / description",key:"description",value:p.description,kind:"textarea",full:true}
   ],p.media||[],p.visible!==false,publicationStatusEvidenceHtml(p,i))).join("")||`<div class="empty-state">No publications added yet.</div>`;
 }
@@ -3505,6 +3627,19 @@ document.addEventListener("input",e=>{
   scheduleAdminPreview();
 });
 document.addEventListener("change",e=>{
+  const field=e.target.closest?.("[data-provisional-presentation-field]");
+  if(!field)return;
+  normalizeEducationDocuments(currentContent);
+  const index=Number(field.dataset.provisionalDocumentIndex),doc=currentContent.educationDocuments[index];
+  if(!doc||doc.id!=="provisional-certificate")return;
+  const key=field.dataset.provisionalPresentationField,value=field.value;
+  if(key==="presentationStyle"&&PROVISIONAL_CERTIFICATE_STYLE_VALUES.includes(value))doc.presentationStyle=value;
+  if(key==="previewSize"&&PROVISIONAL_CERTIFICATE_SIZE_VALUES.includes(value))doc.previewSize=value;
+  if(key==="previewFit"&&PROVISIONAL_CERTIFICATE_FIT_VALUES.includes(value))doc.previewFit=value;
+  if(key==="presentationStyle")document.querySelectorAll('[data-provisional-style-card]').forEach(card=>card.classList.toggle("selected",card.dataset.provisionalStyleCard===doc.presentationStyle));
+  scheduleAdminPreview(true);
+});
+document.addEventListener("change",e=>{
   const visible=e.target.closest?.("[data-education-document-visible]");
   if(visible){normalizeEducationDocuments(currentContent);const i=Number(visible.dataset.educationDocumentVisible);if(currentContent.educationDocuments[i])currentContent.educationDocuments[i].visible=visible.checked;scheduleAdminPreview(true);return;}
   const fileInput=e.target.closest?.("[data-education-document-file]");
@@ -3518,9 +3653,17 @@ document.addEventListener("click",async e=>{
   b=e.target.closest?.("[data-remove-education-document]");
   if(b){normalizeEducationDocuments(currentContent);const i=Number(b.dataset.removeEducationDocument),doc=currentContent.educationDocuments[i];if(!doc)return;if(permanentEducationDocumentDefinition(doc.id)){setStatus(`${doc.title} is a permanent Education subsection. Remove its PDF or turn off Show publicly instead.`);return;}if(!confirm(`Remove the ${doc.title||"document"} subsection?`))return;if(doc.storagePath){try{await sb.storage.from("cv-files").remove([doc.storagePath])}catch{}}const removedKey=educationAdminKeyForDocument(doc);currentContent.educationDocuments.splice(i,1);if(educationAdminActiveCategory===removedKey)educationAdminActiveCategory="education";renderEducationSubsectionEditor();scheduleAdminPreview(true);return;}
   b=e.target.closest?.("[data-remove-education-document-file]");
-  if(b){normalizeEducationDocuments(currentContent);const i=Number(b.dataset.removeEducationDocumentFile),doc=currentContent.educationDocuments[i];if(!doc)return;if(doc.storagePath){try{await sb.storage.from("cv-files").remove([doc.storagePath])}catch{}}doc.url="";doc.filename="";doc.updated_at="";doc.storagePath="";renderEducationSubsectionEditor();scheduleAdminPreview(true);return;}
+  if(b){normalizeEducationDocuments(currentContent);const i=Number(b.dataset.removeEducationDocumentFile),doc=currentContent.educationDocuments[i];if(!doc)return;if(doc.storagePath){try{await sb.storage.from("cv-files").remove([doc.storagePath])}catch{}}if(doc.previewPath){try{await sb.storage.from("site-media").remove([doc.previewPath])}catch{}}doc.url="";doc.filename="";doc.updated_at="";doc.storagePath="";doc.previewUrl="";doc.previewPath="";renderEducationSubsectionEditor();scheduleAdminPreview(true);return;}
   b=e.target.closest?.("[data-upload-education-document]");
   if(b){const i=Number(b.dataset.uploadEducationDocument),input=document.querySelector(`[data-education-document-file="${i}"]`),file=input?.files?.[0];if(!file){setStatus("Choose a PDF first.");return;}b.disabled=true;setStatus("Uploading education document...");const ok=await uploadEducationDocumentPdf(i,file);b.disabled=false;if(ok){await persistContent("Education document uploaded.");renderEducationSubsectionEditor();scheduleAdminPreview(true);}return;}
+});
+
+document.addEventListener("click",async e=>{
+  const button=e.target.closest?.("[data-generate-provisional-preview]");
+  if(!button)return;
+  button.disabled=true;
+  await regenerateProvisionalCertificatePreview(Number(button.dataset.generateProvisionalPreview));
+  button.disabled=false;
 });
 
 document.addEventListener("change",e=>{

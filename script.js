@@ -1552,6 +1552,20 @@ function educationGradeLabel(item){
 
 
 /* Custom Education document subsections ----------------------------------- */
+const PROVISIONAL_CERTIFICATE_STYLE_VALUES=["official-credential","framed-certificate","split-dossier","gallery-display","minimal-archive"];
+const PROVISIONAL_CERTIFICATE_SIZE_VALUES=["very-small","small","standard","medium","large","full","original"];
+const PROVISIONAL_CERTIFICATE_FIT_VALUES=["exact","center","fill"];
+function normalizeProvisionalCertificatePresentation(src){
+  const item=(src&&typeof src==="object")?src:{};
+  return {
+    presentationStyle:PROVISIONAL_CERTIFICATE_STYLE_VALUES.includes(item.presentationStyle)?item.presentationStyle:"official-credential",
+    previewSize:PROVISIONAL_CERTIFICATE_SIZE_VALUES.includes(item.previewSize)?item.previewSize:"large",
+    previewFit:PROVISIONAL_CERTIFICATE_FIT_VALUES.includes(item.previewFit)?item.previewFit:"exact",
+    previewUrl:String(item.previewUrl||""),
+    previewPath:String(item.previewPath||"")
+  };
+}
+
 const PERMANENT_EDUCATION_DOCUMENTS=[
   {id:"provisional-certificate",title:"Provisional Certificate"},
   {id:"transcript",title:"Transcript"},
@@ -1569,13 +1583,13 @@ function normalizeEducationDocuments(content){
     const src=(item&&typeof item==="object")?item:{};
     let id=String(src.id||"").trim().toLowerCase().replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"").slice(0,64);
     if(!id)id=`document-${index+1}`;
-    return {id,title:String(src.title||"").trim(),description:String(src.description||""),visible:src.visible!==false,url:String(src.url||""),filename:String(src.filename||""),updated_at:String(src.updated_at||"")};
+    return {id,title:String(src.title||"").trim(),description:String(src.description||""),visible:src.visible!==false,url:String(src.url||""),filename:String(src.filename||""),updated_at:String(src.updated_at||""),...normalizeProvisionalCertificatePresentation(src)};
   });
   const used=new Set();
   const permanent=PERMANENT_EDUCATION_DOCUMENTS.map(def=>{
     const idx=normalized.findIndex((item,i)=>!used.has(i)&&(item.id===def.id||String(item.title||"").trim().toLowerCase()===def.title.toLowerCase()));
     if(idx>=0){used.add(idx);return {...normalized[idx],id:def.id,title:def.title,visible:normalized[idx].visible!==false};}
-    return {id:def.id,title:def.title,description:"",visible:true,url:"",filename:"",updated_at:""};
+    return {id:def.id,title:def.title,description:"",visible:true,url:"",filename:"",updated_at:"",...normalizeProvisionalCertificatePresentation({})};
   });
   const seen=new Set(permanent.map(item=>item.id));
   const extras=[];
@@ -1601,7 +1615,24 @@ function educationDocumentTabHtml(doc){
   const view=educationDocumentViewId(doc);
   return `<button class="activity-tab" type="button" data-education-view="${escAttr(view)}" data-education-dynamic="true" role="tab" aria-selected="false"><span class="activity-tab-icon" aria-hidden="true">${educationDocumentIcon(doc)}</span><span class="activity-tab-label">${esc(doc.title)}</span></button>`;
 }
+function provisionalCertificatePanelHtml(doc){
+  const view=educationDocumentViewId(doc),url=safeUrl(doc.url),presentation=normalizeProvisionalCertificatePresentation(doc);
+  const preview=safeUrl(presentation.previewUrl),style=presentation.presentationStyle,size=presentation.previewSize,fit=presentation.previewFit;
+  const title=doc.title||"Provisional Certificate";
+  const previewHtml=url?`<div class="provisional-certificate-preview provisional-preview-size-${escAttr(size)} provisional-preview-fit-${escAttr(fit)}">
+    <a class="provisional-certificate-page" href="${escAttr(url)}" target="_blank" rel="noopener" data-lightbox-media-kind="pdf" data-lightbox-mode="on" data-media-url="${escAttr(url)}" data-media-preview="${escAttr(preview||"")}" data-media-title="${escAttr(title)}" data-media-caption="${escAttr(doc.description||"")}" data-media-download-name="${escAttr(doc.filename||"Provisional_Certificate.pdf")}">
+      ${preview?`<img src="${escAttr(preview)}" alt="Preview of ${escAttr(title)}" loading="lazy">`:`<div class="provisional-certificate-pdf-fallback"><span>PDF</span><strong>Provisional Certificate</strong><small>Open the document to view it.</small></div>`}
+    </a>
+  </div>`:"";
+  return `<div class="education-document-panel provisional-certificate-panel hidden" data-education-panel="${escAttr(view)}" data-education-dynamic="true" data-provisional-style="${escAttr(style)}">
+    <article class="provisional-certificate-layout">
+      <div class="provisional-certificate-copy"><span class="gradesheet-kicker">Academic credential</span><h3>${esc(title)}</h3>${doc.description?`<p class="muted">${esc(doc.description)}</p>`:""}${doc.filename?`<p class="education-document-meta">${esc(doc.filename)}${doc.updated_at?` · updated ${esc(formatDate(doc.updated_at))}`:""}</p>`:""}<div class="provisional-certificate-actions">${url?`<a class="button" href="${escAttr(url)}" target="_blank" rel="noopener">View Provisional Certificate</a>`:`<span class="muted small">Document has not been uploaded yet.</span>`}</div></div>
+      ${previewHtml}
+    </article>
+  </div>`;
+}
 function educationDocumentPanelHtml(doc){
+  if(doc?.id==="provisional-certificate")return provisionalCertificatePanelHtml(doc);
   const view=educationDocumentViewId(doc),hasUrl=!!safeUrl(doc.url),url=safeUrl(doc.url);
   return `<div class="education-document-panel hidden" data-education-panel="${escAttr(view)}" data-education-dynamic="true"><article class="education-document-card"><div class="education-document-copy"><span class="gradesheet-kicker">Education document</span><h3>${esc(doc.title)}</h3>${doc.description?`<p class="muted">${esc(doc.description)}</p>`:""}${doc.filename?`<p class="education-document-meta">${esc(doc.filename)}${doc.updated_at?` · updated ${esc(formatDate(doc.updated_at))}`:""}</p>`:""}</div><div class="education-document-action">${hasUrl?`<a class="button" href="${escAttr(url)}" target="_blank" rel="noopener">View ${esc(doc.title)}</a>`:`<span class="muted small">Document has not been uploaded yet.</span>`}</div></article></div>`;
 }
