@@ -2296,15 +2296,52 @@ function repairPreGradesheetState(content){
 
 
 /* Custom Education document subsections ----------------------------------- */
-const PROVISIONAL_CERTIFICATE_STYLE_VALUES=["official-credential","framed-certificate","split-dossier","gallery-display","minimal-archive"];
-const PROVISIONAL_CERTIFICATE_SIZE_VALUES=["very-small","small","standard","medium","large","full","original"];
-const PROVISIONAL_CERTIFICATE_FIT_VALUES=["exact","center","fill"];
-function normalizeProvisionalCertificatePresentation(src){
+const EDUCATION_DOCUMENT_SIZE_VALUES=["very-small","small","standard","medium","large","full","original"];
+const EDUCATION_DOCUMENT_FIT_VALUES=["exact","center","fill"];
+const EDUCATION_DOCUMENT_PRESENTATIONS={
+  "provisional-certificate":{
+    defaultStyle:"official-credential",
+    previewLabel:"Certificate preview",
+    styles:[
+      ["official-credential","Official Credential","Formal university-record presentation with restrained rules and a centered document preview.","pcs-official"],
+      ["framed-certificate","Framed Certificate","A refined certificate frame with a soft academic border and prominent page presentation.","pcs-framed"],
+      ["split-dossier","Split Dossier","Professional two-column dossier: document details beside the certificate preview on larger screens.","pcs-split"],
+      ["gallery-display","Gallery Display","A spacious gallery-style document stage that makes the certificate itself the visual focus.","pcs-gallery"],
+      ["minimal-archive","Minimal Archive","Quiet archival presentation with minimal chrome, metadata, and a clean document page.","pcs-minimal"]
+    ]
+  },
+  "transcript":{
+    defaultStyle:"official-transcript",
+    previewLabel:"Transcript preview",
+    styles:[
+      ["official-transcript","Official Transcript","Structured university-record presentation with formal rules and a clear document stage.","trs-official"],
+      ["ledger-record","Ledger Record","A refined academic ledger with ruled metadata and a strong record-oriented hierarchy.","trs-ledger"],
+      ["academic-dossier","Academic Dossier","A professional dossier layout with transcript details beside the document on larger screens.","trs-dossier"],
+      ["registry-sheet","Registry Sheet","Modern registrar-inspired presentation with a subtle institutional band and clean page framing.","trs-registry"],
+      ["minimal-record","Minimal Record","A quiet archival transcript view with minimal ornament and maximum document clarity.","trs-minimal"]
+    ]
+  },
+  "testimonial":{
+    defaultStyle:"institutional-letter",
+    previewLabel:"Testimonial preview",
+    styles:[
+      ["institutional-letter","Institutional Letter","Formal letter-style presentation with restrained typography and a professional document stage.","tst-letter"],
+      ["endorsement-frame","Endorsement Frame","Elegant framed presentation designed to emphasize an official recommendation or testimonial.","tst-frame"],
+      ["signature-focus","Signature Focus","Document-first composition with a calm introduction and extra visual emphasis on the letter itself.","tst-signature"],
+      ["reference-dossier","Reference Dossier","Two-column reference-file layout that pairs document context with the testimonial preview.","tst-dossier"],
+      ["minimal-letter","Minimal Letter","Clean correspondence-style treatment with subtle rules and very little visual chrome.","tst-minimal"]
+    ]
+  }
+};
+function educationDocumentPresentationConfig(id){return EDUCATION_DOCUMENT_PRESENTATIONS[String(id||"")]||null;}
+function normalizeEducationDocumentPresentation(src,id){
   const item=(src&&typeof src==="object")?src:{};
+  const config=educationDocumentPresentationConfig(id||item.id)||EDUCATION_DOCUMENT_PRESENTATIONS["provisional-certificate"];
+  const allowed=config.styles.map(style=>style[0]);
   return {
-    presentationStyle:PROVISIONAL_CERTIFICATE_STYLE_VALUES.includes(item.presentationStyle)?item.presentationStyle:"official-credential",
-    previewSize:PROVISIONAL_CERTIFICATE_SIZE_VALUES.includes(item.previewSize)?item.previewSize:"large",
-    previewFit:PROVISIONAL_CERTIFICATE_FIT_VALUES.includes(item.previewFit)?item.previewFit:"exact",
+    presentationStyle:allowed.includes(item.presentationStyle)?item.presentationStyle:config.defaultStyle,
+    previewSize:EDUCATION_DOCUMENT_SIZE_VALUES.includes(item.previewSize)?item.previewSize:"large",
+    previewFit:EDUCATION_DOCUMENT_FIT_VALUES.includes(item.previewFit)?item.previewFit:"exact",
     previewUrl:String(item.previewUrl||""),
     previewPath:String(item.previewPath||"")
   };
@@ -2340,7 +2377,7 @@ function normalizeEducationDocuments(content){
       filename:String(src.filename||""),
       updated_at:String(src.updated_at||""),
       storagePath:String(src.storagePath||""),
-      ...normalizeProvisionalCertificatePresentation(src)
+      ...normalizeEducationDocumentPresentation(src,id)
     };
   };
   const normalized=raw.map(normalizeOne);
@@ -2348,7 +2385,7 @@ function normalizeEducationDocuments(content){
   const permanent=PERMANENT_EDUCATION_DOCUMENTS.map((def,index)=>{
     const match=normalized.find((item,i)=>!used.has(i)&&(item.id===def.id||String(item.title||"").trim().toLowerCase()===def.title.toLowerCase()));
     if(match){used.add(normalized.indexOf(match));return {...match,id:def.id,title:def.title,visible:match.visible!==false};}
-    return {id:def.id,title:def.title,description:"",visible:true,url:"",filename:"",updated_at:"",storagePath:"",...normalizeProvisionalCertificatePresentation({})};
+    return {id:def.id,title:def.title,description:"",visible:true,url:"",filename:"",updated_at:"",storagePath:"",...normalizeEducationDocumentPresentation({},def.id)};
   });
   const seen=new Set(permanent.map(item=>item.id));
   const extras=[];
@@ -2386,41 +2423,37 @@ async function uploadEducationDocumentPdf(index,file){
   doc.filename=file.name;
   doc.updated_at=new Date().toISOString();
   doc.storagePath=path;
-  if(doc.id==="provisional-certificate"){
-    try{await createEducationDocumentPreviewFromFile(doc,file)}catch(err){console.warn("Provisional Certificate preview generation failed:",err)}
+  if(educationDocumentPresentationConfig(doc.id)){
+    try{await createEducationDocumentPreviewFromFile(doc,file)}catch(err){console.warn(`${doc.title} preview generation failed:`,err)}
   }
   if(permanentEducationDocumentDefinition(doc.id))doc.visible=true;
   return true;
 }
-function provisionalCertificateStyleCards(doc,index){
-  const selected=normalizeProvisionalCertificatePresentation(doc).presentationStyle;
-  const styles=[
-    ["official-credential","Official Credential","Formal university-record presentation with restrained rules and a centered document preview.","pcs-official"],
-    ["framed-certificate","Framed Certificate","A refined certificate frame with a soft academic border and prominent page presentation.","pcs-framed"],
-    ["split-dossier","Split Dossier","Professional two-column dossier: document details beside the certificate preview on larger screens.","pcs-split"],
-    ["gallery-display","Gallery Display","A spacious gallery-style document stage that makes the certificate itself the visual focus.","pcs-gallery"],
-    ["minimal-archive","Minimal Archive","Quiet archival presentation with minimal chrome, metadata, and a clean document page.","pcs-minimal"]
-  ];
-  return `<div class="provisional-presentation-admin">
-    <div class="settings-head provisional-presentation-head"><div><h4>Provisional Certificate page style</h4><p class="muted small">Choose how the Provisional Certificate subsection appears publicly. The PDF preview remains clickable in every style.</p></div></div>
-    <div class="provisional-style-choice-grid" role="radiogroup" aria-label="Provisional Certificate page style">${styles.map(([value,title,desc,preview])=>`<label class="provisional-style-choice ${selected===value?"selected":""}" data-provisional-style-card="${value}"><input type="radio" name="provisionalCertificateStyle_${index}" value="${value}" data-provisional-presentation-field="presentationStyle" data-provisional-document-index="${index}" ${selected===value?"checked":""}><span class="provisional-style-preview ${preview}"><i></i><i></i><i></i></span><strong>${title}</strong><small>${desc}</small></label>`).join("")}</div>
+function educationDocumentStyleCards(doc,index){
+  const config=educationDocumentPresentationConfig(doc?.id);
+  if(!config)return "";
+  const presentation=normalizeEducationDocumentPresentation(doc,doc.id),selected=presentation.presentationStyle;
+  return `<div class="provisional-presentation-admin education-document-presentation-admin" data-document-presentation-admin="${escAttr(doc.id)}">
+    <div class="settings-head provisional-presentation-head"><div><h4>${esc(doc.title)} page style</h4><p class="muted small">Choose how the ${esc(doc.title)} subsection appears publicly. The PDF preview remains clickable in every style.</p></div></div>
+    <div class="provisional-style-choice-grid" role="radiogroup" aria-label="${escAttr(doc.title)} page style">${config.styles.map(([value,title,desc,preview])=>`<label class="provisional-style-choice ${selected===value?"selected":""}" data-document-style-card="${value}" data-document-style-index="${index}"><input type="radio" name="educationDocumentStyle_${index}" value="${value}" data-document-presentation-field="presentationStyle" data-document-index="${index}" ${selected===value?"checked":""}><span class="provisional-style-preview ${preview}"><i></i><i></i><i></i></span><strong>${title}</strong><small>${desc}</small></label>`).join("")}</div>
     <div class="form-grid provisional-preview-controls">
-      <div class="field"><label>PDF preview size</label><select data-provisional-presentation-field="previewSize" data-provisional-document-index="${index}">
-        ${[["very-small","Very small"],["small","Small"],["standard","Standard"],["medium","Medium"],["large","Large"],["full","Full width"],["original","Original / natural"]].map(([value,label])=>`<option value="${value}" ${normalizeProvisionalCertificatePresentation(doc).previewSize===value?"selected":""}>${label}</option>`).join("")}
+      <div class="field"><label>PDF preview size</label><select data-document-presentation-field="previewSize" data-document-index="${index}">
+        ${[["very-small","Very small"],["small","Small"],["standard","Standard"],["medium","Medium"],["large","Large"],["full","Full width"],["original","Original / natural"]].map(([value,label])=>`<option value="${value}" ${presentation.previewSize===value?"selected":""}>${label}</option>`).join("")}
       </select><span class="helper">Uses the same size scale as your normal attachment/media controls.</span></div>
-      <div class="field"><label>Preview fit</label><select data-provisional-presentation-field="previewFit" data-provisional-document-index="${index}">
-        <option value="exact" ${normalizeProvisionalCertificatePresentation(doc).previewFit==="exact"?"selected":""}>Exact page</option>
-        <option value="center" ${normalizeProvisionalCertificatePresentation(doc).previewFit==="center"?"selected":""}>Center fit</option>
-        <option value="fill" ${normalizeProvisionalCertificatePresentation(doc).previewFit==="fill"?"selected":""}>Fill / crop</option>
+      <div class="field"><label>Preview fit</label><select data-document-presentation-field="previewFit" data-document-index="${index}">
+        <option value="exact" ${presentation.previewFit==="exact"?"selected":""}>Exact page</option>
+        <option value="center" ${presentation.previewFit==="center"?"selected":""}>Center fit</option>
+        <option value="fill" ${presentation.previewFit==="fill"?"selected":""}>Fill / crop</option>
       </select></div>
     </div>
   </div>`;
 }
-function provisionalCertificatePreviewAdminHtml(doc,index){
-  const presentation=normalizeProvisionalCertificatePresentation(doc);
-  const preview=String(presentation.previewUrl||"").trim();
-  if(!doc.url)return `<div class="provisional-admin-preview empty"><span class="muted small">Upload the Provisional Certificate PDF to generate its page-1 preview automatically.</span></div>`;
-  return `<div class="provisional-admin-preview"><div><strong>Certificate preview</strong><span class="muted small">${preview?"Page 1 preview generated from the PDF.":"No page preview yet. You can generate one from the uploaded PDF."}</span></div>${preview?`<a href="${escAttr(doc.url)}" target="_blank" rel="noopener"><img src="${escAttr(preview)}" alt="Provisional Certificate page 1 preview"></a>`:""}<button class="secondary" type="button" data-generate-provisional-preview="${index}">${preview?"Regenerate preview":"Generate preview"}</button></div>`;
+function educationDocumentPreviewAdminHtml(doc,index){
+  const config=educationDocumentPresentationConfig(doc?.id);
+  if(!config)return "";
+  const presentation=normalizeEducationDocumentPresentation(doc,doc.id),preview=String(presentation.previewUrl||"").trim();
+  if(!doc.url)return `<div class="provisional-admin-preview empty"><span class="muted small">Upload the ${esc(doc.title)} PDF to generate its page-1 preview automatically.</span></div>`;
+  return `<div class="provisional-admin-preview"><div><strong>${esc(config.previewLabel)}</strong><span class="muted small">${preview?"Page 1 preview generated from the PDF.":"No page preview yet. You can generate one from the uploaded PDF."}</span></div>${preview?`<a href="${escAttr(doc.url)}" target="_blank" rel="noopener"><img src="${escAttr(preview)}" alt="${escAttr(doc.title)} page 1 preview"></a>`:""}<button class="secondary" type="button" data-generate-education-document-preview="${index}">${preview?"Regenerate preview":"Generate preview"}</button></div>`;
 }
 async function saveEducationDocumentPreview(doc,blob){
   if(doc.previewPath){try{await sb.storage.from("site-media").remove([doc.previewPath])}catch{}}
@@ -2432,25 +2465,25 @@ async function saveEducationDocumentPreview(doc,blob){
   doc.previewPath=path;
 }
 async function createEducationDocumentPreviewFromFile(doc,file){
-  if(doc?.id!=="provisional-certificate")return;
+  if(!educationDocumentPresentationConfig(doc?.id))return;
   const blob=await createPdfPreviewBlob(await file.arrayBuffer());
   await saveEducationDocumentPreview(doc,blob);
 }
-async function regenerateProvisionalCertificatePreview(index){
+async function regenerateEducationDocumentPreview(index){
   normalizeEducationDocuments(currentContent);
-  const doc=currentContent.educationDocuments[index];
-  if(!doc||doc.id!=="provisional-certificate"||!doc.url){setStatus("Upload the Provisional Certificate PDF first.");return false;}
-  setStatus("Generating Provisional Certificate preview...");
+  const doc=currentContent.educationDocuments[index],config=educationDocumentPresentationConfig(doc?.id);
+  if(!doc||!config||!doc.url){setStatus(`Upload the ${doc?.title||"document"} PDF first.`);return false;}
+  setStatus(`Generating ${doc.title} preview...`);
   try{
     const response=await fetch(doc.url,{cache:"no-store"});
     if(!response.ok)throw new Error(`Could not read PDF (${response.status}).`);
     const blob=await createPdfPreviewBlob(await response.arrayBuffer());
     await saveEducationDocumentPreview(doc,blob);
-    await persistContent("Provisional Certificate preview generated.");
+    await persistContent(`${doc.title} preview generated.`);
     renderEducationSubsectionEditor();
     scheduleAdminPreview(true);
     return true;
-  }catch(err){console.error(err);setStatus("Could not generate the Provisional Certificate preview. Re-upload the PDF to generate it from the local file.");return false;}
+  }catch(err){console.error(err);setStatus(`Could not generate the ${doc.title} preview. Re-upload the PDF to generate it from the local file.`);return false;}
 }
 
 function educationDocumentRowHtml(doc,index){
@@ -2470,8 +2503,8 @@ function educationDocumentRowHtml(doc,index){
       <div class="field"><label>Subsection name</label><input data-education-document-field="title" data-education-document-index="${index}" value="${esc(doc.title||"")}" ${permanent?"readonly":""}></div>
       <div class="field full"><label>Short description (optional)</label><textarea data-education-document-field="description" data-education-document-index="${index}" placeholder="A short note shown above the document button.">${esc(doc.description||"")}</textarea></div>
     </div>
-    ${doc.id==="provisional-certificate"?provisionalCertificateStyleCards(doc,index):""}
-    ${doc.id==="provisional-certificate"?provisionalCertificatePreviewAdminHtml(doc,index):""}
+    ${educationDocumentStyleCards(doc,index)}
+    ${educationDocumentPreviewAdminHtml(doc,index)}
     <div class="education-document-current"><div>${current}${updated?`<span class="muted small">${updated}</span>`:""}</div>${doc.url?`<button class="danger secondary-danger" type="button" data-remove-education-document-file="${index}">Remove PDF</button>`:""}</div>
     <div class="gradesheet-upload-card education-document-upload-card" data-education-document-upload-card="${index}">
       <input accept="application/pdf,.pdf" class="gradesheet-file-input" id="${inputId}" type="file" data-education-document-file="${index}">
@@ -3627,16 +3660,16 @@ document.addEventListener("input",e=>{
   scheduleAdminPreview();
 });
 document.addEventListener("change",e=>{
-  const field=e.target.closest?.("[data-provisional-presentation-field]");
+  const field=e.target.closest?.("[data-document-presentation-field]");
   if(!field)return;
   normalizeEducationDocuments(currentContent);
-  const index=Number(field.dataset.provisionalDocumentIndex),doc=currentContent.educationDocuments[index];
-  if(!doc||doc.id!=="provisional-certificate")return;
-  const key=field.dataset.provisionalPresentationField,value=field.value;
-  if(key==="presentationStyle"&&PROVISIONAL_CERTIFICATE_STYLE_VALUES.includes(value))doc.presentationStyle=value;
-  if(key==="previewSize"&&PROVISIONAL_CERTIFICATE_SIZE_VALUES.includes(value))doc.previewSize=value;
-  if(key==="previewFit"&&PROVISIONAL_CERTIFICATE_FIT_VALUES.includes(value))doc.previewFit=value;
-  if(key==="presentationStyle")document.querySelectorAll('[data-provisional-style-card]').forEach(card=>card.classList.toggle("selected",card.dataset.provisionalStyleCard===doc.presentationStyle));
+  const index=Number(field.dataset.documentIndex),doc=currentContent.educationDocuments[index],config=educationDocumentPresentationConfig(doc?.id);
+  if(!doc||!config)return;
+  const key=field.dataset.documentPresentationField,value=field.value,allowed=config.styles.map(style=>style[0]);
+  if(key==="presentationStyle"&&allowed.includes(value))doc.presentationStyle=value;
+  if(key==="previewSize"&&EDUCATION_DOCUMENT_SIZE_VALUES.includes(value))doc.previewSize=value;
+  if(key==="previewFit"&&EDUCATION_DOCUMENT_FIT_VALUES.includes(value))doc.previewFit=value;
+  if(key==="presentationStyle")document.querySelectorAll(`[data-document-style-index="${index}"]`).forEach(card=>card.classList.toggle("selected",card.dataset.documentStyleCard===doc.presentationStyle));
   scheduleAdminPreview(true);
 });
 document.addEventListener("change",e=>{
@@ -3659,10 +3692,10 @@ document.addEventListener("click",async e=>{
 });
 
 document.addEventListener("click",async e=>{
-  const button=e.target.closest?.("[data-generate-provisional-preview]");
+  const button=e.target.closest?.("[data-generate-education-document-preview]");
   if(!button)return;
   button.disabled=true;
-  await regenerateProvisionalCertificatePreview(Number(button.dataset.generateProvisionalPreview));
+  await regenerateEducationDocumentPreview(Number(button.dataset.generateEducationDocumentPreview));
   button.disabled=false;
 });
 
