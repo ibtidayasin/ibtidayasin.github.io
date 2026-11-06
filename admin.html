@@ -16,7 +16,7 @@
       document.documentElement.classList.add('admin-ready');
     }, 6000);
   </script>
-<link href="styles.css?v=20260926-three-education-docs-v9" rel="stylesheet"/>
+<link href="styles.css?v=20261106-language-proficiency-v1" rel="stylesheet"/>
 </head>
 <body class="admin-body">
 <main class="admin-shell">
@@ -1314,7 +1314,7 @@
 </div>
 </details>
 <details class="admin-card navigation-fold">
-<summary><span><strong>Education subsection navigation</strong><small>Choose how the Education and Gradesheet subsection buttons appear.</small></span><span class="navigation-fold-chevron" aria-hidden="true"></span></summary>
+<summary><span><strong>Education subsection navigation</strong><small>Choose how all Education subsections, including Language Proficiency, appear.</small></span><span class="navigation-fold-chevron" aria-hidden="true"></span></summary>
 <div class="navigation-fold-body">
 <div class="settings-head">
 <div>
@@ -1374,7 +1374,7 @@
 <span class="activity-tab-style-name">10. Ribbon Tags</span>
 </label>
 </div>
-<p class="helper">The selected style follows the active website theme automatically. It controls the Education subsection bar only and does not change Academic Activities.</p>
+<p class="helper">The selected style follows the active website theme automatically. It controls all Education subsection tabs, including Language Proficiency, without changing Academic Activities.</p>
 </div>
 </details>
 </div>
@@ -2137,7 +2137,7 @@
       }
       if(!window.supabase?.createClient)throw new Error("Supabase client library is unavailable.");
 
-      await loadScript("admin.js?v=20260926-three-education-docs-v9");
+      await loadScript("admin.js?v=20261106-language-proficiency-v1");
       if(button)button.disabled=false;
       if(status&&status.textContent===readyMessage)status.textContent="";
     }catch(err){

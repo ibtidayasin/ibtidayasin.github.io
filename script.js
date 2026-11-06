@@ -1557,7 +1557,8 @@ const EDUCATION_DOCUMENT_FIT_VALUES=["exact","center","fill"];
 const EDUCATION_DOCUMENT_PRESENTATIONS={
   "provisional-certificate":{defaultStyle:"official-credential",kicker:"Academic credential",buttonLabel:"View Provisional Certificate",fallbackLabel:"Provisional Certificate",styles:["official-credential","framed-certificate","split-dossier","gallery-display","minimal-archive"]},
   "transcript":{defaultStyle:"official-transcript",kicker:"Academic record",buttonLabel:"View Transcript",fallbackLabel:"Transcript",styles:["official-transcript","ledger-record","academic-dossier","registry-sheet","minimal-record"]},
-  "testimonial":{defaultStyle:"institutional-letter",kicker:"Institutional endorsement",buttonLabel:"View Testimonial",fallbackLabel:"Testimonial",styles:["institutional-letter","endorsement-frame","signature-focus","reference-dossier","minimal-letter"]}
+  "testimonial":{defaultStyle:"institutional-letter",kicker:"Institutional endorsement",buttonLabel:"View Testimonial",fallbackLabel:"Testimonial",styles:["institutional-letter","endorsement-frame","signature-focus","reference-dossier","minimal-letter"]},
+  "language-proficiency":{defaultStyle:"academic-scorecard",kicker:"Language assessment",buttonLabel:"View IELTS Test Report",fallbackLabel:"IELTS Academic",styles:["academic-scorecard","band-ledger","exam-dossier","performance-grid","minimal-folio"]}
 };
 function educationDocumentPresentationConfig(id){return EDUCATION_DOCUMENT_PRESENTATIONS[String(id||"")]||null;}
 function normalizeEducationDocumentPresentation(src,id){
@@ -1572,10 +1573,35 @@ function normalizeEducationDocumentPresentation(src,id){
   };
 }
 
+/* Official IELTS details are site-specific. Keep component bands and test date
+   empty until entered from the applicant's original Test Report Form. */
+const DEFAULT_IELTS_OVERALL_BAND="8.0";
+function normalizeIeltsBand(value){
+  const raw=String(value??"").trim();
+  if(!raw)return "";
+  const number=Number(raw);
+  return Number.isFinite(number)&&number>=0&&number<=9&&Math.round(number*2)===number*2?number.toFixed(1):"";
+}
+function normalizeIeltsDetails(src){
+  const data=src&&typeof src==="object"?src:{};
+  const hasOverall=Object.prototype.hasOwnProperty.call(data,"overallBand");
+  const date=String(data.testDate||"").trim();
+  return {
+    testType:"IELTS Academic",
+    overallBand:hasOverall?normalizeIeltsBand(data.overallBand):DEFAULT_IELTS_OVERALL_BAND,
+    listeningBand:normalizeIeltsBand(data.listeningBand),
+    readingBand:normalizeIeltsBand(data.readingBand),
+    writingBand:normalizeIeltsBand(data.writingBand),
+    speakingBand:normalizeIeltsBand(data.speakingBand),
+    testDate:/^\d{4}-\d{2}-\d{2}$/.test(date)?date:""
+  };
+}
+
 const PERMANENT_EDUCATION_DOCUMENTS=[
   {id:"provisional-certificate",title:"Provisional Certificate"},
   {id:"transcript",title:"Transcript"},
-  {id:"testimonial",title:"Testimonial"}
+  {id:"testimonial",title:"Testimonial"},
+  {id:"language-proficiency",title:"Language Proficiency"}
 ];
 function permanentEducationDocumentDefinition(value){
   const token=String(value||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
@@ -1589,13 +1615,13 @@ function normalizeEducationDocuments(content){
     const src=(item&&typeof item==="object")?item:{};
     let id=String(src.id||"").trim().toLowerCase().replace(/[^a-z0-9-]+/g,"-").replace(/^-+|-+$/g,"").slice(0,64);
     if(!id)id=`document-${index+1}`;
-    return {id,title:String(src.title||"").trim(),description:String(src.description||""),visible:src.visible!==false,url:String(src.url||""),filename:String(src.filename||""),updated_at:String(src.updated_at||""),...normalizeEducationDocumentPresentation(src,id)};
+    return {id,title:String(src.title||"").trim(),description:String(src.description||""),visible:src.visible!==false,url:String(src.url||""),filename:String(src.filename||""),updated_at:String(src.updated_at||""),...normalizeEducationDocumentPresentation(src,id),...(id==="language-proficiency"?normalizeIeltsDetails(src):{})};
   });
   const used=new Set();
   const permanent=PERMANENT_EDUCATION_DOCUMENTS.map(def=>{
     const idx=normalized.findIndex((item,i)=>!used.has(i)&&(item.id===def.id||String(item.title||"").trim().toLowerCase()===def.title.toLowerCase()));
     if(idx>=0){used.add(idx);return {...normalized[idx],id:def.id,title:def.title,visible:normalized[idx].visible!==false};}
-    return {id:def.id,title:def.title,description:"",visible:true,url:"",filename:"",updated_at:"",...normalizeEducationDocumentPresentation({},def.id)};
+    return {id:def.id,title:def.title,description:"",visible:true,url:"",filename:"",updated_at:"",...normalizeEducationDocumentPresentation({},def.id),...(def.id==="language-proficiency"?normalizeIeltsDetails({}):{})};
   });
   const seen=new Set(permanent.map(item=>item.id));
   const extras=[];
@@ -1614,6 +1640,7 @@ function educationDocumentIcon(doc){
   const id=String(doc?.id||"");
   if(id==="provisional-certificate")return `<svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h12v13H6z"></path><path d="M9 7h6M9 10h4"></path><circle cx="12" cy="15.5" r="2.5"></circle><path d="m10.5 17.5-1 3 2.5-1 2.5 1-1-3"></path></svg>`;
   if(id==="transcript")return `<svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h12v18H6z"></path><path d="M9 7h6M9 11h6M9 15h6"></path><path d="M8 7h.01M8 11h.01M8 15h.01"></path></svg>`;
+  if(id==="language-proficiency")return `<svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c-4 5-4 13 0 18M12 3c4 5 4 13 0 18"></path></svg>`;
   if(id==="testimonial")return `<svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h12v18H6z"></path><path d="M9 8h6M9 17h5"></path><path d="M9 12c0-1 .6-1.8 1.6-1.8v2.6H9V12Zm4 0c0-1 .6-1.8 1.6-1.8v2.6H13V12Z"></path></svg>`;
   return `<svg viewBox="0 0 24 24" focusable="false"><path d="M6 3h9l3 3v15H6z"></path><path d="M15 3v4h4"></path><path d="M9 12h6M9 16h6"></path></svg>`;
 }
@@ -1640,7 +1667,32 @@ function featuredEducationDocumentPanelHtml(doc){
     </article>
   </div>`;
 }
+function languageProficiencyPanelHtml(doc){
+  const d=normalizeIeltsDetails(doc),presentation=normalizeEducationDocumentPresentation(doc,doc.id);
+  const url=safeUrl(doc.url),preview=safeUrl(presentation.previewUrl);
+  const components=[["Listening",d.listeningBand],["Reading",d.readingBand],["Writing",d.writingBand],["Speaking",d.speakingBand]];
+  const recorded=components.filter(([,band])=>band);
+  const scores=recorded.length?`<div class="language-band-grid">${recorded.map(([label,band])=>`<div class="language-band-metric"><span>${esc(label)}</span><strong>${esc(band)}</strong></div>`).join("")}</div>`:"";
+  const date=d.testDate?`<span class="language-date">Test date: ${esc(formatDate(d.testDate))}</span>`:"";
+  const link=url?`<a class="button" href="${escAttr(url)}" target="_blank" rel="noopener">View IELTS Test Report</a>`:"";
+  const documentPreview=url?`<div class="language-report-preview education-featured-document-preview provisional-certificate-preview provisional-preview-size-${escAttr(presentation.previewSize)} provisional-preview-fit-${escAttr(presentation.previewFit)}">
+    <a class="education-featured-document-page provisional-certificate-page" href="${escAttr(url)}" target="_blank" rel="noopener" data-lightbox-media-kind="pdf" data-lightbox-mode="on" data-media-url="${escAttr(url)}" data-media-preview="${escAttr(preview)}" data-media-title="IELTS Academic Test Report" data-media-caption="${escAttr(doc.description||"")}" data-media-download-name="${escAttr(doc.filename||"IELTS_Test_Report.pdf")}">
+      ${preview?`<img src="${escAttr(preview)}" loading="lazy" alt="IELTS Test Report preview">`:`<div class="provisional-certificate-pdf-fallback education-featured-document-fallback"><span>PDF</span><strong>IELTS Test Report</strong><small>Click to view the document</small></div>`}
+    </a>
+  </div>`:"";
+  return `<div class="education-document-panel language-proficiency-panel hidden" data-education-panel="${escAttr(educationDocumentViewId(doc))}" data-education-dynamic="true" data-language-style="${escAttr(presentation.presentationStyle)}" data-has-report="${url?"true":"false"}">
+    <article class="language-result-layout">
+      <header class="language-result-heading"><span class="gradesheet-kicker">Standardized English language assessment</span><h3>IELTS Academic</h3><p class="muted">International English Language Testing System</p></header>
+      <div class="language-result-main"><div class="language-overall"><span>Overall band score</span><strong>${esc(d.overallBand||"—")}</strong><small>IELTS Academic</small></div>
+        <div class="language-result-details">${scores}${date?`<div class="language-result-meta">${date}</div>`:""}${doc.description?`<p class="muted language-description">${esc(doc.description)}</p>`:""}<div class="language-report-actions">${link}</div></div>
+      </div>
+      ${documentPreview}
+    </article>
+  </div>`;
+}
+
 function educationDocumentPanelHtml(doc){
+  if(doc?.id==="language-proficiency")return languageProficiencyPanelHtml(doc);
   if(educationDocumentPresentationConfig(doc?.id))return featuredEducationDocumentPanelHtml(doc);
   const view=educationDocumentViewId(doc),hasUrl=!!safeUrl(doc.url),url=safeUrl(doc.url);
   return `<div class="education-document-panel hidden" data-education-panel="${escAttr(view)}" data-education-dynamic="true"><article class="education-document-card"><div class="education-document-copy"><span class="gradesheet-kicker">Education document</span><h3>${esc(doc.title)}</h3>${doc.description?`<p class="muted">${esc(doc.description)}</p>`:""}${doc.filename?`<p class="education-document-meta">${esc(doc.filename)}${doc.updated_at?` · updated ${esc(formatDate(doc.updated_at))}`:""}</p>`:""}</div><div class="education-document-action">${hasUrl?`<a class="button" href="${escAttr(url)}" target="_blank" rel="noopener">View ${esc(doc.title)}</a>`:`<span class="muted small">Document has not been uploaded yet.</span>`}</div></article></div>`;
@@ -1650,7 +1702,7 @@ function renderEducationDocumentSubsections(content){
   const tabs=$("educationTabs"),panels=$("educationDocumentPanels");
   if(!tabs||!panels)return;
   tabs.querySelectorAll('[data-education-dynamic="true"]').forEach(node=>node.remove());
-  const docs=normalizeEducationDocuments(content).filter(doc=>doc.visible!==false&&doc.title&&safeUrl(doc.url));
+  const docs=normalizeEducationDocuments(content).filter(doc=>doc.visible!==false&&doc.title&&(doc.id==="language-proficiency"?Boolean(doc.overallBand||doc.listeningBand||doc.readingBand||doc.writingBand||doc.speakingBand):Boolean(safeUrl(doc.url))));
   docs.forEach(doc=>tabs.insertAdjacentHTML("beforeend",educationDocumentTabHtml(doc)));
   panels.innerHTML=docs.map(educationDocumentPanelHtml).join("");
 }

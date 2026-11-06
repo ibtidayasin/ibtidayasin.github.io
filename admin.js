@@ -2321,6 +2321,17 @@ const EDUCATION_DOCUMENT_PRESENTATIONS={
       ["minimal-record","Minimal Record","A quiet archival transcript view with minimal ornament and maximum document clarity.","trs-minimal"]
     ]
   },
+  "language-proficiency":{
+    defaultStyle:"academic-scorecard",
+    previewLabel:"IELTS Test Report preview",
+    styles:[
+      ["academic-scorecard","Academic Scorecard","Large overall band with clear component metrics and a restrained official-report preview.","lang-scorecard"],
+      ["band-ledger","Band Ledger","A formal result-ledger layout with disciplined horizontal rules.","lang-ledger"],
+      ["exam-dossier","Exam Dossier","Split academic dossier for result details and optional test report.","lang-dossier"],
+      ["performance-grid","Performance Grid","Balanced metric tiles with responsive course-style information hierarchy.","lang-grid"],
+      ["minimal-folio","Minimal Folio","Minimal, typography-led summary that gives the score room to breathe.","lang-folio"]
+    ]
+  },
   "testimonial":{
     defaultStyle:"institutional-letter",
     previewLabel:"Testimonial preview",
@@ -2347,10 +2358,35 @@ function normalizeEducationDocumentPresentation(src,id){
   };
 }
 
+/* Official IELTS details are site-specific. Keep component bands and test date
+   empty until entered from the applicant's original Test Report Form. */
+const DEFAULT_IELTS_OVERALL_BAND="8.0";
+function normalizeIeltsBand(value){
+  const raw=String(value??"").trim();
+  if(!raw)return "";
+  const number=Number(raw);
+  return Number.isFinite(number)&&number>=0&&number<=9&&Math.round(number*2)===number*2?number.toFixed(1):"";
+}
+function normalizeIeltsDetails(src){
+  const data=src&&typeof src==="object"?src:{};
+  const hasOverall=Object.prototype.hasOwnProperty.call(data,"overallBand");
+  const date=String(data.testDate||"").trim();
+  return {
+    testType:"IELTS Academic",
+    overallBand:hasOverall?normalizeIeltsBand(data.overallBand):DEFAULT_IELTS_OVERALL_BAND,
+    listeningBand:normalizeIeltsBand(data.listeningBand),
+    readingBand:normalizeIeltsBand(data.readingBand),
+    writingBand:normalizeIeltsBand(data.writingBand),
+    speakingBand:normalizeIeltsBand(data.speakingBand),
+    testDate:/^\d{4}-\d{2}-\d{2}$/.test(date)?date:""
+  };
+}
+
 const PERMANENT_EDUCATION_DOCUMENTS=[
   {id:"provisional-certificate",title:"Provisional Certificate"},
   {id:"transcript",title:"Transcript"},
-  {id:"testimonial",title:"Testimonial"}
+  {id:"testimonial",title:"Testimonial"},
+  {id:"language-proficiency",title:"Language Proficiency"}
 ];
 function permanentEducationDocumentDefinition(value){
   const token=String(value||"").trim().toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"");
@@ -2377,7 +2413,8 @@ function normalizeEducationDocuments(content){
       filename:String(src.filename||""),
       updated_at:String(src.updated_at||""),
       storagePath:String(src.storagePath||""),
-      ...normalizeEducationDocumentPresentation(src,id)
+      ...normalizeEducationDocumentPresentation(src,id),
+      ...(id==="language-proficiency"?normalizeIeltsDetails(src):{})
     };
   };
   const normalized=raw.map(normalizeOne);
@@ -2385,7 +2422,7 @@ function normalizeEducationDocuments(content){
   const permanent=PERMANENT_EDUCATION_DOCUMENTS.map((def,index)=>{
     const match=normalized.find((item,i)=>!used.has(i)&&(item.id===def.id||String(item.title||"").trim().toLowerCase()===def.title.toLowerCase()));
     if(match){used.add(normalized.indexOf(match));return {...match,id:def.id,title:def.title,visible:match.visible!==false};}
-    return {id:def.id,title:def.title,description:"",visible:true,url:"",filename:"",updated_at:"",storagePath:"",...normalizeEducationDocumentPresentation({},def.id)};
+    return {id:def.id,title:def.title,description:"",visible:true,url:"",filename:"",updated_at:"",storagePath:"",...normalizeEducationDocumentPresentation({},def.id),...(def.id==="language-proficiency"?normalizeIeltsDetails({}):{})};
   });
   const seen=new Set(permanent.map(item=>item.id));
   const extras=[];
@@ -2434,7 +2471,7 @@ function educationDocumentStyleCards(doc,index){
   if(!config)return "";
   const presentation=normalizeEducationDocumentPresentation(doc,doc.id),selected=presentation.presentationStyle;
   return `<div class="provisional-presentation-admin education-document-presentation-admin" data-document-presentation-admin="${escAttr(doc.id)}">
-    <div class="settings-head provisional-presentation-head"><div><h4>${esc(doc.title)} page style</h4><p class="muted small">Choose how the ${esc(doc.title)} subsection appears publicly. The PDF preview remains clickable in every style.</p></div></div>
+    <div class="settings-head provisional-presentation-head"><div><h4>${esc(doc.title)} page style</h4><p class="muted small">Choose how the ${esc(doc.title)} subsection appears publicly. If a PDF is uploaded, its preview remains clickable in every style.</p></div></div>
     <div class="provisional-style-choice-grid" role="radiogroup" aria-label="${escAttr(doc.title)} page style">${config.styles.map(([value,title,desc,preview])=>`<label class="provisional-style-choice ${selected===value?"selected":""}" data-document-style-card="${value}" data-document-style-index="${index}"><input type="radio" name="educationDocumentStyle_${index}" value="${value}" data-document-presentation-field="presentationStyle" data-document-index="${index}" ${selected===value?"checked":""}><span class="provisional-style-preview ${preview}"><i></i><i></i><i></i></span><strong>${title}</strong><small>${desc}</small></label>`).join("")}</div>
     <div class="form-grid provisional-preview-controls">
       <div class="field"><label>PDF preview size</label><select data-document-presentation-field="previewSize" data-document-index="${index}">
@@ -2486,10 +2523,30 @@ async function regenerateEducationDocumentPreview(index){
   }catch(err){console.error(err);setStatus(`Could not generate the ${doc.title} preview. Re-upload the PDF to generate it from the local file.`);return false;}
 }
 
+function ieltsScoreOptions(selected,allowBlank=true){
+  const options=allowBlank?`<option value="">Not entered</option>`:"";
+  return options+Array.from({length:19},(_,i)=>{
+    const band=(i/2).toFixed(1);
+    return `<option value="${band}" ${String(selected||"")===band?"selected":""}>${band}</option>`;
+  }).join("");
+}
+function languageProficiencyAdminFields(doc,index){
+  if(doc?.id!=="language-proficiency")return "";
+  const d=normalizeIeltsDetails(doc);
+  const field=(key,title,value)=>`<div class="field"><label>${title}</label><select data-ielts-field="${key}" data-ielts-index="${index}">${ieltsScoreOptions(value)}</select></div>`;
+  return `<section class="language-admin-fields">
+    <div class="settings-head"><div><h4>IELTS Academic results</h4><p class="muted small">Overall bands are prefilled separately for each applicant. Enter component bands and test date exactly as shown on the official Test Report Form.</p></div></div>
+    <div class="language-admin-score-grid">${field("overallBand","Overall band",d.overallBand)}${field("listeningBand","Listening",d.listeningBand)}${field("readingBand","Reading",d.readingBand)}${field("writingBand","Writing",d.writingBand)}${field("speakingBand","Speaking",d.speakingBand)}
+      <div class="field"><label>Test date</label><input type="date" data-ielts-field="testDate" data-ielts-index="${index}" value="${escAttr(d.testDate)}"></div>
+    </div>
+    <p class="helper">The Language Proficiency subsection can display the IELTS overall score without a PDF. If you upload an official report, please redact sensitive information such as passport or candidate identifiers before making it public.</p>
+  </section>`;
+}
+
 function educationDocumentRowHtml(doc,index){
   const inputId=`educationDocumentFile_${index}`;
   const updated=doc.updated_at?`Updated ${esc(new Date(doc.updated_at).toLocaleString())}`:"";
-  const current=doc.url?`<a class="secondary" href="${esc(doc.url)}" target="_blank" rel="noopener">Open current PDF</a>`:`<span class="muted small">No PDF uploaded yet.</span>`;
+  const current=doc.url?`<a class="secondary" href="${escAttr(doc.url)}" target="_blank" rel="noopener">Open current PDF</a>`:`<span class="muted small">${doc.id==="language-proficiency"?"IELTS scorecard is ready; report PDF is optional.":"No PDF uploaded yet."}</span>`;
   const permanent=!!permanentEducationDocumentDefinition(doc.id);
   return `<article class="education-subsection-admin-item ${permanent?"education-document-permanent":""}" data-education-document-index="${index}">
     <div class="education-subsection-admin-head">
@@ -2503,6 +2560,7 @@ function educationDocumentRowHtml(doc,index){
       <div class="field"><label>Subsection name</label><input data-education-document-field="title" data-education-document-index="${index}" value="${esc(doc.title||"")}" ${permanent?"readonly":""}></div>
       <div class="field full"><label>Short description (optional)</label><textarea data-education-document-field="description" data-education-document-index="${index}" placeholder="A short note shown above the document button.">${esc(doc.description||"")}</textarea></div>
     </div>
+    ${languageProficiencyAdminFields(doc,index)}
     ${educationDocumentStyleCards(doc,index)}
     ${educationDocumentPreviewAdminHtml(doc,index)}
     <div class="education-document-current"><div>${current}${updated?`<span class="muted small">${updated}</span>`:""}</div>${doc.url?`<button class="danger secondary-danger" type="button" data-remove-education-document-file="${index}">Remove PDF</button>`:""}</div>
@@ -2915,7 +2973,7 @@ function educationAdminCategories(){
   return [
     {key:"education",label:"Education",count:(currentContent.education||[]).length,builtIn:true},
     {key:"gradesheet",label:"Gradesheet",count:1,builtIn:true},
-    ...docs.map(doc=>({key:educationAdminKeyForDocument(doc),label:doc.title||"Untitled subsection",count:doc.url?1:0,builtIn:!!permanentEducationDocumentDefinition(doc.id),id:doc.id}))
+    ...docs.map(doc=>({key:educationAdminKeyForDocument(doc),label:doc.title||"Untitled subsection",count:(doc.url||doc.id==="language-proficiency"&&doc.overallBand)?1:0,builtIn:!!permanentEducationDocumentDefinition(doc.id),id:doc.id}))
   ];
 }
 function normalizeEducationAdminCategoryKey(key){
@@ -3671,6 +3729,18 @@ document.addEventListener("change",e=>{
   if(key==="previewFit"&&EDUCATION_DOCUMENT_FIT_VALUES.includes(value))doc.previewFit=value;
   if(key==="presentationStyle")document.querySelectorAll(`[data-document-style-index="${index}"]`).forEach(card=>card.classList.toggle("selected",card.dataset.documentStyleCard===doc.presentationStyle));
   scheduleAdminPreview(true);
+});
+document.addEventListener("change",e=>{
+  const field=e.target.closest?.("[data-ielts-field]");
+  if(!field)return;
+  normalizeEducationDocuments(currentContent);
+  const index=Number(field.dataset.ieltsIndex),key=field.dataset.ieltsField;
+  const doc=currentContent.educationDocuments[index];
+  if(doc?.id!=="language-proficiency"||!["overallBand","listeningBand","readingBand","writingBand","speakingBand","testDate"].includes(key))return;
+  const value=key==="testDate"?field.value:normalizeIeltsBand(field.value);
+  doc[key]=value;
+  scheduleAdminPreview(true);
+  setStatus("IELTS scorecard updated. Click Save all changes to publish.");
 });
 document.addEventListener("change",e=>{
   const visible=e.target.closest?.("[data-education-document-visible]");
