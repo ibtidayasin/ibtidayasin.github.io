@@ -1674,13 +1674,14 @@ function languageProficiencyPanelHtml(doc){
   const recorded=components.filter(([,band])=>band);
   const scores=recorded.length?`<div class="language-band-grid">${recorded.map(([label,band])=>`<div class="language-band-metric"><span>${esc(label)}</span><strong>${esc(band)}</strong></div>`).join("")}</div>`:"";
   const date=d.testDate?`<span class="language-date">Test date: ${esc(formatDate(d.testDate))}</span>`:"";
-  const link=url?`<a class="button" href="${escAttr(url)}" target="_blank" rel="noopener">View IELTS Test Report</a>`:"";
-  const documentPreview=url?`<div class="language-report-preview education-featured-document-preview provisional-certificate-preview provisional-preview-size-${escAttr(presentation.previewSize)} provisional-preview-fit-${escAttr(presentation.previewFit)}">
+  const link=url?`<button class="button" type="button" data-ielts-report-toggle aria-expanded="false" aria-controls="ielts-report-inline-preview">View IELTS Test Report</button>`:"";
+  const documentPreview=url?`<div id="ielts-report-inline-preview" class="language-report-preview education-featured-document-preview provisional-certificate-preview provisional-preview-size-${escAttr(presentation.previewSize)} provisional-preview-fit-${escAttr(presentation.previewFit)} hidden" role="region" aria-label="IELTS Academic Test Report" aria-hidden="true">
     <a class="education-featured-document-page provisional-certificate-page" href="${escAttr(url)}" target="_blank" rel="noopener" data-lightbox-media-kind="pdf" data-lightbox-mode="on" data-media-url="${escAttr(url)}" data-media-preview="${escAttr(preview)}" data-media-title="IELTS Academic Test Report" data-media-caption="${escAttr(doc.description||"")}" data-media-download-name="${escAttr(doc.filename||"IELTS_Test_Report.pdf")}">
-      ${preview?`<img src="${escAttr(preview)}" loading="lazy" alt="IELTS Test Report preview">`:`<div class="provisional-certificate-pdf-fallback education-featured-document-fallback"><span>PDF</span><strong>IELTS Test Report</strong><small>Click to view the document</small></div>`}
+      ${preview?`<img data-report-preview-src="${escAttr(preview)}" loading="lazy" alt="IELTS Test Report preview">`:`<div class="provisional-certificate-pdf-fallback education-featured-document-fallback"><span>PDF</span><strong>IELTS Test Report</strong><small>Click to view the document</small></div>`}
     </a>
+    <div class="language-report-open-original"><a href="${escAttr(url)}" target="_blank" rel="noopener">Open original PDF in a new tab</a></div>
   </div>`:"";
-  return `<div class="education-document-panel language-proficiency-panel hidden" data-education-panel="${escAttr(educationDocumentViewId(doc))}" data-education-dynamic="true" data-language-style="${escAttr(presentation.presentationStyle)}" data-has-report="${url?"true":"false"}">
+  return `<div class="education-document-panel language-proficiency-panel hidden" data-education-panel="${escAttr(educationDocumentViewId(doc))}" data-education-dynamic="true" data-language-style="${escAttr(presentation.presentationStyle)}" data-has-report="${url?"true":"false"}" data-report-open="false">
     <article class="language-result-layout">
       <header class="language-result-heading"><span class="gradesheet-kicker">Standardized English language assessment</span><h3>IELTS Academic</h3><p class="muted">International English Language Testing System</p></header>
       <div class="language-result-main"><div class="language-overall"><span>Overall band score</span><strong>${esc(d.overallBand||"—")}</strong><small>IELTS Academic</small></div>
@@ -1780,6 +1781,24 @@ function bindEducationLocalNav(){
   if(educationLocalNavBound)return;
   educationLocalNavBound=true;
   document.addEventListener("click",event=>{
+    const reportToggle=event.target.closest("[data-ielts-report-toggle]");
+    if(reportToggle){
+      event.preventDefault();
+      const panel=reportToggle.closest(".language-proficiency-panel");
+      const preview=panel?.querySelector(".language-report-preview");
+      if(!preview)return;
+      const opening=preview.classList.contains("hidden");
+      preview.classList.toggle("hidden",!opening);
+      preview.setAttribute("aria-hidden",opening?"false":"true");
+      reportToggle.setAttribute("aria-expanded",opening?"true":"false");
+      reportToggle.textContent=opening?"Hide IELTS Test Report":"View IELTS Test Report";
+      panel.dataset.reportOpen=opening?"true":"false";
+      if(opening){
+        const image=preview.querySelector("img[data-report-preview-src]");
+        if(image&&!image.hasAttribute("src"))image.src=image.dataset.reportPreviewSrc;
+      }
+      return;
+    }
     const button=event.target.closest("[data-education-view]");
     if(!button)return;
     event.preventDefault();
